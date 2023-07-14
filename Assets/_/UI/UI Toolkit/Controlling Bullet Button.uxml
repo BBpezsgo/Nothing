@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Controlling.uss?fileID=7433441132597879392&amp;guid=e9aef513677c2a844bb6c114470bc423&amp;type=3#Controlling" />
+    <ui:VisualElement class="ammo-unselected" style="width: auto; height: 62px; align-items: center;">
+        <ui:Label text="Bullet Name" display-tooltip-when-elided="true" name="label-name" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; -unity-text-align: middle-center; -unity-font-style: bold;" />
+        <ui:VisualElement name="image-icon" style="flex-shrink: 0; flex-grow: 1; width: 48px;" />
+    </ui:VisualElement>
+</ui:UXML>

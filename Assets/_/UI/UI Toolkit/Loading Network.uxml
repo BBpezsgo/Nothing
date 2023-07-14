@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:VisualElement name="root" class="visible">
+        <ui:VisualElement name="window" class="panel" style="min-width: 150px; min-height: 50px;">
+            <ui:Label text="Loading ..." display-tooltip-when-elided="true" name="label-status" />
+            <ui:Button text="Cancel" display-tooltip-when-elided="true" name="button-cancel" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

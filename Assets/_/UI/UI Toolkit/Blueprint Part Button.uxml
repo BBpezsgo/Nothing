@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:VisualElement class="panel">
+        <ui:VisualElement style="flex-direction: row; flex-wrap: nowrap; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+            <ui:VisualElement name="image-icon" style="width: 48px; height: 48px; flex-shrink: 0;" />
+            <ui:Label text="Part Name" display-tooltip-when-elided="true" name="label-name" style="white-space: normal; flex-shrink: 1; padding-left: 4px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        </ui:VisualElement>
+        <ui:Button text="Action" display-tooltip-when-elided="true" name="button-action" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:VisualElement name="root" picking-mode="Ignore" class="visible" style="align-items: center; justify-content: center; position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0);">
+        <ui:VisualElement name="window" class="panel" style="flex-direction: row; flex-wrap: nowrap; justify-content: space-between; min-width: 219px; padding-left: 2px; padding-right: 2px;">
+            <ui:GroupBox text="Lobby" name="host-or-connect" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-basis: 50%; padding-left: 0;">
+                <ui:VisualElement name="panel-host">
+                    <ui:TextField picking-mode="Ignore" label="Address:" name="input-address" focusable="true" value="127.0.0.1" text="127.0.0.1" max-length="15" style="flex-direction: column;" />
+                    <ui:TextField picking-mode="Ignore" label="Port:" name="input-port" focusable="true" value="7777" text="7777" mask-character="00000" max-length="5" style="flex-direction: column;" />
+                    <ui:Button text="Host" display-tooltip-when-elided="true" name="button-host" />
+                    <ui:Button text="Connect" display-tooltip-when-elided="true" name="button-connect" />
+                </ui:VisualElement>
+                <ui:Button text="Quit" display-tooltip-when-elided="true" name="button-quit" />
+            </ui:GroupBox>
+            <ui:GroupBox name="discovery" text="Discovery" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-basis: 50%; padding-left: 0; padding-right: 0; padding-top: 5px; padding-bottom: 5px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="rooms" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="AlwaysVisible" style="flex-grow: 1; background-color: rgb(41, 41, 41); border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px;" />
+                <ui:Button text="Refresh" display-tooltip-when-elided="true" name="button-discovery-refresh" />
+                <ui:Button text="Start Discovery" display-tooltip-when-elided="true" name="button-discovery-toggle" />
+            </ui:GroupBox>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

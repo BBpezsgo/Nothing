@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement class="hotkey">
+        <ui:Label name="label-key" class="hotkey-text" />
+        <ui:Label name="label-tooltip" picking-mode="Ignore" class="hotkey-tooltip" style="left: -6px; right: -38px;" />
+    </ui:VisualElement>
+</ui:UXML>
