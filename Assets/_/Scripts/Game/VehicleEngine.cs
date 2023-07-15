@@ -2,11 +2,13 @@ using AssetManager;
 
 using System.Collections.Generic;
 
+using Unity.Netcode;
+
 using UnityEngine;
 
 using Utilities;
 
-public class VehicleEngine : MonoBehaviour, IHaveAssetFields
+public class VehicleEngine : NetworkBehaviour, IHaveAssetFields
 {
     [SerializeField, ReadOnly] internal Rigidbody rb;
     [SerializeField, ReadOnly] Unit unit;
@@ -470,5 +472,13 @@ public class VehicleEngine : MonoBehaviour, IHaveAssetFields
         float brakingDistance = Mathf.Abs(Utilities.Acceleration.DistanceToReachVelocity(speed, 0f, brake * -20f));
         if (this.IsReverse) brakingDistance = -brakingDistance;
         return brakingDistance;
+    }
+
+    internal void InputRequest(Vector2 input)
+        => InputRequest_ServerRpc(input);
+    [ServerRpc(Delivery = RpcDelivery.Unreliable, RequireOwnership = false)]
+    void InputRequest_ServerRpc(Vector2 input)
+    {
+        InputVector = input;
     }
 }

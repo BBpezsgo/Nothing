@@ -70,10 +70,4 @@ internal class BuildingAttacker : Building, IDetailedDamagable, ISelectable, ICa
 
         Damage(ammount);
     }
-
-    protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
-    {
-        base.OnSynchronize(ref serializer);
-        serializer.SerializeValue(ref controllingByUser);
-    }
 }

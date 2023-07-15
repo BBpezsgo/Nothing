@@ -54,12 +54,4 @@ public class BaseObject : NetworkBehaviour, IHaveAssetFields, INetworkObservable
             serializer.Serialize(Team);
         }
     }
-
-    protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
-    {
-        string lastTeam = Team;
-        serializer.SerializeValue(ref lastTeam, true);
-        if (lastTeam != Team)
-        { UpdateTeam(); }
-    }
 }

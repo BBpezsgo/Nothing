@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -7,9 +8,25 @@ public class IMGUIManager : MonoBehaviour
     public static IMGUIManager Instance;
     [SerializeField, ReadOnly, NonReorderable] List<ImguiWindow> windows = new();
     [SerializeField, ReadOnly, NonReorderable] int windowIdCounter;
-    [SerializeField] GUISkin Skin;
+    [SerializeField] internal GUISkin Skin;
 
     [ReadOnly] public bool BlockedByImgui = false;
+
+    public readonly struct TempSkin : IDisposable
+    {
+        readonly GUISkin savedSkin;
+
+        public TempSkin(GUISkin skin)
+        {
+            this.savedSkin = GUI.skin;
+            GUI.skin = skin;
+        }
+
+        public void Dispose()
+        {
+            GUI.skin = this.savedSkin;
+        }
+    }
 
     void Awake()
     {

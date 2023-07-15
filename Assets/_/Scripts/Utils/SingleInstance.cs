@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SingleInstance<T> : MonoBehaviour where T : SingleInstance<T>
 {
@@ -11,7 +10,7 @@ public class SingleInstance<T> : MonoBehaviour where T : SingleInstance<T>
     {
         if (instance != null)
         {
-            Debug.LogWarning($"[{nameof(SingleInstance<T>)}]: {typeof(T).Name} instance already registered");
+            Debug.LogWarning($"[{nameof(SingleInstance<T>)}]: Instance already registered");
             Object.Destroy(this);
             return;
         }

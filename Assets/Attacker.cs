@@ -57,12 +57,13 @@ internal class Attacker : AttackerBase, IHaveAssetFields
     {
         base.FixedUpdate();
 
+        if (!NetcodeUtils.IsOfflineOrServer)
+        { return; }
+
         if (turret != null) turret.targetTransform = null;
 
         if (BaseObject is ICanTakeControl canTakeControl && canTakeControl.AnybodyControllingThis())
-        {
-            return;
-        }
+        { return; }
 
         if (NewTargetCooldown > 0f)
         {
@@ -93,7 +94,7 @@ internal class Attacker : AttackerBase, IHaveAssetFields
             if (ThinkOnTarget(targets[i])) return;
         }
 
-        if (turret != null) turret.target = Vector3.zero;
+        if (turret != null) turret.target.Value = Vector3.zero;
     }
 
     bool ThinkOnTarget(BaseObject target)
@@ -105,13 +106,13 @@ internal class Attacker : AttackerBase, IHaveAssetFields
         }
 
         bool first = false;
-        if (turret.target == Vector3.zero && turret.targetTransform == null)
+        if (turret.target.Value == Vector3.zero && turret.targetTransform == null)
         { first = true; }
 
-        turret.target = target.transform.position;
+        turret.target.Value = target.transform.position;
         turret.targetTransform = target.transform;
 
-        if (!first && turret.IsAccurateShoot && this.IsOfflineOrServer())
+        if (!first && turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
         { turret.Shoot(); }
 
         return true;
@@ -154,46 +155,6 @@ internal class Attacker : AttackerBase, IHaveAssetFields
             {
                 if (priorityTargets[i] == null) continue;
                 Gizmos.DrawWireSphere(priorityTargets[i].transform.position, 1f);
-            }
-        }
-    }
-
-    protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
-    {
-        base.OnSynchronize(ref serializer);
-
-        if (serializer.IsReader)
-        {
-            serializer.SerializeValue(ref PriorityTargetCount);
-
-            priorityTargets = new List<BaseObject>(PriorityTargetCount);
-
-            for (int i = 0; i < PriorityTargetCount; i++)
-            { priorityTargets.Add(null); }
-
-            for (int i = 0; i < PriorityTargetCount; i++)
-            {
-                ulong id = ulong.MaxValue;
-                serializer.SerializeValue(ref id);
-                NetworkObject other = GetNetworkObject(id);
-                if (other != null && other.gameObject.TryGetComponent<BaseObject>(out BaseObject otherBaseObject))
-                { priorityTargets[i] = otherBaseObject; }
-            }
-        }
-        else if (serializer.IsWriter)
-        {
-            serializer.SerializeValue(ref PriorityTargetCount);
-
-            ulong nullId = ulong.MaxValue;
-            for (int i = 0; i < PriorityTargetCount; i++)
-            {
-                if (i >= priorityTargets.Count)
-                {
-                    serializer.SerializeValue(ref nullId);
-                    continue;
-                }
-                ulong id = priorityTargets[i].NetworkObjectId;
-                serializer.SerializeValue(ref id);
             }
         }
     }

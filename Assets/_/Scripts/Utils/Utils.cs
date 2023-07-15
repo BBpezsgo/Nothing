@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 using System.Runtime.CompilerServices;
+
 using Unity.Netcode;
 
 #if UNITY_EDITOR
@@ -1790,14 +1791,37 @@ internal static class TheTerrain
 
 internal static class NetcodeUtils
 {
-    public static bool FindNetworkObject(ulong id, out NetworkObject networkObject)
+    public static bool IsOfflineOrServer
     {
-        if (NetworkManager.Singleton == null)
+        get
         {
-            networkObject = null;
+            if (NetcodeUtils.IsOffline) return true;
+            return NetworkManager.Singleton.IsServer;
+        }
+    }
+
+    public static bool IsOffline
+    {
+        get
+        {
+            if (NetworkManager.Singleton == null) return true;
+            if (!NetworkManager.Singleton.IsListening) return true;
             return false;
         }
-        if (!NetworkManager.Singleton.IsListening)
+    }
+
+    internal static bool IsClient
+    {
+        get
+        {
+            if (NetcodeUtils.IsOffline) return false;
+            return NetworkManager.Singleton.IsConnectedClient;
+        }
+    }
+
+    public static bool FindNetworkObject(ulong id, out NetworkObject networkObject)
+    {
+        if (NetcodeUtils.IsOffline)
         {
             networkObject = null;
             return false;
@@ -1923,5 +1947,158 @@ static partial class ReflectionUtility
         result.AddRange(GetMembers<T>(type.BaseType, stopAt, memberSearcher, depth + 1));
 
         return result.ToArray();
+    }
+}
+
+[Serializable]
+public class CoolArray<T> : INetworkSerializable, IEnumerable<T>
+    where T : unmanaged, IComparable, IConvertible, IComparable<T>, IEquatable<T>
+{
+    [NonReorderable, ReadOnly] public T[] V;
+
+    public int Length => V.Length;
+
+    public T this[int index]
+    {
+        get
+        {
+            if (index < 0)
+            { throw new IndexOutOfRangeException(); }
+
+            if (index >= this.Length && DefaultElement.HasValue)
+            { return DefaultElement.Value; }
+
+            return V[index];
+        }
+        set
+        {
+            if (index < 0)
+            { throw new IndexOutOfRangeException(); }
+
+            if (index < V.Length)
+            {
+                V[index] = value;
+                return;
+            }
+
+            int addN = 1;
+            while (index >= this.Length + addN)
+            {
+                addN++;
+                if (addN > 8)
+                {
+                    Debug.LogError($"[{nameof(CoolArray<T>)}]: Infinity loop!");
+                    return;
+                }
+            }
+
+            List<T> newV = new(V);
+
+            for (int i = 0; i < addN; i++)
+            { newV.Add(DefaultElement ?? default); }
+
+            newV[index] = value;
+
+            V = newV.ToArray();
+        }
+    }
+
+    readonly T? DefaultElement = null;
+
+    public CoolArray(int length)
+    { V = new T[length]; }
+
+    public CoolArray(int length, T defaultElement) : this(length)
+    { DefaultElement = defaultElement; }
+
+    public CoolArray()
+    { V = new T[0]; }
+
+    public CoolArray(T defaultElement) : this()
+    { DefaultElement = defaultElement; }
+
+    public CoolArray(T[] v)
+    { V = v; }
+
+    public CoolArray(T[] v, T defaultElement) : this(v)
+    { DefaultElement = defaultElement; }
+
+    public CoolArray(IEnumerable<T> v)
+    { V = v.ToArray(); }
+
+    public CoolArray(IEnumerable<T> v, T defaultElement) : this(v)
+    { DefaultElement = defaultElement; }
+
+    public void NetworkSerialize<T1>(BufferSerializer<T1> serializer) where T1 : IReaderWriter
+    {
+        serializer.SerializeValue(ref V);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+        => V.AsEnumerable().GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => V.GetEnumerator();
+
+    public override string ToString()
+    {
+        if (V == null)
+        { return "null"; }
+
+        string result = "";
+
+        for (int i = 0; i < V.Length; i++)
+        {
+            if (i > 0)
+            { result += ", "; }
+            if (result.Length > 50)
+            {
+                result += "...";
+                break;
+            }
+            result += ElementToString(V[i]);
+        }
+
+        result.Trim();
+        return $"[ {result} ]";
+    }
+
+    static string ElementToString(T element)
+    {
+        string result = element.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        if (element is long @long)
+        {
+            if (@long == long.MaxValue)
+            {
+                result = "long.MaxValue";
+            }
+        }
+
+        if (element is ulong @ulong)
+        {
+            if (@ulong == ulong.MaxValue)
+            {
+                result = "ulong.MaxValue";
+            }
+        }
+
+        if (element is uint @uint)
+        {
+            if (@uint == uint.MaxValue)
+            {
+                result = "uint.MaxValue";
+            }
+        }
+
+        if (element is int @int)
+        {
+            if (@int == int.MaxValue)
+            {
+                result = "int.MaxValue";
+            }
+        }
+
+        return result;
     }
 }

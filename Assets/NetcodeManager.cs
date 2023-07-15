@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class NetcodeManager : MonoBehaviour
 {
-    void Awake()
+    void FixedUpdate()
     {
         NetcodeVariableSerializers.Init();
     }

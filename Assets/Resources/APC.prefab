@@ -577,7 +577,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44472583172699633}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
   m_Name: 
@@ -602,7 +602,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44472583172699633}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
@@ -858,7 +858,8 @@ MonoBehaviour:
   IsBallisticProjectile: 1
   Scope: {fileID: 8134447802361416521}
   ScopeHolder: {fileID: 162455347653107985}
-  target: {x: 0, y: 0, z: 0}
+  target:
+    m_InternalValue: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
   overridedInput: {x: 0, y: 0}
   base: {fileID: 0}
@@ -873,7 +874,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44472584589677891}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
   m_Name: 
@@ -898,7 +899,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44472584589677891}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 

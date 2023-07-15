@@ -65,7 +65,19 @@ public class AttackerBase : NetworkBehaviour
 
                 var ray = MainCamera.Camera.ScreenPointToRay(screenCenter);
                 var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
-                turret.target = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+
+                if (NetcodeUtils.IsOfflineOrServer)
+                {
+                    turret.target.Value = point;
+                }
+                else if (NetcodeUtils.IsClient)
+                {
+                    if ((turret.target.Value - point).sqrMagnitude > .5f)
+                    {
+                        turret.TargetRequest(point);
+                    }
+                }
             }
         }
         else
@@ -76,13 +88,35 @@ public class AttackerBase : NetworkBehaviour
             {
                 var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
                 var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
-                turret.target = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+
+                if (NetcodeUtils.IsOfflineOrServer)
+                {
+                    turret.target.Value = point;
+                }
+                else if (NetcodeUtils.IsClient)
+                {
+                    if ((turret.target.Value - point).sqrMagnitude > .5f)
+                    {
+                        turret.TargetRequest(point);
+                    }
+                }
             }
         }
 
         if (Input.GetMouseButton(Utilities.MouseButton.Left) && !MenuManager.AnyMenuVisible)
         {
-            if (turret.IsAccurateShoot && this.IsOfflineOrServer()) turret.Shoot();
+            if (turret.IsAccurateShoot)
+            {
+                if (NetcodeUtils.IsOfflineOrServer)
+                {
+                    turret.Shoot();
+                }
+                else if (NetcodeUtils.IsClient)
+                {
+                    turret.ShootRequest();
+                }
+            }
         }
     }
 

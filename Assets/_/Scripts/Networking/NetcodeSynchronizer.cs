@@ -576,7 +576,7 @@ public class NetcodeSynchronizer : NetworkBehaviour
                     {
                         UserDataRequestHeader message = (UserDataRequestHeader)baseMessage;
 
-                        if (AuthManager.AuthProvider != null && AuthManager.AuthProvider.IsAuthorized &&AuthManager.AuthProvider.ID == message.ID)
+                        if (AuthManager.AuthProvider != null && AuthManager.AuthProvider.IsAuthorized && AuthManager.AuthProvider.ID == message.ID)
                         {
                             NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(MessageType.USER_DATA, NetworkManager.LocalClientId)
                             {
@@ -606,6 +606,21 @@ public class NetcodeSynchronizer : NetworkBehaviour
                     {
                         UserDataHeader message = (UserDataHeader)baseMessage;
                         Services.Singleton.OnUserData(message);
+                        break;
+                    }
+
+                case MessageType.USER_DATA_REQUEST_DIRECT:
+                    {
+                        if (AuthManager.AuthProvider != null && AuthManager.AuthProvider.IsAuthorized)
+                        {
+                            NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(MessageType.USER_DATA, NetworkManager.LocalClientId)
+                            {
+                                UserName = AuthManager.AuthProvider.DisplayName,
+                                ID = AuthManager.AuthProvider.ID,
+                            }, baseMessage.Sender);
+                            break;
+                        }
+
                         break;
                     }
 

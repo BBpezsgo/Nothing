@@ -9862,7 +9862,8 @@ MonoBehaviour:
   IsBallisticProjectile: 1
   Scope: {fileID: 6063154753538146735}
   ScopeHolder: {fileID: 2776137622048779255}
-  target: {x: 0, y: 0, z: 0}
+  target:
+    m_InternalValue: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
   overridedInput: {x: 0, y: 0}
   base: {fileID: 0}
@@ -9877,7 +9878,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2619412344863678373}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
   m_Name: 
@@ -9902,7 +9903,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2619412344863678373}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
@@ -9950,6 +9951,7 @@ GameObject:
   - component: {fileID: -5289328005374519403}
   - component: {fileID: 1849051629192169190}
   - component: {fileID: 9074750142406875483}
+  - component: {fileID: 3413199833213572951}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -10393,6 +10395,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3413199833213572951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d63a55fdb83b3964c80350b38cd70402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0
@@ -10435,7 +10449,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2619412345589989143}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
   m_Name: 
@@ -10460,7 +10474,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2619412345589989143}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 

@@ -307,13 +307,6 @@ internal static class UnclassifiedExtensions
         networkObject.Spawn(destroyWithScene);
     }
 
-    public static bool IsOfflineOrServer(this NetworkBehaviour self)
-    {
-        if (NetworkManager.Singleton == null) return true;
-        if (!NetworkManager.Singleton.IsListening) return true;
-        return NetworkManager.Singleton.IsServer;
-    }
-
     internal static bool Contains<T>(this T[] self, T v) where T : IEquatable<T>
     {
         for (int i = 0; i < self.Length; i++)

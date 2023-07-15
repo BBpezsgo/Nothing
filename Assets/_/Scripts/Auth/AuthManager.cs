@@ -129,7 +129,14 @@ public interface IRemoteAccountProvider
 
     /// <returns><b>Possibly <see langword="null"/>!</b></returns>
     public RemoteAccount Get(string userId);
-    public System.Collections.IEnumerator GetAsync(string userId, System.Action<RemoteAccount, object> callback);
+    public System.Collections.IEnumerator GetAsync(string userId, Action<RemoteAccount, object> callback);
+}
+
+public interface IRemoteAccountProviderWithCustomID<T> : IRemoteAccountProvider
+{
+    /// <returns><b>Possibly <see langword="null"/>!</b></returns>
+    public RemoteAccount Get(T userId);
+    public System.Collections.IEnumerator GetAsync(T userId, Action<RemoteAccount, object> callback);
 }
 
 public interface IAccountMenuProvider

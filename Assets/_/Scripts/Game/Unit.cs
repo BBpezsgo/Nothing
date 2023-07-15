@@ -96,12 +96,34 @@ internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHas
         {
             var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
             var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
-            turret.target = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+            Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+
+            if (NetcodeUtils.IsOfflineOrServer)
+            {
+                turret.target.Value = point;
+            }
+            else if (NetcodeUtils.IsClient)
+            {
+                if ((turret.target.Value - point).sqrMagnitude > .5f)
+                {
+                    turret.TargetRequest(point);
+                }
+            }
         }
 
         if (Input.GetMouseButton(MouseButton.Left))
         {
-            if (turret.IsAccurateShoot && this.IsOfflineOrServer()) turret.Shoot();
+            if (turret.IsAccurateShoot)
+            {
+                if (NetcodeUtils.IsOfflineOrServer)
+                {
+                    turret.Shoot();
+                }
+                else if (NetcodeUtils.IsClient)
+                {
+                    turret.ShootRequest();
+                }
+            }
         }
     }
     public virtual void DoFrequentInput()
@@ -109,22 +131,35 @@ internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHas
 
     protected virtual void FixedUpdate()
     {
-        if (vehicleEngine != null)
+        if (vehicleEngine == null)
+        { return; }
+
+        if (this.IAmControllingThis())
         {
-            if (this.IAmControllingThis())
+            Vector2 input = Vector2.zero;
+
+            input.x = Input.GetAxis("Horizontal");
+            input.y = Input.GetAxis("Vertical");
+
+            if (NetcodeUtils.IsOfflineOrServer)
             {
-                Vector2 input = Vector2.zero;
-
-                input.x = Input.GetAxis("Horizontal");
-                input.y = Input.GetAxis("Vertical");
-
                 vehicleEngine.InputVector = input;
+                return;
             }
-            else
+
+            if (NetcodeUtils.IsClient && vehicleEngine.InputVector != input)
             {
-                vehicleEngine.InputVector = GetInputVector();
+                vehicleEngine.InputRequest(input);
+                return;
             }
+
+            return;
         }
+
+        if (this.AnybodyControllingThis())
+        { return; }
+
+        vehicleEngine.InputVector = GetInputVector();
     }
 
     Vector2 GetInputVector()
@@ -144,15 +179,7 @@ internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHas
 
     void Destroy()
     {
-        if (this.IsOfflineOrServer())
+        if (NetcodeUtils.IsOfflineOrServer)
         { GameObject.Destroy(gameObject); }
-    }
-
-    protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
-    {
-        base.OnSynchronize(ref serializer);
-        serializer.SerializeValue(ref HP);
-        serializer.SerializeValue(ref destination);
-        serializer.SerializeValue(ref controllingByUser);
     }
 }

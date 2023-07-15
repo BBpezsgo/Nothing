@@ -8,8 +8,12 @@ using UnityEngine.UIElements;
 
 using Utilities;
 
-public class BuildingManager : SingleInstance<BuildingManager>
+public class BuildingManager : NetworkBehaviour
 {
+    static BuildingManager instance;
+
+    internal static BuildingManager Instance => instance;
+
     [SerializeField, ReadOnly] Terrain Terrain;
 
     [SerializeField] string Team;
@@ -41,6 +45,17 @@ public class BuildingManager : SingleInstance<BuildingManager>
     [SerializeField] UIDocument BuildingUI;
 
     PriorityKey KeyEsc;
+
+    void Awake()
+    {
+        if (instance != null)
+        {
+            Debug.LogWarning($"[{nameof(BuildingManager)}]: Instance already registered");
+            GameObject.Destroy(this);
+            return;
+        }
+        instance = this;
+    }
 
     void Start()
     {
@@ -86,7 +101,7 @@ public class BuildingManager : SingleInstance<BuildingManager>
     bool MouseCondition()
         => IsBuilding;
 
-    private void LeftMouse_OnClick(Vector2 position)
+    void LeftMouse_OnClick(Vector2 position)
     {
         if (SelectedBuilding == null || SelectedBuilding.Building == null) return;
         if (MenuManager.AnyMenuVisible) return;
@@ -99,14 +114,26 @@ public class BuildingManager : SingleInstance<BuildingManager>
         if (Input.GetKey(KeyCode.LeftControl))
         { worldPosition = new Vector3(Mathf.Round(worldPosition.x), worldPosition.y, Mathf.Round(worldPosition.z)); }
 
-        GameObject newObject = GameObject.Instantiate(BuildableBuildingPrefab, worldPosition - SelectedBuilding.GroundOrigin, Quaternion.identity, transform);
-        newObject.SpawnOverNetwork();
-        
-        BuildableBuilding hologram = newObject.GetComponent<BuildableBuilding>();
-        ApplyBuildableHologram(hologram, SelectedBuilding);
+        PlaceBuilding(worldPosition - SelectedBuilding.GroundOrigin);
     }
 
-    private void Clickable_clickedWithEventInfo(EventBase e)
+    void PlaceBuilding(Vector3 fixedWorldPosition)
+    {
+        if (NetcodeUtils.IsOfflineOrServer)
+        {
+            GameObject newObject = GameObject.Instantiate(BuildableBuildingPrefab, fixedWorldPosition, Quaternion.identity, transform);
+            newObject.SpawnOverNetwork();
+
+            BuildableBuilding hologram = newObject.GetComponent<BuildableBuilding>();
+            ApplyBuildableHologram(hologram, SelectedBuilding);
+        }
+        else
+        {
+            Debug.LogError($"[{nameof(BuildingManager)}]: Not supported :(");
+        }
+    }
+
+    void Clickable_clickedWithEventInfo(EventBase e)
     {
         if (e.target is not Button button) return;
         int i = int.Parse(button.name.Split('-')[1]);
@@ -201,7 +228,7 @@ public class BuildingManager : SingleInstance<BuildingManager>
         }
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         if (CheckValidity)
         {

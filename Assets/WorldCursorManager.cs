@@ -82,7 +82,7 @@ internal class WorldCursorManager : SingleInstance<WorldCursorManager>
     }
 
     bool MouseCondition() =>
-        !TakeControlManager.Instance.IsControlling &&
+        (TakeControlManager.Instance == null || !TakeControlManager.Instance.IsControlling) &&
         !BuildingManager.Instance.IsBuilding &&
         (SelectionManager.Instance.Selected == null || SelectionManager.Instance.Selected.Length == 0);
 

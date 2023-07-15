@@ -106,7 +106,7 @@ public class NetcodeMessaging
                     header.Deserialize(reader);
                     return header;
                 }
-                
+
             case MessageType.USER_DATA:
                 {
                     UserDataHeader header = new(baseMessage.Type, clientId);
@@ -114,6 +114,8 @@ public class NetcodeMessaging
                     return header;
                 }
 
+            case MessageType.USER_DATA_REQUEST_DIRECT:
+                return baseMessage;
             case MessageType.UNKNOWN:
             default:
                 throw new Exception($"[{nameof(NetcodeMessaging)}]: Unknown message type {baseMessage.Type}({baseMessage.TypeRaw}) form client {baseMessage.Sender}");
@@ -267,6 +269,7 @@ namespace Messages
         REQUEST,
 
         USER_DATA_REQUEST,
+        USER_DATA_REQUEST_DIRECT,
         USER_DATA,
     }
 

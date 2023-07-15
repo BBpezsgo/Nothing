@@ -92,7 +92,7 @@ public class IngredientDrawerUIE : PropertyDrawer
 }
 #endif
 
-public class NetcodeServices : NetworkBehaviour, IRemoteAccountProvider
+public class NetcodeServices : NetworkBehaviour, IRemoteAccountProvider, IRemoteAccountProviderWithCustomID<ulong>
 {
     [Serializable]
     struct UserData
@@ -209,6 +209,12 @@ public class NetcodeServices : NetworkBehaviour, IRemoteAccountProvider
     }
     void OnClientConnected(ulong id)
     {
+        if (IsServer)
+        {
+            Debug.Log($"[{nameof(NetcodeServices)}]: Client #{id} connected, sending USER_DATA_REQUEST_DIRECT ...");
+            NetcodeMessaging.SendUnnamedMessage(new EmptyHeader(MessageType.USER_DATA_REQUEST_DIRECT, NetworkManager.LocalClientId), id, NetworkDelivery.Reliable);
+        }
+
         if (Clients.ContainsKey(id))
         {
             Clients[id] = new Client(id);
@@ -370,6 +376,41 @@ public class NetcodeServices : NetworkBehaviour, IRemoteAccountProvider
 
         callback?.Invoke(null, "Timed out");
         yield break;
+    }
+
+    public IRemoteAccountProvider.RemoteAccount Get(ulong userId)
+    {
+        for (int i = 0; i < UserDatas.Count; i++)
+        {
+            if (UserDatas[i].NetworkID != userId) continue;
+            return new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName);
+        }
+
+        if (NetworkManager.ServerClientId == userId)
+        { return new IRemoteAccountProvider.RemoteAccount($"Server"); }
+        else
+        { return new IRemoteAccountProvider.RemoteAccount($"Client #{userId}"); }
+    }
+
+    public IEnumerator GetAsync(ulong userId, Action<IRemoteAccountProvider.RemoteAccount, object> callback)
+    {
+        for (int i = 0; i < UserDatas.Count; i++)
+        {
+            if (UserDatas[i].NetworkID != userId) continue;
+            callback?.Invoke(new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName), null);
+            yield break;
+        }
+
+        if (NetworkManager.ServerClientId == userId)
+        {
+            callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Server"), null);
+            yield break;
+        }
+        else
+        {
+            callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Client #{userId}"), null);
+            yield break;
+        }
     }
 }
 

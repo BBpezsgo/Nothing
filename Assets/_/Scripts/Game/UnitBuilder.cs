@@ -40,7 +40,7 @@ internal class UnitBuilder : Unit
         {
             if (turret != null)
             {
-                turret.target = targets[nearestTargetIndex].transform.position;
+                turret.target.Value = targets[nearestTargetIndex].transform.position;
                 turret.targetTransform = targets[nearestTargetIndex].transform;
             }
             if ((targets[nearestTargetIndex].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
@@ -74,7 +74,7 @@ internal class UnitBuilder : Unit
                 TimeToNextTargetSearch = 2f;
             }
 
-            if (turret != null) turret.target = Vector3.zero;
+            if (turret != null) turret.target.Value = Vector3.zero;
 
             if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
             { seek.Target = Vector3.zero; }

@@ -41,7 +41,7 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
 
     [SerializeField] CursorConfig CursorConfig;
 
-    [SerializeField] NetworkVariable<ulong[]> ControllingObjects = new(new ulong[1] { ulong.MaxValue });
+    [SerializeField] NetworkVariable<CoolArray<ulong>> ControllingObjects = new(new CoolArray<ulong>(ulong.MaxValue));
 
     [Header("UI")]
     [SerializeField] Projectiles Projectiles;
@@ -293,16 +293,24 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
         LoseControl();
         SetWindowCursor();
 
-        if (NetworkManager.Singleton != null &&
-            NetworkManager.IsListening)
-        {
-            ControllingObjects.Value[NetworkManager.LocalClientId] = unit.GetObject().GetComponent<NetworkObject>().NetworkObjectId;
-            ControllingObjects.SetDirty(true);
-        }
-
         CameraController.FollowObject = ((Component)unit).transform;
         CameraController.JustFollow = false;
         ControllingObject = unit;
+
+        if (ControllingObject.GetObject() != null &&
+            ControllingObject.GetObject().TryGetComponent(out HoveringLabel label) &&
+            AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
+        {
+            label.Show(remoteAccounts.Get(NetworkManager.LocalClientId)?.DisplayName);
+        }
+
+        if (NetworkManager.Singleton != null &&
+            NetworkManager.IsListening)
+        {
+            ControllingObjects.Value[(int)NetworkManager.LocalClientId] = unit.GetObject().GetComponent<NetworkObject>().NetworkObjectId;
+            ControllingObjects.SetDirty(true);
+            RefreshControlling_ClientRpc(ControllingObjects.Value);
+        }
 
         UI.gameObject.SetActive(true);
         BarHealth = UI.rootVisualElement.Q<ProgressBar>("bar-health");
@@ -503,8 +511,9 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
             NetworkManager.IsListening &&
             NetworkManager.IsServer)
         {
-            ControllingObjects.Value[NetworkManager.LocalClientId] = ulong.MaxValue;
+            ControllingObjects.Value[(int)NetworkManager.LocalClientId] = ulong.MaxValue;
             ControllingObjects.SetDirty(true);
+            RefreshControlling_ClientRpc(ControllingObjects.Value);
         }
 
         UI.gameObject.SetActive(false);
@@ -517,8 +526,13 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         if (ControllingObject.GetObject() == null) return;
 
+        if (ControllingObject.GetObject().TryGetComponent(out HoveringLabel label))
+        {
+            label.Hide();
+        }
+
         if (ControllingObject is ICanTakeControlAndHasTurret hasTurret)
-        { hasTurret.Turret.target = Vector3.zero; }
+        { hasTurret.Turret.target.Value = Vector3.zero; }
 
         CameraController.FollowObject = null;
         ControllingObject = null;
@@ -535,9 +549,6 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
         HideCursor(IngameCursorRed);
         UnityEngine.Cursor.lockState = CursorLockMode.None;
         if (ControllingObject.GetObject() == null) return;
-
-        if (ControllingObject is ICanTakeControlAndHasTurret hasTurret)
-        { hasTurret.Turret.target = Vector3.zero; }
 
         CameraController.FollowObject = null;
         ControllingObject = null;
@@ -570,44 +581,41 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
     {
         Debug.Log($"[{nameof(TakeControlManager)}]: Client {serverRpcParams.Receive.SenderClientId} wants to take control of object {objectID} ...");
 
-        if ((int)serverRpcParams.Receive.SenderClientId >= ControllingObjects.Value.Length)
-        {
-            int addN = 1;
-            while ((int)serverRpcParams.Receive.SenderClientId >= ControllingObjects.Value.Length + addN)
-            {
-                addN++;
-                if (addN > 8)
-                {
-                    Debug.LogError($"[{nameof(TakeControlManager)}]: Infinity loop!", this);
-                    return;
-                }
-            }
-            List<ulong> controllingObjects = new(ControllingObjects.Value);
-            for (int i = 0; i < addN; i++)
-            {
-                controllingObjects.Add(ulong.MaxValue);
-            }
-
-            Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID}  now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
-            controllingObjects[(int)serverRpcParams.Receive.SenderClientId] = objectID;
-
-            ControllingObjects.Value = controllingObjects.ToArray();
-            ControllingObjects.SetDirty(true);
-            return;
-        }
-
-        if ((int)serverRpcParams.Receive.SenderClientId < 0)
-        {
-            Debug.LogWarning($"What? serverRpcParams.Receive.SenderClientId is {serverRpcParams.Receive.SenderClientId}", this);
-            return;
-        }
-
         if (ControllingObjects.Value[(int)serverRpcParams.Receive.SenderClientId] == ulong.MaxValue)
         {
-            Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID}  now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
+            Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID} is now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
+
+            if (NetcodeUtils.FindGameObject(objectID, out GameObject unitObject2) &&
+                unitObject2.TryGetComponent(out HoveringLabel label) &&
+                AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
+            {
+                label.Show(remoteAccounts.Get(serverRpcParams.Receive.SenderClientId)?.DisplayName);
+            }
+
             ControllingObjects.Value[(int)serverRpcParams.Receive.SenderClientId] = objectID;
             ControllingObjects.SetDirty(true);
 
+            RefreshControlling_ClientRpc(ControllingObjects.Value);
+            return;
+        }
+
+        if (NetcodeUtils.FindGameObject(objectID, out GameObject unitObject) &&
+            unitObject.TryGetComponent(out ICanTakeControl unit) &&
+            AnybodyControlling(unit, out ulong controlledBy) &&
+            controlledBy == serverRpcParams.Receive.SenderClientId)
+        {
+            Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID} is now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
+
+            if (unitObject.TryGetComponent(out HoveringLabel label) &&
+                AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
+            {
+                label.Show(remoteAccounts.Get(serverRpcParams.Receive.SenderClientId)?.DisplayName);
+            }
+
+            ControllingObjects.Value[(int)serverRpcParams.Receive.SenderClientId] = objectID;
+            ControllingObjects.SetDirty(true);
+
+            RefreshControlling_ClientRpc(ControllingObjects.Value);
             return;
         }
 
@@ -619,68 +627,55 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
     {
         Debug.Log($"[{nameof(TakeControlManager)}]: Client {serverRpcParams.Receive.SenderClientId} lost control of an object ...");
 
-        if ((int)serverRpcParams.Receive.SenderClientId >= ControllingObjects.Value.Length)
-        { return; }
+        ulong lostControlObject = ControllingObjects.Value[(int)serverRpcParams.Receive.SenderClientId];
 
-        if ((int)serverRpcParams.Receive.SenderClientId < 0)
+        if (NetcodeUtils.FindGameObject(lostControlObject, out GameObject unitObject) &&
+            unitObject.TryGetComponent(out HoveringLabel label))
         {
-            Debug.LogWarning($"What? serverRpcParams.Receive.SenderClientId is {serverRpcParams.Receive.SenderClientId}", this);
-            return;
+            label.Hide();
         }
 
-        ulong lostControlObject = ControllingObjects.Value[serverRpcParams.Receive.SenderClientId];
-        ControllingObjects.Value[serverRpcParams.Receive.SenderClientId] = ulong.MaxValue;
+        ControllingObjects.Value[(int)serverRpcParams.Receive.SenderClientId] = ulong.MaxValue;
         ControllingObjects.SetDirty(true);
 
+        RefreshControlling_ClientRpc(ControllingObjects.Value);
+
         Debug.Log($"[{nameof(TakeControlManager)}]: Object {lostControlObject} is now controlled by nobody", this);
-        RefreshControlling_ClientRpc();
     }
 
     [ClientRpc(Delivery = RpcDelivery.Reliable)]
-    void RefreshControlling_ClientRpc()
+    void RefreshControlling_ClientRpc(CoolArray<ulong> controllingObjects)
     {
+        CoolArray<ulong> ControllingObjects = new(controllingObjects, ulong.MaxValue);
+
         Debug.Log($"[{nameof(TakeControlManager)}]: Server sent a RefreshControlling command, so ...", this);
 
-        if ((int)NetworkManager.LocalClientId >= ControllingObjects.Value.Length)
-        { return; }
+        Debug.Log($"[{nameof(TakeControlManager)}]: {nameof(ControllingObjects)} = {ControllingObjects}");
 
-        if ((int)NetworkManager.LocalClientId < 0)
-        {
-            Debug.LogWarning($"What? LocalClientId is {NetworkManager.LocalClientId}", this);
-            return;
-        }
-
-        ulong controllingThis = ControllingObjects.Value[NetworkManager.LocalClientId];
-        if (controllingThis == ulong.MaxValue &&
-            ControllingObject.GetObject() != null)
+        ulong controllingThis = ControllingObjects[(int)NetworkManager.LocalClientId];
+        if (controllingThis == ulong.MaxValue)
         {
             Debug.Log($"[{nameof(TakeControlManager)}]: Not controlling anything");
             LoseControlClient();
             return;
         }
 
-        if (controllingThis != ulong.MaxValue)
+        if (!NetcodeUtils.FindGameObject(controllingThis, out var controlling))
         {
-            if (NetcodeUtils.FindGameObject(controllingThis, out var controlling))
-            {
-                if (!controlling.TryGetComponent<ICanTakeControl>(out var unit))
-                {
-                    Debug.LogError($"[{nameof(TakeControlManager)}]: Object {controlling} does not have a {nameof(ICanTakeControl)} component", controlling);
-                    LoseControlClient();
-                    return;
-                }
-
-                TakeControlClient(unit);
-                Debug.LogError($"[{nameof(TakeControlManager)}]: Controlling object {unit}", unit.GetObject().gameObject);
-            }
-            else
-            {
-
-                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object {controlling} not found", this);
-                LoseControlClient();
-                return;
-            }
+            Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object {controlling} not found", this);
+            LoseControlClient();
+            return;
         }
+
+        if (!controlling.TryGetComponent<ICanTakeControl>(out var unit))
+        {
+            Debug.LogError($"[{nameof(TakeControlManager)}]: Object {controlling} does not have a {nameof(ICanTakeControl)} component", controlling);
+            LoseControlClient();
+            return;
+        }
+
+        TakeControlClient(unit);
+        Debug.Log($"[{nameof(TakeControlManager)}]: Controlling object {unit}", unit.GetObject().gameObject);
     }
 
     internal bool IAmControlling(ICanTakeControl @this)
@@ -689,16 +684,9 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
             !NetworkManager.IsListening)
         { return ControllingObject.GetObject() == @this.GetObject(); }
 
-        ulong[] controllingObjects = ControllingObjects.Value;
-
-        if ((int)NetworkManager.LocalClientId >= controllingObjects.Length)
+        if ((int)NetworkManager.LocalClientId >= ControllingObjects.Value.Length ||
+            (int)NetworkManager.LocalClientId < 0)
         { return false; }
-
-        if ((int)NetworkManager.LocalClientId < 0)
-        {
-            Debug.LogWarning($"What? LocalClientId is {NetworkManager.LocalClientId}", this);
-            return false;
-        }
 
         if (!@this.GetObject().TryGetComponent(out NetworkObject networkObject))
         {
@@ -706,7 +694,7 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
             return false;
         }
 
-        return networkObject.NetworkObjectId == controllingObjects[(int)NetworkManager.LocalClientId];
+        return networkObject.NetworkObjectId == ControllingObjects.Value[(int)NetworkManager.LocalClientId];
     }
 
     internal bool AnybodyControlling(ICanTakeControl @this)
@@ -719,17 +707,15 @@ public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
             !NetworkManager.IsListening)
         { return ControllingObject.GetObject() == @this.GetObject(); }
 
-        ulong[] controllingObjects = ControllingObjects.Value;
-
         if (!@this.GetObject().TryGetComponent(out NetworkObject networkObject))
         {
             Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", @this.GetObject());
             return false;
         }
 
-        for (int i = 0; i < controllingObjects.Length; i++)
+        for (int i = 0; i < ControllingObjects.Value.Length; i++)
         {
-            if (controllingObjects[i] == networkObject.NetworkObjectId)
+            if (ControllingObjects.Value[i] == networkObject.NetworkObjectId)
             {
                 clientID = (ulong)i;
                 return true;

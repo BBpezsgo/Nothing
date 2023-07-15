@@ -108,9 +108,4 @@ public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields
         }
         // === ===
     }
-
-    protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
-    {
-        serializer.SerializeValue(ref Target);
-    }
 }

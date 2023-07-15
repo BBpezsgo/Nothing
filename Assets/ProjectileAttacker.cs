@@ -109,12 +109,12 @@ internal class ProjectileAttacker : AttackerBase, IHaveAssetFields
 
             // turret.Input = new Vector2(0f, angle_.Value * Mathf.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Mathf.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
             turret.RequiedProjectileLifetime = t.Value - Time.fixedDeltaTime;
-            turret.target = projPosition;
+            turret.target.Value = projPosition;
         }
         else
         {
             turret.Input = Vector3.zero;
-            turret.target = Vector3.zero;
+            turret.target.Value = Vector3.zero;
         }
 
 
@@ -122,7 +122,7 @@ internal class ProjectileAttacker : AttackerBase, IHaveAssetFields
 
         turret.targetTransform = null;
 
-        if (turret.IsAccurateShoot && this.IsOfflineOrServer())
+        if (turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
         {
             if (t.HasValue && requiredShoots != null)
             {

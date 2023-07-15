@@ -43,7 +43,7 @@ internal class Building : BaseObject, IDamagable
 
     void Destroy()
     {
-        if (this.IsOfflineOrServer())
+        if (NetcodeUtils.IsOfflineOrServer)
         { GameObject.Destroy(gameObject); }
     }
 

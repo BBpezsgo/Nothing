@@ -24,7 +24,7 @@ public class CreatureSpawner : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!this.IsOfflineOrServer())
+        if (!NetcodeUtils.IsOfflineOrServer)
         { return; }
 
         Creatures.PurgeObjects();

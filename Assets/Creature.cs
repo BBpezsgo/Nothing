@@ -275,7 +275,7 @@ public class Creature : NetworkBehaviour, IDamagable
 
     void Destroy()
     {
-        if (this.IsOfflineOrServer())
+        if (NetcodeUtils.IsOfflineOrServer)
         {
             GameObject.Destroy(gameObject);
         }

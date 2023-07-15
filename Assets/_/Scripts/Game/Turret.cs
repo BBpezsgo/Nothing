@@ -97,7 +97,7 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
     [SerializeField] internal Transform ScopeHolder;
 
     [Header("Other")]
-    [SerializeField, ReadOnly] internal Vector3 target;
+    [SerializeField, ReadOnly] internal NetworkVariable<Vector3> target;
     [SerializeField, ReadOnly] internal Transform targetTransform;
     [SerializeField, ReadOnly] Vector2 overridedInput = Vector2.zero;
 
@@ -119,7 +119,7 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
 
     [SerializeField] bool ShowRadius;
 
-    internal Vector3 TargetPosition => targetTransform == null ? target : targetTransform.position;
+    internal Vector3 TargetPosition => targetTransform == null ? target.Value : targetTransform.position;
 
     internal float TurretLocalRotation
     {
@@ -323,6 +323,8 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
     }
 
     internal bool Shoot()
+        => Shoot(null, 0f);
+    internal bool Shoot(RequiredShoots requiedShoots, float impactTime)
     {
         if (reload > 0f) return false;
         if (CurrentProjectile == null) return false;
@@ -366,7 +368,22 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
 
             if (IsAccurateShoot)
             {
-                if ((targetTransform != null && targetTransform.gameObject.TryGetComponent(out RequiredShoots requiedShoots)))
+                if (requiedShoots != null)
+                {
+                    float predictedDamage = 0f;
+                    if (requiedShoots.HasComponent<Projectile>())
+                    {
+                        predictedDamage = 1f;
+                    }
+                    else
+                    {
+                        predictedDamage += _projectile.ImpactDamage;
+                        predictedDamage += _projectile.ExploisonDamage * .2f;
+                    }
+                    requiedShoots.Shoot(impactTime, predictedDamage);
+                }
+                else if (targetTransform != null &&
+                    targetTransform.gameObject.TryGetComponent(out requiedShoots))
                 {
                     if ((predictedImpactPosition - TargetPosition).sqrMagnitude < 1f)
                     {
@@ -381,61 +398,6 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
                     }
                 }
             }
-        }
-
-        return true;
-    }
-
-    internal bool Shoot(RequiredShoots requiredShoots, float impactTime)
-    {
-        if (reload > 0f) return false;
-        if (CurrentProjectile == null) return false;
-
-        if (AudioSource != null &&
-            ShootSound != null)
-        { AudioSource.PlayOneShot(ShootSound); }
-
-        reload = reloadTime;
-
-        for (int i = 0; i < ShootEffectInstances.Length; i++)
-        { ShootEffectInstances[i].Emit(); }
-
-        GameObject newProjectile = GameObject.Instantiate(CurrentProjectile, shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
-        if (newProjectile.TryGetComponent<Rigidbody>(out var rb))
-        {
-            rb.velocity = shootPosition.forward * projectileVelocity;
-        }
-
-        if (newProjectile.TryGetComponent<Projectile>(out var _projectile))
-        {
-            _projectile.TargetPosition = TargetPosition;
-
-            _projectile.lastPosition = shootPosition.position;
-
-            _projectile.ignoreCollision = projectileIgnoreCollision.ToArray();
-            _projectile.OwnerTeamHash = @base.TeamHash;
-            _projectile.Owner = @base;
-
-            _projectile.LifeLeft = CurrentProjectileLifetime;
-            _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
-
-            _projectile.Shot = new Projectile.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
-
-            Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
-
-            shots.Add((_projectile, predictedImpactPosition));
-
-            float predictedDamage = 0f;
-            if (requiredShoots.HasComponent<Projectile>())
-            {
-                predictedDamage = 1f;
-            }
-            else
-            {
-                predictedDamage += _projectile.ImpactDamage;
-                predictedDamage += _projectile.ExploisonDamage * .2f;
-            }
-            requiredShoots.Shoot(impactTime, predictedDamage);
         }
 
         return true;
@@ -497,5 +459,28 @@ public class Turret : NetworkBehaviour, IHaveAssetFields
         RotateCannonInstant(input.y);
         reload = 0f;
         Shoot();
+    }
+
+    internal void ShootRequest()
+        => ShootRequest_ServerRpc(new Vector2(TurretLocalRotation, CannonLocalRotation));
+
+    [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
+    void ShootRequest_ServerRpc(Vector2 input)
+    {
+        this.input = input;
+        currentError = CalculateError(input);
+
+        TurretLocalRotation = input.x;
+        CannonLocalRotation = input.y;
+        Shoot();
+    }
+
+    internal void TargetRequest(Vector3 point)
+        => TargetRequest_ServerRpc(point);
+
+    [ServerRpc(Delivery = RpcDelivery.Unreliable, RequireOwnership = false)]
+    void TargetRequest_ServerRpc(Vector3 point)
+    {
+        this.target.Value = point;
     }
 }
