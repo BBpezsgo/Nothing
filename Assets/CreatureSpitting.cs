@@ -107,10 +107,10 @@ public class CreatureSpitting : Creature
 
         targetPosition += new Vector3(0f, .5f, 0f);
 
-        if (this.IsServer)
+        if (NetcodeUtils.IsOfflineOrServer)
         {
             SpitTo(targetPosition);
-            SpitTo_ClientRpc(targetPosition);
+            if (!NetcodeUtils.IsOffline) SpitTo_ClientRpc(targetPosition);
         }
     }
     void SpitTo(Vector3 targetPosition)
@@ -182,10 +182,10 @@ public class CreatureSpitting : Creature
                 {
                     if (AudioSource != null && SpitSound != null)
                     {
-                        if (this.IsServer)
+                        if (NetcodeUtils.IsOfflineOrServer)
                         {
                             AudioSource.PlayOneShot(SpitSound);
-                            SpitSound_ClientRpc();
+                            if (!NetcodeUtils.IsOffline) SpitSound_ClientRpc();
                         }
                     }
                 }

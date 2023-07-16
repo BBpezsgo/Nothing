@@ -75,3 +75,4 @@ crashlytics-build.properties
 /UIElementsSchema
 /.vsconfig
 *.meta
+/Packages/packages-lock.json
