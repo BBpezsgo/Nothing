@@ -1,532 +1,539 @@
+using Game;
+using Game.Components;
+using Game.Managers;
+
 using UnityEngine;
 
 using Utilities;
 
-public class Projectile : MonoBehaviour
+namespace Game.Components
 {
-    [System.Serializable]
-    struct ImpactEffect
+    public class Projectile : MonoBehaviour
     {
-        [SerializeField] internal string MaterialID;
-
-        [SerializeField] internal AudioClip Sound;
-
-        [Header("Particles")]
-        [SerializeField] internal GameObject Particles;
-        [SerializeField] internal bool UseNormal;
-
-        [Header("Hoe")]
-        [SerializeField] internal GameObject Hoe;
-    }
-
-    public readonly struct Trajectory
-    {
-        /// <summary>
-        /// In degrees
-        /// </summary>
-        public readonly float ShootAngle;
-        /// <summary>
-        /// In degrees
-        /// </summary>
-        public readonly float ShootDirection;
-        public readonly float Velocity;
-        public readonly Vector3 ShootPosition;
-
-        public Trajectory(float shootAngle, float shootDirection, float velocity, Vector3 shootPosition)
+        [System.Serializable]
+        struct ImpactEffect
         {
-            ShootAngle = shootAngle;
-            ShootDirection = shootDirection;
-            Velocity = velocity;
-            ShootPosition = shootPosition;
+            [SerializeField] internal string MaterialID;
+
+            [SerializeField] internal AudioClip Sound;
+
+            [Header("Particles")]
+            [SerializeField] internal GameObject Particles;
+            [SerializeField] internal bool UseNormal;
+
+            [Header("Hoe")]
+            [SerializeField] internal GameObject Hoe;
         }
 
-        public Vector2 Velocity2D()
-            => new(Velocity * Mathf.Cos(ShootAngle * Mathf.Deg2Rad), Velocity * Mathf.Sin(ShootAngle * Mathf.Deg2Rad));
-
-        public Vector3 Velocity3D()
+        public readonly struct Trajectory
         {
-            Vector3 result = Vector3.zero;
-            result.x = Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
-            result.y = Mathf.Sin(ShootAngle * Mathf.Deg2Rad);
-            result.z = Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
-            return result;
-        }
+            /// <summary>
+            /// In degrees
+            /// </summary>
+            public readonly float ShootAngle;
+            /// <summary>
+            /// In degrees
+            /// </summary>
+            public readonly float ShootDirection;
+            public readonly float Velocity;
+            public readonly Vector3 ShootPosition;
 
-        public Vector3 Position(float t)
-        {
-            Vector2 displacement = Utilities.Ballistics.Displacement(ShootAngle * Mathf.Deg2Rad, Velocity, t);
-            Vector3 displacement3D = Vector3.zero;
-
-            displacement3D.x = displacement.x * Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
-            displacement3D.y = displacement.y;
-            displacement3D.z = displacement.x * Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
-
-            displacement3D += ShootPosition;
-
-            return displacement3D;
-        }
-
-        public static Vector2 TransformPositionToPlane(Vector3 position, float directionRad)
-            => new()
+            public Trajectory(float shootAngle, float shootDirection, float velocity, Vector3 shootPosition)
             {
-                y = position.y,
-                x = position.x * Mathf.Cos(directionRad) + position.y * Mathf.Sin(directionRad),
-            };
-    }
+                ShootAngle = shootAngle;
+                ShootDirection = shootDirection;
+                Velocity = velocity;
+                ShootPosition = shootPosition;
+            }
 
-    [SerializeField] bool Register;
-    [SerializeField, ReadOnly] AudioSource AudioSource;
+            public Vector2 Velocity2D()
+                => new(Velocity * Mathf.Cos(ShootAngle * Mathf.Deg2Rad), Velocity * Mathf.Sin(ShootAngle * Mathf.Deg2Rad));
 
-    [Header("Movement")]
-    [SerializeField] internal float Acceleration = 0f;
-
-    [Header("Impact")]
-    [SerializeField] float ImpactForce = 1f;
-    [SerializeField] internal float ImpactDamage = 1f;
-    [SerializeField] bool CanBounce = true;
-    [SerializeField, Range(0f, 90f)] float BounceAngle = 50f;
-
-    [Header("Exploison")]
-    [SerializeField] float ExploisonForce = 0f;
-    [SerializeField] float ExploisonRadius = 0f;
-    [SerializeField] internal float ExploisonDamage = 0f;
-    [SerializeField] bool ExplodeOnImpact = false;
-    [SerializeField] bool ExplodeWhenExpires = false;
-
-    [Header("Effects")]
-    [SerializeField] GameObject ExploisonEffect;
-    [SerializeField] AudioClip ImpactSound;
-    [SerializeField] GameObject impactEffect;
-    [SerializeField] ImpactEffect[] ImpactEffects = new ImpactEffect[0];
-    [SerializeField] GameObject trail;
-
-    [SerializeField] GameObject RicochetEffect;
-
-    [SerializeField] float rotationSpeedX;
-    [SerializeField] float rotationSpeedY;
-    [SerializeField] float rotationSpeedZ;
-
-    [SerializeField] bool RandomRotation = false;
-
-    [SerializeField] Transform RotateThis;
-
-    [Header("Stuff")]
-    [SerializeField] bool DieInWater = true;
-    [SerializeField] bool DestroyInExploisons = false;
-    [SerializeField, ReadOnly, NonReorderable] internal Transform[] ignoreCollision;
-    [SerializeField, ReadOnly] internal float LifeLeft;
-    [SerializeField, ReadOnly] internal float Lifetime;
-    [SerializeField, ReadOnly] internal bool InfinityLifetime = true;
-
-    [SerializeField, ReadOnly] Rigidbody rb;
-
-    [SerializeField, ReadOnly] internal int OwnerTeamHash;
-    [SerializeField, ReadOnly] internal BaseObject Owner;
-
-    [SerializeField, Range(0f, 1f)] internal float PropabilityOfProjectileIntersection = .5f;
-
-    [SerializeField] bool DamageAllies = false;
-
-    internal Rigidbody Rigidbody => rb;
-
-    internal Vector3 Position => rb.position + (rb.velocity * Time.fixedDeltaTime);
-
-    internal Trajectory Shot;
-
-    [SerializeField, ReadOnly] bool destroyed = false;
-
-    readonly RaycastHit[] hits = new RaycastHit[5];
-    [SerializeField, ReadOnly] internal Vector3 lastPosition;
-    [SerializeField, ReadOnly] internal Vector3 positionDelta;
-    [SerializeField, ReadOnly] internal Vector3 TargetPosition;
-
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody>();
-    }
-
-    void OnEnable()
-    { if (Register) RegisteredObjects.Projectiles.Add(this); }
-    void OnDisable()
-    { if (Register) RegisteredObjects.Projectiles.Remove(this); }
-
-    void Start()
-    {
-        if (lastPosition == Vector3.zero) lastPosition = transform.position;
-
-        if (RandomRotation)
-        {
-            Quaternion randomRotation = Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
-            if (RotateThis != null)
-            { RotateThis.rotation = randomRotation; }
-            else
-            { transform.rotation = randomRotation; }
-        }
-
-        AudioSource = GetComponent<AudioSource>();
-    }
-
-    void FixedUpdate()
-    {
-        if (destroyed) return;
-
-        Lifetime += Time.fixedDeltaTime;
-
-        if (Acceleration != 0f && rb != null)
-        {
-            rb.velocity += Acceleration * Time.fixedDeltaTime * rb.velocity.normalized;
-        }
-
-        Debug3D.DrawPoint(lastPosition, .5f, Color.gray);
-        Debug3D.DrawPoint(transform.position, .5f, Color.white);
-
-        positionDelta = transform.position - lastPosition;
-
-        Debug.DrawRay(lastPosition, positionDelta, Color.black, Time.fixedDeltaTime);
-
-        int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude);
-
-        lastPosition = transform.position;
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            if (hits[i].collider.isTrigger)
+            public Vector3 Velocity3D()
             {
-                if (!hits[i].collider.gameObject.HasComponent<Projectile>())
+                Vector3 result = Vector3.zero;
+                result.x = Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
+                result.y = Mathf.Sin(ShootAngle * Mathf.Deg2Rad);
+                result.z = Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
+                return result;
+            }
+
+            public Vector3 Position(float t)
+            {
+                Vector2 displacement = Utilities.Ballistics.Displacement(ShootAngle * Mathf.Deg2Rad, Velocity, t);
+                Vector3 displacement3D = Vector3.zero;
+
+                displacement3D.x = displacement.x * Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
+                displacement3D.y = displacement.y;
+                displacement3D.z = displacement.x * Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
+
+                displacement3D += ShootPosition;
+
+                return displacement3D;
+            }
+
+            public static Vector2 TransformPositionToPlane(Vector3 position, float directionRad)
+                => new()
                 {
-                    if (hits[i].collider.gameObject.name != "Water" || !DieInWater)
+                    y = position.y,
+                    x = position.x * Mathf.Cos(directionRad) + position.y * Mathf.Sin(directionRad),
+                };
+        }
+
+        [SerializeField] bool Register;
+        [SerializeField, ReadOnly] AudioSource AudioSource;
+
+        [Header("Movement")]
+        [SerializeField] internal float Acceleration = 0f;
+
+        [Header("Impact")]
+        [SerializeField] float ImpactForce = 1f;
+        [SerializeField] internal float ImpactDamage = 1f;
+        [SerializeField] bool CanBounce = true;
+        [SerializeField, Range(0f, 90f)] float BounceAngle = 50f;
+
+        [Header("Exploison")]
+        [SerializeField] float ExploisonForce = 0f;
+        [SerializeField] float ExploisonRadius = 0f;
+        [SerializeField] internal float ExploisonDamage = 0f;
+        [SerializeField] bool ExplodeOnImpact = false;
+        [SerializeField] bool ExplodeWhenExpires = false;
+
+        [Header("Effects")]
+        [SerializeField] GameObject ExploisonEffect;
+        [SerializeField] AudioClip ImpactSound;
+        [SerializeField] GameObject impactEffect;
+        [SerializeField] ImpactEffect[] ImpactEffects = new ImpactEffect[0];
+        [SerializeField] GameObject trail;
+
+        [SerializeField] GameObject RicochetEffect;
+
+        [SerializeField] float rotationSpeedX;
+        [SerializeField] float rotationSpeedY;
+        [SerializeField] float rotationSpeedZ;
+
+        [SerializeField] bool RandomRotation = false;
+
+        [SerializeField] Transform RotateThis;
+
+        [Header("Stuff")]
+        [SerializeField] bool DieInWater = true;
+        [SerializeField] bool DestroyInExploisons = false;
+        [SerializeField, ReadOnly, NonReorderable] internal Transform[] ignoreCollision;
+        [SerializeField, ReadOnly] internal float LifeLeft;
+        [SerializeField, ReadOnly] internal float Lifetime;
+        [SerializeField, ReadOnly] internal bool InfinityLifetime = true;
+
+        [SerializeField, ReadOnly] Rigidbody rb;
+
+        [SerializeField, ReadOnly] internal int OwnerTeamHash;
+        [SerializeField, ReadOnly] internal BaseObject Owner;
+
+        [SerializeField, Range(0f, 1f)] internal float PropabilityOfProjectileIntersection = .5f;
+
+        [SerializeField] bool DamageAllies = false;
+
+        internal Rigidbody Rigidbody => rb;
+
+        internal Vector3 Position => rb.position + (rb.velocity * Time.fixedDeltaTime);
+
+        internal Trajectory Shot;
+
+        [SerializeField, ReadOnly] bool destroyed = false;
+
+        readonly RaycastHit[] hits = new RaycastHit[5];
+        [SerializeField, ReadOnly] internal Vector3 lastPosition;
+        [SerializeField, ReadOnly] internal Vector3 positionDelta;
+        [SerializeField, ReadOnly] internal Vector3 TargetPosition;
+
+        void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
+        void OnEnable()
+        { if (Register) RegisteredObjects.Projectiles.Add(this); }
+        void OnDisable()
+        { if (Register) RegisteredObjects.Projectiles.Remove(this); }
+
+        void Start()
+        {
+            if (lastPosition == Vector3.zero) lastPosition = transform.position;
+
+            if (RandomRotation)
+            {
+                Quaternion randomRotation = Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
+                if (RotateThis != null)
+                { RotateThis.rotation = randomRotation; }
+                else
+                { transform.rotation = randomRotation; }
+            }
+
+            AudioSource = GetComponent<AudioSource>();
+        }
+
+        void FixedUpdate()
+        {
+            if (destroyed) return;
+
+            Lifetime += Time.fixedDeltaTime;
+
+            if (Acceleration != 0f && rb != null)
+            {
+                rb.velocity += Acceleration * Time.fixedDeltaTime * rb.velocity.normalized;
+            }
+
+            Debug3D.DrawPoint(lastPosition, .5f, Color.gray);
+            Debug3D.DrawPoint(transform.position, .5f, Color.white);
+
+            positionDelta = transform.position - lastPosition;
+
+            Debug.DrawRay(lastPosition, positionDelta, Color.black, Time.fixedDeltaTime);
+
+            int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude);
+
+            lastPosition = transform.position;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                if (hits[i].collider.isTrigger)
+                {
+                    if (!hits[i].collider.gameObject.HasComponent<Projectile>())
                     {
-                        continue;
+                        if (hits[i].collider.gameObject.name != "Water" || !DieInWater)
+                        {
+                            continue;
+                        }
                     }
                 }
+                if (hits[i].transform == transform)
+                { continue; }
+                if (ignoreCollision.Contains(hits[i].transform))
+                { continue; }
+                if (Impact(hits[i].point, hits[i].normal, hits[i].collider))
+                { return; }
             }
-            if (hits[i].transform == transform)
-            { continue; }
-            if (ignoreCollision.Contains(hits[i].transform))
-            { continue; }
-            if (Impact(hits[i].point, hits[i].normal, hits[i].collider))
-            { return; }
-        }
 
-        if (rotationSpeedX != 0f ||
-            rotationSpeedY != 0f ||
-            rotationSpeedZ != 0f)
-        {
-            if (RotateThis != null)
+            if (rotationSpeedX != 0f ||
+                rotationSpeedY != 0f ||
+                rotationSpeedZ != 0f)
             {
-                RotateThis.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
+                if (RotateThis != null)
+                {
+                    RotateThis.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
+                }
+                else
+                {
+                    transform.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
+                }
             }
             else
             {
-                transform.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
+                var rotation = Quaternion.FromToRotation(Vector3.forward, positionDelta.normalized);
+                if (positionDelta != Vector3.zero) transform.rotation = rotation;
             }
-        }
-        else
-        {
-            var rotation = Quaternion.FromToRotation(Vector3.forward, positionDelta.normalized);
-            if (positionDelta != Vector3.zero) transform.rotation = rotation;
-        }
 
-        if (!InfinityLifetime)
-        {
-            LifeLeft -= Time.fixedDeltaTime;
-            if (LifeLeft <= 0f)
+            if (!InfinityLifetime)
             {
-                if (Owner != null && Owner is UnitAttacker owner2)
-                { owner2.turret.NotifyImpact(this, Position); }
-
-                if (ExplodeWhenExpires)
+                LifeLeft -= Time.fixedDeltaTime;
+                if (LifeLeft <= 0f)
                 {
-                    Vector3 position = transform.position;
+                    if (Owner != null && Owner is UnitAttacker owner2)
+                    { owner2.turret.NotifyImpact(this, Position); }
 
-                    if (TargetPosition != Vector3.zero && (TargetPosition - position).sqrMagnitude < 2f)
-                    { position = TargetPosition; }
+                    if (ExplodeWhenExpires)
+                    {
+                        Vector3 position = transform.position;
 
-                    if (ExploisonEffect != null) GameObject.Instantiate(ExploisonEffect, position, Quaternion.identity, ObjectGroups.Effects);
-                    Explode(position, 0f);
+                        if (TargetPosition != Vector3.zero && (TargetPosition - position).sqrMagnitude < 2f)
+                        { position = TargetPosition; }
+
+                        if (ExploisonEffect != null) GameObject.Instantiate(ExploisonEffect, position, Quaternion.identity, ObjectGroups.Effects);
+                        Explode(position, 0f);
+                    }
+
+                    GameObject.Destroy(gameObject);
                 }
-
-                GameObject.Destroy(gameObject);
-            }
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (destroyed) return;
-
-        if (!other.gameObject.HasComponent<Projectile>())
-        {
-            if (other.gameObject.name != "Water" || !DieInWater)
-            {
-                return;
             }
         }
 
-        if (ignoreCollision.Contains(other.transform)) return;
-        Vector3 point = other.ClosestPointOnBounds(Position);
-        Vector3 normal = Vector3.up;
-        Impact(point, normal, other);
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (destroyed) return;
-        if (collision.collider.isTrigger)
+        void OnTriggerEnter(Collider other)
         {
-            if (!collision.gameObject.HasComponent<Projectile>())
+            if (destroyed) return;
+
+            if (!other.gameObject.HasComponent<Projectile>())
             {
-                if (collision.gameObject.name != "Water" || !DieInWater)
+                if (other.gameObject.name != "Water" || !DieInWater)
                 {
                     return;
                 }
             }
+
+            if (ignoreCollision.Contains(other.transform)) return;
+            Vector3 point = other.ClosestPointOnBounds(Position);
+            Vector3 normal = Vector3.up;
+            Impact(point, normal, other);
         }
-        if (ignoreCollision.Contains(collision.transform)) return;
-        Vector3 point;
-        Vector3 normal;
-        if (collision.contactCount > 0)
+
+        void OnCollisionEnter(Collision collision)
         {
-            ContactPoint contact = collision.GetContact(0);
-            point = contact.point;
-            normal = contact.normal;
-        }
-        else
-        {
-            point = collision.collider.ClosestPointOnBounds(Position); ;
-            normal = Vector3.up;
-        }
-        Impact(point, normal, collision.collider);
-    }
-
-    bool Impact(Vector3 at, Vector3 normal, Collider obj, bool force = false)
-    {
-        if (destroyed) return true;
-        Debug.DrawLine(at, at + normal, Color.red, 5f);
-        Debug3D.DrawSphere(at, .2f, Color.red, 5f);
-
-        bool hasMaterial = obj.gameObject.TryGetComponent(out IObjectMaterial material);
-
-        float fuckYouValue = obj.TryGetComponent(out BaseObject _baseObj) ? TeamManager.Instance.GetFuckYou(_baseObj.TeamHash, this.OwnerTeamHash) : 0f;
-
-        if (obj.TryGetComponent(out Projectile otherProjectile))
-        {
-            if (!force)
+            if (destroyed) return;
+            if (collision.collider.isTrigger)
             {
-                if (PropabilityOfProjectileIntersection == 0f)
-                { return false; }
-
-                if (PropabilityOfProjectileIntersection != 1f && Random.value > PropabilityOfProjectileIntersection)
-                { return false; }
+                if (!collision.gameObject.HasComponent<Projectile>())
+                {
+                    if (collision.gameObject.name != "Water" || !DieInWater)
+                    {
+                        return;
+                    }
+                }
             }
+            if (ignoreCollision.Contains(collision.transform)) return;
+            Vector3 point;
+            Vector3 normal;
+            if (collision.contactCount > 0)
+            {
+                ContactPoint contact = collision.GetContact(0);
+                point = contact.point;
+                normal = contact.normal;
+            }
+            else
+            {
+                point = collision.collider.ClosestPointOnBounds(Position); ;
+                normal = Vector3.up;
+            }
+            Impact(point, normal, collision.collider);
+        }
+
+        bool Impact(Vector3 at, Vector3 normal, Collider obj, bool force = false)
+        {
+            if (destroyed) return true;
+            Debug.DrawLine(at, at + normal, Color.red, 5f);
+            Debug3D.DrawSphere(at, .2f, Color.red, 5f);
+
+            bool hasMaterial = obj.gameObject.TryGetComponent(out IObjectMaterial material);
+
+            float fuckYouValue = obj.TryGetComponent(out BaseObject _baseObj) ? TeamManager.Instance.GetFuckYou(_baseObj.TeamHash, this.OwnerTeamHash) : 0f;
+
+            if (obj.TryGetComponent(out Projectile otherProjectile))
+            {
+                if (!force)
+                {
+                    if (PropabilityOfProjectileIntersection == 0f)
+                    { return false; }
+
+                    if (PropabilityOfProjectileIntersection != 1f && Random.value > PropabilityOfProjectileIntersection)
+                    { return false; }
+                }
+
+                destroyed = true;
+                otherProjectile.Impact(at, -normal, GetComponent<Collider>(), true);
+            }
+            else if (CanBounce && (!hasMaterial || material.Hardness > float.Epsilon))
+            {
+                float normalAngle = Vector3.Angle(rb.velocity, -normal);
+                float impactAngle = 90f - Mathf.Clamp(normalAngle, 0f, 90f);
+
+                float modifiedImpactAngle = impactAngle;
+                if (hasMaterial)
+                { modifiedImpactAngle /= material.Hardness; }
+
+                if (modifiedImpactAngle < BounceAngle && rb != null)
+                {
+                    float impactEnergy = Mathf.Sin(impactAngle * Mathf.Deg2Rad);
+                    float remaingEnergy = 1f - impactEnergy;
+
+                    if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
+                    { obj.attachedRigidbody.AddForceAtPosition(ImpactForce * impactEnergy * transform.forward, at, ForceMode.Impulse); }
+
+                    var newVelocity = Vector3.Reflect(rb.velocity * remaingEnergy, normal);
+                    rb.velocity = newVelocity;
+
+                    if (RicochetEffect != null)
+                    { GameObject.Instantiate(RicochetEffect, at, Quaternion.LookRotation(newVelocity, Vector3.up), ObjectGroups.Effects); }
+
+                    return false;
+                }
+            }
+
+            DetachTrail();
+
+            TakeDamage(obj, at, fuckYouValue);
+
+            bool impactEffectCreated = false;
+
+            if (ExplodeOnImpact)
+            { impactEffectCreated = impactEffectCreated || Explode(at, hasMaterial ? material.BlastAbsorptionCapacity : 0f); }
 
             destroyed = true;
-            otherProjectile.Impact(at, -normal, GetComponent<Collider>(), true);
-        }
-        else if (CanBounce && (!hasMaterial || material.Hardness > float.Epsilon))
-        {
-            float normalAngle = Vector3.Angle(rb.velocity, -normal);
-            float impactAngle = 90f - Mathf.Clamp(normalAngle, 0f, 90f);
 
-            float modifiedImpactAngle = impactAngle;
-            if (hasMaterial)
-            { modifiedImpactAngle /= material.Hardness; }
+            if (!impactEffectCreated)
+            { impactEffectCreated = CreateImpactEffect(obj.gameObject, at, normal, material); }
 
-            if (modifiedImpactAngle < BounceAngle && rb != null)
-            {
-                float impactEnergy = Mathf.Sin(impactAngle * Mathf.Deg2Rad);
-                float remaingEnergy = 1f - impactEnergy;
+            if (Owner != null && Owner is UnitAttacker owner2)
+            { owner2.turret.NotifyImpact(this, at); }
 
-                if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
-                { obj.attachedRigidbody.AddForceAtPosition(ImpactForce * impactEnergy * transform.forward, at, ForceMode.Impulse); }
+            if (!impactEffectCreated && impactEffect != null) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
+            GameObject.Destroy(gameObject);
 
-                var newVelocity = Vector3.Reflect(rb.velocity * remaingEnergy, normal);
-                rb.velocity = newVelocity;
-
-                if (RicochetEffect != null)
-                { GameObject.Instantiate(RicochetEffect, at, Quaternion.LookRotation(newVelocity, Vector3.up), ObjectGroups.Effects); }
-
-                return false;
-            }
-        }
-
-        DetachTrail();
-
-        TakeDamage(obj, at, fuckYouValue);
-
-        bool impactEffectCreated = false;
-
-        if (ExplodeOnImpact)
-        { impactEffectCreated = impactEffectCreated || Explode(at, hasMaterial ? material.BlastAbsorptionCapacity : 0f); }
-
-        destroyed = true;
-
-        if (!impactEffectCreated)
-        { impactEffectCreated = CreateImpactEffect(obj.gameObject, at, normal, material); }
-
-        if (Owner != null && Owner is UnitAttacker owner2)
-        { owner2.turret.NotifyImpact(this, at); }
-
-        if (!impactEffectCreated && impactEffect != null) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
-        GameObject.Destroy(gameObject);
-
-        return true;
-    }
-
-    void DetachTrail()
-    {
-        if (trail == null) return;
-        trail.transform.SetParent(ObjectGroups.Effects);
-
-        if (trail.TryGetComponent(out TrailRenderer trailRenderer))
-        { trailRenderer.emitting = false; }
-
-        if (trail.TryGetComponent(out ParticleSystem particleSystem))
-        {
-            ParticleSystem.EmissionModule emission = particleSystem.emission;
-            emission.enabled = false;
-        }
-    }
-
-    void TakeDamage(Collider other, Vector3 at, float fuckYouValue)
-    {
-        if (fuckYouValue < 0f && !DamageAllies)
-        { return; }
-
-        if (ImpactForce != 0f && other.attachedRigidbody != null)
-        { other.attachedRigidbody.AddForceAtPosition(transform.forward * ImpactForce, at, ForceMode.Impulse); }
-
-        if (ImpactDamage <= 0f)
-        { return; }
-
-        if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamagable))
-        {
-            detailedDamagable.Damage(ImpactDamage, this);
-            return;
-        }
-
-        if (other.gameObject.TryGetComponentInParent(out IDamagable damagable))
-        {
-            damagable.Damage(ImpactDamage);
-            return;
-        }
-    }
-
-    bool CreateImpactEffect(GameObject other, Vector3 at, Vector3 normal, IObjectMaterial material)
-    {
-        if (ImpactEffects == null ||
-            ImpactEffects.Length == 0 ||
-            material == null)
-        { return false; }
-
-        bool impactEffectCreated = false;
-
-        string m = material.Material;
-        for (int i = 0; i < ImpactEffects.Length; i++)
-        {
-            if (ImpactEffects[i].MaterialID == m)
-            {
-                if (ImpactEffects[i].Particles != null)
-                {
-                    Vector3 direction = ImpactEffects[i].UseNormal ? normal : Vector3.up;
-
-                    if (other.HasComponent<TerrainCollider>())
-                    {
-                        direction = Vector3.up;
-                    }
-
-                    GameObject.Instantiate(ImpactEffects[i].Particles, at, Quaternion.LookRotation(Vector3.up, direction), ObjectGroups.Effects);
-
-                    impactEffectCreated = true;
-                }
-
-                if (ImpactEffects[i].Hoe != null)
-                {
-                    GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform);
-                }
-            }
-        }
-
-        return impactEffectCreated;
-    }
-
-    bool Explode(Vector3 origin, float absorbed)
-    {
-        if (ExploisonRadius <= 0f ||
-            destroyed) return false;
-
-        destroyed = true;
-
-        if (absorbed < 1f)
-        {
-            Collider[] objectsInRange = Physics.OverlapSphere(origin, ExploisonRadius);
-
-            for (int i = 0; i < objectsInRange.Length; i++)
-            {
-                Collider objectCollider = objectsInRange[i];
-
-                if (objectCollider.gameObject == this.gameObject) continue;
-
-                if (objectCollider.isTrigger)
-                {
-                    if (objectCollider.gameObject.TryGetComponent(out Projectile otherProjectile))
-                    { otherProjectile.OnOtherExploison(this); }
-                    else
-                    { continue; }
-                }
-
-                float fuckYouValue = objectCollider.gameObject.TryGetComponent(out BaseObject _baseObj) ? TeamManager.Instance.GetFuckYou(_baseObj.TeamHash, this.OwnerTeamHash) : 0f;
-
-                if (fuckYouValue < 0f && !DamageAllies)
-                { continue; }
-
-                if (objectCollider.attachedRigidbody != null) objectCollider.attachedRigidbody.AddExplosionForce(ExploisonForce * (1f - absorbed), origin, ExploisonRadius, 1f, ForceMode.Impulse);
-
-                GameObject @object = objectCollider.gameObject;
-
-                float distanceSqr = Mathf.Max(1f, (@object.transform.position - origin).sqrMagnitude);
-
-                if (@object.TryGetComponent(out IDetailedDamagable detailedDamagable))
-                {
-                    detailedDamagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr, this);
-                }
-                else if (@object.TryGetComponent<IDamagable>(out var damagable))
-                {
-                    damagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr);
-                }
-            }
-        }
-
-        if (ExploisonEffect != null)
-        {
-            GameObject.Instantiate(ExploisonEffect, origin, Quaternion.identity, ObjectGroups.Effects);
             return true;
         }
 
-        return false;
-    }
-
-    private void OnOtherExploison(Projectile exploisonSource)
-    {
-        if (!DestroyInExploisons) return;
-        if (destroyed) return;
-
-        destroyed = true;
-
-        if (trail != null)
+        void DetachTrail()
         {
+            if (trail == null) return;
             trail.transform.SetParent(ObjectGroups.Effects);
-            if (trail.TryGetComponent<TrailRenderer>(out var trailRenderer))
+
+            if (trail.TryGetComponent(out TrailRenderer trailRenderer))
             { trailRenderer.emitting = false; }
+
+            if (trail.TryGetComponent(out ParticleSystem particleSystem))
+            {
+                ParticleSystem.EmissionModule emission = particleSystem.emission;
+                emission.enabled = false;
+            }
         }
 
-        if (ExploisonRadius > 0f)
-        { Explode(Position, 0f); }
+        void TakeDamage(Collider other, Vector3 at, float fuckYouValue)
+        {
+            if (fuckYouValue < 0f && !DamageAllies)
+            { return; }
 
-        if (Owner != null && Owner is UnitAttacker owner2)
-        { owner2.turret.NotifyImpact(this, Position); }
+            if (ImpactForce != 0f && other.attachedRigidbody != null)
+            { other.attachedRigidbody.AddForceAtPosition(transform.forward * ImpactForce, at, ForceMode.Impulse); }
 
-        if (impactEffect != null) GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects);
-        GameObject.Destroy(gameObject);
+            if (ImpactDamage <= 0f)
+            { return; }
+
+            if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamagable))
+            {
+                detailedDamagable.Damage(ImpactDamage, this);
+                return;
+            }
+
+            if (other.gameObject.TryGetComponentInParent(out IDamagable damagable))
+            {
+                damagable.Damage(ImpactDamage);
+                return;
+            }
+        }
+
+        bool CreateImpactEffect(GameObject other, Vector3 at, Vector3 normal, IObjectMaterial material)
+        {
+            if (ImpactEffects == null ||
+                ImpactEffects.Length == 0 ||
+                material == null)
+            { return false; }
+
+            bool impactEffectCreated = false;
+
+            string m = material.Material;
+            for (int i = 0; i < ImpactEffects.Length; i++)
+            {
+                if (ImpactEffects[i].MaterialID == m)
+                {
+                    if (ImpactEffects[i].Particles != null)
+                    {
+                        Vector3 direction = ImpactEffects[i].UseNormal ? normal : Vector3.up;
+
+                        if (other.HasComponent<TerrainCollider>())
+                        {
+                            direction = Vector3.up;
+                        }
+
+                        GameObject.Instantiate(ImpactEffects[i].Particles, at, Quaternion.LookRotation(Vector3.up, direction), ObjectGroups.Effects);
+
+                        impactEffectCreated = true;
+                    }
+
+                    if (ImpactEffects[i].Hoe != null)
+                    {
+                        GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform);
+                    }
+                }
+            }
+
+            return impactEffectCreated;
+        }
+
+        bool Explode(Vector3 origin, float absorbed)
+        {
+            if (ExploisonRadius <= 0f ||
+                destroyed) return false;
+
+            destroyed = true;
+
+            if (absorbed < 1f)
+            {
+                Collider[] objectsInRange = Physics.OverlapSphere(origin, ExploisonRadius);
+
+                for (int i = 0; i < objectsInRange.Length; i++)
+                {
+                    Collider objectCollider = objectsInRange[i];
+
+                    if (objectCollider.gameObject == this.gameObject) continue;
+
+                    if (objectCollider.isTrigger)
+                    {
+                        if (objectCollider.gameObject.TryGetComponent(out Projectile otherProjectile))
+                        { otherProjectile.OnOtherExploison(this); }
+                        else
+                        { continue; }
+                    }
+
+                    float fuckYouValue = objectCollider.gameObject.TryGetComponent(out BaseObject _baseObj) ? TeamManager.Instance.GetFuckYou(_baseObj.TeamHash, this.OwnerTeamHash) : 0f;
+
+                    if (fuckYouValue < 0f && !DamageAllies)
+                    { continue; }
+
+                    if (objectCollider.attachedRigidbody != null) objectCollider.attachedRigidbody.AddExplosionForce(ExploisonForce * (1f - absorbed), origin, ExploisonRadius, 1f, ForceMode.Impulse);
+
+                    GameObject @object = objectCollider.gameObject;
+
+                    float distanceSqr = Mathf.Max(1f, (@object.transform.position - origin).sqrMagnitude);
+
+                    if (@object.TryGetComponent(out IDetailedDamagable detailedDamagable))
+                    {
+                        detailedDamagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr, this);
+                    }
+                    else if (@object.TryGetComponent<IDamagable>(out var damagable))
+                    {
+                        damagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr);
+                    }
+                }
+            }
+
+            if (ExploisonEffect != null)
+            {
+                GameObject.Instantiate(ExploisonEffect, origin, Quaternion.identity, ObjectGroups.Effects);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void OnOtherExploison(Projectile exploisonSource)
+        {
+            if (!DestroyInExploisons) return;
+            if (destroyed) return;
+
+            destroyed = true;
+
+            if (trail != null)
+            {
+                trail.transform.SetParent(ObjectGroups.Effects);
+                if (trail.TryGetComponent<TrailRenderer>(out var trailRenderer))
+                { trailRenderer.emitting = false; }
+            }
+
+            if (ExploisonRadius > 0f)
+            { Explode(Position, 0f); }
+
+            if (Owner != null && Owner is UnitAttacker owner2)
+            { owner2.turret.NotifyImpact(this, Position); }
+
+            if (impactEffect != null) GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects);
+            GameObject.Destroy(gameObject);
+        }
     }
 }

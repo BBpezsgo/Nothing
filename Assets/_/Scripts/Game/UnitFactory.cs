@@ -1,89 +1,138 @@
 using AssetManager;
 
+using Game.Managers;
+
 using System;
 using System.Collections.Generic;
 
+using Unity.Netcode;
+
 using UnityEngine;
 
-internal class UnitFactory : Building, INeedDirectWorldCursor
+namespace Game.Components
 {
-    [Serializable]
-    internal class QueuedUnit
+    internal class UnitFactory : Building, INeedDirectWorldCursor
     {
-        [SerializeField, ReadOnly] internal string PrefabID;
-        [SerializeField, ReadOnly] internal float RequiedProgress;
-
-        [SerializeField, ReadOnly] internal float Progress;
-    }
-
-    internal List<QueuedUnit> Queue;
-    public int CursorPriority => 0;
-
-    public float Progress
-    {
-        get
+        [Serializable]
+        internal class QueuedUnit : INetworkSerializable
         {
-            if (Queue.Count == 0) return 0f;
-            var producing = Queue[0];
-            return producing.Progress / producing.RequiedProgress;
-        }
-    }
+            [SerializeField, ReadOnly] internal string PrefabID;
+            [SerializeField, ReadOnly] internal float RequiedProgress;
 
-    [SerializeField, AssetField] Transform DepotSpawn;
+            [SerializeField, ReadOnly] internal float Progress;
 
-    void OnEnable()
-    { WorldCursorManager.Instance.Register(this); }
-    void OnDisable()
-    { WorldCursorManager.Instance.Deregister(this); }
-
-    void Start()
-    {
-        Queue = new List<QueuedUnit>();
-        UpdateTeam();
-    }
-
-    void FixedUpdate()
-    {
-        if (Queue.Count > 0)
-        {
-            Queue[0].Progress += Time.fixedDeltaTime;
-            if (Queue[0].Progress >= Queue[0].RequiedProgress)
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
-                OnUnitDone(Queue[0]);
-                Queue.RemoveAt(0);
+                serializer.SerializeValue(ref PrefabID);
+                serializer.SerializeValue(ref RequiedProgress);
+                serializer.SerializeValue(ref Progress);
+            }
+        }
+
+        internal List<QueuedUnit> Queue;
+        public int CursorPriority => 0;
+
+        public float Progress
+        {
+            get
+            {
+                if (Queue.Count == 0) return 0f;
+                var producing = Queue[0];
+                return producing.Progress / producing.RequiedProgress;
+            }
+        }
+
+        [SerializeField, AssetField] Transform DepotSpawn;
+
+        void OnEnable()
+        { WorldCursorManager.Instance.Register(this); }
+        void OnDisable()
+        { WorldCursorManager.Instance.Deregister(this); }
+
+        void Start()
+        {
+            Queue = new List<QueuedUnit>();
+            UpdateTeam();
+        }
+
+        void FixedUpdate()
+        {
+            if (!NetcodeUtils.IsOfflineOrServer)
+            { return; }
+
+            if (Queue.Count <= 0)
+            { return; }
+
+            Queue[0].Progress += Time.fixedDeltaTime;
+
+            if (Queue[0].Progress < Queue[0].RequiedProgress)
+            { return; }
+
+            OnUnitDone(Queue[0]);
+            Queue.RemoveAt(0);
+
+            if (UnitFactoryManager.Instance.SelectedFactory == this)
+            { UnitFactoryManager.Instance.RefreshQueue(); }
+        }
+
+        void OnUnitDone(QueuedUnit unit)
+        {
+            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, DepotSpawn.position, DepotSpawn.rotation);
+            instance.transform.SetParent(transform.parent);
+            if (instance.TryGetComponent(out BaseObject baseObject))
+            {
+                baseObject.Team = Team;
+            }
+            instance.SetActive(true);
+        }
+
+        public bool OnWorldCursor(Vector3 worldPosition)
+        {
+            UnitFactoryManager.Instance.Show(this);
+            return true;
+        }
+
+        internal void QueueUnit(UnitFactoryManager.ProducableUnit unit)
+        {
+            if (NetcodeUtils.IsOfflineOrServer)
+            {
+                Queue.Add(new QueuedUnit()
+                {
+                    Progress = 0f,
+                    RequiedProgress = unit.ProgressRequied,
+                    PrefabID = unit.PrefabID,
+                });
 
                 if (UnitFactoryManager.Instance.SelectedFactory == this)
                 { UnitFactoryManager.Instance.RefreshQueue(); }
             }
+            else
+            {
+                QueueUnitRequest_ServerRpc(unit);
+            }
         }
-    }
 
-    void OnUnitDone(QueuedUnit unit)
-    {
-        GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, DepotSpawn.position, DepotSpawn.rotation);
-        instance.transform.SetParent(transform.parent);
-        if (instance.TryGetComponent(out BaseObject baseObject))
+        [ServerRpc]
+        void QueueUnitRequest_ServerRpc(UnitFactoryManager.ProducableUnit unit)
         {
-            baseObject.Team = Team;
+            Queue.Add(new QueuedUnit()
+            {
+                Progress = 0f,
+                RequiedProgress = unit.ProgressRequied,
+                PrefabID = unit.PrefabID,
+            });
+
+            if (UnitFactoryManager.Instance.SelectedFactory == this)
+            { UnitFactoryManager.Instance.RefreshQueue(); }
+
+            RefreshRequest_ClientRpc();
         }
-    }
 
-    public bool OnWorldCursor(Vector3 worldPosition)
-    {
-        UnitFactoryManager.Instance.Show(this);
-        return true;
-    }
-
-    internal void QueueUnit(UnitFactoryManager.ProducableUnit unit)
-    {
-        Queue.Add(new QueuedUnit()
+        [ClientRpc]
+        void RefreshRequest_ClientRpc()
         {
-            Progress = 0f,
-            RequiedProgress = unit.ProgressRequied,
-            PrefabID = unit.PrefabID,
-        });
-
-        if (UnitFactoryManager.Instance.SelectedFactory == this)
-        { UnitFactoryManager.Instance.RefreshQueue(); }
+            if (UnitFactoryManager.Instance.SelectedFactory == this)
+            { UnitFactoryManager.Instance.RefreshQueue(); }
+        }
     }
 }

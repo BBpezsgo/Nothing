@@ -1,185 +1,181 @@
 using AssetManager;
 
+using Game.Managers;
+
 using Unity.Netcode;
 
 using UnityEngine;
 
 using Utilities;
 
-internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHasTurret
+namespace Game.Components
 {
-    [SerializeField, ReadOnly] Vector3 destination;
-    [SerializeField, AssetField] VehicleEngine vehicleEngine;
-    [SerializeField, AssetField] internal Turret turret;
-
-    public Turret Turret => turret;
-    [SerializeField, ReadOnly] ulong controllingByUser;
-    public ulong ControllingByUser
+    internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHasTurret
     {
-        get => controllingByUser;
-        set => controllingByUser = value;
-    }
+        [SerializeField, ReadOnly] Vector3 destination;
+        [SerializeField, AssetField] MovementEngine vehicleEngine;
+        [SerializeField, AssetField] internal Turret turret;
 
-    [SerializeField, AssetField] internal GameObject UiSelected;
-
-    [SerializeField, ReadOnly] internal UnitBehaviour UnitBehaviour;
-
-    [SerializeField] internal GameObject DestroyEffect;
-    [SerializeField, AssetField] internal float HP;
-    float _maxHp;
-
-    internal float NormalizedHP => HP / _maxHp;
-
-    ISelectable.State selectableState = ISelectable.State.None;
-    public ISelectable.State SelectableState
-    {
-        get => selectableState;
-        set
+        public Turret Turret => turret;
+        [SerializeField, ReadOnly] ulong controllingByUser;
+        public ulong ControllingByUser
         {
-            if (this == null) return;
-            if (UiSelected == null) return;
-            selectableState = value;
-            if (selectableState == ISelectable.State.None)
-            { UiSelected.SetActive(false); }
-            else
-            {
-                UiSelected.SetActive(true);
-                if (selectableState == ISelectable.State.Almost)
-                { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.AlmostSelectedColor, 1f); }
-                else if (selectableState == ISelectable.State.Selected)
-                { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.SelectedColor, 1f); }
-            }
+            get => controllingByUser;
+            set => controllingByUser = value;
         }
-    }
 
-    void Awake()
-    {
-        this.ControllingByUser = ulong.MaxValue;
+        [SerializeField, AssetField] internal GameObject UiSelected;
 
-        if (turret != null) turret.@base = this;
-        if (!TryGetComponent(out UnitBehaviour))
-        { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehaviour)} is null", this); }
+        [SerializeField, ReadOnly] internal UnitBehaviour UnitBehaviour;
 
-        _maxHp = HP == 0f ? 1f : HP;
-    }
+        [SerializeField] internal GameObject DestroyEffect;
+        [SerializeField, AssetField] internal float HP;
+        float _maxHp;
 
-    void Start()
-    {
-        if (!TryGetComponent(out vehicleEngine))
-        { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
-        UpdateTeam();
+        internal float NormalizedHP => HP / _maxHp;
 
-        _maxHp = HP == 0f ? 1f : HP;
-    }
-
-    void OnEnable()
-    { RegisteredObjects.Units.Add(this); }
-    void OnDisable()
-    { RegisteredObjects.Units.Remove(this); }
-
-    public override void OnDestroy()
-    {
-        if (gameObject.scene.isLoaded && DestroyEffect != null)
-        { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
-
-        base.OnDestroy();
-
-        if (this.IAmControllingThis() && gameObject.scene.isLoaded)
-        { TakeControlManager.Instance.ControllableDestroyed(); }
-    }
-
-    public virtual void DoInput()
-    {
-        if (turret == null) return;
-
-        if (!Input.GetKey(KeyCode.LeftAlt))
+        ISelectable.State selectableState = ISelectable.State.None;
+        public ISelectable.State SelectableState
         {
-            var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-            var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
-            Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
-
-            if (NetcodeUtils.IsOfflineOrServer)
+            get => selectableState;
+            set
             {
-                turret.target.Value = point;
-            }
-            else if (NetcodeUtils.IsClient)
-            {
-                if ((turret.target.Value - point).sqrMagnitude > .5f)
+                if (this == null) return;
+                if (UiSelected == null) return;
+                selectableState = value;
+                if (selectableState == ISelectable.State.None)
+                { UiSelected.SetActive(false); }
+                else
                 {
-                    turret.TargetRequest(point);
+                    UiSelected.SetActive(true);
+                    if (selectableState == ISelectable.State.Almost)
+                    { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.AlmostSelectedColor, 1f); }
+                    else if (selectableState == ISelectable.State.Selected)
+                    { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.SelectedColor, 1f); }
                 }
             }
         }
 
-        if (Input.GetMouseButton(MouseButton.Left))
+        void Awake()
         {
-            if (turret.IsAccurateShoot)
+            this.ControllingByUser = ulong.MaxValue;
+
+            if (turret != null) turret.@base = this;
+            if (!TryGetComponent(out UnitBehaviour))
+            { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehaviour)} is null", this); }
+
+            _maxHp = HP == 0f ? 1f : HP;
+        }
+
+        void Start()
+        {
+            if (!TryGetComponent(out vehicleEngine))
+            { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
+            UpdateTeam();
+
+            _maxHp = HP == 0f ? 1f : HP;
+        }
+
+        void OnEnable()
+        { RegisteredObjects.Units.Add(this); }
+        void OnDisable()
+        { RegisteredObjects.Units.Remove(this); }
+
+        public override void OnDestroy()
+        {
+            if (gameObject.scene.isLoaded && DestroyEffect != null)
+            { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
+
+            base.OnDestroy();
+
+            if (this.IAmControllingThis() && gameObject.scene.isLoaded)
+            { TakeControlManager.Instance.ControllableDestroyed(); }
+        }
+
+        public virtual void DoInput()
+        {
+            if (turret == null) return;
+
+            if (!Input.GetKey(KeyCode.LeftAlt))
             {
+                var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+                var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
+                Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+
                 if (NetcodeUtils.IsOfflineOrServer)
                 {
-                    turret.Shoot();
+                    turret.SetTarget(point);
                 }
                 else if (NetcodeUtils.IsClient)
                 {
-                    turret.ShootRequest();
+                    if ((turret.TargetPosition - point).sqrMagnitude > .5f)
+                    {
+                        turret.TargetRequest(point);
+                    }
                 }
             }
+
+            if (Input.GetMouseButton(MouseButton.Left))
+            {
+                turret.PrepareShooting = true;
+
+                if (turret.IsAccurateShoot)
+                {
+                    if (NetcodeUtils.IsOfflineOrServer)
+                    {
+                        turret.Shoot();
+                    }
+                    else if (NetcodeUtils.IsClient)
+                    {
+                        turret.ShootRequest();
+                    }
+                }
+            }
+            else
+            {
+                turret.PrepareShooting = false;
+            }
         }
-    }
-    public virtual void DoFrequentInput()
-    { }
+        public virtual void DoFrequentInput()
+        { }
 
-    protected virtual void FixedUpdate()
-    {
-        if (vehicleEngine == null)
-        { return; }
-
-        if (this.IAmControllingThis())
+        protected virtual void FixedUpdate()
         {
-            Vector2 input = Vector2.zero;
+            if (vehicleEngine == null)
+            { return; }
 
-            input.x = Input.GetAxis("Horizontal");
-            input.y = Input.GetAxis("Vertical");
+            if (this.IAmControllingThis())
+            {
+                if (MouseManager.MouseOnWindow)
+                { vehicleEngine.DoUserInput(); }
+                return;
+            }
 
+            if (this.AnybodyControllingThis())
+            { return; }
+
+            vehicleEngine.InputVector = GetInputVector();
+        }
+
+        Vector2 GetInputVector()
+        {
+            if (UnitBehaviour == null) return Vector2.zero;
+            return UnitBehaviour.GetOutput();
+        }
+
+        public void Damage(float ammount)
+        {
+            HP -= ammount;
+            if (HP <= 0f)
+            {
+                Destroy();
+            }
+        }
+
+        void Destroy()
+        {
             if (NetcodeUtils.IsOfflineOrServer)
-            {
-                vehicleEngine.InputVector = input;
-                return;
-            }
-
-            if (NetcodeUtils.IsClient && vehicleEngine.InputVector != input)
-            {
-                vehicleEngine.InputRequest(input);
-                return;
-            }
-
-            return;
+            { GameObject.Destroy(gameObject); }
         }
-
-        if (this.AnybodyControllingThis())
-        { return; }
-
-        vehicleEngine.InputVector = GetInputVector();
-    }
-
-    Vector2 GetInputVector()
-    {
-        if (UnitBehaviour == null) return Vector2.zero;
-        return UnitBehaviour.GetOutput();
-    }
-
-    public void Damage(float ammount)
-    {
-        HP -= ammount;
-        if (HP <= 0f)
-        {
-            Destroy();
-        }
-    }
-
-    void Destroy()
-    {
-        if (NetcodeUtils.IsOfflineOrServer)
-        { GameObject.Destroy(gameObject); }
     }
 }

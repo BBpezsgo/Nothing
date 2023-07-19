@@ -875,8 +875,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abb4954eade84d4bb840541aadbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Knockback: 1
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
+  Barrel: {fileID: 0}
+  RequiedBarrelRotationSpeed: 0
+  BarrelRotationAcceleration: 0
+  BarrelRotationSpeed: 0
+  PrepareShooting: 0
   cannon: {fileID: 478279084}
   cannonRotationSpeed: 20
   cannonLowestAngle: -10
@@ -898,8 +904,7 @@ MonoBehaviour:
   IsBallisticProjectile: 1
   Scope: {fileID: 0}
   ScopeHolder: {fileID: 0}
-  target:
-    m_InternalValue: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
   overridedInput: {x: 0, y: 0}
   base: {fileID: 0}
@@ -1369,6 +1374,9 @@ MonoBehaviour:
   - ID: c
     Color: {r: 0.83137256, g: 0.20784314, b: 0.5475496, a: 0}
     Hash: 0
+  - ID: scav
+    Color: {r: 0.5660378, g: 0.40980512, b: 0.11480955, a: 0}
+    Hash: 0
   fuckYous:
   - Team1: a
     Team1Hash: 0
@@ -1384,7 +1392,7 @@ MonoBehaviour:
     Team1Hash: 0
     Team2: a
     Team2Hash: 0
-    FuckYouValue: 0
+    FuckYouValue: -1
   - Team1: b
     Team1Hash: 0
     Team2: b
@@ -1395,6 +1403,12 @@ MonoBehaviour:
     Team2: c
     Team2Hash: 0
     FuckYouValue: -1
+  - Team1: scav
+    Team1Hash: 0
+    Team2: scav
+    Team2Hash: 0
+    FuckYouValue: -1
+  btnAutoFriends: 
 --- !u!4 &808182007
 Transform:
   m_ObjectHideFlags: 0
@@ -2159,31 +2173,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Team: a
   ProducableUnits:
-  - Unit: {fileID: 4690245384110751948, guid: d35e67d154dc0e6468bf4096c5d64330, type: 3}
+  - Hash: 1734
+    Unit: {fileID: 4690245384110751948, guid: d35e67d154dc0e6468bf4096c5d64330, type: 3}
     ProgressRequied: 3
-  - Unit: {fileID: 44472583122888728, guid: f8dbf41fb105ecd45a65da977d26f3ec, type: 3}
+  - Hash: 931
+    Unit: {fileID: 44472583122888728, guid: f8dbf41fb105ecd45a65da977d26f3ec, type: 3}
     ProgressRequied: 5
-  - Unit: {fileID: 4032902050812513782, guid: 19e567b948cfd9742b38382475c4cbe6, type: 3}
+  - Hash: 138
+    Unit: {fileID: 4032902050812513782, guid: 19e567b948cfd9742b38382475c4cbe6, type: 3}
     ProgressRequied: 7
-  - Unit: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd, type: 3}
+  - Hash: 48
+    Unit: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd, type: 3}
     ProgressRequied: 10
   ConstructableBuildings:
-  - SpaceNeed: {x: 10, y: 5, z: 10}
+  - Hash: 332
+    SpaceNeed: {x: 20, y: 5, z: 20}
     Building: {fileID: 2759722349239998939, guid: bfc523d2d2500a847bf8551940258919,
       type: 3}
     ProgressRequied: 11
-  - SpaceNeed: {x: 2, y: 4, z: 2}
+  - Hash: 1613
+    SpaceNeed: {x: 2, y: 4, z: 2}
     Building: {fileID: 5949810894222826661, guid: c5057dca95ffbbb4496a743e3fda0976,
       type: 3}
     ProgressRequied: 5
-  - SpaceNeed: {x: 2, y: 4, z: 2}
+  - Hash: 54
+    SpaceNeed: {x: 2, y: 4, z: 2}
     Building: {fileID: 4273319253527134430, guid: 9c15fdf5485b1844f8594fda053e798b,
       type: 3}
     ProgressRequied: 16
-  - SpaceNeed: {x: 3.5, y: 8, z: 3.5}
+  - Hash: 696
+    SpaceNeed: {x: 3.5, y: 8, z: 3.5}
     Building: {fileID: 1728721395496267737, guid: 76de461b9ea102248ac9a91c67bdd983,
       type: 3}
     ProgressRequied: 20
+  btn_GenHash: 
 --- !u!4 &1356665773
 Transform:
   m_ObjectHideFlags: 0
@@ -2264,7 +2287,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1376606809
 Transform:
   m_ObjectHideFlags: 0
@@ -3325,6 +3348,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2093730559}
   - component: {fileID: 2093730558}
+  - component: {fileID: 2093730560}
   m_Layer: 0
   m_Name: BuildingManager
   m_TagString: Untagged
@@ -3344,9 +3368,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69871d22ea6819945a7f209975f049a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Terrain: {fileID: 0}
   Team: a
   SelectedBuilding:
+    Hash: 0
     SpaceNeed: {x: 1, y: 1, z: 1}
     Building: {fileID: 0}
     ProgressRequied: 0
@@ -3380,6 +3404,26 @@ Transform:
   m_Father: {fileID: 1358086404}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2093730560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2093730557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1500434050
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!1 &2135375409
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,19 +1,22 @@
 using UnityEngine;
 
-public class ParticleSystemDestroy : MonoBehaviour
+namespace Game.Components
 {
-    [SerializeField, ReadOnly] ParticleSystem _particleSystem;
-
-    void Awake()
+    public class ParticleSystemDestroy : MonoBehaviour
     {
-        _particleSystem = GetComponent<ParticleSystem>();
-    }
+        [SerializeField, ReadOnly] ParticleSystem _particleSystem;
 
-    void FixedUpdate()
-    {
-        if (_particleSystem.particleCount == 0)
+        void Awake()
         {
-            GameObject.Destroy(gameObject);
+            _particleSystem = GetComponent<ParticleSystem>();
+        }
+
+        void FixedUpdate()
+        {
+            if (_particleSystem.particleCount == 0)
+            {
+                GameObject.Destroy(gameObject);
+            }
         }
     }
 }

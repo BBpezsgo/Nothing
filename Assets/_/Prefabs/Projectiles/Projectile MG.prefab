@@ -272,9 +272,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Register: 0
+  AudioSource: {fileID: 0}
   Acceleration: 0
   ImpactForce: 1
-  ImpactDamage: 2
+  ImpactDamage: 1
   CanBounce: 1
   BounceAngle: 45
   ExploisonForce: 0
@@ -283,30 +284,36 @@ MonoBehaviour:
   ExplodeOnImpact: 0
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
+  ImpactSound: {fileID: 0}
   impactEffect: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
     type: 3}
   ImpactEffects:
   - MaterialID: Dirt
+    Sound: {fileID: 0}
     Particles: {fileID: 5220818771854075135, guid: 17c513c42962f19469b78a03345229fc,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 179531623064346593, guid: 252fe6fc0299df646bce00136809c58a, type: 3}
   - MaterialID: Metal
+    Sound: {fileID: 0}
     Particles: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 179531623064346593, guid: fa896e01193c6f743adb120133c44d28, type: 3}
   - MaterialID: Concrete
+    Sound: {fileID: 0}
     Particles: {fileID: 7690606633279578764, guid: 333214152a1848c4288d56d05285f6f5,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}
   - MaterialID: Water
+    Sound: {fileID: 0}
     Particles: {fileID: 7944883426860124920, guid: 783eb12d07beaac488a5207cfff12cf1,
       type: 3}
     UseNormal: 0
     Hoe: {fileID: 0}
   - MaterialID: Creature
+    Sound: {fileID: 0}
     Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
       type: 3}
     UseNormal: 1
@@ -319,6 +326,7 @@ MonoBehaviour:
   rotationSpeedZ: 0
   RandomRotation: 0
   RotateThis: {fileID: 0}
+  DieInWater: 1
   DestroyInExploisons: 0
   ignoreCollision: []
   LifeLeft: 0

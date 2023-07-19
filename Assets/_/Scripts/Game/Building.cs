@@ -2,58 +2,61 @@ using AssetManager;
 
 using UnityEngine;
 
-internal class Building : BaseObject, IDamagable
+namespace Game.Components
 {
-    [SerializeField] GameObject DestroyEffect;
-    [SerializeField, AssetField] internal float HP;
-    [SerializeField] public Vector3 GroundOrigin;
-
-    internal float NormalizedHP => HP / _maxHp;
-
-    float _maxHp;
-
-    public override void OnDestroy()
+    internal class Building : BaseObject, IDamagable
     {
-        if (gameObject.scene.isLoaded && DestroyEffect != null)
-        { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
+        [SerializeField] GameObject DestroyEffect;
+        [SerializeField, AssetField] internal float HP;
+        [SerializeField] public Vector3 GroundOrigin;
 
-        base.OnDestroy();
-    }
+        internal float NormalizedHP => HP / _maxHp;
 
-    void OnEnable()
-    { RegisteredObjects.Buildings.Add(this); }
-    void OnDisable()
-    { RegisteredObjects.Buildings.Remove(this); }
+        float _maxHp;
 
-    void Start()
-    {
-        UpdateTeam();
-
-        _maxHp = HP == 0f ? 1f : HP;
-    }
-
-    public void Damage(float ammount)
-    {
-        HP -= ammount;
-        if (HP <= 0f)
+        public override void OnDestroy()
         {
-            Destroy();
+            if (gameObject.scene.isLoaded && DestroyEffect != null)
+            { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
+
+            base.OnDestroy();
         }
-    }
 
-    void Destroy()
-    {
-        if (NetcodeUtils.IsOfflineOrServer)
-        { GameObject.Destroy(gameObject); }
-    }
+        void OnEnable()
+        { RegisteredObjects.Buildings.Add(this); }
+        void OnDisable()
+        { RegisteredObjects.Buildings.Remove(this); }
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(GroundOrigin - Vector3.right, GroundOrigin + Vector3.right);
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(GroundOrigin - Vector3.up, GroundOrigin + Vector3.up);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(GroundOrigin - Vector3.forward, GroundOrigin + Vector3.forward);
+        void Start()
+        {
+            UpdateTeam();
+
+            _maxHp = HP == 0f ? 1f : HP;
+        }
+
+        public void Damage(float ammount)
+        {
+            HP -= ammount;
+            if (HP <= 0f)
+            {
+                Destroy();
+            }
+        }
+
+        void Destroy()
+        {
+            if (NetcodeUtils.IsOfflineOrServer)
+            { GameObject.Destroy(gameObject); }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(GroundOrigin - Vector3.right, GroundOrigin + Vector3.right);
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(GroundOrigin - Vector3.up, GroundOrigin + Vector3.up);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(GroundOrigin - Vector3.forward, GroundOrigin + Vector3.forward);
+        }
     }
 }

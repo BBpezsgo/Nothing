@@ -1,4 +1,7 @@
 using UnityEngine;
 
-public class LoadedAssetObject : MonoBehaviour
-{ }
+namespace AssetManager.Components
+{
+    public class LoadedAssetObject : MonoBehaviour
+    { }
+}

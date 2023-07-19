@@ -1,4 +1,5 @@
-using Messages;
+
+using Networking.Messages;
 
 using System;
 using System.Collections.Generic;
@@ -8,219 +9,225 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-public class NetcodeMessaging
+namespace Networking
 {
-    static NetworkManager NetworkManager => NetworkManager.Singleton;
-    internal const int MessageSize = 1100;
-    internal const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
+    using Messages;
 
-    internal static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
+    public class NetcodeMessaging
     {
-        BaseMessage baseMessage = new(MessageType.UNKNOWN, ulong.MaxValue);
-        if (!reader.TryBeginRead(BaseMessage.HeaderSize))
-        { throw new Exception($"Tried to read {BaseMessage.HeaderSize} bytes from buffer with size of {reader.Length} bytes from position {reader.Position}"); }
-        baseMessage.Deserialize(reader);
-        switch (baseMessage.Type)
+        static NetworkManager NetworkManager => NetworkManager.Singleton;
+        internal const int MessageSize = 1100;
+        internal const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
+
+        internal static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
         {
-            case MessageType.SYNC:
-                {
-                    ComponentHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-            case MessageType.UNKNOWN_OBJECT:
-                {
-                    ObjectHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.SPAWN_OBJECT:
-                {
-                    InstantiationHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    if (NetworkManager.IsServer)
-                    { Debug.LogWarning($"[{nameof(NetcodeMessaging)}]: Server got a '{baseMessage.Type}' message"); }
-                    return header;
-                }
-            case MessageType.GET_RATE:
-                return baseMessage;
-            case MessageType.RATE:
-                {
-                    LiteralHeader<byte> header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    if (NetworkManager.IsServer)
-                    { Debug.LogWarning($"[{nameof(NetcodeMessaging)}]: Server got a '{baseMessage.Type}' message"); }
-                    return header;
-                }
-
-            case MessageType.DESTROY_OBJECT:
-                {
-                    ObjectHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-            case MessageType.RPC:
-                {
-                    RpcHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.GET_SCENE:
-                return baseMessage;
-            case MessageType.SCENE:
-                {
-                    StringHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.CHUNK:
-                {
-                    ChunkHeader header = new(baseMessage.Type, clientId);
-                    if (!reader.TryBeginRead(header.Size()))
-                    { throw new OverflowException($"Tried to read {header.Size()} bytes from buffer with size of {reader.Length} bytes"); }
-                    header.Deserialize(reader);
-                    return header;
-                }
-            case MessageType.CHUNK_ACK:
-                {
-                    EmptyChunkHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.SCENE_LOADED:
-                return baseMessage;
-            case MessageType.REQUEST:
-                {
-                    RequestHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.USER_DATA_REQUEST:
-                {
-                    UserDataRequestHeader header = new(baseMessage.Type, baseMessage.Sender);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.USER_DATA:
-                {
-                    UserDataHeader header = new(baseMessage.Type, clientId);
-                    header.Deserialize(reader);
-                    return header;
-                }
-
-            case MessageType.USER_DATA_REQUEST_DIRECT:
-                return baseMessage;
-            case MessageType.UNKNOWN:
-            default:
-                throw new Exception($"[{nameof(NetcodeMessaging)}]: Unknown message type {baseMessage.Type}({baseMessage.TypeRaw}) form client {baseMessage.Sender}");
-        }
-    }
-
-    internal static BaseMessage[] ReciveUnnamedMessage(ulong clientId, FastBufferReader reader)
-    {
-        string senderName = ((clientId == NetworkManager.ServerClientId) ? $"server" : $"client {clientId}");
-        Debug.Log($"[{nameof(NetcodeMessaging)}]: Recived {reader.Length} bytes from {senderName}");
-        int endlessSafe = 5000;
-        List<BaseMessage> result = new();
-        while (reader.TryBeginRead(BaseMessage.HeaderSize))
-        {
-            if (endlessSafe-- <= 0) { Debug.LogError($"[{nameof(NetcodeMessaging)}]: Endless loop!"); break; }
-
-            try
+            BaseMessage baseMessage = new(MessageType.UNKNOWN, ulong.MaxValue);
+            if (!reader.TryBeginRead(BaseMessage.HeaderSize))
+            { throw new Exception($"Tried to read {BaseMessage.HeaderSize} bytes from buffer with size of {reader.Length} bytes from position {reader.Position}"); }
+            baseMessage.Deserialize(reader);
+            switch (baseMessage.Type)
             {
-                var message = DeserializeMessage(clientId, reader);
-                if (message.Type != MessageType.SYNC)
+                case MessageType.SYNC:
+                    {
+                        ComponentHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+                case MessageType.UNKNOWN_OBJECT:
+                    {
+                        ObjectHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.SPAWN_OBJECT:
+                    {
+                        InstantiationHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        if (NetworkManager.IsServer)
+                        { Debug.LogWarning($"[{nameof(NetcodeMessaging)}]: Server got a '{baseMessage.Type}' message"); }
+                        return header;
+                    }
+                case MessageType.GET_RATE:
+                    return baseMessage;
+                case MessageType.RATE:
+                    {
+                        LiteralHeader<byte> header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        if (NetworkManager.IsServer)
+                        { Debug.LogWarning($"[{nameof(NetcodeMessaging)}]: Server got a '{baseMessage.Type}' message"); }
+                        return header;
+                    }
+
+                case MessageType.DESTROY_OBJECT:
+                    {
+                        ObjectHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+                case MessageType.RPC:
+                    {
+                        RpcHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.GET_SCENE:
+                    return baseMessage;
+                case MessageType.SCENE:
+                    {
+                        StringHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.CHUNK:
+                    {
+                        ChunkHeader header = new(baseMessage.Type, clientId);
+                        if (!reader.TryBeginRead(header.Size()))
+                        { throw new OverflowException($"Tried to read {header.Size()} bytes from buffer with size of {reader.Length} bytes"); }
+                        header.Deserialize(reader);
+                        return header;
+                    }
+                case MessageType.CHUNK_ACK:
+                    {
+                        EmptyChunkHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.SCENE_LOADED:
+                    return baseMessage;
+                case MessageType.REQUEST:
+                    {
+                        RequestHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.USER_DATA_REQUEST:
+                    {
+                        UserDataRequestHeader header = new(baseMessage.Type, baseMessage.Sender);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.USER_DATA:
+                    {
+                        UserDataHeader header = new(baseMessage.Type, clientId);
+                        header.Deserialize(reader);
+                        return header;
+                    }
+
+                case MessageType.USER_DATA_REQUEST_DIRECT:
+                    return baseMessage;
+                case MessageType.UNKNOWN:
+                default:
+                    throw new Exception($"[{nameof(NetcodeMessaging)}]: Unknown message type {baseMessage.Type}({baseMessage.TypeRaw}) form client {baseMessage.Sender}");
+            }
+        }
+
+        internal static BaseMessage[] ReciveUnnamedMessage(ulong clientId, FastBufferReader reader)
+        {
+            string senderName = ((clientId == NetworkManager.ServerClientId) ? $"server" : $"client {clientId}");
+            Debug.Log($"[{nameof(NetcodeMessaging)}]: Recived {reader.Length} bytes from {senderName}");
+            int endlessSafe = 5000;
+            List<BaseMessage> result = new();
+            while (reader.TryBeginRead(BaseMessage.HeaderSize))
+            {
+                if (endlessSafe-- <= 0) { Debug.LogError($"[{nameof(NetcodeMessaging)}]: Endless loop!"); break; }
+
+                try
                 {
-                    Debug.Log(
-                    $"[{nameof(NetcodeMessaging)}]: Recived message {message.Type} from {senderName} " +
+                    var message = DeserializeMessage(clientId, reader);
+                    if (message.Type != MessageType.SYNC)
+                    {
+                        Debug.Log(
+                        $"[{nameof(NetcodeMessaging)}]: Recived message {message.Type} from {senderName} " +
+                        $"{{\n" +
+                        $"{message.ToString()}" +
+                        $"}}"
+                        );
+                    }
+                    result.Add(message);
+                }
+                catch (Exception ex)
+                { Debug.LogException(ex); }
+            }
+            return result.ToArray();
+        }
+
+        internal static void BroadcastUnnamedMessage(Messages.INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        {
+            if (!NetworkManager.IsServer)
+            {
+                Debug.LogError($"[{nameof(NetcodeMessaging)}]: Client can not broadcast message");
+                return;
+            }
+            using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
+            data.Serialize(writer);
+            BroadcastUnnamedMessage(writer, networkDelivery);
+        }
+
+        internal static void SendUnnamedMessage(Messages.INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        {
+            using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
+            if (data is BaseMessage message)
+            {
+                if (!writer.TryBeginWrite(message.Size()))
+                { throw new OverflowException($"Not enough space in the buffer (Avaliable: {writer.Capacity}) (Requied: {message.Size()})"); }
+                string destinationName = ((destination == NetworkManager.ServerClientId) ? $"server" : $"client {destination}");
+                Debug.Log(
+                    $"[{nameof(NetcodeMessaging)}]: Sending message {message.Type} to {destinationName} " +
                     $"{{\n" +
                     $"{message.ToString()}" +
                     $"}}"
                     );
-                }
-                result.Add(message);
             }
-            catch (Exception ex)
-            { Debug.LogException(ex); }
+            data.Serialize(writer);
+            SendUnnamedMessage(writer, destination, networkDelivery);
         }
-        return result.ToArray();
-    }
 
-    internal static void BroadcastUnnamedMessage(Messages.INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
-    {
-        if (!NetworkManager.IsServer)
+        internal static void BroadcastUnnamedMessage(FastBufferWriter writer, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
-            Debug.LogError($"[{nameof(NetcodeMessaging)}]: Client can not broadcast message");
-            return;
+            if (!NetworkManager.IsServer)
+            {
+                Debug.LogError($"[{nameof(NetcodeMessaging)}]: Client can not broadcast message");
+                return;
+            }
+            NetworkManager.CustomMessagingManager.SendUnnamedMessageToAll(writer, networkDelivery);
+            Debug.Log($"[{nameof(NetcodeMessaging)}]: Broadcasted {writer.Length} bytes");
         }
-        using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
-        data.Serialize(writer);
-        BroadcastUnnamedMessage(writer, networkDelivery);
-    }
 
-    internal static void SendUnnamedMessage(Messages.INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
-    {
-        using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
-        if (data is BaseMessage message)
+        internal static void SendUnnamedMessage(FastBufferWriter writer, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
-            if (!writer.TryBeginWrite(message.Size()))
-            { throw new OverflowException($"Not enough space in the buffer (Avaliable: {writer.Capacity}) (Requied: {message.Size()})"); }
-            string destinationName = ((destination == NetworkManager.ServerClientId) ? $"server" : $"client {destination}");
-            Debug.Log(
-                $"[{nameof(NetcodeMessaging)}]: Sending message {message.Type} to {destinationName} " +
-                $"{{\n" +
-                $"{message.ToString()}" +
-                $"}}"
-                );
+            NetworkManager.CustomMessagingManager.SendUnnamedMessage(destination, writer, networkDelivery);
+            Debug.Log($"[{nameof(NetcodeMessaging)}]: Sent {writer.Length} bytes to client {destination}");
         }
-        data.Serialize(writer);
-        SendUnnamedMessage(writer, destination, networkDelivery);
     }
 
-    internal static void BroadcastUnnamedMessage(FastBufferWriter writer, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+    public readonly struct NetcodeMessageInfo
     {
-        if (!NetworkManager.IsServer)
+        public bool IsReading => !_isWriting;
+        public bool IsWriting => _isWriting;
+        public TimeSpan Sent => _sent;
+        public TimeSpan Received => _received;
+
+        readonly bool _isWriting;
+        readonly TimeSpan _sent;
+        readonly TimeSpan _received;
+
+        public NetcodeMessageInfo(bool isWriting, TimeSpan timeSpan)
         {
-            Debug.LogError($"[{nameof(NetcodeMessaging)}]: Client can not broadcast message");
-            return;
+            _isWriting = isWriting;
+            _sent = timeSpan;
+            _received = DateTime.UtcNow.TimeOfDay;
         }
-        NetworkManager.CustomMessagingManager.SendUnnamedMessageToAll(writer, networkDelivery);
-        Debug.Log($"[{nameof(NetcodeMessaging)}]: Broadcasted {writer.Length} bytes");
     }
 
-    internal static void SendUnnamedMessage(FastBufferWriter writer, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
-    {
-        NetworkManager.CustomMessagingManager.SendUnnamedMessage(destination, writer, networkDelivery);
-        Debug.Log($"[{nameof(NetcodeMessaging)}]: Sent {writer.Length} bytes to client {destination}");
-    }
 }
 
-public readonly struct NetcodeMessageInfo
-{
-    public bool IsReading => !_isWriting;
-    public bool IsWriting => _isWriting;
-    public TimeSpan Sent => _sent;
-    public TimeSpan Received => _received;
-
-    readonly bool _isWriting;
-    readonly TimeSpan _sent;
-    readonly TimeSpan _received;
-
-    public NetcodeMessageInfo(bool isWriting, TimeSpan timeSpan)
-    {
-        _isWriting = isWriting;
-        _sent = timeSpan;
-        _received = DateTime.UtcNow.TimeOfDay;
-    }
-}
-
-namespace Messages
+namespace Networking.Messages
 {
     internal enum MessageType : byte
     {
@@ -700,7 +707,7 @@ namespace Messages
     }
 }
 
-namespace Network
+namespace Networking.Network
 {
     class ChunkCollector
     {

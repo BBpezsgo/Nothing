@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Blueprints
+namespace Game.Blueprints
 {
     [CreateAssetMenu]
     public class Parts : ScriptableObject

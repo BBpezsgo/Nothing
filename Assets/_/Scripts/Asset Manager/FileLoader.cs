@@ -6,6 +6,9 @@ using DataUtilities.FilePacker;
 using DataUtilities.ReadableFileFormat;
 using DataUtilities.Serializer;
 
+using Networking;
+using Networking.Network;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -490,7 +493,6 @@ namespace AssetManager
 
     #region Netcode Things
 
-
     public abstract class NetcodeThing : IFileOrFolder
     {
         public abstract string Name { get; }
@@ -504,7 +506,7 @@ namespace AssetManager
         float downloadProgress = 0f;
         internal float DownloadProgress => downloadProgress;
 
-        internal void OnProgress(Network.ChunkCollector chunkCollector) => downloadProgress = chunkCollector.Progress;
+        internal void OnProgress(ChunkCollector chunkCollector) => downloadProgress = chunkCollector.Progress;
 
         protected abstract void Download();
 
@@ -729,7 +731,7 @@ namespace AssetManager
 
         /// <exception cref="NotImplementedException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        internal System.Collections.IEnumerator LoadAsnyc(string basePath, Action onDone, Action<Network.ChunkCollector> progress = null)
+        internal System.Collections.IEnumerator LoadAsnyc(string basePath, Action onDone, Action<ChunkCollector> progress = null)
         {
             if (string.IsNullOrWhiteSpace(basePath))
             { throw new ArgumentException($"'{nameof(basePath)}' cannot be null or whitespace.", nameof(basePath)); }
@@ -1654,6 +1656,7 @@ namespace AssetManager
             return deserializer.DeserializeObject<T>();
         }
 
+        /*
         static string GetPath(string path)
         {
             if (!System.IO.Path.IsPathFullyQualified(path))
@@ -1661,6 +1664,7 @@ namespace AssetManager
             else
             { return path.Replace('\\', '/'); }
         }
+        */
 
         static string GetPath(params string[] paths)
         {
@@ -1671,8 +1675,7 @@ namespace AssetManager
             }
             else
             {
-                List<string> newPath = new();
-                newPath.Add(Path);
+                List<string> newPath = new() { Path };
                 newPath.AddRange(paths);
                 return System.IO.Path.Combine(newPath.ToArray()).Replace('\\', '/');
             }

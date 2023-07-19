@@ -4,87 +4,94 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-internal class UnitBuilder : Unit
+namespace Game.Components
 {
-    [SerializeField, ReadOnly, NonReorderable] BuildableBuilding[] targets = new BuildableBuilding[0];
-    [SerializeField, ReadOnly] int nearestTargetIndex = -1;
-    [SerializeField, AssetField] float DistanceToBuild = 1f;
-    [SerializeField, AssetField] float ConstructionSpeed = 1f;
-
-    [SerializeField, ReadOnly] float TimeToNextTargetSearch = 1f;
-
-    void FindTargets()
+    internal class UnitBuilder : Unit
     {
-        if (string.IsNullOrEmpty(Team)) return;
-        List<BuildableBuilding> result = new();
-        for (int i = RegisteredObjects.BuildableBuildings.Count - 1; i >= 0; i--)
+        [SerializeField, ReadOnly, NonReorderable] BuildableBuilding[] targets = new BuildableBuilding[0];
+        [SerializeField, ReadOnly] int nearestTargetIndex = -1;
+        [SerializeField, AssetField] float DistanceToBuild = 1f;
+        [SerializeField, AssetField] float ConstructionSpeed = 1f;
+
+        [SerializeField, ReadOnly] float TimeToNextTargetSearch = 1f;
+
+        void FindTargets()
         {
-            if (RegisteredObjects.BuildableBuildings == null)
-            { continue; }
-            if (this.Team != RegisteredObjects.BuildableBuildings[i].Team)
-            { continue; }
-
-            result.Add(RegisteredObjects.BuildableBuildings[i]);
-        }
-        targets = result.ToArray();
-    }
-
-    int NearestTarget() => targets.ClosestI(transform.position).Item1;
-
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
-        if (this.AnybodyControllingThis()) return;
-
-        if (nearestTargetIndex != -1 && targets[nearestTargetIndex] != null)
-        {
-            if (turret != null)
+            if (string.IsNullOrEmpty(Team)) return;
+            List<BuildableBuilding> result = new();
+            for (int i = RegisteredObjects.BuildableBuildings.Count - 1; i >= 0; i--)
             {
-                turret.target.Value = targets[nearestTargetIndex].transform.position;
-                turret.targetTransform = targets[nearestTargetIndex].transform;
+                if (RegisteredObjects.BuildableBuildings == null)
+                { continue; }
+                if (this.Team != RegisteredObjects.BuildableBuildings[i].Team)
+                { continue; }
+
+                result.Add(RegisteredObjects.BuildableBuildings[i]);
             }
-            if ((targets[nearestTargetIndex].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
-            {
-                targets[nearestTargetIndex].Build(ConstructionSpeed * Time.fixedDeltaTime);
-            }
-
-            if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
-            { seek.Target = targets[nearestTargetIndex].transform.position; }
+            targets = result.ToArray();
         }
-        else
+
+        int NearestTarget() => targets.ClosestI(transform.position).Item1;
+
+        protected override void FixedUpdate()
         {
-            if (TimeToNextTargetSearch > 0)
+            base.FixedUpdate();
+            if (this.AnybodyControllingThis()) return;
+
+            if (nearestTargetIndex != -1 && targets[nearestTargetIndex] != null)
             {
-                TimeToNextTargetSearch -= Time.fixedDeltaTime;
+                if (turret != null)
+                {
+                    turret.SetTarget(targets[nearestTargetIndex].transform);
+                }
+                if ((targets[nearestTargetIndex].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
+                {
+                    targets[nearestTargetIndex].Build(ConstructionSpeed * Time.fixedDeltaTime);
+                }
+
+                if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
+                { seek.Target = targets[nearestTargetIndex].transform.position; }
+
+                if (TryGetComponent<UnitBehaviour_AvoidObstacles>(out var avoidObstacles))
+                { avoidObstacles.IgnoreCollision = targets[nearestTargetIndex].transform; }
             }
             else
             {
-                if (targets.Length == 0)
+                if (TimeToNextTargetSearch > 0)
                 {
-                    FindTargets();
+                    TimeToNextTargetSearch -= Time.fixedDeltaTime;
+                }
+                else
+                {
+                    if (targets.Length == 0)
+                    {
+                        FindTargets();
+                    }
+
+                    if (targets.Length != 0)
+                    {
+                        targets = targets.PurgeObjects();
+                    }
+
+                    nearestTargetIndex = NearestTarget();
+
+                    TimeToNextTargetSearch = 2f;
                 }
 
-                if (targets.Length != 0)
-                {
-                    targets = targets.PurgeObjects();
-                }
+                if (turret != null) turret.SetTarget(Vector3.zero);
 
-                nearestTargetIndex = NearestTarget();
+                if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
+                { seek.Target = Vector3.zero; }
 
-                TimeToNextTargetSearch = 2f;
+                if (TryGetComponent<UnitBehaviour_AvoidObstacles>(out var avoidObstacles))
+                { avoidObstacles.IgnoreCollision = null; }
             }
+        }
 
-            if (turret != null) turret.target.Value = Vector3.zero;
-
-            if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
-            { seek.Target = Vector3.zero; }
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(transform.position, DistanceToBuild);
         }
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, DistanceToBuild);
-    }
 }
-

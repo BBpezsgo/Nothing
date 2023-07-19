@@ -1,9 +1,252 @@
-﻿using System;
+﻿using Game.Components;
+
+using System;
 using System.Collections.Generic;
 
 using Unity.Netcode;
 
 using UnityEngine;
+
+internal static class UnclassifiedExtensions
+{
+    public static void SpawnOverNetwork(this GameObject gameObject, bool destroyWithScene = true)
+    {
+        if (NetworkManager.Singleton == null)
+        { return; }
+        if (!NetworkManager.Singleton.IsListening)
+        { return; }
+        if (!gameObject.TryGetComponent<NetworkObject>(out var networkObject))
+        { return; }
+        networkObject.Spawn(destroyWithScene);
+    }
+
+    internal static bool Contains<T>(this T[] self, T v) where T : IEquatable<T>
+    {
+        for (int i = 0; i < self.Length; i++)
+        {
+            if ((IEquatable<T>)self[i] == (IEquatable<T>)v) return true;
+        }
+        return false;
+    }
+
+    internal static bool Contains(this UnityEngine.Object[] self, UnityEngine.Object v)
+    {
+        for (int i = 0; i < self.Length; i++)
+        {
+            if (self[i] == v) return true;
+        }
+        return false;
+    }
+    internal static RaycastHit[] Exclude(this RaycastHit[] hits, params Transform[] exclude)
+    {
+        List<RaycastHit> result = new();
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].transform != null && exclude.Contains(hits[i].transform))
+            { continue; }
+
+            result.Add(hits[i]);
+        }
+        return result.ToArray();
+    }
+    internal static RaycastHit[] ExcludeTriggers(this RaycastHit[] hits)
+    {
+        List<RaycastHit> result = new();
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.isTrigger) continue;
+
+            result.Add(hits[i]);
+        }
+        return result.ToArray();
+    }
+
+    internal static RaycastHit Closest(this RaycastHit[] hits, Vector3 origin)
+    {
+        float closest = (origin - hits[0].point).sqrMagnitude;
+        int closestI = 0;
+
+        for (int i = 1; i < hits.Length; i++)
+        {
+            float d = (origin - hits[i].point).sqrMagnitude;
+            if (closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return hits[closestI];
+    }
+
+    internal static Transform Closest(this Transform[] v, Vector3 origin)
+    {
+        if (v.Length == 0) return null;
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            if (v[i] == null) continue;
+            float d = (origin - v[i].position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return v[closestI];
+    }
+
+    internal static System.ValueTuple<int, float> ClosestI(this Transform[] v, Vector3 origin)
+    {
+        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            if (v[i] == null) continue;
+            float d = (origin - v[i].position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+    }
+    internal static System.ValueTuple<int, float> ClosestI(this Component[] v, Vector3 origin)
+    {
+        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 0; i < v.Length; i++)
+        {
+            if (v[i] == null) continue;
+            float d = (origin - v[i].transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+    }
+    internal static System.ValueTuple<int, float> ClosestI(this IAmObject[] v, Vector3 origin)
+    {
+        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 0; i < v.Length; i++)
+        {
+            if ((UnityEngine.Object)v[i] == null) continue;
+            float d = (origin - ((Component)v[i]).transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+    }
+    internal static System.ValueTuple<int, float> ClosestI(this GameObject[] v, Vector3 origin)
+    {
+        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            if (v[i] == null) continue;
+            float d = (origin - v[i].gameObject.transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+            }
+        }
+
+        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+    }
+
+    const float ScreenRayMaxDistance = 500f;
+
+    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out Vector3 worldPosition)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out worldPosition);
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance);
+    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out Vector3 worldPosition)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance))
+        {
+            worldPosition = hit.point;
+            return true;
+        }
+        worldPosition = Vector3.zero;
+        return false;
+    }
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance))
+        {
+            return hit.point;
+        }
+        return ray.GetPoint(maxDistance);
+    }
+
+    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask, out Vector3 worldPosition)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask, out worldPosition);
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask);
+    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask, out Vector3 worldPosition)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
+        {
+            worldPosition = hit.point;
+            return true;
+        }
+        worldPosition = Vector3.zero;
+        return false;
+    }
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
+        {
+            return hit.point;
+        }
+        return ray.GetPoint(maxDistance);
+    }
+
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out RaycastHit[] hits)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out hits);
+    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out RaycastHit[] hits)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        hits = Physics.RaycastAll(ray, maxDistance).ExcludeTriggers();
+        if (hits.Length > 0)
+        {
+            return hits[0].point;
+        }
+        return ray.GetPoint(maxDistance);
+    }
+
+    internal static void SetEmissionColor(this Material material, Color color, float emission)
+    {
+        material.color = color;
+        material.SetColor("_EmissionColor", color * emission);
+    }
+}
 
 internal static class MeshEx
 {
@@ -294,247 +537,6 @@ internal static class VectorEx
     }
 }
 
-internal static class UnclassifiedExtensions
-{
-    public static void SpawnOverNetwork(this GameObject gameObject, bool destroyWithScene = true)
-    {
-        if (NetworkManager.Singleton == null)
-        { return; }
-        if (!NetworkManager.Singleton.IsListening)
-        { return; }
-        if (!gameObject.TryGetComponent<NetworkObject>(out var networkObject))
-        { return; }
-        networkObject.Spawn(destroyWithScene);
-    }
-
-    internal static bool Contains<T>(this T[] self, T v) where T : IEquatable<T>
-    {
-        for (int i = 0; i < self.Length; i++)
-        {
-            if ((IEquatable<T>)self[i] == (IEquatable<T>)v) return true;
-        }
-        return false;
-    }
-
-    internal static bool Contains(this UnityEngine.Object[] self, UnityEngine.Object v)
-    {
-        for (int i = 0; i < self.Length; i++)
-        {
-            if (self[i] == v) return true;
-        }
-        return false;
-    }
-    internal static RaycastHit[] Exclude(this RaycastHit[] hits, params Transform[] exclude)
-    {
-        List<RaycastHit> result = new();
-        for (int i = 0; i < hits.Length; i++)
-        {
-            if (hits[i].transform != null && exclude.Contains(hits[i].transform))
-            { continue; }
-
-            result.Add(hits[i]);
-        }
-        return result.ToArray();
-    }
-    internal static RaycastHit[] ExcludeTriggers(this RaycastHit[] hits)
-    {
-        List<RaycastHit> result = new();
-        for (int i = 0; i < hits.Length; i++)
-        {
-            if (hits[i].collider.isTrigger) continue;
-
-            result.Add(hits[i]);
-        }
-        return result.ToArray();
-    }
-
-    internal static RaycastHit Closest(this RaycastHit[] hits, Vector3 origin)
-    {
-        float closest = (origin - hits[0].point).sqrMagnitude;
-        int closestI = 0;
-
-        for (int i = 1; i < hits.Length; i++)
-        {
-            float d = (origin - hits[i].point).sqrMagnitude;
-            if (closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return hits[closestI];
-    }
-
-    internal static Transform Closest(this Transform[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return null;
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 1; i < v.Length; i++)
-        {
-            if (v[i] == null) continue;
-            float d = (origin - v[i].position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return v[closestI];
-    }
-
-    internal static System.ValueTuple<int, float> ClosestI(this Transform[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 1; i < v.Length; i++)
-        {
-            if (v[i] == null) continue;
-            float d = (origin - v[i].position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
-    }
-    internal static System.ValueTuple<int, float> ClosestI(this Component[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 0; i < v.Length; i++)
-        {
-            if (v[i] == null) continue;
-            float d = (origin - v[i].transform.position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
-    }
-    internal static System.ValueTuple<int, float> ClosestI(this IAmObject[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 0; i < v.Length; i++)
-        {
-            if ((UnityEngine.Object)v[i] == null) continue;
-            float d = (origin - ((Component)v[i]).transform.position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
-    }
-    internal static System.ValueTuple<int, float> ClosestI(this GameObject[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 1; i < v.Length; i++)
-        {
-            if (v[i] == null) continue;
-            float d = (origin - v[i].gameObject.transform.position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
-    }
-
-    const float ScreenRayMaxDistance = 500f;
-
-    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out Vector3 worldPosition)
-        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out worldPosition);
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition)
-        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance);
-    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out Vector3 worldPosition)
-    {
-        Ray ray = camera.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance))
-        {
-            worldPosition = hit.point;
-            return true;
-        }
-        worldPosition = Vector3.zero;
-        return false;
-    }
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance)
-    {
-        Ray ray = camera.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance))
-        {
-            return hit.point;
-        }
-        return ray.GetPoint(maxDistance);
-    }
-
-    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask, out Vector3 worldPosition)
-        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask, out worldPosition);
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask)
-        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask);
-    internal static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask, out Vector3 worldPosition)
-    {
-        Ray ray = camera.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
-        {
-            worldPosition = hit.point;
-            return true;
-        }
-        worldPosition = Vector3.zero;
-        return false;
-    }
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask)
-    {
-        Ray ray = camera.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
-        {
-            return hit.point;
-        }
-        return ray.GetPoint(maxDistance);
-    }
-
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out RaycastHit[] hits)
-        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out hits);
-    internal static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out RaycastHit[] hits)
-    {
-        Ray ray = camera.ScreenPointToRay(screenPosition);
-        hits = Physics.RaycastAll(ray, maxDistance).ExcludeTriggers();
-        if (hits.Length > 0)
-        {
-            return hits[0].point;
-        }
-        return ray.GetPoint(maxDistance);
-    }
-
-    internal static void SetEmissionColor(this Material material, Color color, float emission)
-    {
-        material.color = color;
-        material.SetColor("_EmissionColor", color * emission);
-    }
-}
-
 public static class DataChunk
 {
     public static T[][] Chunks<T>(this T[] v, int chunkSize)
@@ -550,20 +552,7 @@ public static class DataChunk
     }
 }
 
-[Serializable]
-internal struct Pair<TKey, TValue>
-{
-    [SerializeField] internal TKey Key;
-    [SerializeField] internal TValue Value;
-
-    public Pair(TKey key, TValue value)
-    {
-        Key = key;
-        Value = value;
-    }
-}
-
-internal static class List
+internal static class ListEx
 {
     internal static bool TryGetValue<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key, out TValue value)
         where TKey : IEquatable<TKey>

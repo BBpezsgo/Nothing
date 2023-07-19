@@ -9834,8 +9834,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abb4954eade84d4bb840541aadbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Knockback: 3
   AudioSource: {fileID: 9074750142406875483}
   ShootSound: {fileID: 8300000, guid: 0df6688c90b7ba945b71b1bac3126676, type: 3}
+  Barrel: {fileID: 0}
+  RequiedBarrelRotationSpeed: 0
+  BarrelRotationAcceleration: 0
+  BarrelRotationSpeed: 0
+  PrepareShooting: 0
   cannon: {fileID: 2619412345589989142}
   cannonRotationSpeed: 10
   cannonLowestAngle: -10
@@ -9862,8 +9868,7 @@ MonoBehaviour:
   IsBallisticProjectile: 1
   Scope: {fileID: 6063154753538146735}
   ScopeHolder: {fileID: 2776137622048779255}
-  target:
-    m_InternalValue: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
   overridedInput: {x: 0, y: 0}
   base: {fileID: 0}
@@ -9952,6 +9957,7 @@ GameObject:
   - component: {fileID: 1849051629192169190}
   - component: {fileID: 9074750142406875483}
   - component: {fileID: 3413199833213572951}
+  - component: {fileID: 1269857257918406634}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -9967,7 +9973,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2619412345505571582}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.221, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10026,13 +10032,21 @@ MonoBehaviour:
   rb: {fileID: 0}
   unit: {fileID: 0}
   input: {x: 0, y: 0}
+  CenterOfMass: 0
+  Wheels: []
+  SpringDamper: 1
+  SpringStrength: 10
+  TireGripFactor: 1
+  TireMass: 1
+  EngineForce: 1
+  Handbrake: 0.2
   moveAccelerationFactor: 20
-  moveAccelerationInput: 0
+  TorqueInput: 0
   moveSpeedMax: 50
   engineBrake: 2
-  savedAccelerationValue: 0
+  Torque: 0
   brake: 1
-  handbrake: 2.5
+  handbrake: 0.2
   isHandbraking: 0
   isBraking: 0
   driftFactor: 0.95
@@ -10041,16 +10055,16 @@ MonoBehaviour:
   speedAndSteer: 10
   turnFactor: 1
   steeringSpeed: 1
-  steeringInput: 0
-  steering: 0
-  savedSteeringValue: 0
+  SteeringInput: 0
+  SmoothSteeringInput: 0
+  Steering: 0
   InWater: 0
   waterParticles: {fileID: 4334478021863347416}
   WaterEmissionRate: 0
   dustParticles: {fileID: 1674865959883588309}
   DustEmissionRate: 0
   TrailEmission: 0
-  grounded: 0
+  IsGrounded: 0
   FlippedOverValue: 0
   NextGroundCheck: 0.5
 --- !u!114 &3831125781744870988
@@ -10080,7 +10094,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 1
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
   FollowCursor: 0
   Target: {x: 0, y: 0, z: 0}
   maxDistanceToReverse: 8
@@ -10100,7 +10114,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 2
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
+  IgnoreCollision: {fileID: 0}
   raycastHitCache:
     Obstacles: []
   DetectedThings:
@@ -10407,6 +10422,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d63a55fdb83b3964c80350b38cd70402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxDistance: 500
+  Offset: 1
+--- !u!114 &1269857257918406634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4afca4794df2d7645995fc6a43ba29df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
+    type: 3}
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0

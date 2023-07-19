@@ -3,6 +3,8 @@ using AssetManager;
 using DataUtilities.ReadableFileFormat;
 using DataUtilities.Serializer;
 
+using Game.Components;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +13,10 @@ using System.Linq;
 using Unity.Netcode;
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 using Utilities;
 
-namespace Blueprints
+namespace Game.Blueprints
 {
     [Serializable]
     public class Blueprint : ISerializable<Blueprint>, ISerializableText, IDeserializableText
@@ -603,7 +604,7 @@ namespace Blueprints
             return model;
         }
 
-        public static Value PackPart(PartPacker part)
+        public static Value PackPart(AssetManager.Components.PartPacker part)
         {
             Value result = Value.Object();
 

@@ -1,16 +1,15 @@
+using DataUtilities.ReadableFileFormat;
+
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using UnityEngine;
 
 namespace AssetManager
 {
-    using DataUtilities.ReadableFileFormat;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     [Serializable]
     public class DirectoryNotExistsException : System.Exception
     {
@@ -300,25 +299,25 @@ namespace AssetManager
 
         public static Value? SaveValue(GameObject gameObject, object v)
         {
-            if (v is int) return Value.Literal((int)v);
-            if (v is float) return Value.Literal((float)v);
-            if (v is bool) return Value.Literal((bool)v);
-            if (v is string) return Value.Literal((string)v);
+            if (v is int @int) return Value.Literal(@int);
+            if (v is float @float) return Value.Literal(@float);
+            if (v is bool @bool) return Value.Literal(@bool);
+            if (v is string @string) return Value.Literal(@string);
 
-            if (v is LayerMask) return Value.Literal(((LayerMask)v).value);
+            if (v is LayerMask _layerMask) return Value.Literal(_layerMask.value);
 
-            if (v is GameObject)
+            if (v is GameObject _gameObject)
             {
-                string builtinPrefabName = FindBuiltinPrefab((GameObject)v);
+                string builtinPrefabName = FindBuiltinPrefab(_gameObject);
                 if (!string.IsNullOrEmpty(builtinPrefabName))
                 { return Value.Literal(builtinPrefabName); }
 
-                return Value.Literal($"{Utils.GetObjectPath(gameObject, (GameObject)v)}");
+                return Value.Literal($"{Utils.GetObjectPath(gameObject, _gameObject)}");
             }
 
-            if (v is Transform) return Value.Literal($"{Utils.GetObjectPath(gameObject, ((Transform)v).gameObject)}:{((Transform)v).GetType().FullName}");
+            if (v is Transform _transform) return Value.Literal($"{Utils.GetObjectPath(gameObject, _transform.gameObject)}:{_transform.GetType().FullName}");
 
-            if (v is Component) return Value.Literal($"{Utils.GetObjectPath(gameObject, ((Component)v).gameObject)}:{((Component)v).GetType().FullName}");
+            if (v is Component _component) return Value.Literal($"{Utils.GetObjectPath(gameObject, _component.gameObject)}:{_component.GetType().FullName}");
 
             if (v.GetType().IsArray)
             {
@@ -335,14 +334,13 @@ namespace AssetManager
                 return result;
             }
 
-            if (v is IList)
+            if (v is IList _list)
             {
                 Value result = Value.Object();
-                IList list = (IList)v;
                 int i1 = 0;
-                for (int i = 0; i < list.Count; i++)
+                for (int i = 0; i < _list.Count; i++)
                 {
-                    var value = SaveValue(gameObject, list[i]);
+                    var value = SaveValue(gameObject, _list[i]);
                     if (value.HasValue)
                     { result[(i1++).ToString()] = value.Value; }
                 }

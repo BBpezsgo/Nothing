@@ -1,34 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GridTester : MonoBehaviour
+namespace Grid
 {
-    [SerializeField] int Width;
-    [SerializeField] int Height;
-    [SerializeField] int CellSize;
-    Grid<int> Grid;
-
-    [SerializeField, Button(nameof(GenerateGrid), true, true, "Generate")] string btn_0;
-
-    void Start() => GenerateGrid();
-
-    void GenerateGrid()
+    public class GridTester : MonoBehaviour
     {
-        Grid = new Grid<int>(Width, Height, CellSize);
-    }
+        [SerializeField] int Width;
+        [SerializeField] int Height;
+        [SerializeField] int CellSize;
+        Grid<int> Grid;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
+        [SerializeField, Button(nameof(GenerateGrid), true, true, "Generate")] string btn_0;
+
+        void Start() => GenerateGrid();
+
+        void GenerateGrid()
         {
-            Vector3 mousePosition = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
-            Grid[mousePosition]++;
+            Grid = new Grid<int>(Width, Height, CellSize);
         }
-    }
 
-    void OnDrawGizmos()
-    {
-        Grid?.DebugDraw(transform.position, Color.white);
+        void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Vector3 mousePosition = Game.MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
+                Grid[mousePosition]++;
+            }
+        }
+
+        void OnDrawGizmos()
+        {
+            Grid?.DebugDraw(transform.position, Color.white);
+        }
     }
 }

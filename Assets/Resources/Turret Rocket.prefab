@@ -232,8 +232,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abb4954eade84d4bb840541aadbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Knockback: 1
   AudioSource: {fileID: 8401276797070513005}
   ShootSound: {fileID: 8300000, guid: 479c3100a5002fd4e915ef97a6b8cc8d, type: 3}
+  Barrel: {fileID: 0}
+  RequiedBarrelRotationSpeed: 0
+  BarrelRotationAcceleration: 0
+  BarrelRotationSpeed: 0
+  PrepareShooting: 0
   cannon: {fileID: 4273319252350960347}
   cannonRotationSpeed: 10
   cannonLowestAngle: -30
@@ -384,7 +390,7 @@ MonoBehaviour:
     type: 3}
   HP: 30
   GroundOrigin: {x: 0, y: -1.18, z: 0}
-  <ControllingByUser>k__BackingField: 0
+  controllingByUser: 0
   UiSelected: {fileID: 9132971557407977805}
   Attacker: {fileID: 0}
 --- !u!114 &8554003262345555702
@@ -470,7 +476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1

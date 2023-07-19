@@ -1,15 +1,18 @@
 using UnityEngine;
 
-public static class MainCamera
+namespace Game
 {
-    static Camera camera;
-    public static Camera Camera
+    public static class MainCamera
     {
-        get
+        static Camera camera;
+        public static Camera Camera
         {
-            if (camera == null)
-            { camera = Camera.main; }
-            return camera;
+            get
+            {
+                if (camera == null)
+                { camera = Camera.main; }
+                return camera;
+            }
         }
     }
 }

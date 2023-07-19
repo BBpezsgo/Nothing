@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-using UnityEngine.UIElements;
-
-using System.Runtime.CompilerServices;
 
 using Unity.Netcode;
+using Unity.Collections;
+using Game.Components;
+using Game.Managers;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,21 +23,39 @@ namespace Unity.Netcode
 
     public struct NetworkString : INetworkSerializable
     {
-        Collections.FixedString32Bytes info;
-        public const int maxLength = 29;
+        FixedString32Bytes Data;
+        public readonly int Length => Data.Length;
+
+        public const int MaxLength = 29;
+
+        public NetworkString(FixedString32Bytes data)
+        { Data = data; }
+
+        public NetworkString(string data) : this(new FixedString32Bytes(data))
+        { }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref info);
+            serializer.SerializeValuePreChecked(ref Data);
         }
 
-        public override string ToString()
-        {
-            return info.ToString();
-        }
+        public override string ToString() => Data.ToString();
 
         public static implicit operator string(NetworkString s) => s.ToString();
-        public static implicit operator NetworkString(string s) => new() { info = new Collections.FixedString32Bytes(s ?? "") };
+        public static implicit operator NetworkString(string s) => new(s ?? "");
+    }
+}
+
+[Serializable]
+internal struct Pair<TKey, TValue>
+{
+    [SerializeField] internal TKey Key;
+    [SerializeField] internal TValue Value;
+
+    public Pair(TKey key, TValue value)
+    {
+        Key = key;
+        Value = value;
     }
 }
 
@@ -1511,7 +1529,7 @@ namespace Utilities
 
         internal void Update()
         {
-            if (conditionEnabler != null && !conditionEnabler.Invoke())
+            if ((conditionEnabler != null && !conditionEnabler.Invoke()) || !Game.Managers.MouseManager.MouseOnWindow)
             {
                 Reset();
                 return;
@@ -1522,7 +1540,7 @@ namespace Utilities
                 PositionBeforeDrag = Position;
                 Drag = false;
 
-                ClickedOnUI = MouseManager.IsPointerOverUI(PositionBeforeDrag);
+                ClickedOnUI = Game.Managers.MouseManager.IsPointerOverUI(PositionBeforeDrag);
 
                 if (!ClickedOnUI) OnDown?.Invoke(PositionBeforeDrag);
             }
@@ -1599,7 +1617,7 @@ namespace Utilities
             this.Key = key;
             this.Priority = priority;
             this.ConditionEnabler = null;
-            KeyboardManager.Register(this);
+            Game.Managers.KeyboardManager.Register(this);
         }
 
         public PriorityKey(KeyCode key, int priority, InputConditionEnabler conditionEnabler) : this(key, priority)
@@ -1715,82 +1733,119 @@ namespace Utilities
     }
 }
 
-[Serializable]
-public struct CursorConfig
+namespace Game
 {
-    public Texture2D Texture;
-    public Vector2 Hotspot;
-    public CursorMode Mode;
-
-    public readonly void SetCursor() => UnityEngine.Cursor.SetCursor(Texture, Hotspot, Mode);
-}
-
-internal static class ObjectGroups
-{
-    static Transform game;
-    static Transform effects;
-    static Transform projectiles;
-
-    public static Transform Game
+    [Serializable]
+    public struct CursorConfig
     {
-        get
+        public Texture2D Texture;
+        public Vector2 Hotspot;
+        public CursorMode Mode;
+
+        public readonly void SetCursor() => UnityEngine.Cursor.SetCursor(Texture, Hotspot, Mode);
+    }
+
+    internal static class ObjectGroups
+    {
+        static Transform game;
+        static Transform effects;
+        static Transform projectiles;
+
+        public static Transform Game
         {
-            if (game == null)
+            get
             {
-                GameObject obj = GameObject.Find("Game");
-                if (obj == null)
-                { obj = new GameObject("Game"); }
-                game = obj.transform;
+                if (game == null)
+                {
+                    GameObject obj = GameObject.Find("Game");
+                    if (obj == null)
+                    { obj = new GameObject("Game"); }
+                    game = obj.transform;
+                }
+                return game;
             }
-            return game;
         }
-    }
 
-    public static Transform Effects
-    {
-        get
+        public static Transform Effects
         {
-            GameObject obj = GameObject.Find("Effects");
-            if (obj == null)
-            { obj = new GameObject("Effects"); }
-            effects = obj.transform;
-            return effects;
+            get
+            {
+                GameObject obj = GameObject.Find("Effects");
+                if (obj == null)
+                { obj = new GameObject("Effects"); }
+                effects = obj.transform;
+                return effects;
+            }
         }
-    }
 
-    public static Transform Projectiles
-    {
-        get
+        public static Transform Projectiles
         {
-            GameObject obj = GameObject.Find("Projectiles");
-            if (obj == null)
-            { obj = new GameObject("Projectiles"); }
-            projectiles = obj.transform;
-            return projectiles;
+            get
+            {
+                GameObject obj = GameObject.Find("Projectiles");
+                if (obj == null)
+                { obj = new GameObject("Projectiles"); }
+                projectiles = obj.transform;
+                return projectiles;
+            }
         }
     }
-}
 
-internal static class TheTerrain
-{
-    static Terrain terrain;
-
-    internal static Terrain Terrain
+    internal static class TheTerrain
     {
-        get
+        static Terrain terrain;
+        static float terrainBaseHeight = 0f;
+        static bool hasTerrain = false;
+
+        static void FindTerrainIfNone()
         {
-            if (terrain == null)
-            { terrain = GameObject.FindObjectOfType<Terrain>(); }
-            return terrain;
+            if (!hasTerrain)
+            {
+                terrain = GameObject.FindObjectOfType<Terrain>();
+                hasTerrain = terrain != null;
+
+                if (hasTerrain)
+                { terrainBaseHeight = terrain.transform.position.y; }
+            }
+            else
+            {
+                hasTerrain = terrain != null;
+            }
+        }
+
+        internal static Terrain Terrain
+        {
+            get
+            {
+                FindTerrainIfNone();
+
+                return terrain;
+            }
+        }
+
+        internal static float Height(Vector3 position)
+        {
+            FindTerrainIfNone();
+
+            if (hasTerrain)
+            { return terrain.SampleHeight(position) + terrainBaseHeight; }
+            else
+            { return 0f; }
         }
     }
-
-    internal static Vector3 Height(Vector3 position)
-        => new(position.x, Terrain.SampleHeight(position) + Terrain.transform.position.y, position.z);
 }
 
 internal static class NetcodeUtils
 {
+    public static bool IsServer
+    {
+        get
+        {
+            if (NetcodeUtils.IsOffline) return false;
+            return NetworkManager.Singleton.IsServer;
+        }
+    }
+
     public static bool IsOfflineOrServer
     {
         get

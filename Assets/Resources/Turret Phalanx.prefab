@@ -81,7 +81,7 @@ MonoBehaviour:
     type: 3}
   HP: 25
   GroundOrigin: {x: 0, y: -1.18, z: 0}
-  <ControllingByUser>k__BackingField: 0
+  controllingByUser: 0
   UiSelected: {fileID: 5912824943081610826}
   Attacker: {fileID: 0}
 --- !u!114 &6995106546997309476
@@ -178,7 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -391,8 +391,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abb4954eade84d4bb840541aadbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Knockback: 1
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
+  Barrel: {fileID: 0}
+  RequiedBarrelRotationSpeed: 0
+  BarrelRotationAcceleration: 0
+  BarrelRotationSpeed: 0
+  PrepareShooting: 0
   cannon: {fileID: 1728721396471246300}
   cannonRotationSpeed: 180
   cannonLowestAngle: -30

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4329731264087408725}
   - component: {fileID: 8765060842146390248}
   - component: {fileID: 1819566531665296375}
+  - component: {fileID: 9089273655404864247}
   m_Layer: 0
   m_Name: Builder
   m_TagString: Untagged
@@ -36,7 +37,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4690245384110751948}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.98, y: 1.221, z: -0.72}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -92,11 +93,19 @@ MonoBehaviour:
   rb: {fileID: 0}
   unit: {fileID: 0}
   input: {x: 0, y: 0}
+  CenterOfMass: 0
+  Wheels: []
+  SpringDamper: 1
+  SpringStrength: 10
+  TireGripFactor: 1
+  TireMass: 1
+  EngineForce: 1
+  Handbrake: 0.2
   moveAccelerationFactor: 30
-  moveAccelerationInput: 0
+  TorqueInput: 0
   moveSpeedMax: 50
   engineBrake: 2
-  savedAccelerationValue: 0
+  Torque: 0
   brake: 1
   handbrake: 2.5
   isHandbraking: 0
@@ -107,16 +116,16 @@ MonoBehaviour:
   speedAndSteer: 10
   turnFactor: 3.5
   steeringSpeed: 1
-  steeringInput: 0
-  steering: 0
-  savedSteeringValue: 0
+  SteeringInput: 0
+  SmoothSteeringInput: 0
+  Steering: 0
   InWater: 0
   waterParticles: {fileID: 5145332635455175622}
   WaterEmissionRate: 0
   dustParticles: {fileID: 0}
   DustEmissionRate: 0
   TrailEmission: 0
-  grounded: 0
+  IsGrounded: 0
   FlippedOverValue: 0
   NextGroundCheck: 0.5
 --- !u!114 &5793872590083310718
@@ -146,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 1
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
   FollowCursor: 0
   Target: {x: 0, y: 0, z: 0}
   maxDistanceToReverse: 8
@@ -166,7 +175,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 2
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
+  IgnoreCollision: {fileID: 0}
   raycastHitCache:
     Obstacles: []
   DetectedThings:
@@ -223,7 +233,7 @@ MonoBehaviour:
   HP: 20
   targets: []
   nearestTargetIndex: -1
-  DistanceToBuild: 10
+  DistanceToBuild: 20
   ConstructionSpeed: 1
   TimeToNextTargetSearch: 1
 --- !u!114 &4329731264087408714
@@ -318,6 +328,20 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &9089273655404864247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690245384110751948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4afca4794df2d7645995fc6a43ba29df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
+    type: 3}
 --- !u!1 &4690245385307051920
 GameObject:
   m_ObjectHideFlags: 0
@@ -5292,12 +5316,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.7630005
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5130001
+      value: -0.18400007
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
@@ -5392,12 +5416,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.76300097
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.513
+      value: -0.18400002
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
@@ -5492,12 +5516,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.19
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.45
+      value: 0.04099995
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
@@ -5592,12 +5616,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.19
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.45
+      value: 0.041
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
@@ -5692,12 +5716,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.76300097
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.513
+      value: -0.18400002
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
@@ -5838,12 +5862,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.7630005
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5130001
+      value: -0.18400007
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
         type: 3}

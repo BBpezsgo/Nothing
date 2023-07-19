@@ -1,68 +1,29 @@
+using DataUtilities.ReadableFileFormat;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace AssetManager
 {
-    using DataUtilities.ReadableFileFormat;
+    using Game.Managers;
+
+    using global::AssetManager.Components;
 
     using LoadedAssets;
 
-    using System;
-    using System.Linq;
+    using Networking;
+    using Networking.Components;
 
-    using UnityEngine.Audio;
-    using UnityEngine.Networking;
-    using UnityEngine.SceneManagement;
+    using UI;
 
-    struct DownloadProgress
-    {
-        const int SPEED_HISTORY = 20;
-
-        internal float Progress;
-        internal float Speed;
-        internal float SpeedAvg;
-        internal float RemaingSecs;
-        internal TimeSpan RemaingTime;
-
-        float[] LastSpeeds;
-
-        public void OnProgress(Network.ChunkCollector chunkCollector)
-        {
-            LastSpeeds ??= new float[SPEED_HISTORY];
-
-            for (int i = 1; i < LastSpeeds.Length; i++)
-            { LastSpeeds[i - 1] = LastSpeeds[i]; }
-            LastSpeeds[^1] = chunkCollector.Speed;
-
-            Progress = chunkCollector.Progress;
-            Speed = chunkCollector.Speed;
-
-            {
-                float totalSpeed = 0f;
-                for (int i = 0; i < LastSpeeds.Length; i++)
-                { totalSpeed += LastSpeeds[i]; }
-                SpeedAvg = totalSpeed / LastSpeeds.Length;
-            }
-
-            int remaingBytes = chunkCollector.ExpectedSize - chunkCollector.TotalReceivedBytes;
-            if (SpeedAvg == 0f)
-            {
-                RemaingSecs = float.MaxValue;
-                RemaingTime = TimeSpan.MaxValue;
-            }
-            else
-            {
-                RemaingSecs = remaingBytes / SpeedAvg;
-
-                if (RemaingSecs >= TimeSpan.MaxValue.TotalSeconds)
-                { RemaingTime = TimeSpan.MaxValue; }
-                else
-                { RemaingTime = TimeSpan.FromSeconds(RemaingSecs); }
-            }
-        }
-    }
+    using Utilities;
 
     public class AssetManager : MonoBehaviour
     {
@@ -106,7 +67,6 @@ namespace AssetManager
         [Button(nameof(LoadTestScene), false, true, "Load Test Scene")]
         [SerializeField] string btnXd3;
         [SerializeField] bool AutoLoadTestScene;
-        [SerializeField, MessageBox] MessageBox loadTestObjMsgbox = new();
         [SerializeField] DownloadProgress AssetsDownloadProgress = new();
         [SerializeField, ReadOnly, NonReorderable] List<string> LoadedFromResources = new();
 
@@ -128,7 +88,7 @@ namespace AssetManager
         [SerializeField] string btnXd6;
         [SerializeField] bool TestPackedAssets;
 
-        internal Transform PrefabsGroup
+        Transform PrefabsGroup
         {
             get
             {
@@ -153,7 +113,7 @@ namespace AssetManager
             packer.Pack(packAssetsPath, packAssetsPath + ".bin");
         }
 
-        void SpawnTestObject() => InstantiatePrefab(testObject, (SpawnAt == null) ? Vector3.up : SpawnAt.position, (SpawnAt == null) ? Quaternion.identity : SpawnAt.rotation);
+        void SpawnTestObject() => InstantiatePrefab(testObject, true, (SpawnAt == null) ? Vector3.up : SpawnAt.position, (SpawnAt == null) ? Quaternion.identity : SpawnAt.rotation);
         void LoadTestObject() => LoadPrefab(testObject);
         void LoadTestScene() => LoadScene(testScene, InstantiatePrefab);
 
@@ -166,98 +126,20 @@ namespace AssetManager
             LoadAssets();
         }
 
-        Value ProcessInheritance(Value current, DataUtilities.FilePacker.IFile file, int currentDepth = 0)
-        {
-            if (currentDepth > MaxInheritanceDepth)
-            {
-                AssetLogger.LogWarning($"Inheritance exceeded max {currentDepth} in file {file.FullName}");
-                return current;
-            }
-            if (!current.Has("Base")) return current;
-            string basePath = current["Base"].String ?? "";
-            if (string.IsNullOrWhiteSpace(basePath))
-            {
-                AssetLogger.LogWarning($"Invalid base value in file {file.FullName}:{current["Base"].Location}");
-                return current;
-            }
-            DataUtilities.FilePacker.IFile baseFile = Assets.GetFile(basePath + ".sdf");
-            if (baseFile == null)
-            {
-                AssetLogger.LogWarning($"File {basePath} not found at {file.FullName}:{current["Base"].Location}");
-                return current;
-            }
-            if (baseFile.FullName == file.FullName)
-            {
-                AssetLogger.LogWarning($"Base file is self in file {file.FullName}:{current["Base"].Location}");
-                return current;
-            }
-            Value? @base = LoadFile(baseFile);
-            if (!@base.HasValue) return current;
-            Value baseValue = @base.Value;
-            current.RemoveNode("Base");
-            baseValue.Combine(current);
-            return ProcessInheritance(baseValue, baseFile, currentDepth + 1);
-        }
-
-        public static Value LoadFile(DataUtilities.FilePacker.IFile file)
-            => Parser.Parse(file.Text);
-
-        public static Value[] LoadFiles(DataUtilities.FilePacker.IFolder folder)
-        {
-            if (folder == null) return new Value[0];
-            List<Value> result = new();
-            var files = folder.Files;
-            foreach (var file in files)
-            {
-                try
-                {
-                    Value v = Parser.Parse(file.Text);
-                    result.Add(v);
-                }
-                catch (Exception)
-                { }
-            }
-            return result.ToArray();
-        }
-        public Value[] LoadFilesWithInheritacne(DataUtilities.FilePacker.IFolder folder)
-        {
-            if (folder == null) return new Value[0];
-            List<Value> result = new();
-            var files = folder.Files;
-            foreach (var file in files)
-            {
-                try
-                {
-                    Value v = LoadFileWithInheritacne(file);
-                    result.Add(v);
-                }
-                catch (Exception)
-                { }
-            }
-            return result.ToArray();
-        }
-
-        public Value LoadFileWithInheritacne(DataUtilities.FilePacker.IFile file)
-        {
-            Value content = Parser.Parse(file.Text);
-            Value result = ProcessInheritance(content, file);
-            return result;
-        }
-
         public Value LoadFile(string path)
-            => LoadFile(Assets.GetAbsoluteFile(path));
+            => Files.LoadFile(Assets.GetAbsoluteFile(path));
         public Value[] LoadFiles(string folder)
-            => LoadFiles(Assets.GetAbsoluteFolder(folder));
+            => Files.LoadFiles(Assets.GetAbsoluteFolder(folder));
         public Value[] LoadFilesWithInheritacne(string folder)
-            => LoadFilesWithInheritacne(Assets.GetAbsoluteFolder(folder));
+            => Files.LoadFilesWithInheritacne(Assets.GetAbsoluteFolder(folder), Assets.GetFile, MaxInheritanceDepth);
         public Value LoadFileWithInheritacne(string path)
-            => LoadFileWithInheritacne(Assets.GetAbsoluteFile(path));
+            => Files.LoadFileWithInheritacne(Assets.GetAbsoluteFile(path), Assets.GetFile, MaxInheritanceDepth);
 
         #endregion
 
         #region Scene Loader
 
-        public delegate GameObject ScenePrefabSpawner(string prefabID, Vector3 position, Quaternion rotation);
+        public delegate GameObject ScenePrefabSpawner(string prefabID, bool spawnOverNetwork, Vector3 position, Quaternion rotation);
 
         /// <exception cref="SingletonNotExistException{AssetManager}"></exception>
         public static void LoadScene(string name, ScenePrefabSpawner spawner)
@@ -273,7 +155,7 @@ namespace AssetManager
                 if (EnableDebugLogging) Debug.Log($"File loaded in {(DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
                 string id = content["ID"].String ?? file.Name[..^10];
                 if (id != name) continue;
-                content = Instance.ProcessInheritance(content, file);
+                content = Files.ProcessInheritance(content, file, Instance.Assets.GetFile, Instance.MaxInheritanceDepth);
                 Instance.StartCoroutine(Instance.LoadScene(content, file, spawner));
                 return;
             }
@@ -322,34 +204,6 @@ namespace AssetManager
                 }
             }
 
-            /*
-            if (content.TryGetNode("script", out Value script))
-            {
-                if (script.Type == DataUtilities.ReadableFileFormat.ValueType.LITERAL)
-                {
-                    DataUtilities.FilePacker.IFile scriptFile = Assets.GetFile(script.String);
-                    if (scriptFile != null)
-                    {
-                        var newObj = new GameObject("Scene Script");
-                        newObj.AddComponent<LoadedAssetObject>();
-                        var newComp = newObj.AddComponent<LuaBehaviour>();
-                        newComp.UserDefinedName = "SceneScript";
-                        LuaManager.Instance.TryWarmUp();
-                        newComp.SetScriptPath(scriptFile.FullName);
-                        newComp.LoadScript();
-                    }
-                    else
-                    {
-                        AssetLogger.LogWarning($"File \"{script.String}\" not found at file {file.FullName}:{script.Location}");
-                    }
-                }
-                else
-                {
-                    AssetLogger.LogWarning($"Script must be a literal at file {file.FullName}:{script.Location}");
-                }
-            }
-            */
-
             if (content.TryGetNode("Objects", out Value _objects))
             {
                 var objects = _objects.Array;
@@ -363,7 +217,7 @@ namespace AssetManager
                             AssetLogger.LogWarning($"Unknown object at index {i} in scene \"{id}\" ({file.FullName}:{obj["id"].Location})");
                             continue;
                         }
-                        spawner?.Invoke(obj["ID"].String, obj["At", "Pos", "Position"].Vector2(), Quaternion.identity);
+                        spawner?.Invoke(obj["ID"].String, true, obj["At", "Pos", "Position"].Vector2(), Quaternion.identity);
                     }
                 }
             }
@@ -376,39 +230,54 @@ namespace AssetManager
         /// <summary>
         /// It checks that a prefab has been generated with name <paramref name="prefabName"/> and exists as a child of <see cref="Prefabs"/>.
         /// </summary>
-        /// <exception cref="System.ArgumentException"></exception>
-        bool HasGeneratedPrefab(string prefabName)
+        /// <exception cref="ArgumentException"></exception>
+        bool HasGeneratedPrefab(string prefabName, out GameObject prefab)
         {
-            if (string.IsNullOrWhiteSpace(prefabName)) throw new System.ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
-            if (LoadedFromResources.Contains(prefabName)) return true;
-            return PrefabsGroup.Find(prefabName) != null;
+            if (string.IsNullOrWhiteSpace(prefabName)) throw new ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
+
+            if (LoadedFromResources.Contains(prefabName))
+            {
+                prefab = Resources.Load<GameObject>(prefabName);
+                return true;
+            }
+
+            Transform generatedPrefab = PrefabsGroup.Find(prefabName);
+            if (generatedPrefab != null)
+            {
+                prefab = generatedPrefab.gameObject;
+                return true;
+            }
+
+            prefab = null;
+            return false;
         }
 
         /// <summary>
         /// Returns the generated prefab named <paramref name="prefabName"/> from the children of <see cref="Prefabs"/>.
         /// </summary>
-        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         GameObject GetGeneratedPrefab(string prefabName)
         {
-            if (string.IsNullOrWhiteSpace(prefabName)) throw new System.ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
+            if (string.IsNullOrWhiteSpace(prefabName)) throw new ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
             return PrefabsGroup.Find(prefabName).gameObject;
         }
 
         /// <summary>
         /// Instantiates the prefab <paramref name="prefab"/>.
         /// </summary>
-        public static GameObject InstantiatePrefab(GameObject prefab, bool spawnOverNetwork, bool isBuiltin = false)
+        public static GameObject InstantiatePrefab(GameObject prefab, bool spawnOverNetwork, bool isBuiltin, Vector3 position, Quaternion rotation)
         {
             bool networked = spawnOverNetwork && prefab.HasComponent<Unity.Netcode.NetworkObject>();
 
-            GameObject newObject = GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity);
-            SceneManager.MoveGameObjectToScene(newObject, Instance.GameScene);
+            GameObject newObject = GameObject.Instantiate(prefab, position, rotation);
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(newObject, Instance.GameScene);
+            newObject.transform.SetPositionAndRotation(position, rotation);
             newObject.name = prefab.name;
 
             if (networked)
             {
                 if (NetcodeSynchronizer.Instance != null && newObject.HasComponent<NetcodeView>())
-                { NetcodeSynchronizer.Instance.RegisterObjectInstance(newObject, prefab.name, Vector3.zero, true); }
+                { NetcodeSynchronizer.Instance.RegisterObjectInstance(newObject, prefab.name, position, true); }
 
                 if (Unity.Netcode.NetworkManager.Singleton != null &&
                     Unity.Netcode.NetworkManager.Singleton.IsListening)
@@ -430,17 +299,15 @@ namespace AssetManager
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="SingletonNotExistException{AssetManager}"></exception>
-        static void LoadPrefab(string prefabName)
+        public static GameObject LoadPrefab(string prefabName)
         {
-            Instance.loadTestObjMsgbox.Hide();
             if (string.IsNullOrWhiteSpace(prefabName)) throw new ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
             if (Instance == null) throw new SingletonNotExistException<AssetManager>();
 
-            if (Instance.HasGeneratedPrefab(prefabName))
+            if (Instance.HasGeneratedPrefab(prefabName, out GameObject existingPrefab))
             {
-                if (EnableDebugLogging) Debug.Log($"Prefab {prefabName} already loaded");
-                Instance.loadTestObjMsgbox.Show($"Prefab {prefabName} already loaded", MessageBox.MessageType.Info);
-                return;
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" already loaded");
+                return existingPrefab;
             }
 
             if (Resources.Load<GameObject>(prefabName) != null)
@@ -452,41 +319,40 @@ namespace AssetManager
                     if (Unity.Netcode.NetworkManager.Singleton != null)
                     {
                         Unity.Netcode.NetworkManager.Singleton.AddNetworkPrefab(prefab);
-                        if (EnableDebugLogging) Debug.Log($"Prefab {prefabName} registered for netcode");
+                        if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" registered for netcode");
                     }
                 }
-                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" loaded (Resources)");
-                Instance.loadTestObjMsgbox.Show($"Prefab {prefabName} loaded", MessageBox.MessageType.Info);
-                return;
+                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" loaded (from Resources)");
+                return prefab;
             }
 
             DataUtilities.FilePacker.IFile[] files = Instance.Assets.GetAllFiles("*.obj.sdf");
             foreach (var file in files)
             {
-                if (EnableDebugLogging) Debug.Log($"Load file {file.FullName} ...");
-                System.TimeSpan loadStarted = System.DateTime.UtcNow.TimeOfDay;
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Load file \"{file.FullName}\" ...");
+                TimeSpan loadStarted = DateTime.UtcNow.TimeOfDay;
                 Value content = Parser.Parse(file.Text);
-                if (EnableDebugLogging) Debug.Log($"File loaded in {(System.DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: File loaded in {(DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
                 string id = content["ID"].String ?? file.Name[..^8];
                 if (id != prefabName) continue;
-                content = Instance.ProcessInheritance(content, file);
-                Instance.LoadPrefab(content, file);
-                return;
+                content = Files.ProcessInheritance(content, file, Instance.Assets.GetFile, Instance.MaxInheritanceDepth);
+                return Instance.LoadPrefab(content, file);
             }
+
             AssetLogger.LogError($"Prefab \"{prefabName}\" does not exists");
-            Instance.loadTestObjMsgbox.Show($"Prefab \"{prefabName}\" does not exists", MessageBox.MessageType.Error);
+            return null;
         }
         /// <summary>
         /// Creates the prefab named <paramref name="name"/> as a child of <see cref="Prefabs"/>.
         /// </summary>
-        void LoadPrefab(Value content, DataUtilities.FilePacker.IFile file)
+        GameObject LoadPrefab(Value content, DataUtilities.FilePacker.IFile file)
         {
-            string id = content["ID"].String ?? file.Name[..^8];
+            string prefabName = content["ID"].String ?? file.Name[..^8];
 
-            if (HasGeneratedPrefab(id))
+            if (HasGeneratedPrefab(prefabName, out GameObject existingPrefab))
             {
-                if (EnableDebugLogging) Debug.Log($"Prefab {id} already loaded");
-                Instance.loadTestObjMsgbox.Show($"Prefab {id} already loaded", MessageBox.MessageType.Info);
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" already loaded");
+                return existingPrefab;
             }
             else
             {
@@ -497,11 +363,12 @@ namespace AssetManager
                     if (Unity.Netcode.NetworkManager.Singleton != null)
                     {
                         Unity.Netcode.NetworkManager.Singleton.AddNetworkPrefab(prefab);
-                        if (EnableDebugLogging) Debug.Log($"Prefab {id} registered for netcode");
+                        if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" registered for netcode");
                     }
                 }
-                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{id}\" loaded");
-                Instance.loadTestObjMsgbox.Show($"Prefab {id} loaded", MessageBox.MessageType.Info);
+                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" loaded");
+
+                return prefab;
             }
         }
 
@@ -514,29 +381,29 @@ namespace AssetManager
         /// </summary>
         /// <exception cref="System.ArgumentException"></exception>
         /// <exception cref="SingletonNotExistException{AssetManager}"></exception>
-        public static GameObject InstantiatePrefab(string prefabName, bool spawnOverNetwork)
+        public static GameObject InstantiatePrefab(string prefabName, bool spawnOverNetwork, Vector3 position, Quaternion rotation)
         {
             if (string.IsNullOrWhiteSpace(prefabName)) throw new ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
             if (Instance == null) throw new SingletonNotExistException<AssetManager>();
 
-            if (Instance.BuiltinPrefabs.TryGetValue(prefabName, out var builtinObject))
+            if (Instance.BuiltinPrefabs.TryGetValue(prefabName, out GameObject builtinObject))
             {
-                return InstantiatePrefab(builtinObject, spawnOverNetwork, true);
+                return InstantiatePrefab(builtinObject, spawnOverNetwork, true, position, rotation);
             }
 
             {
                 GameObject resourceAsset = Resources.Load<GameObject>(prefabName);
                 if (resourceAsset != null)
                 {
-                    return InstantiatePrefab(resourceAsset, spawnOverNetwork, true);
+                    return InstantiatePrefab(resourceAsset, spawnOverNetwork, true, position, rotation);
                 }
             }
 
             {
-                if (Blueprints.BlueprintManager.TryGetBlueprint(prefabName, out Blueprints.Blueprint blueprint))
+                if (Game.Blueprints.BlueprintManager.TryGetBlueprint(prefabName, out Game.Blueprints.Blueprint blueprint))
                 {
-                    GameObject instance = Blueprints.BlueprintManager.InstantiateBlueprint(blueprint);
-                    SceneManager.MoveGameObjectToScene(instance, Instance.GameScene);
+                    GameObject instance = Game.Blueprints.BlueprintManager.InstantiateBlueprint(blueprint);
+                    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, Instance.GameScene);
 
                     if (NetcodeSynchronizer.Instance != null && instance.HasComponent<NetcodeView>())
                     { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, Vector3.zero, true); }
@@ -545,45 +412,45 @@ namespace AssetManager
                 }
             }
 
-            if (Instance.HasGeneratedPrefab(prefabName))
+            if (Instance.HasGeneratedPrefab(prefabName, out GameObject exsistingPrefab))
             {
-                if (EnableDebugLogging) Debug.Log($"Prefab {prefabName} already generated, cloning ...");
-                return InstantiatePrefab(Instance.GetGeneratedPrefab(prefabName), spawnOverNetwork);
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" already generated, cloning ...");
+                return InstantiatePrefab(exsistingPrefab, spawnOverNetwork, false, position, rotation);
             }
 
             var filesSDF = Instance.Assets.GetAllFilesEnumerable("*.obj.sdf");
             foreach (var file in filesSDF)
             {
-                if (EnableDebugLogging) Debug.Log($"Load file {file.FullName} ...");
-                System.TimeSpan loadStarted = System.DateTime.UtcNow.TimeOfDay;
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Load file \"{file.FullName}\" ...");
+                TimeSpan loadStarted = DateTime.UtcNow.TimeOfDay;
                 Value content = Parser.Parse(file.Text);
-                if (EnableDebugLogging) Debug.Log($"File loaded in {(System.DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: File loaded in {(DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
                 string id = content["ID"].String ?? file.Name[..^8];
                 if (id != prefabName) continue;
-                content = Instance.ProcessInheritance(content, file);
-                return Instance.InstantiatePrefab(content, file, spawnOverNetwork);
+                content = Files.ProcessInheritance(content, file, Instance.Assets.GetFile, Instance.MaxInheritanceDepth);
+                return Instance.InstantiatePrefab(content, file, spawnOverNetwork, position, rotation);
             }
 
             var filesJSON = Instance.Assets.GetAllFilesEnumerable("*.obj.json");
             foreach (var file in filesJSON)
             {
-                if (EnableDebugLogging) Debug.Log($"Load file {file.FullName} ...");
-                System.TimeSpan loadStarted = System.DateTime.UtcNow.TimeOfDay;
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Load file \"{file.FullName}\" ...");
+                TimeSpan loadStarted = DateTime.UtcNow.TimeOfDay;
                 Value content;
                 try
                 {
                     content = DataUtilities.Json.Parser.Parse(file.Text);
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    AssetLogger.LogError($"Failed to parse file {file.FullName}\r\n{ex}");
+                    AssetLogger.LogError($"Failed to parse file \"{file.FullName}\"\r\n{ex}");
                     continue;
                 }
-                if (EnableDebugLogging) Debug.Log($"File loaded in {(System.DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: File loaded in {(DateTime.UtcNow.TimeOfDay - loadStarted).TotalMilliseconds} ms : {file.FullName}");
                 string id = content["ID"].String ?? file.Name[..^8];
                 if (id != prefabName) continue;
-                content = Instance.ProcessInheritance(content, file);
-                return Instance.InstantiatePrefab(content, file, spawnOverNetwork);
+                content = Files.ProcessInheritance(content, file, Instance.Assets.GetFile, Instance.MaxInheritanceDepth);
+                return Instance.InstantiatePrefab(content, file, spawnOverNetwork, position, rotation);
             }
 
             AssetLogger.LogError($"Prefab \"{prefabName}\" does not exists!");
@@ -596,14 +463,14 @@ namespace AssetManager
         /// If the prefab already exists as a child of <see cref="Prefabs"/> <see cref="InstantiatePrefab(GameObject, bool)"/> is called.<br/>
         /// If not, <see cref="GeneratePrefab(Value, DataUtilities.FilePacker.IFile, out bool)"/> is called before.
         /// </summary>
-        GameObject InstantiatePrefab(Value content, DataUtilities.FilePacker.IFile file, bool spawnOverNetwork)
+        GameObject InstantiatePrefab(Value content, DataUtilities.FilePacker.IFile file, bool spawnOverNetwork, Vector3 position, Quaternion rotation)
         {
-            string id = content["ID"].String ?? file.Name[..^8];
+            string prefabName = content["ID"].String ?? file.Name[..^8];
 
-            if (HasGeneratedPrefab(id))
+            if (HasGeneratedPrefab(prefabName, out GameObject existingPrefab))
             {
-                if (EnableDebugLogging) Debug.Log($"Instantiating generated prefab {id} ...");
-                return InstantiatePrefab(GetGeneratedPrefab(id), spawnOverNetwork);
+                if (EnableDebugLogging) Debug.Log($"Instantiating generated prefab {prefabName} ...");
+                return InstantiatePrefab(existingPrefab, spawnOverNetwork, false, position, rotation);
             }
             else
             {
@@ -614,18 +481,18 @@ namespace AssetManager
                     if (Unity.Netcode.NetworkManager.Singleton != null)
                     {
                         Unity.Netcode.NetworkManager.Singleton.AddNetworkPrefab(prefab);
-                        if (EnableDebugLogging) Debug.Log($"Prefab {id} registered for netcode");
+                        if (EnableDebugLogging) Debug.Log($"Prefab {prefabName} registered for netcode");
                     }
                 }
 
-                if (!HasGeneratedPrefab(id))
+                if (!HasGeneratedPrefab(prefabName, out GameObject existingPrefab2))
                 {
-                    AssetLogger.LogError($"Failed to generate prefab '{id}'");
+                    AssetLogger.LogError($"Failed to generate prefab '{prefabName}'");
                     return null;
                 }
 
-                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{id}\" loaded");
-                return InstantiatePrefab(GetGeneratedPrefab(id), spawnOverNetwork);
+                Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" loaded");
+                return InstantiatePrefab(existingPrefab2, spawnOverNetwork, false, position, rotation);
             }
         }
 
@@ -635,9 +502,9 @@ namespace AssetManager
         GameObject GeneratePrefab(Value content, DataUtilities.FilePacker.IFile file)
         {
             TimeSpan started = DateTime.Now.TimeOfDay;
-            string id = content["ID"].String ?? file.Name[..^8];
+            string prefabName = content["ID"].String ?? file.Name[..^8];
 
-            if (EnableDebugLogging) Debug.Log($"Generating prefab {id} ...");
+            if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Generating prefab \"{prefabName}\" ...");
 
             Type type = typeof(IHaveAssetFields);
             Type[] types = AppDomain.CurrentDomain.GetAssemblies()
@@ -646,7 +513,7 @@ namespace AssetManager
                 .ToArray();
 
             GameObject prefab;
-            prefab = new(id);
+            prefab = new(prefabName);
             prefab.transform.SetParent(PrefabsGroup);
             if (content.Has("Tag")) prefab.tag = content["Tag"].String;
             prefab.SetActive(false);
@@ -663,13 +530,13 @@ namespace AssetManager
                     {
                         if (!BuiltinPrefabs.TryGetValue(ChildNode.String, out GameObject builtinPrefab))
                         {
-                            Debug.LogError($"Builtin prefab \"{ChildNode.String}\" not found");
+                            Debug.LogError($"[{nameof(AssetManager)}]: Builtin prefab \"{ChildNode.String}\" not found");
                         }
                         else
                         {
                             GameObject instance = GameObject.Instantiate(builtinPrefab, prefab.transform);
                             instance.name = ChildNode.String;
-                            SceneManager.MoveGameObjectToScene(instance, GameScene);
+                            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, GameScene);
                         }
                     }
                     else
@@ -722,7 +589,7 @@ namespace AssetManager
                         if (type_.Name != componentName) continue;
 
                         if (!prefab.TryGetComponent(type_, out Component addedComponent))
-                        { Debug.LogWarning($"Component \"{type}\" not found in {prefab}", prefab); }
+                        { Debug.LogWarning($"[{nameof(AssetManager)}]: Component \"{type}\" not found in {prefab}", prefab); }
                         else
                         { ComponentUtils.LoadComponent(prefab, addedComponent, component); }
 
@@ -734,7 +601,7 @@ namespace AssetManager
                         if (type_.Name != componentName) continue;
 
                         if (!prefab.TryGetComponent(type_, out Component addedComponent))
-                        { Debug.LogWarning($"Component \"{type}\" not found in {prefab}", prefab); }
+                        { Debug.LogWarning($"[{nameof(AssetManager)}]: Component \"{type}\" not found in {prefab}", prefab); }
                         else
                         {
                             UnityComponentLoader loader = UnityThingLoaders.GetComponentLoader(type_);
@@ -766,24 +633,9 @@ namespace AssetManager
                 }
             }
 
-            if (EnableDebugLogging) Debug.Log($"Prefab {id} generated in {(DateTime.Now.TimeOfDay - started).TotalMilliseconds} ms", prefab);
+            if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" generated in {(DateTime.Now.TimeOfDay - started).TotalMilliseconds} ms", prefab);
 
             return prefab;
-        }
-
-        /// <summary>
-        /// Loads the prefab called <paramref name="prefabName"/> and creates it at <paramref name="position"/> and <paramref name="rotation"/>.<br/>
-        /// This will call the <see cref="InstantiatePrefab(string, bool)"/> method.
-        /// </summary>
-        /// <exception cref="ArgumentException"/>
-        public static GameObject InstantiatePrefab(string prefabName, Vector3 position, Quaternion rotation)
-        {
-            if (string.IsNullOrWhiteSpace(prefabName)) throw new ArgumentException($"'{nameof(prefabName)}' cannot be null or whitespace.", nameof(prefabName));
-            var newObject = InstantiatePrefab(prefabName, true);
-            if (newObject == null) return null;
-            newObject.transform.SetPositionAndRotation(position, rotation);
-            newObject.SetActive(true);
-            return newObject;
         }
 
 #if UNITY_EDITOR
@@ -1168,7 +1020,7 @@ namespace AssetManager
 
         void Start()
         {
-            GameScene = SceneManager.GetSceneByName("GameScene");
+            GameScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName("GameScene");
             if (GameScene.buildIndex == -1)
             { Debug.LogWarning($"Scene \"GameScene\" not found", this); }
             else if (!GameScene.isLoaded)
@@ -1252,7 +1104,7 @@ namespace AssetManager
             StartCoroutine(Assets.LoadAsnyc(Unity.Netcode.NetworkManager.Singleton.IsConnectedClient ? "netcode" : settings.assets_path, () => { }, OnAssetDownloadProgress));
         }));
 
-        void OnAssetDownloadProgress(Network.ChunkCollector chunkCollector)
+        void OnAssetDownloadProgress(Networking.Network.ChunkCollector chunkCollector)
         {
             AssetsDownloadProgress.OnProgress(chunkCollector);
         }
@@ -1325,27 +1177,5 @@ namespace AssetManager
 
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
-    }
-
-    public interface ICanLoadAsset : IHaveAssetFields
-    {
-        public void LoadAsset(Value data);
-    }
-
-    public interface IHaveAssetFields
-    {
-
-    }
-
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class AssetFieldAttribute : Attribute
-    {
-
-    }
-
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class AssetPropertyAttribute : Attribute
-    {
-
     }
 }
