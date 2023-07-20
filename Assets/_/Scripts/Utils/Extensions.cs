@@ -250,6 +250,7 @@ internal static class UnclassifiedExtensions
 
 internal static class MeshEx
 {
+    /*
     static Vector3 ClosestPoint(Vector3 p, (Vector3 a, Vector3 b, Vector3 c) triangle)
         => ClosestPoint(p, triangle.a, triangle.b, triangle.c);
 
@@ -259,12 +260,12 @@ internal static class MeshEx
         var edge0 = v1 - v0;
         var edge1 = v2 - v0;
 
-        /*
+        
         // Compute the normal vector of the triangle
-        var normal = new Vector3(edge0[1] * edge1[2] - edge0[2] * edge1[1],
-                           edge0[2] * edge1[0] - edge0[0] * edge1[2],
-                           edge0[0] * edge1[1] - edge0[1] * edge1[0]);
-        */
+        // var normal = new Vector3(edge0[1] * edge1[2] - edge0[2] * edge1[1],
+        //                    edge0[2] * edge1[0] - edge0[0] * edge1[2],
+        //                    edge0[0] * edge1[1] - edge0[1] * edge1[0]);
+        
 
         // Compute the vector from a triangle vertex to the point
         var v0_p = new Vector3(p[0] - v0[0], p[1] - v0[1], p[2] - v0[2]);
@@ -294,6 +295,7 @@ internal static class MeshEx
 
         return closest_point;
     }
+    */
 
     /// <summary>
     /// <see href="https://discussions.unity.com/t/closest-point-on-mesh-collider/178"/>
@@ -541,13 +543,17 @@ public static class DataChunk
 {
     public static T[][] Chunks<T>(this T[] v, int chunkSize)
     {
-        T[][] result = new T[Mathf.CeilToInt(((float)v.Length) / ((float)chunkSize))][];
+        int chunkCount = Mathf.CeilToInt(((float)v.Length) / ((float)chunkSize));
+
+        T[][] result = new T[chunkCount][];
+
         for (int i = 0; i < v.Length; i += chunkSize)
         {
             int currentChunkSize = Math.Min(chunkSize, v.Length - i);
             result[i / chunkSize] = new T[currentChunkSize];
             Array.Copy(v, i, result[i / chunkSize], 0, currentChunkSize);
         }
+
         return result;
     }
 }

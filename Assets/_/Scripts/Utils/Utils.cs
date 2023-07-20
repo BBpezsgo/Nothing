@@ -7,6 +7,7 @@ using UnityEngine;
 
 using Unity.Netcode;
 using Unity.Collections;
+
 using Game.Components;
 using Game.Managers;
 
@@ -61,11 +62,19 @@ internal struct Pair<TKey, TValue>
 
 internal struct Triangle
 {
+    public Vector3 A;
+    public Vector3 B;
+    public Vector3 C;
+
+    public static implicit operator (Vector3 a, Vector3 b, Vector3 c)(Triangle triangle)
+        => (triangle.A, triangle.B, triangle.C);
+
     /// <summary>
     /// Thank you <see href="https://forum.unity.com/threads/closest-point-on-mesh-collider.34660/"/>
     /// </summary>
-    public static Vector3 NearestPoint(Vector3 pt, (Vector3 a, Vector3 b, Vector3 c) triangle)
-        => NearestPoint(pt, triangle.a, triangle.b, triangle.c);
+    public static Vector3 NearestPoint(Vector3 pt, Triangle triangle)
+        => NearestPoint(pt, triangle.A, triangle.B, triangle.C);
+
     /// <summary>
     /// Thank you <see href="https://forum.unity.com/threads/closest-point-on-mesh-collider.34660/"/>
     /// </summary>
