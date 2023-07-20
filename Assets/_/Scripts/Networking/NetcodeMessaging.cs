@@ -18,6 +18,7 @@ namespace Networking
         static NetworkManager NetworkManager => NetworkManager.Singleton;
         internal const int MessageSize = 1100;
         internal const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
+        static bool Logs => NetcodeSynchronizer.Instance.Logs;
 
         internal static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
         {
@@ -130,7 +131,7 @@ namespace Networking
         internal static BaseMessage[] ReciveUnnamedMessage(ulong clientId, FastBufferReader reader)
         {
             string senderName = ((clientId == NetworkManager.ServerClientId) ? $"server" : $"client {clientId}");
-            Debug.Log($"[{nameof(NetcodeMessaging)}]: Recived {reader.Length} bytes from {senderName}");
+            if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Recived {reader.Length} bytes from {senderName}");
             int endlessSafe = 5000;
             List<BaseMessage> result = new();
             while (reader.TryBeginRead(BaseMessage.HeaderSize))
@@ -142,12 +143,12 @@ namespace Networking
                     var message = DeserializeMessage(clientId, reader);
                     if (message.Type != MessageType.SYNC)
                     {
-                        Debug.Log(
-                        $"[{nameof(NetcodeMessaging)}]: Recived message {message.Type} from {senderName} " +
-                        $"{{\n" +
-                        $"{message.ToString()}" +
-                        $"}}"
-                        );
+                        if (Logs) Debug.Log(
+                            $"[{nameof(NetcodeMessaging)}]: Recived message {message.Type} from {senderName} " +
+                            $"{{\n" +
+                            $"{message}" +
+                            $"}}"
+                            );
                     }
                     result.Add(message);
                 }
@@ -157,7 +158,7 @@ namespace Networking
             return result.ToArray();
         }
 
-        internal static void BroadcastUnnamedMessage(Messages.INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        internal static void BroadcastUnnamedMessage(INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             if (!NetworkManager.IsServer)
             {
@@ -169,7 +170,7 @@ namespace Networking
             BroadcastUnnamedMessage(writer, networkDelivery);
         }
 
-        internal static void SendUnnamedMessage(Messages.INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        internal static void SendUnnamedMessage(INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
             if (data is BaseMessage message)
@@ -177,10 +178,10 @@ namespace Networking
                 if (!writer.TryBeginWrite(message.Size()))
                 { throw new OverflowException($"Not enough space in the buffer (Avaliable: {writer.Capacity}) (Requied: {message.Size()})"); }
                 string destinationName = ((destination == NetworkManager.ServerClientId) ? $"server" : $"client {destination}");
-                Debug.Log(
+                if (Logs) Debug.Log(
                     $"[{nameof(NetcodeMessaging)}]: Sending message {message.Type} to {destinationName} " +
                     $"{{\n" +
-                    $"{message.ToString()}" +
+                    $"{message}" +
                     $"}}"
                     );
             }
@@ -196,13 +197,13 @@ namespace Networking
                 return;
             }
             NetworkManager.CustomMessagingManager.SendUnnamedMessageToAll(writer, networkDelivery);
-            Debug.Log($"[{nameof(NetcodeMessaging)}]: Broadcasted {writer.Length} bytes");
+            if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Broadcasted {writer.Length} bytes");
         }
 
         internal static void SendUnnamedMessage(FastBufferWriter writer, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             NetworkManager.CustomMessagingManager.SendUnnamedMessage(destination, writer, networkDelivery);
-            Debug.Log($"[{nameof(NetcodeMessaging)}]: Sent {writer.Length} bytes to client {destination}");
+            if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Sent {writer.Length} bytes to client {destination}");
         }
     }
 

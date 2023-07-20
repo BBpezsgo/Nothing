@@ -112,7 +112,7 @@ namespace Game.Components
             }
         }
 
-        [ServerRpc]
+        [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
         void QueueUnitRequest_ServerRpc(UnitFactoryManager.ProducableUnit unit)
         {
             Queue.Add(new QueuedUnit()

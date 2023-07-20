@@ -83,6 +83,7 @@ namespace Networking
             }
         }
 
+        [SerializeField] internal bool Logs = true;
         [SerializeField, NonReorderable, ReadOnly] List<NetcodeView> ObservedObjects = new();
         [SerializeField, Button(nameof(SpawnTestObject), false, true, "Spawn Test Object")] string btn0;
         [SerializeField, Button(nameof(LoadTestScene), false, true, "Load Test Scene")] string btn1;
@@ -95,7 +96,7 @@ namespace Networking
         [SerializeField, ReadOnly] ulong RequestIdCounter = 0;
         [SerializeField, NonReorderable, ReadOnly] List<SentRequest> SentRequests = new();
         [SerializeField, NonReorderable, ReadOnly] List<SentChunk> SentChunks = new();
-        [SerializeField, ReadOnly] Network.ChunkCollectorManager ChunkCollector = new();
+        [SerializeField, ReadOnly] ChunkCollectorManager ChunkCollector = new();
 
         [SerializeField] ImguiWindow Window;
 
@@ -308,7 +309,7 @@ namespace Networking
 
         public override void OnNetworkSpawn()
         {
-            Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Register events");
+            if (Logs) Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Register events");
 
             if (NetworkManager.CustomMessagingManager != null)
             { NetworkManager.CustomMessagingManager.OnUnnamedMessage += OnReceivedUnnamedMessage; }
@@ -321,7 +322,7 @@ namespace Networking
         {
             if (NetworkManager == null) return;
 
-            Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Unregister events");
+            if (Logs) Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Unregister events");
 
             if (NetworkManager.CustomMessagingManager != null)
             { NetworkManager.CustomMessagingManager.OnUnnamedMessage -= OnReceivedUnnamedMessage; }
@@ -350,7 +351,7 @@ namespace Networking
 
         void OnReceivedUnnamedMessage(ulong clientId, FastBufferReader reader)
         {
-            Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Received {reader.Length} bytes from client {clientId}");
+            if (Logs) Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Received {reader.Length} bytes from client {clientId}");
 
             var messages = NetcodeMessaging.ReciveUnnamedMessage(clientId, reader);
 
@@ -399,7 +400,7 @@ namespace Networking
                                 if (ObservedObjects[j].ID != message.ObjectID) continue;
                                 if (ObservedObjects[j].gameObject == null)
                                 {
-                                    Debug.Log($"Sending info that \"{ObservedObjects[j].ID}\" is destroyed");
+                                    if (Logs) Debug.Log($"Sending info that \"{ObservedObjects[j].ID}\" is destroyed");
                                     NetcodeMessaging.SendUnnamedMessage(new ObjectHeader(MessageType.DESTROY_OBJECT, NetworkManager.LocalClientId)
                                     {
                                         ObjectID = ObservedObjects[j].ID,
@@ -407,7 +408,7 @@ namespace Networking
                                 }
                                 else
                                 {
-                                    Debug.Log($"Sending prefab info '{ObservedObjects[j].gameObject.name}'");
+                                    if (Logs) Debug.Log($"Sending prefab info '{ObservedObjects[j].gameObject.name}'");
                                     NetcodeMessaging.SendUnnamedMessage(new InstantiationHeader(MessageType.SPAWN_OBJECT, NetworkManager.LocalClientId)
                                     {
                                         PrefabName = ObservedObjects[j].gameObject.name,
@@ -458,7 +459,7 @@ namespace Networking
                         {
                             if (!isActiveAndEnabled) return;
                             ObjectHeader message = (ObjectHeader)baseMessage;
-                            Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Destroying object {message.ObjectID}");
+                            if (Logs) Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Destroying object {message.ObjectID}");
                             if (TryGetNetworkObject(message.ObjectID, out NetcodeView obj))
                             { GameObject.Destroy(obj.gameObject); }
                             break;

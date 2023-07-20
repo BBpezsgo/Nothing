@@ -36,11 +36,11 @@ namespace Game.Managers
 
         void FixedUpdate()
         {
-            FocusDistance.value = Mathf.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.fixedDeltaTime);
+            FocusDistance.value = Mathf.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.fixedUnscaledDeltaTime);
 
             if (NextRefresh > 0f)
             {
-                NextRefresh -= Time.fixedDeltaTime;
+                NextRefresh -= Time.fixedUnscaledDeltaTime;
                 return;
             }
             NextRefresh = Lazyness;

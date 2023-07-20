@@ -60,6 +60,7 @@ namespace Game.Components
 
             internal void OnDrawGizmos()
             {
+                if (Transform == null) return;
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawLine(Position, Position - new Vector3(0f, Radius, 0f));
             }
@@ -352,6 +353,14 @@ namespace Game.Components
         {
             using (pm_Wheels.Auto())
             {
+                if (Wheels.Length == 0) return;
+
+                Vector3? up = null;
+                Vector3? straightForward = null;
+                Vector3? straightRight = null;
+                Vector3? forward = null;
+                Vector3? right = null;
+
                 for (int i = 0; i < Wheels.Length; i++)
                 {
                     Wheel wheel = Wheels[i];
@@ -372,12 +381,13 @@ namespace Game.Components
 
                     Vector3 tireWorldVelocity = rb.GetPointVelocity(wheelPosition);
 
-
                     Vector3 force = Vector3.zero;
 
                     // Spring
                     {
-                        Vector3 springDirection = wheel.Up;
+                        up ??= transform.up;
+
+                        Vector3 springDirection = up.Value;
                         float springVelocity = Vector3.Dot(springDirection, tireWorldVelocity);
                         float springForce = (springOffset * SpringStrength) - (springVelocity * SpringDamper);
 
@@ -386,7 +396,18 @@ namespace Game.Components
 
                     // Steering
                     {
-                        Vector3 steeringDirection = wheel.Right;
+                        Vector3 steeringDirection;
+                        if (wheel.MaxSteerAngle == 0f)
+                        {
+                            straightRight ??= transform.right;
+                            steeringDirection = straightRight.Value;
+                        }
+                        else
+                        {
+                            right ??= wheel.Right;
+                            steeringDirection = right.Value;
+                        }
+
                         float steeringVelocity = Vector3.Dot(steeringDirection, tireWorldVelocity);
                         float desiredVelocityChange = -steeringVelocity * TireGripFactor;
                         float desiredAcceleration = desiredVelocityChange / Time.fixedDeltaTime;
@@ -396,7 +417,18 @@ namespace Game.Components
 
                     if (IsHandbraking || IsAutoHandbraking)
                     {
-                        Vector3 steeringDirection = wheel.Forward;
+                        Vector3 steeringDirection;
+                        if (wheel.MaxSteerAngle == 0f)
+                        {
+                            straightForward ??= transform.forward;
+                            steeringDirection = straightForward.Value;
+                        }
+                        else
+                        {
+                            forward ??= wheel.Forward;
+                            steeringDirection = forward.Value;
+                        }
+
                         float steeringVelocity = Vector3.Dot(steeringDirection, tireWorldVelocity);
                         float desiredVelocityChange = -steeringVelocity * Handbrake;
                         float desiredAcceleration = desiredVelocityChange / Time.fixedDeltaTime;
@@ -406,10 +438,22 @@ namespace Game.Components
                     }
                     else
                     {
+                        Vector3 _forward;
+                        if (wheel.MaxSteerAngle == 0f)
+                        {
+                            straightForward ??= transform.forward;
+                            _forward = straightForward.Value;
+                        }
+                        else
+                        {
+                            forward ??= wheel.Forward;
+                            _forward = forward.Value;
+                        }
+
                         float normalizedSpeed = Mathf.Clamp(Speed / moveSpeedMax, -1, 1);
                         float avaliableTorque = (1f - normalizedSpeed) * EngineForce;
 
-                        force += avaliableTorque * TorqueInput * wheel.Forward;
+                        force += avaliableTorque * TorqueInput * _forward;
                     }
 
                     rb.AddForceAtPosition(force, wheelPosition);
@@ -500,13 +544,13 @@ namespace Game.Components
         {
             if (IsBraking)
             {
-                rb.Drag(BrakeValue / rb.mass);
+                rb.AddForce(rb.velocity.normalized * -BrakeValue);
                 return;
             }
 
             if (isHandbraking)
             {
-                rb.Drag(HandbrakeValue / rb.mass);
+                rb.AddForce(rb.velocity.normalized * -HandbrakeValue);
                 return;
             }
         }
