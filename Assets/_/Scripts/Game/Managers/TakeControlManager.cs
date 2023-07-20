@@ -762,7 +762,7 @@ namespace Game.Components
 
 public static class ICanTakeControlExtensions
 {
-    public static bool IAmControllingThis(this Game.Components.ICanTakeControl self)
+    public static bool IAmControllingThis(this ICanTakeControl self)
     {
         if (!self.AnybodyControllingThis()) return false;
         if (NetworkManager.Singleton == null ||
@@ -782,16 +782,25 @@ public static class ICanTakeControlExtensions
             !NetworkManager.Singleton.IsListening)
         { return false; }
 
+        if (TakeControlManager.Instance == null)
+        { return false; }
+
         return !TakeControlManager.Instance.IAmControlling(self);
     }
 
     public static bool AnybodyControllingThis(this ICanTakeControl self)
     {
+        if (TakeControlManager.Instance == null)
+        { return false; }
         return TakeControlManager.Instance.AnybodyControlling(self);
     }
 
     public static string ControlledBy(this ICanTakeControl self)
-        => TakeControlManager.Instance.AnybodyControlling(self, out ulong controllingBy) ? $"client {controllingBy}" : "nobody";
+    {
+        if (TakeControlManager.Instance == null)
+        { return "nobody"; }
+        return TakeControlManager.Instance.AnybodyControlling(self, out ulong controllingBy) ? $"client {controllingBy}" : "nobody";
+    }
 }
 
 public static class IAmObjectExtensions
