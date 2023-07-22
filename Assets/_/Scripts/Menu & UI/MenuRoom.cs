@@ -1,3 +1,5 @@
+using Netcode.Transports.WebSocket;
+
 using Networking;
 
 using System.Collections.Generic;
@@ -141,6 +143,8 @@ namespace Game.UI
             { LabelRoomName.text = NetworkManager.Singleton.ConnectedHostname; }
             else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
             { LabelRoomName.text = $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
+            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
+            { LabelRoomName.text = $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
             else
             { LabelRoomName.text = "?"; }
 

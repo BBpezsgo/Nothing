@@ -2,6 +2,7 @@ using AssetManager;
 
 using System;
 using System.Collections.Generic;
+using System.Runtime;
 
 using Unity.Netcode;
 
@@ -48,6 +49,7 @@ namespace Game.Components
 
         [Header("Barrel")]
         [SerializeField, AssetField] internal Transform Barrel;
+        [SerializeField, ReadOnly] bool HasBarrel;
         [SerializeField, AssetField] internal float RequiedBarrelRotationSpeed = 0f;
         [SerializeField, AssetField] internal float BarrelRotationAcceleration = 0f;
         [SerializeField, ReadOnly] float BarrelRotationSpeed = 0f;
@@ -192,9 +194,12 @@ namespace Game.Components
                 { cannon.transform.localEulerAngles = new Vector3(-value, 0f, 0f); }
             }
         }
+
         internal float ShootHeight => shootPosition.position.y;
         public bool IsAccurateShoot => currentError <= 0.001f;
         [SerializeField, ReadOnly] float currentError = 1f;
+
+        float CannonRotationFix => -(90f - Vector3.SignedAngle(transform.forward, Vector3.up, transform.forward));
 
         void Start()
         {
@@ -217,13 +222,15 @@ namespace Game.Components
             { IsBallisticProjectile = projectileRigidbody.useGravity; }
 
             Range = GetRange();
+
+            HasBarrel = Barrel != null;
         }
 
         void FixedUpdate()
         {
             if (reload > 0f) reload -= Time.fixedDeltaTime;
 
-            if (Barrel != null)
+            if (HasBarrel)
             {
                 if (BarrelRotationSpeed != 0)
                 { Barrel.localEulerAngles = new Vector3(0f, 0f, Barrel.localEulerAngles.z + (BarrelRotationSpeed * Time.fixedDeltaTime)); }
@@ -244,7 +251,9 @@ namespace Game.Components
                 }
             }
 
-            if (TargetPosition == Vector3.zero)
+            Vector3 targetPosition = TargetPosition;
+
+            if (targetPosition == Vector3.zero)
             {
                 RotateTurret();
                 RotateCannon();
@@ -263,7 +272,7 @@ namespace Game.Components
                     Vector3 targetVelocity = Vector3.zero;
                     if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out Rigidbody targetRigidbody))
                     { targetVelocity = targetRigidbody.velocity; }
-                    input = CalculateInputVector(TargetPosition, targetVelocity);
+                    input = CalculateInputVector(targetPosition, targetVelocity);
                     this.input = input;
                 }
 
@@ -272,6 +281,9 @@ namespace Game.Components
                 RotateTurret(input.x);
                 RotateCannon(input.y);
             }
+
+            Debug.DrawLine(ShootPosition, transform.position + transform.forward * 150f, Color.yellow, Time.fixedDeltaTime);
+            Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.fixedDeltaTime);
         }
 
         Vector2 CalculateInputVector(Vector3 targetPosition, Vector3 targetVelocity)
@@ -292,6 +304,8 @@ namespace Game.Components
                     targetPosition += offset.To3D() * 1.01f;
                 }
 
+                Debug.DrawLine(transform.position, targetPosition, Color.green, Time.fixedDeltaTime);
+
                 float targetAngle;
 
                 float? theta_ = Utilities.Ballistics.AngleOfReach2(projectileVelocity, shootPosition.position, targetPosition);
@@ -301,7 +315,12 @@ namespace Game.Components
                 else
                 { targetAngle = theta_.Value * Mathf.Rad2Deg; }
 
-                turretRotation = Quaternion.LookRotation(targetPosition - transform.position).eulerAngles.y;
+                Vector3 directionToTarget = targetPosition - transform.position;
+                directionToTarget = Vector3.ProjectOnPlane(directionToTarget, cannon.up);
+
+                turretRotation = Quaternion.LookRotation(directionToTarget).eulerAngles.y;
+
+                targetAngle += CannonRotationFix;
 
                 cannonAngle = Mathf.Clamp(targetAngle, -Mathf.Abs(cannonLowestAngle), Mathf.Abs(cannonHighestAngle));
             }
@@ -314,8 +333,12 @@ namespace Game.Components
                 }
 
                 Vector3 rotationToTarget = Quaternion.LookRotation(targetPosition - transform.position).eulerAngles;
+
                 turretRotation = rotationToTarget.y;
+
                 cannonAngle = -rotationToTarget.x;
+                cannonAngle += CannonRotationFix;
+
             }
 
             return new Vector2(turretRotation, cannonAngle);
@@ -517,7 +540,7 @@ namespace Game.Components
         internal float GetRange()
         {
             float range = Utilities.Ballistics.MaxRadius(projectileVelocity, ShootHeight);
-            if (CurrentProjectileLifetime > 0f)
+            if (ProjectileLifetime > 0f)
             { range = Mathf.Min(range, Utilities.Ballistics.DisplacementX(45f * Mathf.Deg2Rad, projectileVelocity, ProjectileLifetime)); }
             this.Range = range;
             return range;

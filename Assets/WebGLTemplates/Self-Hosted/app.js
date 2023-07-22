@@ -52,9 +52,9 @@ if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
 }
 
 #if BACKGROUND_FILENAME
-canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover"
+elements.canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover"
 #endif
-loadingBar.style.display = "block"
+elements.loadingBar.style.display = "block"
 
 function OnQuit() {
     ShowPopup('The game has quitted!', 'info')
@@ -67,7 +67,7 @@ function OnScriptLoaded() {
         progress => { elements.progressBarFull.style.width = 100 * progress + "%" }
         )
     .then(unityInstance => {
-        loadingBar.style.display = 'none'
+        elements.loadingBar.style.display = 'none'
         elements.fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1)
         }

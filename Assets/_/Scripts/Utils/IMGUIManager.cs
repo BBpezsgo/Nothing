@@ -105,7 +105,7 @@ namespace UI
             if (Rect.x + Rect.width > Screen.width) Rect.x = Screen.width - Rect.width;
             if (Rect.y + Rect.height > Screen.height) Rect.y = Screen.height - Rect.height;
 
-            if (Skin != null) GUI.skin = prevSkin;
+            if (prevSkin != null) GUI.skin = prevSkin;
         }
     }
 }

@@ -12,9 +12,9 @@ using UnityEngine.SceneManagement;
 
 namespace AssetManager
 {
-    using Game.Managers;
+    using Components;
 
-    using global::AssetManager.Components;
+    using Game.Managers;
 
     using LoadedAssets;
 
@@ -39,7 +39,21 @@ namespace AssetManager
 
         [Header("Scenes")]
         [SerializeField] string EmptyScene;
-        Scene GameScene;
+        static Scene? CurrentScene
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(SceneManager.LoadedScene))
+                { return null; }
+
+                Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(SceneManager.LoadedScene);
+
+                if (!scene.isLoaded)
+                { return null; }
+
+                return scene;
+            }
+        }
 
         [Header("Models")]
         [SerializeField] Shader defaultShader;
@@ -63,10 +77,12 @@ namespace AssetManager
         [SerializeField] string btnXd;
         [Button(nameof(LoadTestObject), false, true, "Load Test Object")]
         [SerializeField] string btnXd2;
+        /*
         [SerializeField] string testScene;
         [Button(nameof(LoadTestScene), false, true, "Load Test Scene")]
         [SerializeField] string btnXd3;
         [SerializeField] bool AutoLoadTestScene;
+        */
         [SerializeField] DownloadProgress AssetsDownloadProgress = new();
         [SerializeField, ReadOnly, NonReorderable] List<string> LoadedFromResources = new();
 
@@ -115,7 +131,7 @@ namespace AssetManager
 
         void SpawnTestObject() => InstantiatePrefab(testObject, true, (SpawnAt == null) ? Vector3.up : SpawnAt.position, (SpawnAt == null) ? Quaternion.identity : SpawnAt.rotation);
         void LoadTestObject() => LoadPrefab(testObject);
-        void LoadTestScene() => LoadScene(testScene, InstantiatePrefab);
+        // void LoadTestScene() => LoadScene(testScene, InstantiatePrefab);
 
 
         #region Base Loader
@@ -270,7 +286,9 @@ namespace AssetManager
             bool networked = spawnOverNetwork && prefab.HasComponent<Unity.Netcode.NetworkObject>();
 
             GameObject newObject = GameObject.Instantiate(prefab, position, rotation);
-            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(newObject, Instance.GameScene);
+            if (CurrentScene.HasValue)
+            { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(newObject, CurrentScene.Value); }
+
             newObject.transform.SetPositionAndRotation(position, rotation);
             newObject.name = prefab.name;
 
@@ -403,7 +421,8 @@ namespace AssetManager
                 if (Game.Blueprints.BlueprintManager.TryGetBlueprint(prefabName, out Game.Blueprints.Blueprint blueprint))
                 {
                     GameObject instance = Game.Blueprints.BlueprintManager.InstantiateBlueprint(blueprint);
-                    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, Instance.GameScene);
+                    if (CurrentScene.HasValue)
+                    { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, CurrentScene.Value); }
 
                     if (NetcodeSynchronizer.Instance != null && instance.HasComponent<NetcodeView>())
                     { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, Vector3.zero, true); }
@@ -536,7 +555,8 @@ namespace AssetManager
                         {
                             GameObject instance = GameObject.Instantiate(builtinPrefab, prefab.transform);
                             instance.name = ChildNode.String;
-                            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, GameScene);
+                            if (CurrentScene.HasValue)
+                            { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, CurrentScene.Value); }
                         }
                     }
                     else
@@ -1020,13 +1040,6 @@ namespace AssetManager
 
         void Start()
         {
-            GameScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName("GameScene");
-            if (GameScene.buildIndex == -1)
-            { Debug.LogWarning($"Scene \"GameScene\" not found", this); }
-            else if (!GameScene.isLoaded)
-            { Debug.LogWarning($"Scene \"{GameScene.name}\" is not loaded", this); }
-
-            /*
             Debug.Log(
                 "Some Application Info:\n" +
                 $"Application.absoluteURL: '{Application.absoluteURL}'\n" +
@@ -1038,7 +1051,6 @@ namespace AssetManager
                 $"Application.streamingAssetsPath: '{Application.streamingAssetsPath}'\n" +
                 $"Application.temporaryCachePath: '{Application.temporaryCachePath}'"
             );
-            */
 
             LoadConfig();
             window = IMGUIManager.Instance.CreateWindow(new Rect(Screen.width - 20 - 140, 20, 140, 110));
@@ -1051,10 +1063,12 @@ namespace AssetManager
             settings = config;
             Assets = new FolderLoader();
             testObject = settings.test_object;
+            /*
             testScene = settings.test_scene;
 
             if (AutoLoadTestScene)
             { LoadAssets(); }
+            */
         }
 
         void LoadAssets()
@@ -1070,7 +1084,7 @@ namespace AssetManager
         {
             AssetLogger.Path = Path.Combine(Assets.Root.FullName, "errors.log");
 
-            if (AutoLoadTestScene) LoadTestScene();
+            // if (AutoLoadTestScene) LoadTestScene();
 
             DataUtilities.FilePacker.IFile prefabsFile = Assets.GetAbsoluteFile("prefabs.txt");
             if (prefabsFile != null)
@@ -1100,7 +1114,7 @@ namespace AssetManager
             settings = config;
             Assets = new FolderLoader();
             testObject = settings.test_object;
-            testScene = settings.test_scene;
+            // testScene = settings.test_scene;
             StartCoroutine(Assets.LoadAsnyc(Unity.Netcode.NetworkManager.Singleton.IsConnectedClient ? "netcode" : settings.assets_path, () => { }, OnAssetDownloadProgress));
         }));
 
@@ -1164,8 +1178,8 @@ namespace AssetManager
             {
                 if (GUILayout.Button("Spawn Test Object"))
                 { SpawnTestObject(); }
-                if (GUILayout.Button("Load Test Scene"))
-                { LoadTestScene(); }
+                // if (GUILayout.Button("Load Test Scene"))
+                // { LoadTestScene(); }
             }
             else
             {

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -6,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class SceneManager : SingleInstance<SceneManager>
 {
-    [SerializeField] string GameScene;
     [SerializeField] List<string> scenes = new();
 
     public static IReadOnlyList<string> Scenes => instance.scenes;
@@ -43,7 +41,10 @@ public class SceneManager : SingleInstance<SceneManager>
 
         if (LoadedScene != null &&
             LoadedScene.Equals(scene, System.StringComparison.InvariantCultureIgnoreCase))
-        { return; }
+        {
+            Debug.Log($"[{nameof(SceneManager)}]: Scene \"{scene}\" already loaded (i think ...)");
+            return;
+        }
 
         Scene scene1 = UnityEngine.SceneManagement.SceneManager.GetSceneByName(scene);
 

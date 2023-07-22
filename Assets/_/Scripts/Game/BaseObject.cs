@@ -16,7 +16,7 @@ namespace Game.Components
     public class BaseObject : NetworkBehaviour, IHaveAssetFields, INetworkObservable
     {
         [Header("Team")]
-        [SerializeField, AssetField] internal string Team;
+        [SerializeField] internal string Team;
         [SerializeField, ReadOnly] internal int TeamHash = -1;
         [SerializeField, AssetField] protected Renderer[] teamRenderers = new Renderer[0];
 

@@ -14,6 +14,8 @@ namespace Game.Components
     {
         [SerializeField, ReadOnly] protected Rigidbody rb;
         [SerializeField, ReadOnly] protected BaseObject BaseObject;
+        ICanTakeControlAndHasTurret CanTakeControlObject;
+        bool CanTakeControl;
 
         internal string Team => BaseObject.Team;
         internal int TeamHash => BaseObject.TeamHash;
@@ -33,6 +35,11 @@ namespace Game.Components
         {
             if (!TryGetComponent(out BaseObject))
             { Debug.LogError($"[{nameof(AttackerBase)}]: No BaseObject!"); }
+            else if (BaseObject is ICanTakeControlAndHasTurret canTakeControl)
+            {
+                CanTakeControlObject = canTakeControl;
+                CanTakeControl = true;
+            }
 
             if (turret != null) turret.@base = BaseObject;
         }
@@ -44,9 +51,11 @@ namespace Game.Components
 
         protected virtual void FixedUpdate()
         {
-            if (HullRotationStabilizer)
+            if (HullRotationStabilizer &&
+                CanTakeControl &&
+                CanTakeControlObject.IAmControllingThis())
             {
-                var rotation = transform.rotation.eulerAngles.y + 360f;
+                float rotation = transform.rotation.eulerAngles.y + 360f;
                 rotationDelta = (lastRotation - rotation) % 360f;
                 lastRotation = rotation;
             }

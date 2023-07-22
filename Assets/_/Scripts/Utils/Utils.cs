@@ -10,6 +10,7 @@ using Unity.Collections;
 
 using Game.Components;
 using Game.Managers;
+using Networking.Managers;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -1538,7 +1539,7 @@ namespace Utilities
 
         internal void Update()
         {
-            if ((conditionEnabler != null && !conditionEnabler.Invoke()) || !Game.Managers.MouseManager.MouseOnWindow)
+            if ((conditionEnabler != null && !conditionEnabler.Invoke()))
             {
                 Reset();
                 return;
@@ -1549,7 +1550,7 @@ namespace Utilities
                 PositionBeforeDrag = Position;
                 Drag = false;
 
-                ClickedOnUI = Game.Managers.MouseManager.IsPointerOverUI(PositionBeforeDrag);
+                ClickedOnUI = MouseManager.IsPointerOverUI(PositionBeforeDrag);
 
                 if (!ClickedOnUI) OnDown?.Invoke(PositionBeforeDrag);
             }
@@ -1751,7 +1752,7 @@ namespace Game
         public Vector2 Hotspot;
         public CursorMode Mode;
 
-        public readonly void SetCursor() => UnityEngine.Cursor.SetCursor(Texture, Hotspot, Mode);
+        public readonly void SetCursor() => Cursor.SetCursor(Texture, Hotspot, Mode);
     }
 
     internal static class ObjectGroups
@@ -1846,6 +1847,8 @@ namespace Game
 
 internal static class NetcodeUtils
 {
+    public static bool NoNetworking => NetcodeManager.NoNetworking;
+
     public static bool IsServer
     {
         get
@@ -1868,7 +1871,7 @@ internal static class NetcodeUtils
     {
         get
         {
-            if (NetworkManager.Singleton == null) return true;
+            if (NoNetworking) return true;
             if (!NetworkManager.Singleton.IsListening) return true;
             return false;
         }

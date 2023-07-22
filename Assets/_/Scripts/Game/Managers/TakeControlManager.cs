@@ -693,7 +693,7 @@ namespace Game.Managers
 
         internal bool IAmControlling(ICanTakeControl @this)
         {
-            if (NetworkManager.Singleton == null ||
+            if (NetcodeUtils.NoNetworking ||
                 !NetworkManager.IsListening)
             { return ControllingObject.GetObject() == @this.GetObject(); }
 
@@ -716,9 +716,14 @@ namespace Game.Managers
         {
             clientID = default;
 
-            if (NetworkManager.Singleton == null ||
-                !NetworkManager.IsListening)
-            { return ControllingObject.GetObject() == @this.GetObject(); }
+            try
+            {
+                if (NetcodeUtils.NoNetworking ||
+                    !NetworkManager.IsListening)
+                { return ControllingObject.GetObject() == @this.GetObject(); }
+            }
+            catch (System.NullReferenceException)
+            { return false; }
 
             if (!@this.GetObject().TryGetComponent(out NetworkObject networkObject))
             {
@@ -765,7 +770,7 @@ public static class ICanTakeControlExtensions
     public static bool IAmControllingThis(this ICanTakeControl self)
     {
         if (!self.AnybodyControllingThis()) return false;
-        if (NetworkManager.Singleton == null ||
+        if (NetcodeUtils.NoNetworking ||
             !NetworkManager.Singleton.IsListening)
         { return true; }
 
@@ -778,7 +783,7 @@ public static class ICanTakeControlExtensions
     public static bool SomebodyElseControllingThis(this ICanTakeControl self)
     {
         if (!self.AnybodyControllingThis()) return false;
-        if (NetworkManager.Singleton == null ||
+        if (NetcodeUtils.NoNetworking ||
             !NetworkManager.Singleton.IsListening)
         { return false; }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 using Unity.Netcode;
@@ -76,10 +77,37 @@ namespace Networking
 
             if (!TryGetComponent(out NetworkManager))
             { Debug.LogError($"[{nameof(NetworkDiscovery)}]: {nameof(NetworkManager)} is null", this); }
+
+            if (!IsSupported)
+            {
+                Debug.Log($"[{nameof(NetworkDiscovery)}]: Not supported");
+            }
         }
+
+        public static bool IsSupported =>
+            Application.isEditor ||
+            SupportedPlatforms.Contains(Application.platform);
+
+        static readonly RuntimePlatform[] SupportedPlatforms = new RuntimePlatform[]
+        {
+            RuntimePlatform.Android,
+            RuntimePlatform.WindowsEditor,
+            RuntimePlatform.WindowsPlayer,
+            RuntimePlatform.WindowsServer,
+            RuntimePlatform.LinuxEditor,
+            RuntimePlatform.LinuxPlayer,
+            RuntimePlatform.LinuxServer,
+            RuntimePlatform.IPhonePlayer,
+            RuntimePlatform.EmbeddedLinuxArm32,
+            RuntimePlatform.EmbeddedLinuxArm64,
+            RuntimePlatform.EmbeddedLinuxX64,
+            RuntimePlatform.EmbeddedLinuxX86,
+        };
 
         void FixedUpdate()
         {
+            if (!IsSupported) return;
+
             if (!HasStartedWithServer &&
                 !IsRunning &&
                 NetworkManager.IsServer)

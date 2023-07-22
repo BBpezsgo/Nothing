@@ -61,7 +61,7 @@ namespace Game.Managers
         }
 
         [System.Serializable]
-        public class MainMenu<T> where T : System.Enum
+        public class MainMenu<T> where T : struct, System.Enum
         {
             [Header("Info")]
 
@@ -87,23 +87,30 @@ namespace Game.Managers
                 // this.startScale = transform.localScale;
             }
 
-            public void Update(float deltaTime, float lerpAmmount, float minScale)
+            public void Update()//float deltaTime, float lerpAmmount, float minScale)
             {
                 if (transform == null) SetTransform();
 
                 if (Enabled)
                 {
-                    if (!Active) SetActive(true);
+                    if (!Active)
+                    {
+                        SetActive(true);
+                        SetUI();
+                    }
                     // this.alpha = Mathf.Lerp(this.alpha, 1f, deltaTime * lerpAmmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
                 else
                 {
-                    if (Active) SetActive(false);
+                    if (Active)
+                    {
+                        SetActive(false);
+                        SetUI();
+                    }
                     // this.alpha = Mathf.Lerp(this.alpha, 0f, deltaTime * lerpAmmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
-                SetUI();
             }
 
             void SetActive(bool active)
@@ -158,7 +165,7 @@ namespace Game.Managers
         [field: SerializeField] internal bool AnyPopupVisible { get; set; } = false;
 
         [SerializeField, ReadOnly] bool _anyMenuVisible = false;
-        internal static bool AnyMenuVisible => Instance == null ? false : Instance._anyMenuVisible;
+        internal static bool AnyMenuVisible => Instance != null && Instance._anyMenuVisible;
 
         internal MainMenuType CurrentMenu
         {
@@ -227,12 +234,12 @@ namespace Game.Managers
             set => currentPanel = value;
         }
 
-        void UpdateMenus<T>(MainMenu<T>[] menus, T currentMenu) where T : System.Enum
+        void UpdateMenus<T>(MainMenu<T>[] menus, T currentMenu) where T : struct, System.Enum
         {
             for (int i = 0; i < menus.Length; i++)
             {
                 menus[i].Enabled = currentMenu.Equals(menus[i].Type);
-                menus[i].Update(Time.deltaTime, lerpAmmount, minScale);
+                menus[i].Update(); //Time.deltaTime, lerpAmmount, minScale);
             }
         }
 

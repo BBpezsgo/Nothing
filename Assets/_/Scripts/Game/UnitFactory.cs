@@ -77,8 +77,19 @@ namespace Game.Components
 
         void OnUnitDone(QueuedUnit unit)
         {
-            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, DepotSpawn.position, DepotSpawn.rotation);
+            Vector3 spawnAt = DepotSpawn.position;
+            spawnAt.y = TheTerrain.Height(spawnAt);
+            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, spawnAt, DepotSpawn.rotation);
             instance.transform.SetParent(transform.parent);
+
+            if (instance.TryGetComponent<Collider>(out var collider))
+            {
+                instance.transform.position = new Vector3(
+                    instance.transform.position.x,
+                    instance.transform.position.y + collider.bounds.size.y,
+                    instance.transform.position.z);
+            }
+
             if (instance.TryGetComponent(out BaseObject baseObject))
             {
                 baseObject.Team = Team;

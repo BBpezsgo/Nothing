@@ -103,8 +103,8 @@ namespace Game.Components
 #pragma warning restore IDE0052 // Remove unread private members
 
         [Header("Steer")]
-        [SerializeField, AssetField] internal float driftFactor = 0.95f;
-        [SerializeField, AssetField] internal float driftFactorWithHandbrake = 0.98f;
+        [SerializeField, AssetField, Range(0f, 1f)] internal float driftFactor = 0.95f;
+        [SerializeField, AssetField, Range(0f, 1f)] internal float driftFactorWithHandbrake = 0.98f;
         [SerializeField, AssetField] internal bool isHaveTracks = false;
         [SerializeField, AssetField] internal float speedAndSteer = 40f;
         [SerializeField, AssetField] internal float turnFactor = 3.5f;
@@ -510,8 +510,8 @@ namespace Game.Components
 
             Gizmos.color = IsGrounded ? Color.green : Color.red;
 
-            var rayOrigin = Collider.bounds.center;
-            var raySize = Collider.bounds.size;
+            Vector3 rayOrigin = Collider.bounds.center;
+            Vector3 raySize = Collider.bounds.size;
             var rayLength = 0.1f;
 
             Gizmos.DrawWireCube(rayOrigin, raySize);
@@ -589,11 +589,26 @@ namespace Game.Components
         /// </summary>
         void KillOrthogonalVelocity()
         {
-            Vector3 forwardVelocity = transform.forward * Vector3.Dot(rb.velocity, transform.forward);
-            Vector3 rightVelocity = transform.right * Vector3.Dot(rb.velocity, transform.right);
-            Vector3 finalVelocity = forwardVelocity + rightVelocity * (isHandbraking ? driftFactorWithHandbrake : driftFactor);
+            /*
+            // Get the local velocity of the wheel - where transform is the wheel's transform
+            Vector3 localVelocity = transform.TransformDirection(rb.velocity);
 
-            rb.velocity = new Vector3(finalVelocity.x, rb.velocity.y, finalVelocity.z);
+            //Remove the velocity from the local axis - x in this case
+            localVelocity.x *= (isHandbraking ? driftFactorWithHandbrake : driftFactor);
+
+            //Apply it back to the rigidbody
+            rb.velocity = transform.InverseTransformDirection(localVelocity);
+            */
+
+            Vector3 velocity = rb.velocity;
+            Vector3 forward = transform.forward;
+            Vector3 right = transform.right;
+
+            Vector3 forwardVelocity = Vector3.Dot(velocity, forward) * forward;
+            Vector3 rightVelocity = (isHandbraking ? driftFactorWithHandbrake : driftFactor) * Vector3.Dot(velocity, right) * right;
+            Vector3 finalVelocity = forwardVelocity + rightVelocity;
+
+            rb.velocity = new Vector3(finalVelocity.x, velocity.y, finalVelocity.z);
         }
 
         bool IsTireScreeching => isHandbraking || Mathf.Abs(LaterialVelocity) > 15f;
@@ -603,8 +618,8 @@ namespace Game.Components
         readonly Collider[] GroundHits = new Collider[1];
         bool CheckGround()
         {
-            var rayOrigin = Collider.bounds.center - (transform.up * .2f);
-            var raySize = Collider.bounds.size;
+            Vector3 rayOrigin = Collider.bounds.center - (transform.up * .2f);
+            Vector3 raySize = Collider.bounds.size;
 
             int n = Physics.OverlapBoxNonAlloc(
                 rayOrigin,

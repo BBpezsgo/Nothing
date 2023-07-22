@@ -272,6 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Register: 0
+  AudioSource: {fileID: 0}
   Acceleration: 0
   ImpactForce: 0
   ImpactDamage: 30
@@ -284,25 +285,30 @@ MonoBehaviour:
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 4523666862470076258, guid: ddfa46f7e7a30c04e91f3382b3ca68f9,
     type: 3}
+  ImpactSound: {fileID: 0}
   impactEffect: {fileID: 0}
   ImpactEffects:
   - MaterialID: Water
+    Sound: {fileID: 0}
     Particles: {fileID: 6917058538467329693, guid: 6df60bdd51805624bbf98b11c048de5a,
       type: 3}
     UseNormal: 0
     Hoe: {fileID: 0}
   - MaterialID: Creature
+    Sound: {fileID: 0}
     Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}
   trail: {fileID: 3367495707484266341}
-  RicochetEffect: {fileID: 0}
+  RicochetEffect: {fileID: 812897034027791835, guid: 806d8af19112baf4fa37b28f3ec0290a,
+    type: 3}
   rotationSpeedX: 0
   rotationSpeedY: 0
   rotationSpeedZ: 0
   RandomRotation: 0
   RotateThis: {fileID: 0}
+  DieInWater: 1
   DestroyInExploisons: 1
   ignoreCollision: []
   LifeLeft: 0

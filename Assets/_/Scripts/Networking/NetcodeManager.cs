@@ -4,11 +4,15 @@ using UnityEngine;
 
 namespace Networking.Managers
 {
-    public class NetcodeManager : MonoBehaviour
+    public class NetcodeManager : SingleInstance<NetcodeManager>
     {
-        void FixedUpdate()
+        internal static bool NoNetworking = true;
+
+        void Start()
         {
             NetcodeVariableSerializers.Init();
+
+            NoNetworking = NetworkManager.Singleton == null;
         }
 
         void Singleton_OnServerStopped(bool isHost)

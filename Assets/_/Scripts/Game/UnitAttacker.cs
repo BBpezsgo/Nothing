@@ -21,6 +21,21 @@ namespace Game.Components
             Attacker.DoFrequentInput();
         }
 
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (TryGetComponent(out UnitBehaviour_Seek seek))
+            {
+                if (!turret.HasNoTarget && Vector3.Distance(turret.TargetPosition, turret.ShootPosition) >= turret.Range)
+                {
+                    seek.Target = turret.TargetPosition;
+                    return;
+                }
+                seek.Target = Vector3.zero;
+            }
+        }
+
         void Awake()
         {
             this.ControllingByUser = ulong.MaxValue;
