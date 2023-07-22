@@ -119,7 +119,12 @@ namespace Game.Components
             turret.PrepareShooting = true;
 
             if (!first && turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
-            { turret.Shoot(); }
+            {
+                if (target.TryGetComponent(out requiredShoots))
+                { turret.Shoot(requiredShoots); }
+                else
+                { turret.Shoot(); }
+            }
 
             return true;
         }

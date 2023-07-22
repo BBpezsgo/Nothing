@@ -9835,9 +9835,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 3
+  CannonKnockback: 1
+  CannonKnockbackRestoreSpeed: 2
+  CannonKnockbackSpeed: 10
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
   AudioSource: {fileID: 9074750142406875483}
   ShootSound: {fileID: 8300000, guid: 0df6688c90b7ba945b71b1bac3126676, type: 3}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0

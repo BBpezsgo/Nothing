@@ -90,6 +90,9 @@ namespace Game.Managers
 
             for (int i = NeedDirectWorldCursor.Count - 1; i >= 0; i--)
             {
+                if (NeedDirectWorldCursor[i].gameObject == null) continue;
+                if (!NeedDirectWorldCursor[i].gameObject.activeSelf) continue;
+
                 if (hit.collider != null)
                 {
                     var v = hit.collider.gameObject.GetComponentsInParent<MonoBehaviour>(false);

@@ -61,14 +61,14 @@ namespace Game.Components
             this.ControllingByUser = ulong.MaxValue;
 
             if (turret != null) turret.@base = this;
-            if (!TryGetComponent(out UnitBehaviour))
-            { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehaviour)} is null", this); }
 
             _maxHp = HP == 0f ? 1f : HP;
         }
 
         void Start()
         {
+            if (!TryGetComponent(out UnitBehaviour))
+            { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehaviour)} is null", this); }
             if (!TryGetComponent(out vehicleEngine))
             { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
             UpdateTeam();

@@ -10,6 +10,7 @@ using Unity.Collections;
 
 using Game.Components;
 using Game.Managers;
+
 using Networking.Managers;
 
 #if UNITY_EDITOR
@@ -1843,6 +1844,13 @@ namespace Game
             { return 0f; }
         }
     }
+}
+
+internal readonly struct ProfilerMarkers
+{
+    internal static readonly Unity.Profiling.ProfilerMarker UnitsBehaviour = new("Game.Units.Behaviour");
+    internal static readonly Unity.Profiling.ProfilerMarker Wheels = new("Game.VehicleEngine.Wheels");
+    internal static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");
 }
 
 internal static class NetcodeUtils

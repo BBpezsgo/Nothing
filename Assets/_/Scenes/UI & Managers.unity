@@ -1334,6 +1334,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
   Barrel: {fileID: 0}
@@ -2084,6 +2089,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UI: {fileID: 0}
+--- !u!1 &930107781
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 930107782}
+  - component: {fileID: 930107784}
+  - component: {fileID: 930107783}
+  m_Layer: 5
+  m_Name: Research
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &930107782
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930107781}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1604100311}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &930107783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930107781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c19f7a7a2e5ca34f8654bd866cbf7a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UI: {fileID: 0}
+  ResearchablePanel: {fileID: 9197481963319205126, guid: 3582ad0b7fde5584f8cf5e146dfa63f5,
+    type: 3}
+--- !u!114 &930107784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930107781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: d8eced316c6287b498b16f4e3c583f0b, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 69ec1c6a1e8fd3047b6ad1ce1a0a2cd9,
+    type: 3}
+  m_SortingOrder: 0
 --- !u!1 &930337497
 GameObject:
   m_ObjectHideFlags: 0
@@ -2116,6 +2186,67 @@ Transform:
   m_Father: {fileID: 1604100311}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &936371020
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 936371021}
+  - component: {fileID: 936371022}
+  m_Layer: 0
+  m_Name: Research Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &936371021
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936371020}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &936371022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 936371020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eead6a040c750e4aa8dc66d77b23669, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  researchables:
+  - ID: tank
+    RequiedResearches:
+    - apc
+    Name: Tank
+    ResearchTime: 2
+    IsResearched: 0
+    CurrentTime: 0
+    IsResearching: 0
+  - ID: apc
+    RequiedResearches: []
+    Name: APC
+    ResearchTime: 2
+    IsResearched: 0
+    CurrentTime: 0
+    IsResearching: 0
+  SelectedFacility: {fileID: 0}
 --- !u!1 &989274989
 GameObject:
   m_ObjectHideFlags: 0
@@ -2782,6 +2913,21 @@ MonoBehaviour:
     Building: {fileID: 1728721395496267737, guid: 76de461b9ea102248ac9a91c67bdd983,
       type: 3}
     ProgressRequied: 20
+  - Hash: 937
+    SpaceNeed: {x: 9, y: 10, z: 9}
+    Building: {fileID: 1891352470232770018, guid: a1ae9d1be982a5d4d97e318db36a8e98,
+      type: 3}
+    ProgressRequied: 10
+  - Hash: 1524
+    SpaceNeed: {x: 5.6, y: 5, z: 5.6}
+    Building: {fileID: 6226412810010601917, guid: 1e1dd8781f09e2146bca38d4122eb17f,
+      type: 3}
+    ProgressRequied: 40
+  - Hash: 1742
+    SpaceNeed: {x: 3.5, y: 10, z: 3.5}
+    Building: {fileID: 1726614090810903875, guid: ffd0834e263987d41ab5450a5730fdcf,
+      type: 3}
+    ProgressRequied: 30
   btn_GenHash: 
 --- !u!4 &1356665773
 Transform:
@@ -2843,6 +2989,7 @@ Transform:
   - {fileID: 326525616}
   - {fileID: 673795877}
   - {fileID: 1222227741}
+  - {fileID: 936371021}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3329,6 +3476,7 @@ Transform:
   - {fileID: 1290309620}
   - {fileID: 590286352}
   - {fileID: 365012115}
+  - {fileID: 930107782}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3386,6 +3534,12 @@ MonoBehaviour:
   - Type: 6
     group: {fileID: 0}
     uiDocument: {fileID: 428785315}
+    Enabled: 0
+    Active: 0
+    transform: {fileID: 0}
+  - Type: 7
+    group: {fileID: 0}
+    uiDocument: {fileID: 930107784}
     Enabled: 0
     Active: 0
     transform: {fileID: 0}
@@ -3497,6 +3651,8 @@ MonoBehaviour:
     Tooltip: Scenes
   - Key: 3
     Tooltip: Perfomance
+  - Key: 4
+    Tooltip: Research
   - Key: F4
     Tooltip: Toggle asset manager window
 --- !u!1 &1786335804

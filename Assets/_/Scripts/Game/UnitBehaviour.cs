@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 
-using Unity.Profiling;
-
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace Game.Components
 {
@@ -11,9 +8,6 @@ namespace Game.Components
     {
         [SerializeField, Button(nameof(SetBehaviours), true, true, "Set Behaviours")] string btn_0;
         [SerializeField, ReadOnly, NonReorderable] UnitBehaviour_Base[] Behaviours = new UnitBehaviour_Base[0];
-
-        public static readonly ProfilerCategory ProfilerCategory = new("Game");
-        public static readonly ProfilerMarker ProfilerMarker = new(ProfilerCategory, "Units.Behaviour", Unity.Profiling.LowLevel.MarkerFlags.Default);
 
         class Comparer : IComparer<UnitBehaviour_Base>
         {
@@ -23,20 +17,20 @@ namespace Game.Components
 
         internal Vector2 GetOutput()
         {
-            using (ProfilerMarker.Auto())
-            {
-                Vector2 result = Vector2.zero;
+            Vector2 result = Vector2.zero;
 
+            using (ProfilerMarkers.UnitsBehaviour.Auto())
+            {
                 for (int i = 0; i < Behaviours.Length; i++)
                 {
-                    var subresult = Behaviours[i].GetOutput();
+                    Vector2? subresult = Behaviours[i].GetOutput();
                     if (!subresult.HasValue) continue;
                     result = subresult.Value;
                     break;
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         void SetBehaviours()
@@ -47,7 +41,6 @@ namespace Game.Components
 
         void Start()
         {
-            Profiler.SetCategoryEnabled(ProfilerCategory, true);
             SetBehaviours();
         }
     }

@@ -8,14 +8,18 @@ namespace Game.Components
 {
     internal class UnitBuilder : Unit
     {
-        [SerializeField, ReadOnly, NonReorderable] BuildableBuilding[] targets = new BuildableBuilding[0];
-        [SerializeField, ReadOnly] int nearestTargetIndex = -1;
+        [SerializeField, ReadOnly, NonReorderable] BuildableBuilding[] ToBeBuilt = new BuildableBuilding[0];
+        [SerializeField, ReadOnly, NonReorderable] Building[] ToBeRepair = new Building[0];
+
+        [SerializeField, ReadOnly] int nearestToBeBuilt = -1;
+        [SerializeField, ReadOnly] int nearestToBeRepair = -1;
+
         [SerializeField, AssetField] float DistanceToBuild = 1f;
         [SerializeField, AssetField] float ConstructionSpeed = 1f;
 
         [SerializeField, ReadOnly] float TimeToNextTargetSearch = 1f;
 
-        void FindTargets()
+        void FindToBeBuilt()
         {
             if (string.IsNullOrEmpty(Team)) return;
             List<BuildableBuilding> result = new();
@@ -28,64 +32,142 @@ namespace Game.Components
 
                 result.Add(RegisteredObjects.BuildableBuildings[i]);
             }
-            targets = result.ToArray();
+            ToBeBuilt = result.ToArray();
         }
 
-        int NearestTarget() => targets.ClosestI(transform.position).Item1;
+        void FindToBeRepair()
+        {
+            if (string.IsNullOrEmpty(Team)) return;
+            List<Building> result = new();
+            for (int i = RegisteredObjects.Buildings.Count - 1; i >= 0; i--)
+            {
+                if (RegisteredObjects.Buildings == null)
+                { continue; }
+                if (this.Team != RegisteredObjects.Buildings[i].Team)
+                { continue; }
+                if (RegisteredObjects.Buildings[i].NormalizedHP >= 1f)
+                { continue; }
+
+                result.Add(RegisteredObjects.Buildings[i]);
+            }
+            ToBeRepair = result.ToArray();
+        }
+
+        int NearestToBeBuilt() => ToBeBuilt.ClosestI(transform.position).Item1;
+        int NearestToBeRepair() => ToBeRepair.ClosestI(transform.position).Item1;
 
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
             if (this.AnybodyControllingThis()) return;
 
-            if (nearestTargetIndex != -1 && targets[nearestTargetIndex] != null)
+            if (nearestToBeBuilt != -1 && ToBeBuilt[nearestToBeBuilt] != null)
             {
-                if (turret != null)
-                {
-                    turret.SetTarget(targets[nearestTargetIndex].transform);
-                }
-                if ((targets[nearestTargetIndex].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
-                {
-                    targets[nearestTargetIndex].Build(ConstructionSpeed * Time.fixedDeltaTime);
-                }
-
-                if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
-                { seek.Target = targets[nearestTargetIndex].transform.position; }
-
-                if (TryGetComponent<UnitBehaviour_AvoidObstacles>(out var avoidObstacles))
-                { avoidObstacles.IgnoreCollision = targets[nearestTargetIndex].transform; }
+                DoBuild();
+            }
+            else if (nearestToBeRepair != -1 && ToBeRepair[nearestToBeRepair] != null)
+            {
+                DoRepair();
             }
             else
             {
-                if (TimeToNextTargetSearch > 0)
-                {
-                    TimeToNextTargetSearch -= Time.fixedDeltaTime;
-                }
-                else
-                {
-                    if (targets.Length == 0)
-                    {
-                        FindTargets();
-                    }
-
-                    if (targets.Length != 0)
-                    {
-                        targets = targets.PurgeObjects();
-                    }
-
-                    nearestTargetIndex = NearestTarget();
-
-                    TimeToNextTargetSearch = 2f;
-                }
-
-                if (turret != null) turret.SetTarget(Vector3.zero);
-
-                if (TryGetComponent<UnitBehaviour_Seek>(out var seek))
-                { seek.Target = Vector3.zero; }
-
-                if (TryGetComponent<UnitBehaviour_AvoidObstacles>(out var avoidObstacles))
-                { avoidObstacles.IgnoreCollision = null; }
+                DoIdle();
             }
+        }
+
+        void DoBuild()
+        {
+            if (nearestToBeBuilt < 0 || nearestToBeBuilt >= ToBeRepair.Length)
+            { return; }
+            if (ToBeBuilt[nearestToBeBuilt] == null)
+            { return; }
+
+            if (turret != null)
+            {
+                turret.SetTarget(ToBeBuilt[nearestToBeBuilt].transform);
+            }
+
+            if ((ToBeBuilt[nearestToBeBuilt].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
+            {
+                ToBeBuilt[nearestToBeBuilt].Build(ConstructionSpeed * Time.fixedDeltaTime);
+
+                if (TryGetComponent(out UnitBehaviour_Seek seek))
+                { seek.Target = Vector3.zero; }
+            }
+            else
+            {
+                if (TryGetComponent(out UnitBehaviour_Seek seek))
+                { seek.Target = ToBeBuilt[nearestToBeBuilt].transform.position; }
+            }
+
+            if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
+            { avoidObstacles.IgnoreCollision = ToBeBuilt[nearestToBeBuilt].transform; }
+        }
+
+        void DoRepair()
+        {
+            if (nearestToBeRepair < 0 || nearestToBeRepair >= ToBeRepair.Length)
+            { return; }
+            if (ToBeRepair[nearestToBeRepair] == null)
+            { return; }
+
+            if (turret != null)
+            {
+                turret.SetTarget(ToBeRepair[nearestToBeRepair].transform);
+            }
+
+            if ((ToBeRepair[nearestToBeRepair].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
+            {
+                ToBeRepair[nearestToBeRepair].Repair(ConstructionSpeed * Time.fixedDeltaTime);
+                if (ToBeRepair[nearestToBeRepair].NormalizedHP >= 1f)
+                { ToBeRepair[nearestToBeRepair] = null; }
+
+                if (TryGetComponent(out UnitBehaviour_Seek seek))
+                { seek.Target = Vector3.zero; }
+            }
+            else
+            {
+                if (TryGetComponent(out UnitBehaviour_Seek seek))
+                { seek.Target = ToBeRepair[nearestToBeRepair].transform.position; }
+            }
+
+            if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
+            { avoidObstacles.IgnoreCollision = ToBeRepair[nearestToBeRepair].transform; }
+        }
+
+        void DoIdle()
+        {
+            if (TimeToNextTargetSearch > 0)
+            {
+                TimeToNextTargetSearch -= Time.fixedDeltaTime;
+            }
+            else
+            {
+                if (ToBeBuilt.Length == 0 && ToBeRepair.Length == 0)
+                {
+                    FindToBeBuilt();
+                    FindToBeRepair();
+                }
+
+                if (ToBeBuilt.Length != 0)
+                { ToBeBuilt = ToBeBuilt.PurgeObjects(); }
+
+                if (ToBeRepair.Length != 0)
+                { ToBeRepair = ToBeRepair.PurgeObjects(); }
+
+                nearestToBeBuilt = NearestToBeBuilt();
+                nearestToBeRepair = NearestToBeRepair();
+
+                TimeToNextTargetSearch = 2f;
+            }
+
+            if (turret != null) turret.SetTarget(Vector3.zero);
+
+            if (TryGetComponent(out UnitBehaviour_Seek seek))
+            { seek.Target = Vector3.zero; }
+
+            if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
+            { avoidObstacles.IgnoreCollision = null; }
         }
 
         private void OnDrawGizmosSelected()

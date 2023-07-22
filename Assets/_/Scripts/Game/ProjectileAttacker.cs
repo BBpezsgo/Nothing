@@ -66,39 +66,46 @@ namespace Game.Components
                 { return false; }
             }
 
-            Projectile.Trajectory shot = projectile.Shot;
-            float v = turret.projectileVelocity * .95f;
+            float? angle_;
+            float? t;
+            Vector3 projPosition;
 
-            float lifetime = projectile.Lifetime + Time.fixedDeltaTime;
-
-            var projectileTOF = Utilities.Ballistics.CalculateTime(shot.Velocity, shot.ShootAngle * Mathf.Deg2Rad, shot.ShootPosition.y);
-
-            if (projectileTOF.HasValue && (projectileTOF - lifetime) < .5f)
+            using (ProfilerMarkers.TrajectoryMath.Auto())
             {
-                // Debug3D.DrawSphere(projectile.Position, 3f, Color.magenta, 5f);
-                return false;
-            }
+                Projectile.Trajectory shot = projectile.Shot;
+                float v = turret.projectileVelocity * .95f;
 
-            Vector3 projPosition = shot.Position(lifetime);
+                float lifetime = projectile.Lifetime + Time.fixedDeltaTime;
 
-            float d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
+                var projectileTOF = Ballistics.CalculateTime(shot.Velocity, shot.ShootAngle * Mathf.Deg2Rad, shot.ShootPosition.y);
 
-            float? angle_ = Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
+                if (projectileTOF.HasValue && (projectileTOF - lifetime) < .5f)
+                {
+                    // Debug3D.DrawSphere(projectile.Position, 3f, Color.magenta, 5f);
+                    return false;
+                }
 
-            float? t = angle_.HasValue ? Ballistics.TimeToReachDistance(v, angle_.Value, d) : null;
+                projPosition = shot.Position(lifetime);
 
-            for (int i = 0; i < 3; i++)
-            {
-                if (!angle_.HasValue) break;
-                if (!t.HasValue) break;
+                float d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
 
-                projPosition = shot.Position(lifetime + t.Value);
+                angle_ = Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
 
-                d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
+                t = angle_.HasValue ? Ballistics.TimeToReachDistance(v, angle_.Value, d) : null;
 
-                angle_ = Utilities.Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
+                for (int i = 0; i < 3; i++)
+                {
+                    if (!angle_.HasValue) break;
+                    if (!t.HasValue) break;
 
-                t = angle_.HasValue ? Utilities.Ballistics.TimeToReachDistance(v, angle_.Value, d) : null;
+                    projPosition = shot.Position(lifetime + t.Value);
+
+                    d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
+
+                    angle_ = Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
+
+                    t = angle_.HasValue ? Ballistics.TimeToReachDistance(v, angle_.Value, d) : null;
+                }
             }
 
             // Debug.DrawLine(projectile.Position, projPosition, Color.red, Time.fixedDeltaTime, false);
@@ -129,22 +136,13 @@ namespace Game.Components
             if (turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
             {
                 if (t.HasValue && requiredShoots != null)
-                {
-                    turret.Shoot(requiredShoots, t.Value);
-                }
+                { turret.Shoot(requiredShoots, t.Value); }
                 else
-                {
-                    turret.Shoot();
-                }
+                { turret.Shoot(); }
             }
 
             turret.PrepareShooting = true;
             return true;
-        }
-
-        void OnDrawGizmosSelected()
-        {
-
         }
     }
 }

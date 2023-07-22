@@ -37,6 +37,21 @@ namespace Game.UI
                     return;
                 }
             }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_Research)
+                {
+                    MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.None;
+                    Research.ResearchManager.Instance.DeselectFacility();
+                    return;
+                }
+
+                if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.None)
+                {
+                    MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.Game_Research;
+                    return;
+                }
+            }
         }
     }
 }

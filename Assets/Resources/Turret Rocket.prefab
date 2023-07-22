@@ -236,6 +236,7 @@ MonoBehaviour:
   AudioSource: {fileID: 8401276797070513005}
   ShootSound: {fileID: 8300000, guid: 479c3100a5002fd4e915ef97a6b8cc8d, type: 3}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
@@ -257,7 +258,9 @@ MonoBehaviour:
     type: 3}
   Projectiles: []
   SelectedProjectile: 0
-  ShootEffects: []
+  ShootEffects:
+  - {fileID: 8990596160454144657, guid: 60f5e7c895ff69c40a7a3f3f25ac0e17, type: 3}
+  - {fileID: 3494347763345842717, guid: 4445a766bd3be9242bf9c62ca53a038f, type: 3}
   IsBallisticProjectile: 1
   Scope: {fileID: 4273319252713343511}
   ScopeHolder: {fileID: 4273319252398771123}

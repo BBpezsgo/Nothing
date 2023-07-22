@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 
 using Unity.Netcode;
-using Unity.Profiling;
 
 using UnityEngine;
 
@@ -16,8 +15,6 @@ namespace Game.Components
 {
     public class VehicleEngine : MovementEngine, IHaveAssetFields
     {
-        static readonly ProfilerMarker pm_Wheels = new("Game.VehicleEngine.Wheels");
-
         [SerializeField, ReadOnly] Unit unit;
 
 #pragma warning disable IDE0052 // Remove unread private members
@@ -351,7 +348,7 @@ namespace Game.Components
 
         void DoWheelPhysics()
         {
-            using (pm_Wheels.Auto())
+            using (ProfilerMarkers.Wheels.Auto())
             {
                 if (Wheels.Length == 0) return;
 

@@ -34,6 +34,8 @@ namespace Game.Managers
             Game_BlueprintManager,
 
             Game_BlueprintDesigner,
+
+            Game_Research,
         }
 
         internal enum IntermediateMenuType

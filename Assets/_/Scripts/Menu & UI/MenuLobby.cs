@@ -81,9 +81,9 @@ namespace Game.UI
             }
         }
 
-        void ButtonConnectDiscoveredServer(EventBase @base)
+        void ButtonConnectDiscoveredServer(EventBase e)
         {
-            string socket = ((VisualElement)@base.target).name.Split('-')[1];
+            string socket = ((VisualElement)e.target).name.Split('-')[1];
             ushort port = ushort.Parse(socket.Split(':')[^1]);
             string address = socket[..(socket.Length - socket.Split(':')[^1].Length - 1)];
 

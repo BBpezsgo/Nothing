@@ -113,12 +113,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 0.5
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackPosition: {x: 0, y: 0}
   AudioSource: {fileID: 5466001084010902814}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
-  Barrel: {fileID: 0}
+  Barrel: {fileID: 5322412339203651809}
   HasBarrel: 0
-  RequiedBarrelRotationSpeed: 0
-  BarrelRotationAcceleration: 0
+  RequiedBarrelRotationSpeed: 600
+  BarrelRotationAcceleration: 300
   BarrelRotationSpeed: 0
   PrepareShooting: 0
   cannon: {fileID: 5278498343604609213}
@@ -126,7 +129,7 @@ MonoBehaviour:
   cannonLowestAngle: -10
   cannonHighestAngle: 30
   rotationSpeed: 180
-  reloadTime: 0.3
+  reloadTime: 0.2
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 1

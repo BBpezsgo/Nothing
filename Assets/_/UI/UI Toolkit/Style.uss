@@ -284,3 +284,41 @@ Scroller {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
+
+.progressbar > #unity-progress-bar > .unity-progress-bar__background {
+    background-color: rgba(48, 48, 48, 255);
+    border-left-width: 0.5px;
+    border-right-width: 0.5px;
+    border-top-width: 0.5px;
+    border-bottom-width: 0.5px;
+    border-left-color: rgba(37, 37, 37, 255);
+    border-right-color: rgba(37, 37, 37, 255);
+    border-top-color: rgba(37, 37, 37, 255);
+    border-bottom-color: rgba(37, 37, 37, 255);
+    border-top-left-radius: 1px;
+    border-bottom-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    height: auto;
+}
+
+.progressbar > #unity-progress-bar > .unity-progress-bar__background > .unity-progress-bar__progress {
+    background-color: rgb(56, 93, 131);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.progressbar > #unity-progress-bar {
+    max-height: 15px;
+    min-height: 15px;
+}
+
+.progressbar Label {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 8px;
+}

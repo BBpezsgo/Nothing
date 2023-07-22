@@ -1,5 +1,3 @@
-using Game;
-using Game.Components;
 using Game.Managers;
 
 using UnityEngine;
@@ -117,6 +115,7 @@ namespace Game.Components
         [SerializeField] Transform RotateThis;
 
         [Header("Stuff")]
+        [SerializeField] LayerMask HitLayerMask;
         [SerializeField] bool DieInWater = true;
         [SerializeField] bool DestroyInExploisons = false;
         [SerializeField, ReadOnly, NonReorderable] internal Transform[] ignoreCollision;
@@ -190,28 +189,54 @@ namespace Game.Components
 
             Debug.DrawRay(lastPosition, positionDelta, Color.black, Time.fixedDeltaTime);
 
-            int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude);
+            int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude, HitLayerMask);
 
             lastPosition = transform.position;
 
-            for (int i = 0; i < hitCount; i++)
+            if (hitCount > 0)
             {
-                if (hits[i].collider.isTrigger)
+                int closestI = -1;
+                float closestD = float.MaxValue;
+
+                for (int i = 0; i < hitCount; i++)
                 {
-                    if (!hits[i].collider.gameObject.HasComponent<Projectile>())
+                    if (hits[i].collider.isTrigger)
                     {
-                        if (hits[i].collider.gameObject.name != "Water" || !DieInWater)
+                        if (!hits[i].collider.gameObject.HasComponent<Projectile>())
                         {
-                            continue;
+                            if (hits[i].collider.gameObject.name != "Water" || !DieInWater)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    if (hits[i].transform == transform)
+                    { continue; }
+                    if (ignoreCollision.Contains(hits[i].transform))
+                    { continue; }
+
+                    if (closestI == -1)
+                    {
+                        closestI = i;
+                    }
+                    else
+                    {
+                        float d = (lastPosition - hits[i].point).sqrMagnitude;
+                        if (d < closestD)
+                        {
+                            d = closestD;
+                            closestI = i;
                         }
                     }
                 }
-                if (hits[i].transform == transform)
-                { continue; }
-                if (ignoreCollision.Contains(hits[i].transform))
-                { continue; }
-                if (Impact(hits[i].point, hits[i].normal, hits[i].collider))
-                { return; }
+
+                if (closestI != -1)
+                {
+                    if (Impact(hits[closestI].point, hits[closestI].normal, hits[closestI].collider))
+                    {
+                        return;
+                    }
+                }
             }
 
             if (rotationSpeedX != 0f ||

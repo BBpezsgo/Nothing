@@ -182,13 +182,9 @@ namespace Game.Components
                 if (turret.IsAccurateShoot)
                 {
                     if (NetcodeUtils.IsOfflineOrServer)
-                    {
-                        turret.Shoot();
-                    }
+                    { turret.Shoot(); }
                     else if (NetcodeUtils.IsClient)
-                    {
-                        turret.ShootRequest();
-                    }
+                    { turret.ShootRequest(); }
                 }
             }
             else

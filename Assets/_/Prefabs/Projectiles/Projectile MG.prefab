@@ -326,6 +326,9 @@ MonoBehaviour:
   rotationSpeedZ: 0
   RandomRotation: 0
   RotateThis: {fileID: 0}
+  HitLayerMask:
+    serializedVersion: 2
+    m_Bits: 209
   DieInWater: 1
   DestroyInExploisons: 0
   ignoreCollision: []

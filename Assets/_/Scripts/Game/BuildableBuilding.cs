@@ -81,11 +81,12 @@ namespace Game.Components
             BuildingProcess += progress;
 
             for (int i = 0; i < materials.Length; i++)
-            { materials[i].SetFloat("_Progress", BuildingProcess); }
+            { materials[i].SetFloat("_Progress", BuildingProcess / BuildingProcessRequied); }
 
-            if (NetcodeUtils.IsServer)
+            if (NetcodeUtils.IsOfflineOrServer)
             {
-                NetBuildingProcess.Value = BuildingProcess;
+                if (NetcodeUtils.IsServer)
+                { NetBuildingProcess.Value = BuildingProcess; }
 
                 if (BuildingProcess >= BuildingProcessRequied)
                 {

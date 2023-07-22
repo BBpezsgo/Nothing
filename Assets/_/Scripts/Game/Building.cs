@@ -1,5 +1,7 @@
 using AssetManager;
 
+using System;
+
 using UnityEngine;
 
 namespace Game.Components
@@ -57,6 +59,11 @@ namespace Game.Components
             Gizmos.DrawLine(GroundOrigin - Vector3.up, GroundOrigin + Vector3.up);
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(GroundOrigin - Vector3.forward, GroundOrigin + Vector3.forward);
+        }
+
+        internal void Repair(float v)
+        {
+            HP = Mathf.Min(_maxHp, HP + v);
         }
     }
 }

@@ -173,26 +173,32 @@ MonoBehaviour:
     MaxSteerAngle: 20
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   - Transform: {fileID: 44472583743903952}
     MaxSteerAngle: 0
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   - Transform: {fileID: 44472584190629862}
     MaxSteerAngle: 0
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   - Transform: {fileID: 44472583033830937}
     MaxSteerAngle: 20
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   - Transform: {fileID: 44472582474547958}
     MaxSteerAngle: 0
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   - Transform: {fileID: 44472583875898585}
     MaxSteerAngle: 0
     Radius: 0.42
     _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   SpringDamper: 0.5
   SpringStrength: 15
   TireGripFactor: 0.1
@@ -253,7 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 1
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
   FollowCursor: 0
   Target: {x: 0, y: 0, z: 0}
   maxDistanceToReverse: 8
@@ -273,7 +279,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Priority: 2
-  VehicleEngine: {fileID: 0}
+  MovementEngine: {fileID: 0}
+  IgnoreCollision: {fileID: 0}
   raycastHitCache:
     Obstacles: []
   DetectedThings:
@@ -880,9 +887,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 0.5
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
   AudioSource: {fileID: 145842333711360083}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
@@ -911,8 +924,7 @@ MonoBehaviour:
   IsBallisticProjectile: 1
   Scope: {fileID: 8134447802361416521}
   ScopeHolder: {fileID: 162455347653107985}
-  target:
-    m_InternalValue: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
   overridedInput: {x: 0, y: 0}
   base: {fileID: 0}
