@@ -1,5 +1,138 @@
+export type PreprocessorVariables = {
+	/**
+	 * The Company Name defined in the Player Settings.
+	 */
+	COMPANY_NAME: string
+
+	/**
+	 * The Product Name defined in the Player Settings.
+	 */
+	PRODUCT_NAME: string
+
+	/**
+	 * The Version defined in the Player Settings.
+	 */
+	PRODUCT_VERSION: string
+
+	/**
+	 * The Default Canvas Width defined in the Player Settings > Resolution and Presentation.
+	 */
+	WIDTH: number
+
+	/**
+	 * The Default Canvas Height in the Player Settings > Resolution and Presentation.
+	 */
+	HEIGHT: number
+
+	/**
+	 * This's set to the "Dark" value when Splash Style Player Settings > Splash Image is set to Light on Dark, otherwise it's set to the "Light" value.
+	 */
+	SPLASH_SCREEN_STYLE: 'Dark' | 'Light'
+
+	/**
+	 * Represents the Background Color defined in a form of a hex triplet.
+	 */
+	BACKGROUND_COLOR: string
+
+	/**
+	 * The Unity version.
+	 */
+	UNITY_VERSION: string
+
+	/**
+	 * This's set to true if the Development Build option is enabled.
+	 */
+	DEVELOPMENT_PLAYER: boolean
+
+	/**
+	 * This's set to Gzip or Brotli, depending on the compression method you use and the type of decompressor included in the build.
+	 * If neither is included, the variable is set to an empty string.
+	 */
+	DECOMPRESSION_FALLBACK: 'Gzip' | 'Brotli' | ''
+
+	/**
+	 * This is set to true if the current build is a WebAssembly build.
+	 */
+	USE_WASM: boolean
+
+	/**
+	 * This is set to true if the current build uses threads.
+	 */
+	USE_THREADS: boolean
+
+	/**
+	 * This is set to true if the current build supports the WebGL1.0 graphics API.
+	 */
+	USE_WEBGL_1_0: boolean
+
+	/**
+	 * This is set to true if the current build supports the WebGL2.0 graphics API.
+	 */
+	USE_WEBGL_2_0: boolean
+
+	/**
+	 * This is set to true if the current build uses indexedDB caching for the downloaded files.
+	 */
+	USE_DATA_CACHING: boolean
+
+	/**
+	 * This is set to the filename of the build loader script.
+	 */
+	LOADER_FILENAME: string
+
+	/**
+	 * This is set to the filename of the main data file.
+	 */
+	DATA_FILENAME: string
+
+	/**
+	 * This is set to the filename of the build framework script.
+	 */
+	FRAMEWORK_FILENAME: string
+
+	/**
+	 * This is set to the filename of the WebAssembly module when the current build is a WebAssembly build, otherwise it's set to the filename of the asm.js module.
+	 */
+	CODE_FILENAME: string
+
+	/**
+	 * This is set to the filename of the memory file when memory is stored in an external file, otherwise it's set to an empty string.
+	 */
+	MEMORY_FILENAME: string
+
+	/**
+	 * This is set to the filename of the JSON file containing debug symbols when the current build is using debug symbols, otherwise it's set to an empty string.
+	 */
+	SYMBOLS_FILENAME: string
+
+	/**
+	 * This is set to the filename of the background image when the background image is selected in the Player Settings > Splash Image, otherwise it's set to an empty string.
+	*/
+	BACKGROUND_FILENAME: string
+}
+
+export function UnityPreprocessorVariables(): PreprocessorVariables
+
 declare global {
+    /**
+     * @param canvas Unity runtime uses the `canvas` object to render the game.
+    * @param config The config object contains the build configuration, such as the code and data URLs, product and company name, and version.
+    * @param onProgress The WebGL loader calls the onProgress callback object every time the download progress updates.The progress argument that comes with the onProgress callback determines the loading progress as a value between 0.0 and 1.0.
+     */
     function createUnityInstance(canvas: HTMLCanvasElement, config: any, onProgress: (progress: number) => void): Promise<UnityInstance>
+}
+
+export type UnityBuildConfig = {
+    dataUrl: string
+    frameworkUrl: string
+    codeUrl?: string
+    memoryUrl?: string
+    symbolsUrl?: string
+    streamingAssetsUrl?: string
+    companyName: string
+    productName: string
+    productVersion: string
+    showBanner: (msg: string, type: 'error' | 'warning' | 'info') => void
 }
 
 export interface UnityInstance {
@@ -174,7 +307,7 @@ export interface UnityModule {
     disableAccessToMediaDevices(): unknown
     disabledCanvasEvents: string[]
     doRequestFullscreen(): unknown
-    downloadProgress: { } | { dataUrl: object }
+    downloadProgress: {} | { dataUrl: object }
     emscriptenWebGLGet(): unknown
     emscriptenWebGLGetBufferBinding(): unknown
     emscriptenWebGLGetIndexed(): unknown
@@ -357,9 +490,9 @@ export interface UnityModule {
     warnOnce(): unknown
     webSocketInstances(): unknown
     webglApplyExplicitProgramBindings(): unknown
-    webglContextAttributes: {preserveDrawingBuffer: boolean, powerPreference: number}
+    webglContextAttributes: { preserveDrawingBuffer: boolean, powerPreference: number }
     webglGetUniformLocation(): unknown
-    websocket:object
+    websocket: object
     withBuiltinMalloc(): unknown
     wr(): unknown
     writeArrayToMemory(): unknown
@@ -484,7 +617,7 @@ declare class UnityCache {
      */
     static clearCache(): Promise<void>
 
-    
+
     /**
      * Execute an operation on the cache
      * @param store The name of the store to use

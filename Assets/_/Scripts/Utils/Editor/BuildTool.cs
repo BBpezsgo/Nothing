@@ -261,6 +261,7 @@ namespace Utilities.Editor
                 Debug.LogException(exception);
                 return null;
             }
+
             return report;
         }
 

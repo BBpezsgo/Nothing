@@ -1,25 +1,28 @@
 const elements = Elements()
+const Preferences = UnityPreprocessorVariables()
 
 const buildUrl = "Build"
-const loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}"
+const loaderUrl = buildUrl + "/" + Preferences.LOADER_FILENAME
 
-const config = {
-    dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-    frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-#if USE_WASM
-    codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
-#endif
-#if MEMORY_FILENAME
-    memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
-#endif
-#if SYMBOLS_FILENAME
-    symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
-#endif
+/** @type {import('./unity').UnityBuildConfig} */
+let config = {
+    dataUrl: buildUrl + "/" + Preferences.DATA_FILENAME,
+    frameworkUrl: buildUrl + "/" + Preferences.FRAMEWORK_FILENAME,
     streamingAssetsUrl: "StreamingAssets",
-    companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
-    productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
-    productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+    companyName: Preferences.COMPANY_NAME,
+    productName: Preferences.PRODUCT_NAME,
+    productVersion: Preferences.PRODUCT_VERSION,
     showBanner: ShowPopup,
+}
+
+if (Preferences.USE_WASM) {
+    config.codeUrl = buildUrl + "/" + Preferences.CODE_FILENAME
+}
+if (Preferences.MEMORY_FILENAME) {
+    config.memoryUrl = buildUrl + "/" + Preferences.MEMORY_FILENAME
+}
+if (Preferences.SYMBOLS_FILENAME) {
+    config.symbolsUrl = buildUrl + "/" + Preferences.SYMBOLS_FILENAME
 }
 
 // By default Unity keeps WebGL canvas render target size matched with
@@ -47,13 +50,13 @@ if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
 } else {
     // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
-    elements.canvas.style.width = "{{{ WIDTH }}}px"
-    elements.canvas.style.height = "{{{ HEIGHT }}}px"
+    elements.canvas.style.width = Preferences.WIDTH + "px"
+    elements.canvas.style.height = Preferences.HEIGHT + "px"
 }
 
-#if BACKGROUND_FILENAME
-elements.canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover"
-#endif
+if (Preferences.BACKGROUND_FILENAME) {
+    elements.canvas.style.background = "url('" + buildUrl + "/" + Preferences.BACKGROUND_FILENAME.replace(/'/g, '%27') + "') center / cover"
+}
 elements.loadingBar.style.display = "block"
 
 function OnQuit() {

@@ -21,11 +21,7 @@ namespace Authentication.Providers
         public string DisplayName
         {
             get => AccountData.DisplayName;
-            set
-            {
-                AccountData.DisplayName = value;
-                // Save();
-            }
+            set => AccountData.DisplayName = value;
         }
         public string AvatarUrl
         {
@@ -52,8 +48,6 @@ namespace Authentication.Providers
         [SerializeField] UIDocument loginMenu;
         [SerializeField] UIDocument accountMenu;
 
-        bool HaveAccount => System.IO.File.Exists(dataFilePath);
-
         void Start()
         {
             ResetHaveAccount();
@@ -62,20 +56,6 @@ namespace Authentication.Providers
             {
                 loginMenu.rootVisualElement.Q<Button>("button-anonymous").clicked += Login;
                 ResetHaveAccount();
-            };
-
-            accountMenu.OnEnabled().onEnable += () =>
-            {
-                /*
-                accountMenu.rootVisualElement.Q<Button>("btn-save").clicked += OnButtonUpdateAccount;
-                // accountMenu.rootVisualElement.Q<Button>("btn-close").clicked += MenuNavigator.Instance.OnButtonAccountCloseClick;
-                accountMenu.rootVisualElement.Q<TextField>("inp-name").value = AuthManager.AuthProvider.DisplayName;
-                accountMenu.rootVisualElement.Q<TextField>("inp-name").RegisterValueChangedCallback(e =>
-                {
-                    // accountMenu.rootVisualElement.Q<ButtonThatCanBeDisabled>("btn-save").enabled = !string.IsNullOrEmpty(e.newValue);
-                });
-                // accountMenu.rootVisualElement.Q<ButtonThatCanBeDisabled>("btn-save").enabled = false;
-                */
             };
 
             if (AutoAuthorize)
@@ -97,7 +77,7 @@ namespace Authentication.Providers
 
         void ResetHaveAccount()
         {
-            // if (loginMenu.rootVisualElement != null) loginMenu.rootVisualElement.Q<VisualElement>("ico-anonymous").visible = HaveAccount;
+
         }
 
         #region UI Callback
@@ -111,20 +91,15 @@ namespace Authentication.Providers
 
         public void Login()
         {
-            /*
-            if (HaveAccount)
-            {
-                AccountData = AssetManager.Storage.ReadObject<AnonymousUser>(DataFilePath);
-            }
-            else
-            {
-            */
             AccountData = new AnonymousUser()
             {
-                ID = "anonymous-" + System.Guid.NewGuid().ToString(),
+                ID = "anonymous-" + Guid.NewGuid().ToString(),
             };
-            // Save();
-            // }
+
+            Cookies.SetCookie(new Cookies.Cookie("Account", AccountData.ID)
+            {
+                MaxAge = 60 * 60 * 24 * 7,
+            });
 
             // Debug.Log($"[{nameof(AnonymousManager)}]: Login anonymous {{ UserID: {AccountData.ID} }}");
 
@@ -132,7 +107,10 @@ namespace Authentication.Providers
             AuthManager.OnAuthorized?.Invoke(this);
         }
 
-        void Save() => AssetManager.Storage.Write(AccountData, DataFilePath);
+        void Save()
+        {
+            AssetManager.Storage.Write(AccountData, DataFilePath);
+        }
 
         public void Logout()
         {
@@ -144,20 +122,15 @@ namespace Authentication.Providers
         public string[] GetFriends() => AccountData.Friends.ToArray();
         public void AddFriend(string newFriendID)
         {
-            throw new System.NotImplementedException();
-            // AccountData.Friends.Add(newFriendID);
-            // Save();
+            throw new NotImplementedException();
         }
         public void RemoveFriend(string userId)
         {
-            throw new System.NotImplementedException();
-            // AccountData.Friends.Remove(userId);
-            // Save();
+            throw new NotImplementedException();
         }
 
         public void Show()
         {
-            // MenuManager.Singleton.CurrentPanel = MenuManager.PanelType.AccountAnonymous;
             if (accountMenu.rootVisualElement != null)
             { accountMenu.rootVisualElement.Q<TextField>("inp-name").value = AccountData.DisplayName ?? AuthManager.USERNAME_NULL; }
         }
