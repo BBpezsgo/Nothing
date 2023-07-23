@@ -2177,3 +2177,64 @@ public class CoolArray<T> : INetworkSerializable, IEnumerable<T>
         return result;
     }
 }
+
+public class SearcherCoroutine<T>
+{
+    int i;
+    T[] gotList = null;
+    bool isRunning;
+
+    readonly Func<T[]> list;
+    readonly Action<T> callback;
+
+    public bool IsRunning => isRunning;
+
+    public SearcherCoroutine(Func<T[]> list, Action<T> callback)
+    {
+        i = 0;
+        this.list = list;
+        this.callback = callback;
+        isRunning = false;
+    }
+
+    public void Search(MonoBehaviour caller)
+    {
+        isRunning = true;
+        caller.StartCoroutine(Search());
+    }
+
+    public IEnumerator Search()
+    {
+        i = 0;
+
+        if (list == null)
+        {
+            isRunning = false;
+            yield break;
+        }
+
+        if (callback == null)
+        {
+            isRunning = false;
+            yield break;
+        }
+
+        gotList = list?.Invoke();
+
+        if (gotList == null)
+        {
+            isRunning = false;
+            yield break;
+        }
+
+        while (i < gotList.Length)
+        {
+            yield return new WaitForFixedUpdate();
+
+            this.callback?.Invoke(gotList[i]);
+            i++;
+        }
+
+        isRunning = false;
+    }
+}
