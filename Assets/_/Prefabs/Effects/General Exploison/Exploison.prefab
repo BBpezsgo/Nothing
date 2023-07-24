@@ -4823,7 +4823,6 @@ GameObject:
   - component: {fileID: 3387115979063222468}
   - component: {fileID: 3387115979063222473}
   - component: {fileID: 3387115979063222470}
-  - component: {fileID: 3387115979063222471}
   m_Layer: 0
   m_Name: Exploison
   m_TagString: Untagged
@@ -9683,19 +9682,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &3387115979063222471
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3387115979063222469}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
 --- !u!1 &3387115980004879975
 GameObject:
   m_ObjectHideFlags: 0
@@ -9707,7 +9693,6 @@ GameObject:
   - component: {fileID: 3387115980004879974}
   - component: {fileID: 3387115980004879979}
   - component: {fileID: 3387115980004879976}
-  - component: {fileID: 3387115980004879977}
   m_Layer: 0
   m_Name: SmallParticles
   m_TagString: Untagged
@@ -14567,19 +14552,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &3387115980004879977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3387115980004879975}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
 --- !u!1 &3387115980509588096
 GameObject:
   m_ObjectHideFlags: 0
@@ -19576,7 +19548,6 @@ GameObject:
   - component: {fileID: 7642596332715820967}
   - component: {fileID: 8848959821277652653}
   - component: {fileID: 5749364034693310849}
-  - component: {fileID: 6378275027958491883}
   m_Layer: 0
   m_Name: BigParticles
   m_TagString: Untagged
@@ -24443,19 +24414,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6378275027958491883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4045058564501412693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
 --- !u!1 &5925143150132494697
 GameObject:
   m_ObjectHideFlags: 0
