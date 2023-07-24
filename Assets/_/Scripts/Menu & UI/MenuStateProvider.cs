@@ -4,13 +4,11 @@ namespace Game.Managers
 {
     public class MenuStateProvider : MonoBehaviour
     {
-        // internal bool InLobby => Photon.Pun.PhotonNetwork.InLobby;
-
         internal bool InNetcodeRoom
         {
             get
             {
-                if (Unity.Netcode.NetworkManager.Singleton == null) return false;
+                if (NetcodeUtils.IsOffline) return false;
                 return
                     Unity.Netcode.NetworkManager.Singleton.IsListening && (
                         Unity.Netcode.NetworkManager.Singleton.IsServer || (
@@ -21,20 +19,18 @@ namespace Game.Managers
             }
         }
 
-        // internal bool InPhotonRoom => Photon.Pun.PhotonNetwork.InRoom;
-
         public bool NetcodeIsLoading
         {
             get
             {
-                if (Unity.Netcode.NetworkManager.Singleton == null) return false;
+                if (NetcodeUtils.IsOffline) return false;
                 return
                     Unity.Netcode.NetworkManager.Singleton.IsClient &&
                     !Unity.Netcode.NetworkManager.Singleton.IsConnectedClient;
             }
         }
 
-        public bool IsOffline => Unity.Netcode.NetworkManager.Singleton == null;
+        public bool IsOffline => NetcodeUtils.IsOffline;
 
         public bool Authorized => Authentication.AuthManager.IsAuthorized;
     }

@@ -93,7 +93,9 @@ namespace Game.Components
         [SerializeField, AssetField] internal List<Transform> projectileIgnoreCollision = new();
         [SerializeField, AssetField] internal Transform shootPosition;
         [SerializeField, AssetField] internal GameObject projectile;
+        PooledObject PooledProjectile;
         [SerializeField, AssetField] internal GameObject[] Projectiles;
+        PooledObject[] PooledProjectiles;
 
         internal float CurrentProjectileLifetime
         {
@@ -105,13 +107,13 @@ namespace Game.Components
             }
         }
 
-        internal GameObject CurrentProjectile
+        internal PooledObject CurrentProjectile
         {
             get
             {
-                if (projectile != null) return projectile;
-                if (SelectedProjectile < 0 || SelectedProjectile >= Projectiles.Length) return null;
-                return Projectiles[SelectedProjectile];
+                if (PooledProjectile != null) return PooledProjectile;
+                if (SelectedProjectile < 0 || SelectedProjectile >= PooledProjectiles.Length) return null;
+                return PooledProjectiles[SelectedProjectile];
             }
         }
 
@@ -219,6 +221,20 @@ namespace Game.Components
 
         void Start()
         {
+            if (projectile != null)
+            {
+                PooledProjectile = ObjectPool.Instance.GeneratePool(projectile);
+            }
+
+            if (Projectiles.Length > 0)
+            {
+                PooledProjectiles = new PooledObject[Projectiles.Length];
+                for (int i = 0; i < Projectiles.Length; i++)
+                {
+                    PooledProjectiles[i] = ObjectPool.Instance.GeneratePool(Projectiles[i]);
+                }
+            }
+
             targetTransform = null;
             if (ShootEffects != null)
             {
@@ -608,7 +624,7 @@ namespace Game.Components
             for (int i = 0; i < ShootEffectInstances.Length; i++)
             { ShootEffectInstances[i].Emit(); }
 
-            GameObject newProjectile = GameObject.Instantiate(CurrentProjectile, shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
+            GameObject newProjectile = CurrentProjectile.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
             if (newProjectile.TryGetComponent(out Rigidbody rb))
             {
                 rb.velocity = shootPosition.forward * projectileVelocity;

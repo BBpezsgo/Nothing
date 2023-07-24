@@ -10,7 +10,7 @@ public class SingleInstance<T> : MonoBehaviour where T : SingleInstance<T>
     {
         if (instance != null)
         {
-            Debug.LogWarning($"[{nameof(SingleInstance<T>)}]: Instance already registered");
+            Debug.LogWarning($"[{typeof(T).Name}]: Instance already registered, destroying self");
             Object.Destroy(this);
             return;
         }

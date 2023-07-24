@@ -53,7 +53,7 @@ namespace Game.Managers
         {
             if (instance != null)
             {
-                Debug.LogWarning($"[{nameof(BuildingManager)}]: Instance already registered");
+                Debug.LogWarning($"[{nameof(BuildingManager)}]: Instance already registered, destroying self");
                 GameObject.Destroy(this);
                 return;
             }

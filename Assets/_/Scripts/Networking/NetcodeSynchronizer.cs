@@ -115,7 +115,7 @@ namespace Networking
         {
             if (Instance != null)
             {
-                Debug.LogWarning($"{nameof(NetcodeSynchronizer)} instance already registered");
+                Debug.LogWarning($"[{nameof(NetcodeSynchronizer)}] Instance already registered, destroying this gameObject");
                 gameObject.Destroy();
                 return;
             }

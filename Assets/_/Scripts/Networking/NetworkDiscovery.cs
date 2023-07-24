@@ -68,7 +68,7 @@ namespace Networking
         {
             if (instance != null)
             {
-                Debug.LogWarning($"[{nameof(NetworkDiscovery)}]: Instance already registered", this);
+                Debug.LogWarning($"[{nameof(NetworkDiscovery)}]: Instance already registered, destroying self");
                 Object.Destroy(this);
                 return;
             }

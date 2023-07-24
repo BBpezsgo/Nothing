@@ -238,11 +238,8 @@ namespace Game.Components
 
         #region Mono Callbacks
 
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
-            Collider = GetComponent<Collider>();
-            unit = GetComponent<Unit>();
             if (trailRenderers.Count == 0) HasTrailRenderers = false;
             for (int i = 0; i < trailRenderers.Count; i++)
             {
@@ -273,8 +270,16 @@ namespace Game.Components
             }
         }
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
+            if (!TryGetComponent(out Collider))
+            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(Collider)} is null", this); }
+
+            if (!TryGetComponent(out unit))
+            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(unit)} is null", this); }
+
             rb.centerOfMass = new Vector3(0f, rb.centerOfMass.x + CenterOfMass, rb.centerOfMass.z);
 
             for (int i = 0; i < Wheels.Length; i++)

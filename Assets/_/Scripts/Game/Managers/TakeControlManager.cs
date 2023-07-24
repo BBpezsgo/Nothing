@@ -74,7 +74,7 @@ namespace Game.Managers
         {
             if (instance != null)
             {
-                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Instance already registered");
+                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Instance already registered, destroying self");
                 Object.Destroy(this);
                 return;
             }
@@ -693,8 +693,7 @@ namespace Game.Managers
 
         internal bool IAmControlling(ICanTakeControl @this)
         {
-            if (NetcodeUtils.NoNetworking ||
-                !NetworkManager.IsListening)
+            if (NetcodeUtils.IsOffline)
             { return ControllingObject.GetObject() == @this.GetObject(); }
 
             if ((int)NetworkManager.LocalClientId >= ControllingObjects.Value.Length ||
@@ -718,8 +717,7 @@ namespace Game.Managers
 
             try
             {
-                if (NetcodeUtils.NoNetworking ||
-                    !NetworkManager.IsListening)
+                if (NetcodeUtils.IsOffline)
                 { return ControllingObject.GetObject() == @this.GetObject(); }
             }
             catch (System.NullReferenceException)
@@ -770,8 +768,7 @@ public static class ICanTakeControlExtensions
     public static bool IAmControllingThis(this ICanTakeControl self)
     {
         if (!self.AnybodyControllingThis()) return false;
-        if (NetcodeUtils.NoNetworking ||
-            !NetworkManager.Singleton.IsListening)
+        if (NetcodeUtils.IsOffline)
         { return true; }
 
         if (TakeControlManager.Instance == null)
@@ -783,8 +780,7 @@ public static class ICanTakeControlExtensions
     public static bool SomebodyElseControllingThis(this ICanTakeControl self)
     {
         if (!self.AnybodyControllingThis()) return false;
-        if (NetcodeUtils.NoNetworking ||
-            !NetworkManager.Singleton.IsListening)
+        if (NetcodeUtils.IsOffline)
         { return false; }
 
         if (TakeControlManager.Instance == null)

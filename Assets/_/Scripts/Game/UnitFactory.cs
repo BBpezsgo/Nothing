@@ -49,8 +49,10 @@ namespace Game.Components
         void OnDisable()
         { WorldCursorManager.Instance.Deregister(this); }
 
-        void Start()
+        protected override void Start()
         {
+            base.Start();
+
             Queue = new List<QueuedUnit>();
             UpdateTeam();
         }

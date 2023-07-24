@@ -1692,6 +1692,50 @@ MonoBehaviour:
     Hotspot: {x: 16, y: 16}
     Mode: 0
   CommandManager: {fileID: 0}
+--- !u!1 &712866114
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 712866115}
+  - component: {fileID: 712866116}
+  m_Layer: 0
+  m_Name: Object Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &712866115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 712866114}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 18
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &712866116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 712866114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39c7f517a4726b2448f040374147db61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &728120205
 GameObject:
   m_ObjectHideFlags: 0
@@ -2990,6 +3034,7 @@ Transform:
   - {fileID: 673795877}
   - {fileID: 1222227741}
   - {fileID: 936371021}
+  - {fileID: 712866115}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3006,13 +3051,14 @@ GameObject:
   - component: {fileID: 1376606811}
   - component: {fileID: 1376606810}
   - component: {fileID: 1376606813}
+  - component: {fileID: 1376606814}
   m_Layer: 0
   m_Name: Networking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1376606809
 Transform:
   m_ObjectHideFlags: 0
@@ -3127,6 +3173,19 @@ MonoBehaviour:
   SecureConnection: 0
   AllowForwardedRequest: 0
   CertificateBase64String: 
+--- !u!114 &1376606814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376606806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58e82f17a7b2c7c4dba9ce04b5f00f78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isOffline: 1
 --- !u!1 &1410994568
 GameObject:
   m_ObjectHideFlags: 0

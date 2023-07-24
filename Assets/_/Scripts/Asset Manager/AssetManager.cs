@@ -1026,7 +1026,7 @@ namespace AssetManager
         {
             if (Instance != null)
             {
-                if (EnableDebugLogging) Debug.Log($"{this.GetType().Name}: Instance already registered!");
+                if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Instance already registered, destroying self gameObject");
                 gameObject.Destroy();
                 return;
             }

@@ -145,20 +145,20 @@ namespace Game.Components
         [SerializeField, ReadOnly] internal Vector3 positionDelta;
         [SerializeField, ReadOnly] internal Vector3 TargetPosition;
 
-        void Awake()
-        {
-            rb = GetComponent<Rigidbody>();
-        }
-
         void OnEnable()
-        { if (Register) RegisteredObjects.Projectiles.Add(this); }
+        {
+            if (Register) RegisteredObjects.Projectiles.Add(this);
+
+            destroyed = false;
+            AttachTrail();
+        }
         void OnDisable()
-        { if (Register) RegisteredObjects.Projectiles.Remove(this); }
+        {
+            if (Register) RegisteredObjects.Projectiles.Remove(this);
+        }
 
         void Start()
         {
-            if (lastPosition == Vector3.zero) lastPosition = transform.position;
-
             if (RandomRotation)
             {
                 Quaternion randomRotation = Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
@@ -168,6 +168,7 @@ namespace Game.Components
                 { transform.rotation = randomRotation; }
             }
 
+            rb = GetComponent<Rigidbody>();
             AudioSource = GetComponent<AudioSource>();
         }
 
@@ -277,7 +278,9 @@ namespace Game.Components
                         Explode(position, 0f);
                     }
 
-                    GameObject.Destroy(gameObject);
+                    gameObject.SetActive(false);
+                    OwnerTeamHash = -1;
+                    Owner = null;
                 }
             }
         }
@@ -399,7 +402,10 @@ namespace Game.Components
             { owner2.turret.NotifyImpact(this, at); }
 
             if (!impactEffectCreated && impactEffect != null) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
-            GameObject.Destroy(gameObject);
+
+            gameObject.SetActive(false);
+            OwnerTeamHash = -1;
+            Owner = null;
 
             return true;
         }
@@ -416,6 +422,22 @@ namespace Game.Components
             {
                 ParticleSystem.EmissionModule emission = particleSystem.emission;
                 emission.enabled = false;
+            }
+        }
+
+        void AttachTrail()
+        {
+            if (trail == null) return;
+            if (trail.transform.parent.gameObject == gameObject) return;
+            trail.transform.SetParent(transform);
+
+            if (trail.TryGetComponent(out TrailRenderer trailRenderer))
+            { trailRenderer.emitting = true; }
+
+            if (trail.TryGetComponent(out ParticleSystem particleSystem))
+            {
+                ParticleSystem.EmissionModule emission = particleSystem.emission;
+                emission.enabled = true;
             }
         }
 
@@ -558,7 +580,10 @@ namespace Game.Components
             { owner2.turret.NotifyImpact(this, Position); }
 
             if (impactEffect != null) GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects);
-            GameObject.Destroy(gameObject);
+
+            gameObject.SetActive(false);
+            OwnerTeamHash = -1;
+            Owner = null;
         }
     }
 }

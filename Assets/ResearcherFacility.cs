@@ -1,11 +1,5 @@
 using Game.Managers;
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -16,8 +10,9 @@ namespace Game.Components
         [SerializeField, ReadOnly] internal string ResearchingID;
         public int CursorPriority => 0;
 
-        void Start()
+        protected override void Start()
         {
+            base.Start();
             WorldCursorManager.Instance.Register(this);
             ResearchingID = null;
             UpdateTeam();

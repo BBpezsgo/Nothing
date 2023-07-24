@@ -34,7 +34,7 @@ namespace UI
         {
             if (Instance != null)
             {
-                Debug.Log($"{nameof(IMGUIManager)} instance already registered");
+                Debug.Log($"[{nameof(IMGUIManager)}]: Instance already registered, destroying self");
                 GameObject.Destroy(gameObject);
                 return;
             }

@@ -47,9 +47,14 @@ namespace Game.Components
         void Awake()
         {
             this.ControllingByUser = ulong.MaxValue;
+        }
+
+        protected override void Start()
+        {
+            base.Start();
 
             if (!TryGetComponent(out Attacker))
-            { Debug.LogError($"[{nameof(BuildingAttacker)}]: No Attacker!"); }
+            { Debug.LogError($"[{nameof(BuildingAttacker)}]: {nameof(Attacker)} is null", this); }
         }
 
         public override void OnDestroy()

@@ -15,7 +15,7 @@ namespace Game.Managers
         {
             if (Instance != null)
             {
-                Debug.LogWarning($"[{nameof(KeyboardManager)}]: Instance already registered");
+                Debug.LogWarning($"[{nameof(KeyboardManager)}]: Instance already registered, destroying self");
                 Object.Destroy(this);
                 return;
             }

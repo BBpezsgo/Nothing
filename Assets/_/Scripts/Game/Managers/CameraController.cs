@@ -82,7 +82,7 @@ namespace Game.Managers
         {
             if (Instance != null)
             {
-                Debug.LogWarning($"[{nameof(CameraController)}]: Instance already registered");
+                Debug.LogWarning($"[{nameof(CameraController)}]: Instance already registered, destroying self");
                 GameObject.Destroy(gameObject);
                 return;
             }

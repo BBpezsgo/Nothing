@@ -6,11 +6,23 @@ using System.Runtime.InteropServices;
 
 static class CookiesLib
 {
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     internal static extern void SetCookies(string cookies);
 
     [DllImport("__Internal")]
     internal static extern string GetCookies();
+#else
+    internal static void SetCookies(string cookies)
+    {
+
+    }
+
+    internal static string GetCookies()
+    {
+        return "";
+    }
+#endif
 }
 
 public static class Cookies

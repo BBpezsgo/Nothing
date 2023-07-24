@@ -25,7 +25,7 @@ public class SceneManager : SingleInstance<SceneManager>
     {
         if (instance != null)
         {
-            Debug.LogWarning($"{nameof(SceneManager)}: Instance already registered!");
+            Debug.LogWarning($"[{nameof(SceneManager)}]: Instance already registered, destroying self");
             Destroy(this);
             return;
         }
@@ -33,6 +33,24 @@ public class SceneManager : SingleInstance<SceneManager>
 
         transform.SetParent(null);
         DontDestroyOnLoad(this);
+
+
+        {
+            string v = "Some Scene Info:\n" +
+                $"Active Scene: '{UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}'\n" +
+                $"Loaded Scene Count: {UnityEngine.SceneManagement.SceneManager.sceneCount}\n" +
+                $"Scene Count: {UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings}\n" +
+                $"Scenes: [\n";
+            int n = UnityEngine.SceneManagement.SceneManager.sceneCount;
+            for (int i = 0; i < n; i++)
+            {
+                var s = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                v += $"  {i}: '{s.name}' (loaded: {s.isLoaded}),\n";
+            }
+            v += $"]";
+
+            Debug.Log(v);
+        }
     }
 
     public static void LoadScene(string scene)

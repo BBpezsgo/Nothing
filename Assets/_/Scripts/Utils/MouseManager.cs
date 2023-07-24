@@ -39,7 +39,7 @@ namespace Game.Managers
         {
             if (Instance != null)
             {
-                Debug.LogWarning($"[{nameof(MouseManager)}]: Instance already registered");
+                Debug.LogWarning($"[{nameof(MouseManager)}]: Instance already registered, destroying self");
                 Object.Destroy(this);
                 return;
             }

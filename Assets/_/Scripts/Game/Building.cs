@@ -29,7 +29,7 @@ namespace Game.Components
         void OnDisable()
         { RegisteredObjects.Buildings.Remove(this); }
 
-        void Start()
+        protected virtual void Start()
         {
             UpdateTeam();
 
@@ -51,7 +51,7 @@ namespace Game.Components
             { GameObject.Destroy(gameObject); }
         }
 
-        private void OnDrawGizmosSelected()
+        protected virtual void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(GroundOrigin - Vector3.right, GroundOrigin + Vector3.right);

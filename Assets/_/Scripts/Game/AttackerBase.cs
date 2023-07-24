@@ -31,22 +31,22 @@ namespace Game.Components
         [SerializeField, ReadOnly] float lastRotation;
         [SerializeField, ReadOnly] float rotationDelta;
 
-        protected virtual void Awake()
+        protected virtual void Start()
         {
             if (!TryGetComponent(out BaseObject))
-            { Debug.LogError($"[{nameof(AttackerBase)}]: No BaseObject!"); }
-            else if (BaseObject is ICanTakeControlAndHasTurret canTakeControl)
+            { Debug.LogError($"[{nameof(AttackerBase)}]: {nameof(BaseObject)} is null", this); }
+
+            rb = GetComponent<Rigidbody>();
+            // if (!TryGetComponent(out rb))
+            // { Debug.LogError($"[{nameof(AttackerBase)}]: {nameof(rb)} is null", this); }
+
+            if (BaseObject is ICanTakeControlAndHasTurret canTakeControl)
             {
                 CanTakeControlObject = canTakeControl;
                 CanTakeControl = true;
             }
 
             if (turret != null) turret.@base = BaseObject;
-        }
-
-        protected virtual void Start()
-        {
-            rb = GetComponent<Rigidbody>();
         }
 
         protected virtual void FixedUpdate()

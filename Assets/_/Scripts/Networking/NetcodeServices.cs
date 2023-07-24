@@ -163,12 +163,14 @@ namespace Networking
                 return;
             }
 
+            /*
             if (NetworkManager.Singleton == null)
             {
                 Debug.Log($"[{nameof(NetcodeServices)}]: NetworkManager is null, destroying self");
                 GameObject.Destroy(gameObject);
                 return;
             }
+            */
 
             Services.Singleton = this;
 

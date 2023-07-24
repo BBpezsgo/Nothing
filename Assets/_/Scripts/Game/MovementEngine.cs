@@ -31,9 +31,10 @@ namespace Game.Components
         /// </summary>
         public float AngularVelocity => rb.angularVelocity.y;
 
-        protected virtual void Awake()
+        protected virtual void Start()
         {
-            rb = GetComponent<Rigidbody>();
+            if (!TryGetComponent(out rb))
+            { Debug.LogError($"[{nameof(MovementEngine)}]: {nameof(rb)} is null", this); }
         }
 
         internal virtual float CalculateBrakingDistance()

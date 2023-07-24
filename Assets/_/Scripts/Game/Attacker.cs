@@ -27,9 +27,8 @@ namespace Game.Components
         }
         [SerializeField, ReadOnly] float NewTargetCooldown = 1f;
 
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
             NewTargetCooldown = Random.value + 1f;
         }
 

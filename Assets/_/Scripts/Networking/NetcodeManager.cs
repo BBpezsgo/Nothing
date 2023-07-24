@@ -6,13 +6,9 @@ namespace Networking.Managers
 {
     public class NetcodeManager : SingleInstance<NetcodeManager>
     {
-        internal static bool NoNetworking = true;
-
         void Start()
         {
             NetcodeVariableSerializers.Init();
-
-            NoNetworking = NetworkManager.Singleton == null;
         }
 
         void Singleton_OnServerStopped(bool isHost)

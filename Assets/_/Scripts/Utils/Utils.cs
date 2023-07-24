@@ -12,6 +12,7 @@ using Game.Components;
 using Game.Managers;
 
 using Networking.Managers;
+using Networking;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -1855,8 +1856,6 @@ internal readonly struct ProfilerMarkers
 
 internal static class NetcodeUtils
 {
-    public static bool NoNetworking => NetcodeManager.NoNetworking;
-
     public static bool IsServer
     {
         get
@@ -1875,11 +1874,14 @@ internal static class NetcodeUtils
         }
     }
 
+    /// <summary>
+    /// Returns <see langword="true"/> if there is <b>no <see cref="NetworkManager.Singleton"/></b>, if it is running in <b>offline mode</b>, or if the <see cref="NetworkManager"/> is <b>not listening</b>.
+    /// </summary>
     public static bool IsOffline
     {
         get
         {
-            if (NoNetworking) return true;
+            if (OfflineManager.IsOffline) return true;
             if (!NetworkManager.Singleton.IsListening) return true;
             return false;
         }

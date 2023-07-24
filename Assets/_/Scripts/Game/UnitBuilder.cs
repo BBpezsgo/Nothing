@@ -77,7 +77,7 @@ namespace Game.Components
 
         void DoBuild()
         {
-            if (nearestToBeBuilt < 0 || nearestToBeBuilt >= ToBeRepair.Length)
+            if (nearestToBeBuilt < 0 || nearestToBeBuilt >= ToBeBuilt.Length)
             { return; }
             if (ToBeBuilt[nearestToBeBuilt] == null)
             { return; }
@@ -119,8 +119,12 @@ namespace Game.Components
             if ((ToBeRepair[nearestToBeRepair].transform.position - transform.position).To2D().sqrMagnitude <= (DistanceToBuild * DistanceToBuild))
             {
                 ToBeRepair[nearestToBeRepair].Repair(ConstructionSpeed * Time.fixedDeltaTime);
+                
                 if (ToBeRepair[nearestToBeRepair].NormalizedHP >= 1f)
-                { ToBeRepair[nearestToBeRepair] = null; }
+                {
+                    ToBeRepair[nearestToBeRepair] = null;
+                    return;
+                }
 
                 if (TryGetComponent(out UnitBehaviour_Seek seek))
                 { seek.Target = Vector3.zero; }
