@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{{{ PRODUCT_NAME }}} WebGL Player</title>
     <link rel="shortcut icon" href="app/favicon.ico">
-    <link rel="stylesheet" href="app/style.css">
+    <link rel="stylesheet" href="app/css/style.css">
   </head>
   <body>
       <button id="details-show" style="margin:10px" class="btn" onclick="document.getElementById('details').style.display='block';document.getElementById('details-show').style.display='none'">
@@ -53,7 +53,7 @@
           </div>
           <div id="unity-error-popup">
               <div id="unity-error-close" onclick="document.getElementById('unity-error-popup').classList.remove('show');if(OnPopupClosed)OnPopupClosed('error')">X</div>
-              <h1><img src="app/icon-error.png" width="32" height="32">Error</h1>
+              <h1><img src="app/img/icon-error.png" width="32" height="32">Error</h1>
 
               <hr>
               <p>
@@ -62,7 +62,7 @@
           </div>
           <div id="unity-warning-popup">
               <div id="unity-warning-close" onclick="document.getElementById('unity-warning-popup').classList.remove('show');if(OnPopupClosed)OnPopupClosed('warning')">X</div>
-              <h1><img src="app/icon-warning.png" width="32" height="32">Warning</h1>
+              <h1><img src="app/img/icon-warning.png" width="32" height="32">Warning</h1>
               <hr>
               <p>
                   TEST WARNING MESSAGE
@@ -70,7 +70,7 @@
           </div>
           <div id="unity-info-popup">
               <div id="unity-info-close" onclick="document.getElementById('unity-info-popup').classList.remove('show');if(OnPopupClosed)OnPopupClosed('info')">X</div>
-              <h1><img src="app/icon-info.png" width="32" height="32">Info</h1>
+              <h1><img src="app/img/icon-info.png" width="32" height="32">Info</h1>
               <hr>
               <p>
                   TEST INFO MESSAGE

@@ -165,27 +165,28 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform:
-    translate(-50%, -50%);
+    transform: translate(-50%, -50%);
     display: none;
 }
 
 #unity-logo {
     width: 154px;
     height: 130px;
-    background: url('unity-logo-{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}.png') no-repeat center;
+    background: url('/app/img/logo.png') no-repeat center;
 }
 
 #unity-progress-bar-empty {
-    width: 141px; height: 18px;
+    width: 141px;
+    height: 18px;
     margin-top: 10px;
-    margin-left: 6.5px; background: url('progress-bar-empty-{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}.png') no-repeat center;
+    margin-left: 6.5px; background: url('/app/img/progress-bar-empty-{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}.png') no-repeat center;
 }
 
 #unity-progress-bar-full {
-    width: 0%; height: 18px;
+    width: 0%;
+    height: 18px;
     margin-top: 10px;
-    background: url('progress-bar-full-{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}.png') no-repeat center;
+    background: url('/app/img/progress-bar-full-{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}.png') no-repeat center;
 }
 
 #unity-footer {
@@ -286,11 +287,11 @@ body {
 }
 
 #logo-unity {
-    background-image: url('unity.svg');
+    background-image: url('/app/img/unity.svg');
     background-size: 130%;
 }
 #logo-webgl {
-    background-image: url('webgl.svg');
+    background-image: url('/app/img/webgl.svg');
 }
 
 canvas#unity-canvas.game-quitted {
