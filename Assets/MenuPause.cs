@@ -5,7 +5,6 @@ using Networking;
 using System.Collections.Generic;
 
 using Unity.Netcode;
-
 using Unity.Netcode.Transports.UTP;
 
 using UnityEngine;
@@ -13,7 +12,7 @@ using UnityEngine.UIElements;
 
 namespace Game.UI
 {
-    public class MenuRoom : MonoBehaviour
+    public class MenuPause : MonoBehaviour
     {
         [SerializeField, ReadOnly] UIDocument UI;
 
@@ -32,10 +31,29 @@ namespace Game.UI
         void OnEnable()
         {
             LabelRoomName = UI.rootVisualElement.Q<Label>("label-room-name");
+            UI.rootVisualElement.Q<Button>("button-disconnect").clicked += ButtonDisconnect;
             PlayersScrollView = UI.rootVisualElement.Q<ScrollView>("players");
 
-            UpdatePlayersTimer = 2f;
-            RefreshPlayerList();
+            if (NetcodeUtils.IsOffline)
+            {
+                UI.rootVisualElement.Q<VisualElement>("players-container").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+                LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+
+                UI.rootVisualElement.Q<Button>("button-disconnect").text = "Exit";
+            }
+            else
+            {
+                UI.rootVisualElement.Q<VisualElement>("players-container").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+                LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+
+                if (NetworkManager.Singleton.IsServer)
+                { UI.rootVisualElement.Q<Button>("button-disconnect").text = "Stop Server"; }
+                else
+                { UI.rootVisualElement.Q<Button>("button-disconnect").text = "Disconnect"; }
+
+                UpdatePlayersTimer = 2f;
+                RefreshPlayerList();
+            }
         }
 
         internal void RefreshPlayerList()
@@ -57,16 +75,7 @@ namespace Game.UI
                 else
                 { newPanel.Q<Label>("label-ping").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None); }
 
-                Button buttonKick = newPanel.Q<Button>("button-kick");
-                if (!net.IsServer)
-                {
-                    buttonKick.style.display = DisplayStyle.None;
-                }
-                else
-                {
-                    buttonKick.userData = client.Value.NetworkID.ToString();
-                    buttonKick.clickable.clickedWithEventInfo += Clickable_clickedWithEventInfo;
-                }
+                newPanel.Q<Button>("button-kick").style.display = DisplayStyle.None;
 
                 PlayersScrollView.Add(newPanel);
             }
@@ -88,9 +97,7 @@ namespace Game.UI
                     else
                     { newPanel.Q<Label>("label-ping").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None); }
 
-                    Button buttonKick = newPanel.Q<Button>("button-kick");
-                    buttonKick.userData = client.Value.ClientId.ToString();
-                    buttonKick.clickable.clickedWithEventInfo += Clickable_clickedWithEventInfo;
+                    newPanel.Q<Button>("button-kick").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
 
                     PlayersScrollView.Add(newPanel);
                 }
@@ -113,11 +120,13 @@ namespace Game.UI
             }
         }
 
-        void Clickable_clickedWithEventInfo(EventBase obj)
+        void ButtonDisconnect()
         {
-            var clientId = ulong.Parse(((VisualElement)obj.target).userData.ToString());
-            Debug.Log($"[{nameof(MenuRoom)}]: Kick client {clientId}");
-            NetworkManager.Singleton.DisconnectClient(clientId);
+            OfflineManager.IsOffline = false;
+            Debug.Log($"[{nameof(MenuRoom)}]: Shutting down ...");
+            NetworkManager.Singleton.Shutdown();
+            Debug.Log($"[{nameof(MenuRoom)}]: Shut down");
+            MenuNavigator.Instance.IsPaused = false;
         }
 
         void FixedUpdate()
@@ -131,11 +140,14 @@ namespace Game.UI
             else
             { LabelRoomName.text = "?"; }
 
-            UpdatePlayersTimer -= Time.fixedDeltaTime;
-            if (UpdatePlayersTimer <= 0f)
+            if (!NetcodeUtils.IsOffline)
             {
-                UpdatePlayersTimer = 2f;
-                RefreshPlayerList();
+                UpdatePlayersTimer -= Time.fixedDeltaTime;
+                if (UpdatePlayersTimer <= 0f)
+                {
+                    UpdatePlayersTimer = 2f;
+                    RefreshPlayerList();
+                }
             }
         }
     }

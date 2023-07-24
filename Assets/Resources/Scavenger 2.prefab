@@ -256,7 +256,7 @@ MonoBehaviour:
   controllingByUser: 0
   UiSelected: {fileID: 0}
   UnitBehaviour: {fileID: 0}
-  DestroyEffect: {fileID: 3387115980509588096, guid: 93cf482d3f7974f4d90b5f45d52d5879,
+  DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 40
   Attacker: {fileID: 0}
@@ -594,7 +594,9 @@ MonoBehaviour:
   Knockback: 0.5
   CannonKnockback: 0
   CannonKnockbackRestoreSpeed: 1
-  CannonKnockbackPosition: {x: 0, y: 0}
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
   AudioSource: {fileID: 1172948685928354091}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
   Barrel: {fileID: 1172948686482848758}

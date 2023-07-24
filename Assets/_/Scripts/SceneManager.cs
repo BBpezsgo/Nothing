@@ -74,8 +74,15 @@ public class SceneManager : SingleInstance<SceneManager>
 
         if (Unity.Netcode.NetworkManager.Singleton == null ||
             !Unity.Netcode.NetworkManager.Singleton.IsListening)
-        { UnityEngine.SceneManagement.SceneManager.LoadScene(scene, LoadSceneMode.Additive); }
+        {
+            Debug.Log($"[{nameof(SceneManager)}]: Loading scene \"{scene}\" (unity)");
+            UnityEngine.SceneManagement.SceneManager.LoadScene(scene, LoadSceneMode.Additive);
+        }
         else if (Unity.Netcode.NetworkManager.Singleton.IsServer)
-        { Unity.Netcode.NetworkManager.Singleton.SceneManager.LoadScene(scene, LoadSceneMode.Additive); }
+        {
+            Debug.Log($"[{nameof(SceneManager)}]: Loading scene \"{scene}\" (netcode)");
+            Unity.Netcode.SceneEventProgressStatus status = Unity.Netcode.NetworkManager.Singleton.SceneManager.LoadScene(scene, LoadSceneMode.Additive);
+            Debug.Log($"[{nameof(SceneManager)}]: Scene loading status: {status}");
+        }
     }
 }

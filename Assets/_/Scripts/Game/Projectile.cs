@@ -8,6 +8,12 @@ namespace Game.Components
 {
     public class Projectile : MonoBehaviour
     {
+        struct TrailData
+        {
+            internal Transform Parent;
+            internal Vector3 LocalPosition;
+        }
+
         [System.Serializable]
         struct ImpactEffect
         {
@@ -103,6 +109,7 @@ namespace Game.Components
         [SerializeField] GameObject impactEffect;
         [SerializeField] ImpactEffect[] ImpactEffects = new ImpactEffect[0];
         [SerializeField] GameObject trail;
+        TrailData trailData;
 
         [SerializeField] GameObject RicochetEffect;
 
@@ -170,6 +177,15 @@ namespace Game.Components
 
             rb = GetComponent<Rigidbody>();
             AudioSource = GetComponent<AudioSource>();
+
+            if (trail != null)
+            {
+                trailData = new TrailData()
+                {
+                    Parent = trail.transform.parent,
+                    LocalPosition = trail.transform.localPosition,
+                };
+            }
         }
 
         void FixedUpdate()
@@ -201,18 +217,16 @@ namespace Game.Components
 
                 for (int i = 0; i < hitCount; i++)
                 {
-                    if (hits[i].collider.isTrigger)
+                    if (hits[i].collider.isTrigger &&
+                        !hits[i].collider.gameObject.HasComponent<Projectile>() &&
+                        (hits[i].collider.gameObject.name != "Water" || !DieInWater))
                     {
-                        if (!hits[i].collider.gameObject.HasComponent<Projectile>())
-                        {
-                            if (hits[i].collider.gameObject.name != "Water" || !DieInWater)
-                            {
-                                continue;
-                            }
-                        }
+                        continue;
                     }
+
                     if (hits[i].transform == transform)
                     { continue; }
+
                     if (ignoreCollision.Contains(hits[i].transform))
                     { continue; }
 
@@ -225,7 +239,7 @@ namespace Game.Components
                         float d = (lastPosition - hits[i].point).sqrMagnitude;
                         if (d < closestD)
                         {
-                            d = closestD;
+                            closestD = d;
                             closestI = i;
                         }
                     }
@@ -245,13 +259,9 @@ namespace Game.Components
                 rotationSpeedZ != 0f)
             {
                 if (RotateThis != null)
-                {
-                    RotateThis.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
-                }
+                { RotateThis.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self); }
                 else
-                {
-                    transform.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self);
-                }
+                { transform.Rotate(rotationSpeedX * Time.fixedDeltaTime, rotationSpeedY * Time.fixedDeltaTime, rotationSpeedZ * Time.fixedDeltaTime, Space.Self); }
             }
             else
             {
@@ -428,11 +438,18 @@ namespace Game.Components
         void AttachTrail()
         {
             if (trail == null) return;
-            if (trail.transform.parent.gameObject == gameObject) return;
-            trail.transform.SetParent(transform);
+            if (trailData.Parent == null) return;
+
+            if (trail.transform.parent.gameObject != trailData.Parent.gameObject)
+            { trail.transform.SetParent(transform); }
+
+            trail.transform.localPosition = trailData.LocalPosition;
 
             if (trail.TryGetComponent(out TrailRenderer trailRenderer))
-            { trailRenderer.emitting = true; }
+            {
+                trailRenderer.emitting = true;
+                trailRenderer.Clear();
+            }
 
             if (trail.TryGetComponent(out ParticleSystem particleSystem))
             {

@@ -90,6 +90,9 @@ namespace Game.UI
                 float value1 = drawValues[i - 1];
                 float value2 = drawValues[i];
 
+                value1 = Mathf.Clamp(value1, 0f, maxValue);
+                value2 = Mathf.Clamp(value2, 0f, maxValue);
+
                 float x1 = (i - 1) * widthScale;
                 float x2 = (i) * widthScale;
 

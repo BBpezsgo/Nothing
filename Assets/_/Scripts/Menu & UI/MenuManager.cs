@@ -1,3 +1,5 @@
+using Game.UI;
+
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -30,6 +32,11 @@ namespace Game.Managers
             /// <b>Managed automatically</b>
             /// </summary>
             Login,
+
+            /// <summary>
+            /// <b>Managed automatically</b>
+            /// </summary>
+            Pause,
 
             Game_BlueprintManager,
 
@@ -183,12 +190,20 @@ namespace Game.Managers
 
                 if (stateProvider.InNetcodeRoom)
                 {
+                    if (MenuNavigator.instance.IsPaused)
+                    { return MainMenuType.Pause; }
+                    else 
                     if (Input.GetKey(KeyCode.Alpha0))
                     { return MainMenuType.Room; }
                 }
                 else if (!Networking.OfflineManager.IsOffline)
                 {
                     return MainMenuType.Lobby;
+                }
+                else
+                {
+                    if (MenuNavigator.instance.IsPaused)
+                    { return MainMenuType.Pause; }
                 }
 
                 return currentMenu;

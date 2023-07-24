@@ -18,6 +18,8 @@ public class PooledObject
     public GameObject Instantiate(Transform parent)
     {
         GameObject instance = Instantiate();
+        if (instance == null) return null;
+
         instance.transform.SetParent(parent);
         return instance;
     }
@@ -25,6 +27,8 @@ public class PooledObject
     public GameObject Instantiate(Vector3 position, Quaternion rotation)
     {
         GameObject instance = Instantiate();
+        if (instance == null) return null;
+
         instance.transform.SetPositionAndRotation(position, rotation);
         return instance;
     }
@@ -32,6 +36,8 @@ public class PooledObject
     public GameObject Instantiate(Vector3 position, Quaternion rotation, Transform parent)
     {
         GameObject instance = Instantiate();
+        if (instance == null) return null;
+
         instance.transform.SetParent(parent);
         instance.transform.SetPositionAndRotation(position, rotation);
         return instance;
@@ -62,7 +68,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
             {
                 if (Instances[i] == null)
                 {
-                    Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Pooled instance is destroyed", ObjectPool.instance);
+                    Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Pooled instance is destroyed  (pool: \"{Prefab.name}\")", ObjectPool.instance);
                     Instances.RemoveAt(i);
                     continue;
                 }
@@ -76,7 +82,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
 
             if (Instances.Count >= MaxSize)
             {
-                Debug.LogError($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded!", ObjectPool.instance);
+                Debug.LogError($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance);
                 return null;
             }
 

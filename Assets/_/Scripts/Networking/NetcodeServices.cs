@@ -437,7 +437,7 @@ namespace Unity.Netcode
 
     public struct Client : INetworkSerializable
     {
-        public NetworkString Name;
+        public Collections.FixedString32Bytes Name;
         public int Id;
         public bool IsHost;
 

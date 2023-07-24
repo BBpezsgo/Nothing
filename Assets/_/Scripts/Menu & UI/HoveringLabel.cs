@@ -41,7 +41,7 @@ namespace Game.UI.Components
 
         GUIContent GUIContent = GUIContent.none;
 
-        readonly NetworkVariable<NetworkString> NetworkedText = new(new NetworkString());
+        readonly NetworkVariable<Unity.Collections.FixedString32Bytes> NetworkedText = new(new Unity.Collections.FixedString32Bytes());
         readonly NetworkVariable<bool> NetworkedVisible = new(false);
 
         void Start()
@@ -55,9 +55,9 @@ namespace Game.UI.Components
             _visible = newValue;
         }
 
-        void OnNetworkedTextChanged(NetworkString previousValue, NetworkString newValue)
+        void OnNetworkedTextChanged(Unity.Collections.FixedString32Bytes previousValue, Unity.Collections.FixedString32Bytes newValue)
         {
-            GUIContent = string.IsNullOrEmpty(newValue.ToString()) ? GUIContent.none : new GUIContent(newValue);
+            GUIContent = string.IsNullOrEmpty(newValue.ToString()) ? GUIContent.none : new GUIContent(newValue.ToString());
         }
 
         public void Show(string text)

@@ -4,19 +4,23 @@ namespace Game.Components
 {
     public class ParticleSystemDestroy : MonoBehaviour
     {
-        [SerializeField, ReadOnly] ParticleSystem _particleSystem;
+        [SerializeField, ReadOnly] ParticleSystem[] ParticleSystems;
 
         void Awake()
         {
-            _particleSystem = GetComponent<ParticleSystem>();
+            ParticleSystems = GetComponentsInChildren<ParticleSystem>(false);
         }
 
         void FixedUpdate()
         {
-            if (_particleSystem.particleCount == 0)
+            for (int i = 0; i < ParticleSystems.Length; i++)
             {
-                GameObject.Destroy(gameObject);
+                if (ParticleSystems[i] == null)
+                { continue; }
+                if (ParticleSystems[i].particleCount > 0)
+                { return; }
             }
+            GameObject.Destroy(gameObject);
         }
     }
 }

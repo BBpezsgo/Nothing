@@ -9,6 +9,38 @@ using UnityEngine;
 
 internal static class UnclassifiedExtensions
 {
+    public static T Get<T>(this IReadOnlyList<T> v, int index, T @default)
+    {
+        if (index < 0 || index >= v.Count)
+        { return @default; }
+        return v[index];
+    }
+    public static T Get<T>(this NetworkList<T> v, int index, T @default) where T : unmanaged, IEquatable<T>
+    {
+        if (index < 0 || index >= v.Count)
+        { return @default; }
+        return v[index];
+    }
+    public static void Set<T>(this NetworkList<T> v, int index, T value, T @default) where T : unmanaged, IEquatable<T>
+    {
+        if (index < 0)
+        { return; }
+
+        int endlessSafe = 16;
+        while (index >= v.Count)
+        {
+            if (endlessSafe-- <= 0)
+            {
+                Debug.LogError($"Endless loop");
+                return;
+            }
+
+            v.Add(@default);
+        }
+
+        v[index] = value;
+    }
+
     public static void SpawnOverNetwork(this GameObject gameObject, bool destroyWithScene = true)
     {
         if (NetworkManager.Singleton == null)

@@ -6,7 +6,11 @@ namespace Networking
 {
     public class OfflineManager : SingleInstance<OfflineManager>
     {
-        public static bool IsOffline => NetworkManager.Singleton == null || instance.isOffline;
+        public static bool IsOffline
+        {
+            get => NetworkManager.Singleton == null || instance.isOffline;
+            set => instance.isOffline = value;
+        }
 
         [SerializeField] bool isOffline;
     }

@@ -33,6 +33,7 @@ namespace Game.UI
         {
             InputSocket = UI.rootVisualElement.Q<TextField>("input-socket");
             LabelSocketError = UI.rootVisualElement.Q<Label>("label-socket-error");
+            UI.rootVisualElement.Q<Button>("button-offline").clicked += ButtonOffline;
             UI.rootVisualElement.Q<Button>("button-host").clicked += ButtonHost;
             UI.rootVisualElement.Q<Button>("button-connect").clicked += ButtonConnect;
 #if UNITY_EDITOR
@@ -57,6 +58,11 @@ namespace Game.UI
             }
 
             RefreshDiscoveryUI();
+        }
+
+        private void ButtonOffline()
+        {
+            OfflineManager.IsOffline = true;
         }
 
         void OnDisable()

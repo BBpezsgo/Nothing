@@ -594,37 +594,11 @@ namespace Game.Components
                 BarrelRotationSpeed < RequiedBarrelRotationSpeed)
             { return false; }
 
-            if (IsServer)
-            { OnShoot_ClientRpc(new Vector2(TurretLocalRotation, CannonLocalRotation)); }
-
-            if (CannonKnockback != 0f)
-            {
-                CannonKnockbackPosition.target = CannonKnockbackPosition.original - CannonKnockback;
-                CannonKnockbackState = CannonKnockbackStates.Knockback;
-            }
-
-            if (@base.TryGetComponent(out Rigidbody baseRigidbody))
-            {
-                if (cannon == null)
-                {
-                    baseRigidbody.AddForceAtPosition(transform.forward * -Knockback, transform.position, ForceMode.Impulse);
-                }
-                else
-                {
-                    baseRigidbody.AddForceAtPosition(cannon.forward * -Knockback, transform.position, ForceMode.Impulse);
-                }
-            }
-
-            if (AudioSource != null &&
-                ShootSound != null)
-            { AudioSource.PlayOneShot(ShootSound); }
-
-            reload = reloadTime;
-
-            for (int i = 0; i < ShootEffectInstances.Length; i++)
-            { ShootEffectInstances[i].Emit(); }
-
             GameObject newProjectile = CurrentProjectile.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
+
+            if (newProjectile == null)
+            { return false; }
+
             if (newProjectile.TryGetComponent(out Rigidbody rb))
             {
                 rb.velocity = shootPosition.forward * projectileVelocity;
@@ -682,6 +656,27 @@ namespace Game.Components
                     }
                 }
             }
+
+            if (IsServer)
+            { OnShoot_ClientRpc(new Vector2(TurretLocalRotation, CannonLocalRotation)); }
+
+            if (CannonKnockback != 0f)
+            {
+                CannonKnockbackPosition.target = CannonKnockbackPosition.original - CannonKnockback;
+                CannonKnockbackState = CannonKnockbackStates.Knockback;
+            }
+
+            if (@base.TryGetComponent(out Rigidbody baseRigidbody))
+            { baseRigidbody.AddForceAtPosition((cannon == null ? transform : cannon).forward * -Knockback, transform.position, ForceMode.Impulse); }
+
+            if (AudioSource != null &&
+                ShootSound != null)
+            { AudioSource.PlayOneShot(ShootSound); }
+
+            reload = reloadTime;
+
+            for (int i = 0; i < ShootEffectInstances.Length; i++)
+            { ShootEffectInstances[i].Emit(); }
 
             return true;
         }

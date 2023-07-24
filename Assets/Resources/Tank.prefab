@@ -10175,7 +10175,7 @@ MonoBehaviour:
   controllingByUser: 0
   UiSelected: {fileID: 6946811753196514077}
   UnitBehaviour: {fileID: 0}
-  DestroyEffect: {fileID: 3387115980509588096, guid: 93cf482d3f7974f4d90b5f45d52d5879,
+  DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 80
   Attacker: {fileID: 0}

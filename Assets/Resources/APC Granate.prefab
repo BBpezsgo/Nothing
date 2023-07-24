@@ -113,9 +113,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 2
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
   AudioSource: {fileID: 5867078746325976924}
   ShootSound: {fileID: 8300000, guid: d0dd384cec9f320419f41a2792a06c8f, type: 3}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
@@ -695,7 +701,7 @@ MonoBehaviour:
   controllingByUser: 0
   UiSelected: {fileID: 8342270499660186645}
   UnitBehaviour: {fileID: 0}
-  DestroyEffect: {fileID: 3387115980509588096, guid: 93cf482d3f7974f4d90b5f45d52d5879,
+  DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 50
   Attacker: {fileID: 0}

@@ -1,11 +1,37 @@
 using Game.Managers;
 
+using System;
+
 using UnityEngine;
+
+using Utilities;
 
 namespace Game.UI
 {
     public class MenuNavigator : SingleInstance<MenuNavigator>
     {
+        [ReadOnly] public bool IsPaused;
+
+        PriorityKey KeyEsc;
+
+        void Start()
+        {
+            KeyEsc = new PriorityKey(KeyCode.Escape, -10, EscKeyCondition);
+            KeyEsc.OnDown += OnKeyEsc;
+        }
+
+        bool EscKeyCondition()
+        {
+            if (!MenuManager.AnyMenuVisible)
+            { return true; }
+            return MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Pause;
+        }
+
+        void OnKeyEsc()
+        {
+            IsPaused = !IsPaused;
+        }
+
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -37,6 +63,7 @@ namespace Game.UI
                     return;
                 }
             }
+            /*
             else if (Input.GetKeyDown(KeyCode.Alpha4))
             {
                 if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_Research)
@@ -52,6 +79,7 @@ namespace Game.UI
                     return;
                 }
             }
+            */
         }
     }
 }

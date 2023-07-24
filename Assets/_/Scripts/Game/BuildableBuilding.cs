@@ -12,6 +12,7 @@ namespace Game.Components
     {
         [SerializeField, ReadOnly] GameObject Building;
         [SerializeField, ReadOnly] uint BuildingHash;
+        [SerializeField, ReadOnly] bool IsConstructed;
 
         [SerializeField, ReadOnly] float BuildingProcessRequied = 1f;
         [SerializeField, ReadOnly] float BuildingProcess = 0f;
@@ -42,6 +43,9 @@ namespace Game.Components
                 return;
             }
             Debug.LogError($"[{nameof(BuildingManager)}]: Building \"{buildingHash}\" not found", this);
+
+            IsConstructed = false;
+            BuildingProcess = 0f;
         }
 
         void Start()
@@ -73,38 +77,22 @@ namespace Game.Components
 
         internal void Build(float progress)
         {
+            if (IsConstructed)
+            { return; }
+
             if (Particles != null)
-            {
-                Particles.Emit(Mathf.RoundToInt(ParticlesAmmount * progress));
-            }
+            { Particles.Emit(Mathf.RoundToInt(ParticlesAmmount * progress)); }
 
             BuildingProcess += progress;
 
             for (int i = 0; i < materials.Length; i++)
             { materials[i].SetFloat("_Progress", BuildingProcess / BuildingProcessRequied); }
 
-            if (NetcodeUtils.IsOfflineOrServer)
-            {
-                if (NetcodeUtils.IsServer)
-                { NetBuildingProcess.Value = BuildingProcess; }
+            if (BuildingProcess >= BuildingProcessRequied)
+            { IsConstructed = true; }
 
-                if (BuildingProcess >= BuildingProcessRequied)
-                {
-                    if (Building != null)
-                    {
-                        GameObject instance = GameObject.Instantiate(Building, transform.position, transform.rotation, ObjectGroups.Game);
-                        instance.SpawnOverNetwork();
-
-                        if (instance.TryGetComponent(out BaseObject baseObject))
-                        { baseObject.Team = Team; }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[{nameof(BuildingHologram)}]: Building is null");
-                    }
-                    GameObject.Destroy(gameObject);
-                }
-            }
+            if (NetcodeUtils.IsServer)
+            { NetBuildingProcess.Value = BuildingProcess; }
         }
 
         internal void SetMaterial(Material material)
@@ -145,6 +133,31 @@ namespace Game.Components
                 }
                 Debug.LogError($"[{nameof(BuildingManager)}]: Building \"{BuildingHash}\" not found", this);
             }
+        }
+
+        void FixedUpdate()
+        {
+            if (!IsConstructed)
+            { return; }
+
+            if (!NetcodeUtils.IsOfflineOrServer)
+            { return; }
+
+            if (BuildingProcess < BuildingProcessRequied)
+            { return; }
+
+            if (Building == null)
+            { Debug.LogWarning($"[{nameof(BuildingHologram)}]: Building is null"); }
+            else
+            {
+                GameObject instance = GameObject.Instantiate(Building, transform.position, transform.rotation, ObjectGroups.Game);
+                instance.SpawnOverNetwork();
+
+                if (instance.TryGetComponent(out BaseObject baseObject))
+                { baseObject.Team = Team; }
+            }
+
+            GameObject.Destroy(gameObject);
         }
     }
 }

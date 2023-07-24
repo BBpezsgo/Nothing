@@ -7,7 +7,6 @@
                 <ui:GroupBox name="players-container" text="Players">
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="players" class="panel" />
                 </ui:GroupBox>
-                <ui:Button text="Disconnect" display-tooltip-when-elided="true" name="button-disconnect" />
             </ui:GroupBox>
         </ui:VisualElement>
     </ui:VisualElement>
