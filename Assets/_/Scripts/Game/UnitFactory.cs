@@ -81,22 +81,23 @@ namespace Game.Components
         {
             Vector3 spawnAt = DepotSpawn.position;
             spawnAt.y = TheTerrain.Height(spawnAt);
-            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, spawnAt, DepotSpawn.rotation);
-            instance.transform.SetParent(transform.parent);
-
-            if (instance.TryGetComponent<Collider>(out var collider))
+            AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, spawnAt, DepotSpawn.rotation, instance =>
             {
-                instance.transform.position = new Vector3(
-                    instance.transform.position.x,
-                    instance.transform.position.y + collider.bounds.size.y,
-                    instance.transform.position.z);
-            }
+                instance.transform.SetParent(transform.parent);
 
-            if (instance.TryGetComponent(out BaseObject baseObject))
-            {
-                baseObject.Team = Team;
-            }
-            instance.SetActive(true);
+                if (instance.TryGetComponent<Collider>(out var collider))
+                {
+                    instance.transform.position = new Vector3(
+                        instance.transform.position.x,
+                        instance.transform.position.y + collider.bounds.size.y,
+                        instance.transform.position.z);
+                }
+
+                if (instance.TryGetComponent(out BaseObject baseObject))
+                { baseObject.Team = Team; }
+
+                instance.SetActive(true);
+            });
         }
 
         public bool OnWorldCursor(Vector3 worldPosition)
@@ -118,6 +119,8 @@ namespace Game.Components
 
                 if (UnitFactoryManager.Instance.SelectedFactory == this)
                 { UnitFactoryManager.Instance.RefreshQueue(); }
+
+                RefreshRequest_ClientRpc();
             }
             else
             {
@@ -128,17 +131,8 @@ namespace Game.Components
         [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
         void QueueUnitRequest_ServerRpc(UnitFactoryManager.ProducableUnit unit)
         {
-            Queue.Add(new QueuedUnit()
-            {
-                Progress = 0f,
-                RequiedProgress = unit.ProgressRequied,
-                PrefabID = unit.PrefabID,
-            });
-
-            if (UnitFactoryManager.Instance.SelectedFactory == this)
-            { UnitFactoryManager.Instance.RefreshQueue(); }
-
-            RefreshRequest_ClientRpc();
+            if (NetcodeUtils.IsOfflineOrServer)
+            { QueueUnit(unit); }
         }
 
         [ClientRpc]

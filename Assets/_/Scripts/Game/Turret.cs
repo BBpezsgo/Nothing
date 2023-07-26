@@ -56,6 +56,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] (float original, float current, float target) CannonKnockbackPosition;
         [SerializeField] bool UseBarrelInstead;
         [SerializeField, ReadOnly] CannonKnockbackStates CannonKnockbackState;
+        [SerializeField, ReadOnly] Vector3 CannonOriginalLocalPosition;
 
         Transform KnockbackTransform => UseBarrelInstead ? Barrel : cannon;
 
@@ -266,7 +267,8 @@ namespace Game.Components
                 }
                 else
                 {
-                    CannonKnockbackPosition = (KnockbackTransform.localPosition.z, KnockbackTransform.localPosition.z, KnockbackTransform.localPosition.z);
+                    CannonKnockbackPosition = (0f, 0f, 0f);
+                    CannonOriginalLocalPosition = KnockbackTransform.localPosition;
                 }
             }
         }
@@ -336,7 +338,7 @@ namespace Game.Components
                         break;
                 }
 
-                KnockbackTransform.localPosition = new Vector3(KnockbackTransform.localPosition.x, KnockbackTransform.localPosition.y, CannonKnockbackPosition.current);
+                KnockbackTransform.localPosition = CannonOriginalLocalPosition - Vector3.forward * CannonKnockbackPosition.current;
             }
 
             Vector3 targetPosition = TargetPosition;
@@ -662,7 +664,7 @@ namespace Game.Components
 
             if (CannonKnockback != 0f)
             {
-                CannonKnockbackPosition.target = CannonKnockbackPosition.original - CannonKnockback;
+                CannonKnockbackPosition.target = CannonKnockbackPosition.original + CannonKnockback;
                 CannonKnockbackState = CannonKnockbackStates.Knockback;
             }
 

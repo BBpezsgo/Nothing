@@ -19,7 +19,7 @@ using Utilities;
 namespace Game.Blueprints
 {
     [Serializable]
-    public class Blueprint : ISerializable<Blueprint>, ISerializableText, IDeserializableText
+    public class Blueprint : ISerializable<Blueprint>, ISerializableText, IDeserializableText, INetworkSerializable
     {
         public string Name;
         public List<string> Parts;
@@ -40,6 +40,36 @@ namespace Game.Blueprints
         {
             Name = data["Name"];
             Parts = data["Parts"].Array.ConvertPrimitive<string>().ToList();
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsReader)
+            {
+                FastBufferReader reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out Name, false);
+                reader.ReadValueSafe(out int n);
+                string[] parts = new string[n];
+                for (int i = 0; i < n; i++)
+                {
+                    reader.ReadValueSafe(out string element, true);
+                    parts[i] = element;
+                }
+                Parts = new List<string>(parts);
+            }
+
+            if (serializer.IsWriter)
+            {
+                FastBufferWriter writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(Name, false);
+                int n = Parts.Count;
+                writer.WriteValueSafe(in n);
+                for (int i = 0; i < n; i++)
+                {
+                    string element = Parts[i];
+                    writer.WriteValueSafe(element, true);
+                }
+            }
         }
 
         public void Serialize(Serializer serializer)
@@ -66,7 +96,7 @@ namespace Game.Blueprints
     }
 
     [Serializable]
-    public abstract class BlueprintPart : ISerializable<BlueprintPart>, ISerializableText, IDeserializableText
+    public abstract class BlueprintPart : ISerializable<BlueprintPart>, ISerializableText, IDeserializableText, INetworkSerializable
     {
         [Header("Base")]
         public PartType Type;
@@ -108,6 +138,13 @@ namespace Game.Blueprints
             Type = Enum.Parse<PartType>(data["Type"], true);
             ID = data["ID"];
             Name = data["Name"];
+        }
+
+        public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Type);
+            serializer.SerializeValue(ref ID);
+            serializer.SerializeValue(ref Name);
         }
     }
 
@@ -542,7 +579,7 @@ namespace Game.Blueprints
             { _photographyStudio.gameObject.SetActive(false); }
         }
 
-        private void OnDrawGizmosSelected()
+        void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.white;
             Gizmos.DrawWireCube(_photographyPosition, Vector3.one * _photographySize);
@@ -668,9 +705,12 @@ namespace Game.Blueprints
                         PartBody newPart = new();
                         newPart.DeserializeText(data);
                         if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        { return newPart; }
+                        {
+                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
+                            return newPart;
+                        }
 
-                        Debug.LogWarning($"Part \"{newPart.Name}\" id is null");
+                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
                         return null;
                     }
 
@@ -679,9 +719,12 @@ namespace Game.Blueprints
                         PartTurret newPart = new();
                         newPart.DeserializeText(data);
                         if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        { return newPart; }
+                        {
+                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
+                            return newPart;
+                        }
 
-                        Debug.LogWarning($"Part \"{newPart.Name}\" id is null");
+                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
                         return null;
                     }
 
@@ -690,16 +733,19 @@ namespace Game.Blueprints
                         PartController newPart = new();
                         newPart.DeserializeText(data);
                         if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        { return newPart; }
+                        {
+                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
+                            return newPart;
+                        }
 
-                        Debug.LogWarning($"Part \"{newPart.Name}\" id is null");
+                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
                         return null;
                     }
 
                 case PartType.Unknown:
                 default:
                     {
-                        Debug.LogWarning($"Unknown part type {partType} ({(byte)partType})");
+                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Unknown part type {partType} ({(byte)partType})");
                         return null;
                     }
             }
@@ -707,6 +753,7 @@ namespace Game.Blueprints
 
         public static BlueprintPart[] LoadParts()
         {
+            Debug.Log($"[{nameof(BlueprintManager)}]: Loading parts ...");
             AssetManager.AssetManager.Instance.LoadIfNot();
             Value[] partsData = AssetManager.AssetManager.Instance.LoadFilesWithInheritacne($"Parts");
 
@@ -725,21 +772,21 @@ namespace Game.Blueprints
 
         public static Blueprint[] LoadBlueprints()
         {
-            var blueprintFiles = Storage.GetFiles("Blueprints");
+            Debug.Log($"[{nameof(BlueprintManager)}]: Loading blueprints ...");
+            string[] blueprintFiles = Storage.GetFiles("Blueprints");
             List<Blueprint> result = new();
             for (int i = 0; i < blueprintFiles.Length; i++)
             {
-                var blueprint = Storage.ReadObject<Blueprint>("Blueprints", blueprintFiles[i]);
+                Blueprint blueprint = Storage.ReadObject<Blueprint>("Blueprints", blueprintFiles[i]);
                 if (blueprint != null)
-                {
-                    result.Add(blueprint);
-                }
+                { result.Add(blueprint); }
             }
             return result.ToArray();
         }
 
         public static void SaveBlueprint(Blueprint blueprint)
         {
+            Debug.Log($"[{nameof(BlueprintManager)}]: Save blueprint \"{blueprint.Name}\" ...");
             Storage.Write(blueprint, "Blueprints", $"{Utils.FixFilename(blueprint.Name)}.bin");
         }
 
@@ -897,7 +944,7 @@ namespace Game.Blueprints
 
                 result.name = $"{blueprint.Name} Instance";
                 result.transform.position = Vector3.zero;
-                var networkObject = result.AddComponent<NetworkObject>();
+                NetworkObject networkObject = result.AddComponent<NetworkObject>();
                 networkObject.AutoObjectParentSync = false;
 
                 if (blueprint.TryGetPart(out PartTurretBuiltin turretPartBuiltin))

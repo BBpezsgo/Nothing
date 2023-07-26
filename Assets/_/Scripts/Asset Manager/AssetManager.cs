@@ -390,6 +390,28 @@ namespace AssetManager
             }
         }
 
+        public static void InstantiatePrefab(string prefabName, bool spawnOverNetwork, Vector3 position, Quaternion rotation, System.Action<GameObject> onInstantiated)
+        {
+            GameObject eh = InstantiatePrefab(prefabName, spawnOverNetwork, position, rotation);
+            if (eh != null)
+            {
+                onInstantiated?.Invoke(eh);
+                return;
+            }
+
+            Game.Blueprints.NetworkBlueprintManager.GetBlueprint(prefabName, blueprint =>
+            {
+                GameObject instance = Game.Blueprints.BlueprintManager.InstantiateBlueprint(blueprint);
+                if (CurrentScene.HasValue)
+                { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, CurrentScene.Value); }
+
+                if (NetcodeSynchronizer.Instance != null && instance.HasComponent<NetcodeView>())
+                { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, Vector3.zero, true); }
+
+                onInstantiated?.Invoke(instance);
+            });
+        }
+
         /// <summary>
         /// Generates and instantiates a prefab named <paramref name="prefabName"/>.
         /// This also creates the prefab as a child of <see cref="Prefabs"/>.<br/>
@@ -410,14 +432,6 @@ namespace AssetManager
             }
 
             {
-                GameObject resourceAsset = Resources.Load<GameObject>(prefabName);
-                if (resourceAsset != null)
-                {
-                    return InstantiatePrefab(resourceAsset, spawnOverNetwork, true, position, rotation);
-                }
-            }
-
-            {
                 if (Game.Blueprints.BlueprintManager.TryGetBlueprint(prefabName, out Game.Blueprints.Blueprint blueprint))
                 {
                     GameObject instance = Game.Blueprints.BlueprintManager.InstantiateBlueprint(blueprint);
@@ -431,6 +445,18 @@ namespace AssetManager
                 }
             }
 
+            {
+                GameObject resourceAsset = Resources.Load<GameObject>(prefabName);
+                if (resourceAsset != null)
+                {
+                    return InstantiatePrefab(resourceAsset, spawnOverNetwork, true, position, rotation);
+                }
+            }
+
+            Debug.LogError($"[{nameof(AssetManager)}]: Bruh :(");
+            return null;
+
+            /*
             if (Instance.HasGeneratedPrefab(prefabName, out GameObject exsistingPrefab))
             {
                 if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" already generated, cloning ...");
@@ -474,6 +500,7 @@ namespace AssetManager
 
             AssetLogger.LogError($"Prefab \"{prefabName}\" does not exists!");
             return null;
+            */
         }
 
         /// <summary>
