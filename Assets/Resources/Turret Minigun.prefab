@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 2506376836180171314}
   - component: {fileID: 1726614090810903898}
   - component: {fileID: 8489667657845955715}
+  - component: {fileID: -4868118188652352305}
   m_Layer: 0
   m_Name: Turret Minigun
   m_TagString: Untagged
@@ -304,6 +305,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-4868118188652352305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726614090810903875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1726614091862829228
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,9 +552,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 8489667657845955715}
   ShootSound: {fileID: 0}
   Barrel: {fileID: 5001198054748598325}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 700
   BarrelRotationAcceleration: 700
   BarrelRotationSpeed: 0

@@ -118,6 +118,7 @@ MonoBehaviour:
   CannonKnockbackSpeed: 1
   UseBarrelInstead: 0
   CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 5867078746325976924}
   ShootSound: {fileID: 8300000, guid: d0dd384cec9f320419f41a2792a06c8f, type: 3}
   Barrel: {fileID: 0}
@@ -445,6 +446,7 @@ GameObject:
   - component: {fileID: 4032902050812513779}
   - component: {fileID: 4032902050812513778}
   - component: {fileID: 2776291270581045572}
+  - component: {fileID: 5931494210968893531}
   - component: {fileID: 5401766465187401074}
   - component: {fileID: 4091987216274468370}
   - component: {fileID: 869638110986485263}
@@ -458,6 +460,7 @@ GameObject:
   - component: {fileID: 7101392919599067077}
   - component: {fileID: 5867078746325976924}
   - component: {fileID: 2237418352075832577}
+  - component: {fileID: -3007775867245657093}
   m_Layer: 0
   m_Name: APC Granate
   m_TagString: Untagged
@@ -613,6 +616,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviours: []
+--- !u!114 &5931494210968893531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4032902050812513782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1bdac08c72b32459add34727d8cd29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  MovementEngine: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
+  maxDistanceToReverse: 8
+  useBrakingCalculations: 1
+  currentlyStopping: 0
+  BrakingDistance: 0
 --- !u!114 &5401766465187401074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -956,6 +978,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
     type: 3}
+--- !u!114 &-3007775867245657093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4032902050812513782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4032902050905775096
 GameObject:
   m_ObjectHideFlags: 0

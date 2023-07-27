@@ -134,7 +134,9 @@ namespace Game.Managers
 
             DoAngle(Time.unscaledDeltaTime);
 
-            if (!MenuManager.AnyMenuVisible && MouseManager.MouseOnWindow)
+            if (!MenuManager.AnyMenuVisible &&
+                MouseManager.MouseOnWindow &&
+                !MouseManager.IsPointerOverUI())
             {
                 float zoomInput = -Input.mouseScrollDelta.y * zoomInputMultiplier;
 

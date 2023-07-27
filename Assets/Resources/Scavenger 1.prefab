@@ -118,6 +118,7 @@ MonoBehaviour:
   CannonKnockbackSpeed: 1
   UseBarrelInstead: 0
   CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 5466001084010902814}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
   Barrel: {fileID: 5322412339203651809}
@@ -302,6 +303,7 @@ GameObject:
   - component: {fileID: 2208870706455817139}
   - component: {fileID: 5466001084010902814}
   - component: {fileID: 6747003029182905032}
+  - component: {fileID: 8284725795724639234}
   m_Layer: 0
   m_Name: Scavenger 1
   m_TagString: Untagged
@@ -787,6 +789,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
     type: 3}
+--- !u!114 &8284725795724639234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5278498343419542869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5278498343464692571
 GameObject:
   m_ObjectHideFlags: 0

@@ -77,6 +77,7 @@ GameObject:
   - component: {fileID: 44472583122888733}
   - component: {fileID: 44472583122888732}
   - component: {fileID: 1291722391937297578}
+  - component: {fileID: 7450507445642723445}
   - component: {fileID: 9051299990123292828}
   - component: {fileID: 2707636427151259402}
   - component: {fileID: 4286252400671120353}
@@ -90,6 +91,7 @@ GameObject:
   - component: {fileID: 6303489057961443070}
   - component: {fileID: 145842333711360083}
   - component: {fileID: 1476945729923886981}
+  - component: {fileID: 7566176045427403910}
   m_Layer: 0
   m_Name: APC
   m_TagString: Untagged
@@ -246,6 +248,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviours: []
+--- !u!114 &7450507445642723445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44472583122888728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1bdac08c72b32459add34727d8cd29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  MovementEngine: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
+  maxDistanceToReverse: 8
+  useBrakingCalculations: 1
+  currentlyStopping: 0
+  BrakingDistance: 0
 --- !u!114 &9051299990123292828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -589,6 +610,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
     type: 3}
+--- !u!114 &7566176045427403910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44472583122888728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &44472583172699633
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,6 +925,7 @@ MonoBehaviour:
   CannonKnockbackSpeed: 3
   UseBarrelInstead: 0
   CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 145842333711360083}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
   Barrel: {fileID: 0}

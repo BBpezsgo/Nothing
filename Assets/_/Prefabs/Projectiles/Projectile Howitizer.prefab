@@ -88,9 +88,9 @@ MonoBehaviour:
   ImpactDamage: 60
   CanBounce: 0
   BounceAngle: 0
-  ExploisonForce: 4
-  ExploisonRadius: 10
-  ExploisonDamage: 40
+  ExploisonForce: 30
+  ExploisonRadius: 50
+  ExploisonDamage: 60
   ExplodeOnImpact: 1
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}

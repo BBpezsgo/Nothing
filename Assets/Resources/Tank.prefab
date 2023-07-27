@@ -9951,6 +9951,7 @@ GameObject:
   - component: {fileID: 2619412345505571579}
   - component: {fileID: 2619412345505571578}
   - component: {fileID: 3831125781744870988}
+  - component: {fileID: 3673528625757124021}
   - component: {fileID: 6438836097050141306}
   - component: {fileID: 8353238281767331400}
   - component: {fileID: 2286748800339120391}
@@ -9965,6 +9966,7 @@ GameObject:
   - component: {fileID: 9074750142406875483}
   - component: {fileID: 3413199833213572951}
   - component: {fileID: 1269857257918406634}
+  - component: {fileID: 7518325145530454443}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -10088,6 +10090,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviours: []
+--- !u!114 &3673528625757124021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1bdac08c72b32459add34727d8cd29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  MovementEngine: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
+  maxDistanceToReverse: 8
+  useBrakingCalculations: 1
+  currentlyStopping: 0
+  BrakingDistance: 0
 --- !u!114 &6438836097050141306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10208,6 +10229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   BaseObject: {fileID: 0}
+  EnableTargetLocking: 1
+  TargetLockingThreshold: 50
   turret: {fileID: 2619412344863678371}
   ScopeSensitivity: 1
   HullRotationStabilizer: 1
@@ -10445,6 +10468,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EffectPrefab: {fileID: 6063106679700194604, guid: 72c7e5bebda6d874193d48bc219a17a6,
     type: 3}
+--- !u!114 &7518325145530454443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0

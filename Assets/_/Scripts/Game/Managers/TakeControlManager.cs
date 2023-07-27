@@ -12,6 +12,8 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+using Utilities;
+
 namespace Game.Managers
 {
     public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
@@ -54,6 +56,23 @@ namespace Game.Managers
         [SerializeField, ReadOnly] UIDocument UI;
         [SerializeField] VisualTreeAsset ProjectileButton;
 
+        [Header("UI - Crosshair")]
+        [SerializeField] Color CrosshairColor = Color.white;
+        [SerializeField] Color CrosshairColorInaccurate = Color.red;
+        [SerializeField] Color CrosshairColorAccurate = Color.green;
+        [SerializeField] Color CrosshairColorPrediction = Color.blue;
+        [SerializeField] Color ReloadDotsColor = Color.white;
+        [SerializeField, Min(0)] int ReloadDots = 16;
+        [SerializeField, Min(.5f)] float ReloadDotsRadius = 18f;
+        [SerializeField, Min(.5f)] float ReloadDotsSize = 4f;
+        [SerializeField, Min(.01f)] float ReloadDotsFadeoutSpeed = 5f;
+        [SerializeField, Min(.01f)] float TargetLockAnimationSpeed = 2f;
+
+        Texture2D SphereFilled;
+        float reloadedAt = 0f;
+        float targetedAt = 0f;
+        bool lastTargeted = false;
+
         InputUtils.PriorityKey KeyEsc;
 
         ProgressBar BarHealth;
@@ -77,6 +96,10 @@ namespace Game.Managers
                 return;
             }
             instance = this;
+
+            if (SphereFilled != null)
+            { Texture2D.Destroy(SphereFilled); }
+            SphereFilled = GUIUtils.GenerateCircleFilled(Vector2Int.one * 32);
         }
 
         void Start()
@@ -109,7 +132,7 @@ namespace Game.Managers
             ControllingObjects.Initialize(this);
         }
 
-        private void ControllingObjectsChanged(NetworkListEvent<ulong> changeEvent)
+        void ControllingObjectsChanged(NetworkListEvent<ulong> changeEvent)
         {
             if (!NetcodeUtils.IsClient)
             { return; }
@@ -288,6 +311,7 @@ namespace Game.Managers
 
         void SetCursor(Transform cursor, Vector3 position)
         {
+            /*
             for (int i = 0; i < CursorPriorities.Length; i++)
             {
                 if (cursor == CursorPriorities[i])
@@ -301,24 +325,23 @@ namespace Game.Managers
             if (!cursor.gameObject.activeSelf) cursor.gameObject.SetActive(true);
             cursor.position = position;
             cursor.localScale = IngameCursorScale * Mathf.Clamp(Vector3.Distance(CameraController.CameraPosition, position) * .1f, .1f, 20f) * Vector3.one;
+            */
         }
 
         void HideCursor(Transform cursor)
         {
+            /*
             cursor.position = new Vector3(0f, -50f, 0f);
             cursor.localScale = Vector3.one * .5f;
+            */
         }
 
         void SetWindowCursor()
         {
             if (CameraController.cameraMode == CameraMode.Normal)
-            {
-                UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-            }
+            { UnityEngine.Cursor.lockState = CursorLockMode.Locked; }
             else
-            {
-                UnityEngine.Cursor.lockState = CursorLockMode.None;
-            }
+            { UnityEngine.Cursor.lockState = CursorLockMode.None; }
         }
 
         void TakeControl(ICanTakeControl unit)
@@ -731,6 +754,383 @@ namespace Game.Managers
             }
             return false;
         }
+
+        void OnGUI()
+        {
+            if (!IsControlling)
+            { return; }
+
+            Vector2 predictedHitPosition = Vector2.zero;
+            Vector2 mousePosition = Vector2.zero;
+
+            float reloadPercent = 1f;
+            bool isAccurate = true;
+
+            bool hasTargetRect = false;
+            Rect targetRect = Rect.zero;
+
+            Vector2 targetPosition = Vector2.zero;
+            Vector2 predictedTargetPosition = Vector2.zero;
+
+            if (ControllingObject is ICanTakeControlAndHasTurret hasTurret &&
+                hasTurret.Turret != null)
+            {
+                Vector3 _targetPosition = hasTurret.Turret.TargetPosition;
+                if (_targetPosition != Vector3.zero)
+                {
+                    targetPosition = GUIUtils.TransformPoint(MainCamera.Camera.WorldToScreenPoint(_targetPosition));
+
+                    Vector3 _targetPredictedOffset = hasTurret.Turret.PredictedOffset;
+                    if (_targetPredictedOffset != Vector3.zero)
+                    {
+                        predictedTargetPosition = GUIUtils.TransformPoint(MainCamera.Camera.WorldToScreenPoint(_targetPosition + _targetPredictedOffset));
+                    }
+                }
+
+                Vector3 screenPos = MainCamera.Camera.WorldToScreenPoint(hasTurret.Turret.PredictImpact() ?? _targetPosition);
+
+                if (screenPos.z > 0f)
+                { predictedHitPosition = GUIUtils.TransformPoint(screenPos); }
+
+                if (hasTurret.Turret.ReloadPercent < 1f)
+                { reloadedAt = 0f; }
+                else if (reloadedAt == 0f)
+                { reloadedAt = Time.unscaledTime; }
+
+                if (hasTurret.Turret.reloadTime > 0.01f)
+                { reloadPercent = 1f - Mathf.Clamp01(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime); }
+
+                isAccurate = hasTurret.Turret.IsAccurateShoot;
+
+                if (hasTurret.Turret.TargetTransform != null &&
+                    hasTurret.Turret.TargetTransform.TryGetComponent(out Hitbox hitbox))
+                {
+                    Bounds bounds = hitbox.Bounds;
+
+                    if (bounds.size.magnitude > 50f)
+                    {
+                        hasTargetRect = false;
+                    }
+                    else
+                    {
+                        hasTargetRect = Utils.GetScreenCorners(bounds, out var corners);
+
+                        if (hasTargetRect)
+                        {
+                            targetRect = RectFromCorners(corners.TopLeft, corners.BottomRight);
+
+                            targetRect.Padding(8f);
+
+                            targetRect.position = GUIUtils.TransformPoint(targetRect.position);
+                            targetRect.position = new Vector2(targetRect.position.x, targetRect.position.y - targetRect.height);
+                        }
+                    }
+                }
+            }
+
+            if (MouseManager.MouseOnWindow)
+            { mousePosition = GUIUtils.TransformPoint(Input.mousePosition); }
+
+            if (predictedHitPosition == Vector2.zero &&
+                mousePosition == Vector2.zero &&
+                targetPosition == Vector2.zero)
+            { return; }
+
+            if (lastTargeted)
+            {
+                if (!hasTargetRect)
+                {
+                    lastTargeted = false;
+                    targetedAt = Time.time;
+                }
+            }
+            else
+            {
+                if (hasTargetRect)
+                {
+                    lastTargeted = true;
+                    targetedAt = Time.time;
+                }
+            }
+
+            Color shadowColor = new(0f, 0f, 0f, .8f);
+
+            GL.PushMatrix();
+            if (GLUtils.SolidMaterial.SetPass(0))
+            {
+                float innerSize = 4f;
+                float outerSize = 12f;
+
+                if (targetPosition != Vector2.zero)
+                {
+                    if (predictedTargetPosition != Vector2.zero)
+                    {
+                        DrawCross(predictedTargetPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
+                        DrawCross(predictedTargetPosition, innerSize, outerSize, 1f, CrosshairColorPrediction);
+                    }
+                    else
+                    {
+                        DrawCross(targetPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
+                        DrawCross(targetPosition, innerSize, outerSize, 1f, CrosshairColorPrediction);
+                    }
+                }
+
+                if (mousePosition != Vector2.zero)
+                {
+                    float animation = Mathf.Clamp01((Time.time - targetedAt) * TargetLockAnimationSpeed);
+                    if (!lastTargeted)
+                    { animation = 1f - animation; }
+
+                    if (hasTargetRect && animation != 0f)
+                    {
+                        if (animation != 1f)
+                        {
+                            DrawCornerBoxFromCross(targetRect.center, targetRect.size, 8f, mousePosition, innerSize, outerSize, animation, CrosshairColor);
+                        }
+                        else
+                        {
+                            DrawCornerBox(targetRect.center + Vector2.one, targetRect.size, 8f, shadowColor);
+                            DrawCornerBox(targetRect.center, targetRect.size, 8f, CrosshairColor);
+                        }
+                    }
+                    else
+                    {
+                        DrawCross(mousePosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
+                        DrawCross(mousePosition, innerSize, outerSize, 1f, CrosshairColor);
+                    }
+                }
+
+                if (predictedHitPosition != Vector2.zero)
+                {
+                    DrawCross(predictedHitPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
+                    DrawCross(predictedHitPosition, innerSize, outerSize, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
+                }
+            }
+            GL.PopMatrix();
+
+            if (reloadPercent != 1f)
+            {
+                float step = 1f / (float)ReloadDots;
+
+                for (int i = 0; i < ReloadDots; i++)
+                {
+                    float normalizedIndex = (float)i / (float)ReloadDots;
+
+                    float rad = 2 * Mathf.PI * normalizedIndex;
+                    Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                    float multiplier = Mathf.Clamp01((reloadPercent - normalizedIndex) / step);
+
+                    if (multiplier <= .01f)
+                    { continue; }
+
+                    float size = ReloadDotsSize * multiplier;
+
+                    GUI.DrawTexture(RectUtils.Center(mousePosition + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
+                    GUI.DrawTexture(RectUtils.Center(mousePosition + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
+                }
+            }
+            else
+            {
+                float fadeOutPercent = 1f - Mathf.Clamp01((Time.unscaledTime - reloadedAt) * ReloadDotsFadeoutSpeed);
+
+                if (fadeOutPercent > .0001f)
+                {
+                    for (int i = 0; i < ReloadDots; i++)
+                    {
+                        float normalizedIndex = (float)i / (float)ReloadDots;
+
+                        float rad = 2 * Mathf.PI * normalizedIndex;
+                        Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                        float size = ReloadDotsSize;
+
+                        size += (1f - fadeOutPercent) * 4f;
+
+                        Vector2 offset = Vector2.zero;
+
+                        offset += direction * ReloadDotsRadius;
+                        offset += direction * ((1f - fadeOutPercent) * 4f);
+
+                        GUI.DrawTexture(RectUtils.Center(mousePosition + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
+                    }
+                }
+            }
+        }
+
+        void DrawCross(Vector2 center, float innerSize, float outerSize, float thickness, Color color)
+        {
+            Vector2 innerPointV = Vector2.up * innerSize;
+            Vector2 outerPointV = Vector2.up * outerSize;
+            Vector2 innerPointH = Vector2.left * innerSize;
+            Vector2 outerPointH = Vector2.left * outerSize;
+
+            GLUtils.DrawLine(center + innerPointV, center + outerPointV, thickness, color);
+            GLUtils.DrawLine(center - innerPointV, center - outerPointV, thickness, color);
+            GLUtils.DrawLine(center + innerPointH, center + outerPointH, thickness, color);
+            GLUtils.DrawLine(center - innerPointH, center - outerPointH, thickness, color);
+        }
+
+        void DrawCornerBox(Vector2 center, Vector2 size, float cornerSize, Color color)
+        {
+            Vector2 halfSize = size / 2;
+
+            float cornerSizeWidth = Mathf.Min(halfSize.x, cornerSize);
+            float cornerSizeHeight = Mathf.Min(halfSize.y, cornerSize);
+
+            Vector2 topleft = new(-halfSize.x, -halfSize.y);
+            Vector2 topright = new(halfSize.x, -halfSize.y);
+            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
+            Vector2 bottomright = new(halfSize.x, halfSize.y);
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + new Vector2(topleft.x + cornerSizeWidth, topleft.y));
+                GL.Vertex(center + topleft);
+                GL.Vertex(center + new Vector2(topleft.x, topleft.y + cornerSizeHeight));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + new Vector2(topright.x - cornerSizeWidth, topright.y));
+                GL.Vertex(center + topright);
+                GL.Vertex(center + new Vector2(topright.x, topright.y + cornerSizeHeight));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + new Vector2(bottomleft.x + cornerSizeWidth, bottomleft.y));
+                GL.Vertex(center + bottomleft);
+                GL.Vertex(center + new Vector2(bottomleft.x, bottomleft.y - cornerSizeHeight));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + new Vector2(bottomright.x - cornerSizeWidth, bottomright.y));
+                GL.Vertex(center + bottomright);
+                GL.Vertex(center + new Vector2(bottomright.x, bottomright.y - cornerSizeHeight));
+                GL.End();
+            }
+        }
+
+        void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
+        {
+            Vector2 halfSize = boxSize / 2;
+
+            float boxCornerSizeWidth = Mathf.Min(halfSize.x, boxCornerSize);
+            float boxCornerSizeHeight = Mathf.Min(halfSize.y, boxCornerSize);
+
+            Vector2 innerPointV = Vector2.up * crossInnerSize;
+            Vector2 outerPointV = Vector2.up * crossOuterSize;
+            Vector2 innerPointH = Vector2.left * crossInnerSize;
+            Vector2 outerPointH = Vector2.left * crossOuterSize;
+
+            (Vector2 Inner, Vector2 Outer) crossUp = (innerPointV, outerPointV);
+            (Vector2 Inner, Vector2 Outer) crossDown = (-innerPointV, -outerPointV);
+            (Vector2 Inner, Vector2 Outer) crossRight = (innerPointH, outerPointH);
+            (Vector2 Inner, Vector2 Outer) crossLeft = (-innerPointH, -outerPointH);
+
+            Vector2 center = Vector2.Lerp(crossCenter, boxCenter, t);
+
+            {
+                GL.Begin(GL.LINES);
+                GL.Color(color);
+
+                Vector2 crossLeftOuter = new(Mathf.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
+                Vector2 crossRightOuter = new(Mathf.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
+
+                GL.Vertex(center + Vector2.Lerp(crossLeft.Inner, crossLeftOuter, t));
+                GL.Vertex(center + crossLeftOuter);
+
+                GL.Vertex(center + Vector2.Lerp(crossRight.Inner, crossRightOuter, t));
+                GL.Vertex(center + crossRightOuter);
+
+                GL.End();
+            }
+
+            Vector2 topleft = new(-halfSize.x, -halfSize.y);
+            Vector2 topright = new(halfSize.x, -halfSize.y);
+            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
+            Vector2 bottomright = new(halfSize.x, halfSize.y);
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topleft.x + boxCornerSizeWidth, topleft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topleft, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topleft.x, topleft.y + boxCornerSizeHeight), t));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topright.x - boxCornerSizeWidth, topright.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topright, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topright.x, topright.y + boxCornerSizeHeight), t));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomleft.x + boxCornerSizeWidth, bottomleft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomleft, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomleft.x, bottomleft.y - boxCornerSizeHeight), t));
+                GL.End();
+            }
+
+            {
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(color);
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomright.x - boxCornerSizeWidth, bottomright.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomright, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomright.x, bottomright.y - boxCornerSizeHeight), t));
+                GL.End();
+            }
+        }
+
+        static Rect RectFromCorners(Vector2 topLeft, Vector2 bottomRight)
+            => new(topLeft, bottomRight - topLeft);
+
+        static bool GetScreenCorners(Vector3[] points, out (Vector2 TopLeft, Vector2 BottomRight) corners)
+        {
+            Vector2 topLeft = points[0];
+            Vector2 bottomRight = points[0];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 p = points[i];
+
+                if (p.z < 0)
+                {
+                    corners = (Vector2.zero, Vector2.zero);
+                    return false;
+                }
+
+                if (p.x < topLeft.x)
+                { topLeft.x = p.x; }
+
+                if (p.y < topLeft.y)
+                { topLeft.y = p.y; }
+
+                if (p.x > bottomRight.x)
+                { bottomRight.x = p.x; }
+
+                if (p.y > bottomRight.y)
+                { bottomRight.y = p.y; }
+            }
+
+            corners = (topLeft, bottomRight);
+            return true;
+        }
     }
 }
 
@@ -798,5 +1198,5 @@ public static class ICanTakeControlExtensions
 
 public static class IAmObjectExtensions
 {
-    public static Component GetObject(this Game.Components.IAmObject self) => (Component)self;
+    public static Component GetObject(this IAmObject self) => (Component)self;
 }

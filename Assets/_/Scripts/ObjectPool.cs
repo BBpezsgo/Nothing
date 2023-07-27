@@ -82,7 +82,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
 
             if (Instances.Count >= MaxSize)
             {
-                Debug.LogError($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance);
+                Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance);
                 return null;
             }
 

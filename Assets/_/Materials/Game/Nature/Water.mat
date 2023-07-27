@@ -28,7 +28,7 @@ Material:
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2999
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -60,7 +60,7 @@ Material:
     - _Displacement: 0.5
     - _Displacement_Scroll_Speed: 0.005
     - _QueueControl: 0
-    - _QueueOffset: 0
+    - _QueueOffset: -1
     - _Shorline_Density: 10
     - _Shorline_Speed: -0.1
     - _Strength: 0.14

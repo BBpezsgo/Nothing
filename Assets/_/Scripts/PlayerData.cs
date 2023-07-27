@@ -11,6 +11,7 @@ public class PlayerData : MonoBehaviour
         [SerializeField, ReadOnly] internal uint Hash;
         [SerializeField] internal GameObject Unit;
         [SerializeField] internal float ProgressRequied;
+        [SerializeField] internal string ThumbnailID;
     }
 
     [Serializable]
@@ -20,6 +21,7 @@ public class PlayerData : MonoBehaviour
         [SerializeField] internal Vector3 SpaceNeed = Vector3.one;
         [SerializeField] internal GameObject Building;
         [SerializeField] internal float ProgressRequied;
+        [SerializeField] internal string ThumbnailID;
         internal Vector3 GroundOrigin
         {
             get
@@ -37,7 +39,7 @@ public class PlayerData : MonoBehaviour
     [SerializeField] internal List<ConstructableBuilding> ConstructableBuildings = new();
     [SerializeField, Button(nameof(GenerateHashes), true, false, "Generate Hashes")] string btn_GenHash;
 
-    bool IsUHashUnique(uint hash)
+    bool IsHashUnique(uint hash)
     {
         if (hash == 0) return false;
         for (int i = 0; i < ProducableUnits.Count; i++)
@@ -51,14 +53,14 @@ public class PlayerData : MonoBehaviour
     {
         for (int i = 0; i < ProducableUnits.Count; i++)
         {
-            if (!IsUHashUnique(ProducableUnits[i].Hash))
+            if (!IsHashUnique(ProducableUnits[i].Hash))
             {
                 ProducableUnits[i].Hash = unchecked((uint)ProducableUnits[i].Unit.name.GetHashCode(StringComparison.InvariantCulture));
             }
         }
         for (int i = 0; i < ConstructableBuildings.Count; i++)
         {
-            if (!IsUHashUnique(ConstructableBuildings[i].Hash))
+            if (!IsHashUnique(ConstructableBuildings[i].Hash))
             {
                 ConstructableBuildings[i].Hash = unchecked((uint)ConstructableBuildings[i].Building.name.GetHashCode(StringComparison.InvariantCulture));
             }
@@ -71,5 +73,12 @@ public class PlayerData : MonoBehaviour
         for (int i = 0; i < playerDatas.Length; i++)
         { if (playerDatas[i].Team == team) return playerDatas[i]; }
         return null;
+    }
+
+    internal static bool TryGetThumbnail(string id, out Texture2D thumbnail)
+    {
+        string path = $"Thumbnails/{id}";
+        thumbnail = Resources.Load<Texture2D>(path);
+        return thumbnail != null;
     }
 }

@@ -1,3 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Button text="Button" display-tooltip-when-elided="true" style="width: 100px; height: 100px;" />
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:Button style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; flex-shrink: 1; min-width: 64px; min-height: 64px; max-width: 64px; max-height: 64px;">
+        <ui:VisualElement picking-mode="Ignore" name="image" style="flex-shrink: 0; flex-grow: 1;" />
+    </ui:Button>
 </ui:UXML>

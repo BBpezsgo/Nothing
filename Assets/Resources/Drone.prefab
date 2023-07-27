@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8062244046001752375}
   - component: {fileID: 8062244046001752368}
   - component: {fileID: 8062244046001752369}
+  - component: {fileID: 9201763386767749416}
   - component: {fileID: 8062244046001752370}
   - component: {fileID: 8062244046001752371}
   - component: {fileID: 8062244046001752332}
@@ -21,6 +22,7 @@ GameObject:
   - component: {fileID: 8062244046001752373}
   - component: {fileID: 8062244046001752377}
   - component: {fileID: 8062244046001752378}
+  - component: {fileID: 9144028623863636501}
   m_Layer: 0
   m_Name: Drone
   m_TagString: Untagged
@@ -125,6 +127,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviours: []
+--- !u!114 &9201763386767749416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062244046001752334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1bdac08c72b32459add34727d8cd29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  MovementEngine: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
+  maxDistanceToReverse: 4
+  useBrakingCalculations: 1
+  currentlyStopping: 0
+  BrakingDistance: 0
 --- !u!114 &8062244046001752370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -375,6 +396,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &9144028623863636501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062244046001752334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8062244046070208244
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,9 +455,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0

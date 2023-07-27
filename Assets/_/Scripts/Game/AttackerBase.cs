@@ -20,6 +20,11 @@ namespace Game.Components
         internal string Team => BaseObject.Team;
         internal int TeamHash => BaseObject.TeamHash;
 
+        [Header("Target Locking")]
+        [SerializeField] bool EnableTargetLocking = true;
+        [Tooltip("Min distance in screen space to lock on the target")]
+        [SerializeField] float TargetLockingThreshold = 10f;
+
         [Header("Turret")]
         [SerializeField, AssetField] internal Turret turret;
         public Turret Turret => turret;
@@ -75,31 +80,36 @@ namespace Game.Components
                 if (!MenuManager.AnyMenuVisible && !Input.GetKey(KeyCode.LeftAlt))
                 {
                     Vector2 screenCenter = new Vector2(Screen.width, Screen.height) / 2;
-                    bool targetted = false;
+                    bool targetLocked = false;
 
-                    for (int i = RegisteredObjects.Units.Count - 1; i >= 0; i--)
+                    if (EnableTargetLocking)
                     {
-                        var unit = RegisteredObjects.Units[i];
-                        if (unit == null)
-                        { continue; }
-                        if (TeamManager.Instance.GetFuckYou(TeamHash, unit.TeamHash) < 0f)
-                        { continue; }
+                        for (int i = RegisteredObjects.Units.Count - 1; i >= 0; i--)
+                        {
+                            Unit unit = RegisteredObjects.Units[i];
 
-                        Vector3 screenPosition = MainCamera.Camera.WorldToScreenPoint(unit.transform.position);
+                            if (unit == null)
+                            { continue; }
 
-                        if (screenPosition.z <= 0f)
-                        { continue; }
+                            if (TeamManager.Instance.GetFuckYou(TeamHash, unit.TeamHash) < 0f)
+                            { continue; }
 
-                        if ((screenCenter - screenPosition.To2()).sqrMagnitude > 100f)
-                        { continue; }
+                            Vector3 screenPosition = MainCamera.Camera.WorldToScreenPoint(unit.transform.position);
 
-                        turret.SetTarget(unit.transform);
+                            if (screenPosition.z <= 0f)
+                            { continue; }
 
-                        targetted = true;
-                        break;
+                            if ((screenCenter - screenPosition.To2()).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
+                            { continue; }
+
+                            turret.SetTarget(unit.transform);
+
+                            targetLocked = true;
+                            break;
+                        }
                     }
 
-                    if (!targetted)
+                    if (!targetLocked)
                     {
                         var ray = MainCamera.Camera.ScreenPointToRay(screenCenter);
                         var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
@@ -129,31 +139,36 @@ namespace Game.Components
 
                     if (NetcodeUtils.IsOfflineOrServer)
                     {
-                        bool targetted = false;
+                        bool targetLocked = false;
 
-                        for (int i = RegisteredObjects.Units.Count - 1; i >= 0; i--)
+                        if (EnableTargetLocking)
                         {
-                            var unit = RegisteredObjects.Units[i];
-                            if (unit == null)
-                            { continue; }
-                            if (TeamManager.Instance.GetFuckYou(TeamHash, unit.TeamHash) < 0f)
-                            { continue; }
+                            for (int i = RegisteredObjects.Units.Count - 1; i >= 0; i--)
+                            {
+                                Unit unit = RegisteredObjects.Units[i];
 
-                            Vector3 screenPosition = MainCamera.Camera.WorldToScreenPoint(unit.transform.position);
+                                if (unit == null)
+                                { continue; }
 
-                            if (screenPosition.z <= 0f)
-                            { continue; }
+                                if (TeamManager.Instance.GetFuckYou(TeamHash, unit.TeamHash) < 0f)
+                                { continue; }
 
-                            if ((mousePosition - screenPosition.To2()).sqrMagnitude > 100f)
-                            { continue; }
+                                Vector3 screenPosition = MainCamera.Camera.WorldToScreenPoint(unit.transform.position);
 
-                            turret.SetTarget(unit.transform);
+                                if (screenPosition.z <= 0f)
+                                { continue; }
 
-                            targetted = true;
-                            break;
+                                if ((mousePosition - screenPosition.To2()).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
+                                { continue; }
+
+                                turret.SetTarget(unit.transform);
+
+                                targetLocked = true;
+                                break;
+                            }
                         }
 
-                        if (!targetted)
+                        if (!targetLocked)
                         {
                             var ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
                             var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);

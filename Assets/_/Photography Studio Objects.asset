@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfdf0cc926ed7f43bca30a4c8252919, type: 3}
+  m_Name: Photography Studio Objects
+  m_EditorClassIdentifier: 
+  Objects:
+  - Name: apc-granate
+    Object: {fileID: 4032902050812513782, guid: 19e567b948cfd9742b38382475c4cbe6,
+      type: 3}
+  - Name: apc-mg
+    Object: {fileID: 44472583122888728, guid: f8dbf41fb105ecd45a65da977d26f3ec, type: 3}
+  - Name: builder
+    Object: {fileID: 4690245384110751948, guid: d35e67d154dc0e6468bf4096c5d64330,
+      type: 3}
+  - Name: drone
+    Object: {fileID: 8062244046001752334, guid: d6cc4e5438db13d44aec59fb38f1f0a0,
+      type: 3}
+  - Name: tank
+    Object: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd,
+      type: 3}
+  - Name: factory
+    Object: {fileID: 2759722349239998939, guid: bfc523d2d2500a847bf8551940258919,
+      type: 3}
+  - Name: research-facility
+    Object: {fileID: 1891352470232770018, guid: a1ae9d1be982a5d4d97e318db36a8e98,
+      type: 3}
+  - Name: turret-howitzer
+    Object: {fileID: 6226412810010601917, guid: 1e1dd8781f09e2146bca38d4122eb17f,
+      type: 3}
+  - Name: turret-mg
+    Object: {fileID: 5949810894222826661, guid: c5057dca95ffbbb4496a743e3fda0976,
+      type: 3}
+  - Name: turret-minigun
+    Object: {fileID: 1726614090810903875, guid: ffd0834e263987d41ab5450a5730fdcf,
+      type: 3}
+  - Name: turret-phalanx
+    Object: {fileID: 1728721395496267737, guid: 76de461b9ea102248ac9a91c67bdd983,
+      type: 3}
+  - Name: turret-rocket
+    Object: {fileID: 4273319253527134430, guid: 9c15fdf5485b1844f8594fda053e798b,
+      type: 3}

@@ -34,15 +34,15 @@ namespace Game.Managers
 
             for (int i = 0; i < SelectionManager.Selected.Length; i++)
             {
-                if (((Component)SelectionManager.Selected[i]).TryGetComponent(out Components.UnitBehaviour_Seek seek))
+                if (SelectionManager.Selected[i].GetObject().TryGetComponent(out Components.UnitBehaviour_Goto @goto))
                 {
-                    seek.Target = worldPosition;
-                    RefreshSeekPositions();
+                    @goto.Target = worldPosition;
+                    RefreshGotoPositions();
                 }
             }
         }
 
-        void RefreshSeekPositions()
+        void RefreshGotoPositions()
         {
             int endlessSafe = 20;
 
@@ -63,15 +63,15 @@ namespace Game.Managers
 
             for (int i = 0; i < SelectionManager.Selected.Length; i++)
             {
-                if (((Component)SelectionManager.Selected[i]).TryGetComponent(out Components.UnitBehaviour_Seek seek))
+                if (SelectionManager.Selected[i].GetObject().TryGetComponent(out Components.UnitBehaviour_Goto @goto))
                 {
-                    SeekTargetInstances[i].transform.position = seek.Target + new Vector3(0f, 0.05f, 0f);
-                    if (seek.Target != Vector3.zero)
+                    SeekTargetInstances[i].transform.position = @goto.Target + new Vector3(0f, 0.05f, 0f);
+                    if (@goto.Target != Vector3.zero)
                     {
                         bool clustered = false;
                         for (int j = 0; j < positions.Count; j++)
                         {
-                            Vector2 diff = positions[j] - seek.Target.To2D();
+                            Vector2 diff = positions[j] - @goto.Target.To2D();
                             if (diff.sqrMagnitude < 1f)
                             {
                                 clustered = true;
@@ -80,7 +80,7 @@ namespace Game.Managers
                         }
                         if (!clustered)
                         {
-                            positions.Add(seek.Target.To2D());
+                            positions.Add(@goto.Target.To2D());
                         }
                         SeekTargetInstances[i].SetActive(!clustered);
                     }
@@ -97,8 +97,6 @@ namespace Game.Managers
         }
 
         void OnSelectionChanged()
-        {
-            RefreshSeekPositions();
-        }
+        { RefreshGotoPositions(); }
     }
 }

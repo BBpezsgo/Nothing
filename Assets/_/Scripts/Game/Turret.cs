@@ -85,6 +85,9 @@ namespace Game.Components
         [SerializeField, AssetField] internal float reloadTime = 1f;
         [SerializeField, ReadOnly] float reload;
 
+        internal float CurrentReload => reload;
+        internal float ReloadPercent => (reloadTime <= 0f) ? 1f : (1f - Mathf.Clamp01(reload / reloadTime));
+
         [Header("Projectile")]
         [SerializeField, AssetField] internal float projectileVelocity = 100f;
         [Tooltip("-1 means infinity")]
@@ -134,6 +137,8 @@ namespace Game.Components
         [SerializeField, ReadOnly] Vector2 overridedInput = Vector2.zero;
 
         [SerializeField, ReadOnly] internal BaseObject @base;
+
+        internal Transform TargetTransform => targetTransform;
 
         internal Vector2 Input
         {
@@ -217,6 +222,9 @@ namespace Game.Components
         internal float ShootHeight => shootPosition.position.y;
         public bool IsAccurateShoot => currentError <= 0.001f;
         [SerializeField, ReadOnly] float currentError = 1f;
+
+        Vector3 predictedOffset;
+        internal Vector3 PredictedOffset => predictedOffset;
 
         float CannonRotationFix => -(90f - Vector3.SignedAngle(transform.forward, Vector3.up, transform.forward));
 
@@ -345,6 +353,7 @@ namespace Game.Components
 
             if (targetPosition == Vector3.zero)
             {
+                predictedOffset = Vector3.zero;
                 // RotateTurret();
                 // RotateCannon();
                 currentError = 1f;
@@ -354,6 +363,7 @@ namespace Game.Components
                 Vector2 input;
                 if (overridedInput != Vector2.zero)
                 {
+                    predictedOffset = Vector3.zero;
                     input = overridedInput;
                     this.input = input;
                 }
@@ -372,8 +382,8 @@ namespace Game.Components
                 RotateCannon(input.y);
             }
 
-            Debug.DrawLine(ShootPosition, transform.position + transform.forward * 150f, Color.yellow, Time.fixedDeltaTime);
-            Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.fixedDeltaTime);
+            // Debug.DrawLine(ShootPosition, transform.position + transform.forward * 150f, Color.yellow, Time.fixedDeltaTime);
+            // Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.fixedDeltaTime);
         }
 
         Vector2 CalculateInputVector(Vector3 targetPosition, Vector3 targetVelocity)
@@ -391,10 +401,15 @@ namespace Game.Components
                 if (targetVelocity.To2D().sqrMagnitude > .1f)
                 {
                     Vector2 offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity);
-                    targetPosition += offset.To3D() * 1.01f;
-                }
+                    Vector3 offset3 = offset.To3D() * 1.01f;
+                    predictedOffset = offset3;
 
-                Debug.DrawLine(transform.position, targetPosition, Color.green, Time.fixedDeltaTime);
+                    targetPosition += offset3;
+                }
+                else
+                { predictedOffset = Vector3.zero; }
+
+                // Debug.DrawLine(transform.position, targetPosition, Color.green, Time.fixedDeltaTime);
 
                 float targetAngle;
 
@@ -422,8 +437,12 @@ namespace Game.Components
                 if (targetVelocity.To2D().sqrMagnitude > .1f)
                 {
                     Vector2 offset = Acceleration.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity, projectile.GetComponent<Projectile>().Acceleration);
+                    predictedOffset = offset.To3D();
+
                     targetPosition += offset.To3D();
                 }
+                else
+                { predictedOffset = Vector3.zero; }
 
                 Vector3 rotationToTarget = Quaternion.LookRotation(targetPosition - shootPosition.position).eulerAngles;
 
@@ -450,7 +469,10 @@ namespace Game.Components
         }
 
         internal Vector3? PredictImpact()
+            => PredictImpact(out _);
+        internal Vector3? PredictImpact(out bool outOfRange)
         {
+            outOfRange = false;
             if (!IsBallisticProjectile)
             {
                 return (projectileVelocity * CurrentProjectileLifetime * shootPosition.forward) + shootPosition.position;
@@ -477,12 +499,13 @@ namespace Game.Components
                     float x2 = displacement.x;
                     if (x2 < x)
                     {
+                        outOfRange = true;
                         point = (shootPosition.position - x2 * turretRotation);
                         point.y = displacement.y;
                     }
                 }
 
-                point.y = Mathf.Max(point.y, TheTerrain.Height(point));
+                // point.y = Mathf.Max(point.y, TheTerrain.Height(point));
 
                 return point;
             }

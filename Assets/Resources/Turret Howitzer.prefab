@@ -62,6 +62,7 @@ GameObject:
   - component: {fileID: 7158176234996842188}
   - component: {fileID: 6226412810010601892}
   - component: {fileID: 1851574223832857102}
+  - component: {fileID: 7130314546047162097}
   m_Layer: 0
   m_Name: Turret Howitzer
   m_TagString: Untagged
@@ -129,6 +130,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   BaseObject: {fileID: 0}
+  EnableTargetLocking: 1
+  TargetLockingThreshold: 30
   turret: {fileID: 6226412810601977229}
   ScopeSensitivity: 1
   HullRotationStabilizer: 0
@@ -318,6 +321,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7130314546047162097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6226412810010601917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6226412810108448074
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,6 +450,7 @@ MonoBehaviour:
   CannonKnockbackSpeed: 10
   UseBarrelInstead: 1
   CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
   Barrel: {fileID: 7864771825973627589}

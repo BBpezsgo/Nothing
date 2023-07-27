@@ -18,6 +18,7 @@ namespace Game.Components
         {
             [SerializeField, ReadOnly] internal string PrefabID;
             [SerializeField, ReadOnly] internal float RequiedProgress;
+            [SerializeField, ReadOnly] internal string ThumbnailID;
 
             [SerializeField, ReadOnly] internal float Progress;
 
@@ -38,7 +39,7 @@ namespace Game.Components
             {
                 if (Queue.Count == 0) return 0f;
                 var producing = Queue[0];
-                return producing.Progress / producing.RequiedProgress;
+                return Mathf.Clamp01(producing.Progress / producing.RequiedProgress);
             }
         }
 
@@ -115,6 +116,7 @@ namespace Game.Components
                     Progress = 0f,
                     RequiedProgress = unit.ProgressRequied,
                     PrefabID = unit.PrefabID,
+                    ThumbnailID = unit.ThumbnailID,
                 });
 
                 if (UnitFactoryManager.Instance.SelectedFactory == this)

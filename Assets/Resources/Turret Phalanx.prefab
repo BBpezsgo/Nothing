@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 1728721395496267712}
   - component: {fileID: 7918142236879452903}
   - component: {fileID: 4113071836290615044}
+  - component: {fileID: -5095436802493503044}
   m_Layer: 0
   m_Name: Turret Phalanx
   m_TagString: Untagged
@@ -280,6 +281,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-5095436802493503044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728721395496267737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1728721395539979054
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,9 +405,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 0}
   Barrel: {fileID: 0}
+  HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0

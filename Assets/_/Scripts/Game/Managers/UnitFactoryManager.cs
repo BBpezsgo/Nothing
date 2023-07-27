@@ -18,8 +18,9 @@ namespace Game.Managers
 
         [Header("UI")]
         [SerializeField] UIDocument FactoryUI;
+        [SerializeField] VisualTreeAsset ProducableElement;
         [SerializeField] VisualTreeAsset QueueElement;
-        VisualElement BarProgress;
+        ProgressBar BarProgress;
 
         [SerializeField, ReadOnly, NonReorderable] ProducableUnit[] Units;
 
@@ -28,6 +29,7 @@ namespace Game.Managers
         {
             [SerializeField, ReadOnly] internal string PrefabID;
             [SerializeField, ReadOnly] internal float ProgressRequied;
+            [SerializeField, ReadOnly] internal string ThumbnailID;
 
             public ProducableUnit()
             { }
@@ -36,6 +38,7 @@ namespace Game.Managers
             {
                 PrefabID = other.Unit.name;
                 ProgressRequied = other.ProgressRequied;
+                ThumbnailID = other.ThumbnailID;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -47,19 +50,23 @@ namespace Game.Managers
 
         InputUtils.PriorityKey KeyEsc;
 
-        void ListBuildings()
+        void ListUnits()
         {
             var container = FactoryUI.rootVisualElement.Q<VisualElement>("unity-content-container");
             container.Clear();
             for (int i = 0; i < Units.Length; i++)
             {
-                Button button = new()
-                {
-                    name = $"btn-{i}",
-                    text = $"{Units[i].PrefabID}",
-                };
-                button.clickable.clickedWithEventInfo += Clickable_clickedWithEventInfo;
-                container.Add(button);
+                TemplateContainer newElement = ProducableElement.Instantiate();
+
+                newElement.Q<Label>().text = Units[i].PrefabID;
+
+                if (PlayerData.TryGetThumbnail(Units[i].ThumbnailID, out Texture2D thumbnail))
+                { newElement.Q<VisualElement>("image").style.backgroundImage = new StyleBackground(thumbnail); }
+
+                newElement.Q<Button>().name = $"btn-{i}";
+                newElement.Q<Button>().clickable.clickedWithEventInfo += Clickable_clickedWithEventInfo;
+
+                container.Add(newElement);
             }
         }
 
@@ -79,9 +86,9 @@ namespace Game.Managers
 
             SelectedFactory = factory;
             FactoryUI.gameObject.SetActive(true);
-            ListBuildings();
+            ListUnits();
 
-            BarProgress = FactoryUI.rootVisualElement.Q<VisualElement>("bar-progress");
+            BarProgress = FactoryUI.rootVisualElement.Q<ProgressBar>("progressbar-progress");
         }
 
         ProducableUnit[] GetUnits()
@@ -137,6 +144,8 @@ namespace Game.Managers
                 TemplateContainer newElement = QueueElement.Instantiate();
 
                 newElement.Q<Label>().text = queue[i].PrefabID;
+                if (PlayerData.TryGetThumbnail(queue[i].ThumbnailID, out Texture2D thumbnail))
+                { newElement.Q<VisualElement>("image").style.backgroundImage = new StyleBackground(thumbnail); }
 
                 container.Add(newElement);
             }
@@ -151,9 +160,7 @@ namespace Game.Managers
             }
 
             if (BarProgress != null)
-            {
-                BarProgress.style.width = new StyleLength(new Length(SelectedFactory.Progress * 100f, LengthUnit.Percent));
-            }
+            { BarProgress.value = SelectedFactory.Progress; }
         }
     }
 }

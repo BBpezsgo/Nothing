@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 7471369896691502036}
   - component: {fileID: 5949810894222826684}
   - component: {fileID: 3510143468843732325}
+  - component: {fileID: 5247521709011207244}
   m_Layer: 0
   m_Name: Turret MG
   m_TagString: Untagged
@@ -350,6 +351,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5247521709011207244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5949810894222826661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5949810895189417647
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,7 +598,10 @@ MonoBehaviour:
   Knockback: 1
   CannonKnockback: 0
   CannonKnockbackRestoreSpeed: 1
-  CannonKnockbackPosition: {x: 0, y: 0}
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 3510143468843732325}
   ShootSound: {fileID: 8300000, guid: 7b95848550a2fa14d8e4701cbcac7c36, type: 3}
   Barrel: {fileID: 0}

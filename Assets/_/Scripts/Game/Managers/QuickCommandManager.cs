@@ -11,7 +11,6 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
     Texture2D SphereFilled;
     Texture2D Sphere;
-    Material SolidMaterial;
     [SerializeField] int Size = 120;
     [SerializeField] float CircleThicknessValue = .25f;
     [SerializeField, Min(.0000001f)] float ActionScale = 1f;
@@ -35,7 +34,6 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     void Start()
     {
         RegenerateTextures();
-        SolidMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
 
         LeftMouse = new InputUtils.AdvancedMouse(MouseButton.Left, 14, MouseCondition, HOLD_TIME_REQUIREMENT);
         LeftMouse.OnClick += LeftMouse_OnClick;
@@ -45,11 +43,11 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     {
         if (SphereFilled != null)
         { Texture2D.Destroy(SphereFilled); }
-        SphereFilled = GenerateCircleFilled(Vector2Int.one * 128);
+        SphereFilled = GUIUtils.GenerateCircleFilled(Vector2Int.one * 128);
 
         if (Sphere != null)
         { Texture2D.Destroy(Sphere); }
-        Sphere = GenerateCircle(Vector2Int.one * 128, CircleThicknessValue);
+        Sphere = GUIUtils.GenerateCircle(Vector2Int.one * 128, CircleThicknessValue);
     }
 
     void Update()
@@ -93,55 +91,6 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         WorldPosition = MainCamera.Camera.ScreenToWorldPosition(position);
 
         IsShown = true;
-    }
-
-    static Texture2D GenerateCircleFilled(Vector2Int size)
-    {
-        var result = new Texture2D(size.x, size.y);
-        Vector2 center = Vector2.one * .5f;
-        for (int x = 0; x < result.width; x++)
-        {
-            for (int y = 0; y < result.height; y++)
-            {
-                Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Vector2.Distance(p, center);
-                if (d < .5f)
-                {
-                    result.SetPixel(x, y, Color.white);
-                }
-                else
-                {
-                    result.SetPixel(x, y, new Color(1, 1, 1, 0));
-                }
-            }
-        }
-        result.Apply();
-        return result;
-    }
-
-    static Texture2D GenerateCircle(Vector2Int size, float thickness = .25f)
-    {
-        thickness = Mathf.Clamp(thickness, 0f, .5f);
-        var result = new Texture2D(size.x, size.y);
-        Vector2 center = Vector2.one * .5f;
-        for (int x = 0; x < result.width; x++)
-        {
-            for (int y = 0; y < result.height; y++)
-            {
-                Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Vector2.Distance(p, center);
-                if (d < .5f && d >= (.5f - thickness))
-                {
-                    result.SetPixel(x, y, Color.white);
-                }
-                else
-                {
-                    result.SetPixel(x, y, new Color(1, 1, 1, 0));
-                }
-            }
-        }
-        result.Apply();
-        return result;
     }
 
     void OnGUI()
@@ -280,9 +229,10 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
                 GL.PushMatrix();
 
-                SolidMaterial.SetPass(0);
-
-                GLUtils.DrawLine(projectedWorldPosition, startP, 2f, new Color(0f, 0f, 0f, .5f));
+                if (GLUtils.SolidMaterial.SetPass(0))
+                {
+                    GLUtils.DrawLine(projectedWorldPosition, startP, 2f, new Color(0f, 0f, 0f, .5f));
+                }
 
                 GL.PopMatrix();
             }

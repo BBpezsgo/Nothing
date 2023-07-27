@@ -44,6 +44,7 @@ namespace Game.Managers
         [SerializeField, ReadOnly, NonReorderable] PlayerData.ConstructableBuilding[] Buildings;
 
         [Header("UI")]
+        [SerializeField] VisualTreeAsset BuildingButton;
         [SerializeField] UIDocument BuildingUI;
 
         InputUtils.PriorityKey KeyEsc;
@@ -83,17 +84,29 @@ namespace Game.Managers
 
         void ListBuildings()
         {
-            var container = BuildingUI.rootVisualElement.Q<VisualElement>("unity-content-container");
+            VisualElement container = BuildingUI.rootVisualElement.Q<VisualElement>("unity-content-container");
             container.Clear();
+
             for (int i = 0; i < Buildings.Length; i++)
             {
-                Button button = new()
-                {
-                    name = $"btn-{i}",
-                    text = $"{Buildings[i].Building.name}",
-                };
+                TemplateContainer newElement = BuildingButton.Instantiate();
+
+                Button button = newElement.Q<Button>();
+                button.name = $"btn-{i}";
                 button.clickable.clickedWithEventInfo += Clickable_clickedWithEventInfo;
-                container.Add(button);
+
+                if (PlayerData.TryGetThumbnail(Buildings[i].ThumbnailID, out Texture2D thumbnail))
+                {
+                    newElement.Q<VisualElement>("image").style.backgroundImage = new StyleBackground(thumbnail);
+                    button.text = string.Empty;
+                }
+                else
+                {
+                    newElement.Q<VisualElement>("image").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+                    button.text = $"{Buildings[i].Building.name}";
+                }
+
+                container.Add(newElement);
             }
         }
 

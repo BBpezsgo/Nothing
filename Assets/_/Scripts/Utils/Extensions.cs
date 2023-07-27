@@ -9,6 +9,16 @@ using UnityEngine;
 
 internal static class UnclassifiedExtensions
 {
+    public static Rect Padding(this Rect rect, float padding)
+    {
+        float halfPadding = padding / 2;
+        rect.x -= halfPadding;
+        rect.y -= halfPadding;
+        rect.width += padding;
+        rect.height += padding;
+        return rect;
+    }
+
     public static Color Opacity(this Color c, float alpha)
         => new(c.r, c.g, c.b, c.a * alpha);
 
@@ -767,6 +777,16 @@ internal static class RigidbodyEx
 
 internal static class GameObjectEx
 {
+    internal static void SetLayerRecursive(this GameObject @object, LayerMask layer)
+        => SetLayerRecursive(@object, layer.value);
+
+    internal static void SetLayerRecursive(this GameObject @object, int layer)
+    {
+        @object.layer = layer;
+        foreach (Transform child in @object.transform)
+        { SetLayerRecursive(child.gameObject, layer); }
+    }
+
     internal static bool HasComponent<T>(this GameObject obj) where T : Component => obj.TryGetComponent<T>(out _);
     internal static bool HasComponent(this GameObject obj, Type type) => obj.TryGetComponent(type, out _);
 

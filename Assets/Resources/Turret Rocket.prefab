@@ -233,6 +233,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 8401276797070513005}
   ShootSound: {fileID: 8300000, guid: 479c3100a5002fd4e915ef97a6b8cc8d, type: 3}
   Barrel: {fileID: 0}
@@ -344,6 +350,7 @@ GameObject:
   - component: {fileID: 1041381626135451567}
   - component: {fileID: 4273319253527134407}
   - component: {fileID: 8401276797070513005}
+  - component: {fileID: 1040942022075351440}
   m_Layer: 0
   m_Name: Turret Rocket
   m_TagString: Untagged
@@ -599,6 +606,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1040942022075351440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4273319253527134430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4273319253567439913
 GameObject:
   m_ObjectHideFlags: 0

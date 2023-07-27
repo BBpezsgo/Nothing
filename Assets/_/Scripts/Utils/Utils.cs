@@ -125,8 +125,27 @@ internal readonly struct RectUtils
 
 internal static class GLUtils
 {
+    static Material _solidMaterial;
+    internal static Material SolidMaterial
+    {
+        get
+        {
+            if (_solidMaterial == null)
+            { _solidMaterial = new Material(Shader.Find("Hidden/Internal-Colored")); }
+            return _solidMaterial;
+        }
+    }
     internal static void DrawLine(Vector2 a, Vector2 b, float thickness, Color color)
     {
+        if (thickness <= 0f)
+        { return; }
+
+        if (thickness <= 1f)
+        {
+            DrawLine(a, b, color);
+            return;
+        }
+
         Vector2 diff = b - a;
         if (diff.x < 1 &&
             diff.x > -1 &&
@@ -159,6 +178,80 @@ internal static class GLUtils
 
         GL.End();
     }
+    internal static void DrawLine(Vector2 a, Vector2 b, Color color)
+    {
+        Vector2 diff = b - a;
+        if (diff.x < 1 &&
+            diff.x > -1 &&
+            diff.y < 1 &&
+            diff.y > -1)
+        { return; }
+
+        GL.Begin(GL.LINES);
+
+        GL.Color(color);
+
+        GL.Vertex(a);
+        GL.Vertex(b);
+
+        GL.End();
+    }
+}
+
+internal readonly struct GUIUtils
+{
+    internal static Vector2 TransformPoint(Vector2 screenPosition)
+        => new(screenPosition.x, Screen.height - screenPosition.y);
+
+    internal static Texture2D GenerateCircleFilled(Vector2Int size)
+    {
+        var result = new Texture2D(size.x, size.y);
+        Vector2 center = Vector2.one * .5f;
+        for (int x = 0; x < result.width; x++)
+        {
+            for (int y = 0; y < result.height; y++)
+            {
+                Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
+                float d = Vector2.Distance(p, center);
+                if (d < .5f)
+                {
+                    result.SetPixel(x, y, Color.white);
+                }
+                else
+                {
+                    result.SetPixel(x, y, new Color(1, 1, 1, 0));
+                }
+            }
+        }
+        result.Apply();
+        return result;
+    }
+
+    internal static Texture2D GenerateCircle(Vector2Int size, float thickness = .25f)
+    {
+        thickness = Mathf.Clamp(thickness, 0f, .5f);
+        var result = new Texture2D(size.x, size.y);
+        Vector2 center = Vector2.one * .5f;
+        for (int x = 0; x < result.width; x++)
+        {
+            for (int y = 0; y < result.height; y++)
+            {
+                Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
+                float d = Vector2.Distance(p, center);
+                if (d < .5f && d >= (.5f - thickness))
+                {
+                    result.SetPixel(x, y, Color.white);
+                }
+                else
+                {
+                    result.SetPixel(x, y, new Color(1, 1, 1, 0));
+                }
+            }
+        }
+        result.Apply();
+        return result;
+    }
+
 }
 
 namespace Utilities
@@ -278,6 +371,54 @@ namespace Utilities
             return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
 
+
+        static readonly Vector3[] BoundsProjectorCorners = new Vector3[8];
+        static void ProjectBounds(Camera camera, Bounds bounds, Vector3[] result)
+        {
+            result[0] = camera.WorldToScreenPoint(bounds.center + new Vector3(bounds.extents.x, bounds.extents.y, bounds.extents.z));
+            result[1] = camera.WorldToScreenPoint(bounds.center + new Vector3(-bounds.extents.x, bounds.extents.y, bounds.extents.z));
+            result[2] = camera.WorldToScreenPoint(bounds.center + new Vector3(bounds.extents.x, -bounds.extents.y, bounds.extents.z));
+            result[3] = camera.WorldToScreenPoint(bounds.center + new Vector3(-bounds.extents.x, -bounds.extents.y, bounds.extents.z));
+            result[4] = camera.WorldToScreenPoint(bounds.center + new Vector3(bounds.extents.x, bounds.extents.y, -bounds.extents.z));
+            result[5] = camera.WorldToScreenPoint(bounds.center + new Vector3(-bounds.extents.x, bounds.extents.y, -bounds.extents.z));
+            result[6] = camera.WorldToScreenPoint(bounds.center + new Vector3(bounds.extents.x, -bounds.extents.y, -bounds.extents.z));
+            result[7] = camera.WorldToScreenPoint(bounds.center + new Vector3(-bounds.extents.x, -bounds.extents.y, -bounds.extents.z));
+        }
+        internal static bool GetScreenCorners(Bounds bounds, out (Vector2 TopLeft, Vector2 BottomRight) corners)
+            => Utils.GetScreenCorners(Game.MainCamera.Camera, bounds, out corners);
+        internal static bool GetScreenCorners(Camera camera, Bounds bounds, out (Vector2 TopLeft, Vector2 BottomRight) corners)
+        {
+            ProjectBounds(camera, bounds, BoundsProjectorCorners);
+
+            Vector2 topLeft = BoundsProjectorCorners[0];
+            Vector2 bottomRight = BoundsProjectorCorners[0];
+
+            for (int i = 0; i < BoundsProjectorCorners.Length; i++)
+            {
+                Vector3 p = BoundsProjectorCorners[i];
+
+                if (p.z < 0)
+                {
+                    corners = (Vector2.zero, Vector2.zero);
+                    return false;
+                }
+
+                if (p.x < topLeft.x)
+                { topLeft.x = p.x; }
+
+                if (p.y < topLeft.y)
+                { topLeft.y = p.y; }
+
+                if (p.x > bottomRight.x)
+                { bottomRight.x = p.x; }
+
+                if (p.y > bottomRight.y)
+                { bottomRight.y = p.y; }
+            }
+
+            corners = (topLeft, bottomRight);
+            return true;
+        }
     }
 
     internal static class Ballistics
@@ -2129,4 +2270,10 @@ internal readonly struct MouseButton
     internal const int Left = 0;
     internal const int Right = 1;
     internal const int Middle = 2;
+}
+
+internal readonly struct EditorUtils
+{
+    internal static string ProjectPath => System.IO.Path.GetDirectoryName(Application.dataPath);
+    internal static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
 }
