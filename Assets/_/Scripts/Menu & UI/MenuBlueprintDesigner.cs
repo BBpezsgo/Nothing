@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using Utilities;
-
 namespace Game.UI
 {
     public class MenuBlueprintDesigner : SingleInstance<MenuBlueprintDesigner>
@@ -26,7 +24,7 @@ namespace Game.UI
         [SerializeField, ReadOnly] internal bool OnStartCreateNewBlueprint = false;
         [SerializeField, ReadOnly] internal bool OnStartLoadBlueprint = false;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void OnEnable()
         {
@@ -66,7 +64,7 @@ namespace Game.UI
 
         void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, 4, () => MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintDesigner);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 4, () => MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintDesigner);
             KeyEsc.OnDown += OnKeyEsc;
         }
 

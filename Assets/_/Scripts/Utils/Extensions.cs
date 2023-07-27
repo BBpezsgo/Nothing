@@ -9,6 +9,9 @@ using UnityEngine;
 
 internal static class UnclassifiedExtensions
 {
+    public static Color Opacity(this Color c, float alpha)
+        => new(c.r, c.g, c.b, c.a * alpha);
+
     public static T Get<T>(this IReadOnlyList<T> v, int index, T @default)
     {
         if (index < 0 || index >= v.Count)
@@ -276,7 +279,12 @@ internal static class UnclassifiedExtensions
     internal static void SetEmissionColor(this Material material, Color color, float emission)
     {
         material.color = color;
-        material.SetColor("_EmissionColor", color * emission);
+
+        if (material.HasColor("_Emission"))
+        { material.SetColor("_Emission", color * emission); }
+
+        if (material.HasColor("_EmissionColor"))
+        { material.SetColor("_EmissionColor", color * emission); }
     }
 }
 

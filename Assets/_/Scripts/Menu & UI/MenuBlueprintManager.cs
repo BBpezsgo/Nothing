@@ -5,8 +5,6 @@ using Game.Managers;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using Utilities;
-
 namespace Game.UI
 {
     public class MenuBlueprintManager : MonoBehaviour
@@ -17,7 +15,7 @@ namespace Game.UI
         [SerializeField, ReadOnly] ScrollView ScrollViewBlueprints;
         Blueprint[] Blueprints;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void OnEnable()
         {
@@ -48,7 +46,7 @@ namespace Game.UI
 
         void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, 5, () => MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintManager);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 5, () => MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintManager);
             KeyEsc.OnDown += OnKeyEsc;
         }
 

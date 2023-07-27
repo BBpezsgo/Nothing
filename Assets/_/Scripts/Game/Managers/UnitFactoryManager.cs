@@ -8,8 +8,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using Utilities;
-
 namespace Game.Managers
 {
     public class UnitFactoryManager : SingleInstance<UnitFactoryManager>
@@ -47,7 +45,7 @@ namespace Game.Managers
             }
         }
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void ListBuildings()
         {
@@ -113,9 +111,9 @@ namespace Game.Managers
             return units.ToArray();
         }
 
-        private void Start()
+        void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, 5, () => FactoryUI.gameObject.activeSelf);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 5, () => FactoryUI.gameObject.activeSelf);
             KeyEsc.OnDown += OnKeyEsc;
         }
 

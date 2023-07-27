@@ -49,9 +49,9 @@ namespace Game.Components
                 {
                     UiSelected.SetActive(true);
                     if (selectableState == ISelectable.State.Almost)
-                    { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.AlmostSelectedColor, 1f); }
+                    { UiSelected.GetComponent<UnityEngine.Rendering.Universal.DecalProjector>().material.SetEmissionColor(SelectionManager.Instance.AlmostSelectedColor, 1f); }
                     else if (selectableState == ISelectable.State.Selected)
-                    { UiSelected.GetComponent<Renderer>().material.SetEmissionColor(SelectionManager.Instance.SelectedColor, 1f); }
+                    { UiSelected.GetComponent<UnityEngine.Rendering.Universal.DecalProjector>().material.SetEmissionColor(SelectionManager.Instance.SelectedColor, 1f); }
                 }
             }
         }

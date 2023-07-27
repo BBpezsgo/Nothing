@@ -370,6 +370,59 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &196294525
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 196294526}
+  - component: {fileID: 196294527}
+  m_Layer: 0
+  m_Name: Quick Commands
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &196294526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196294525}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 21
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &196294527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196294525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b92388b3d1c2a244adc4c397fbac035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CircleBackground: {r: 0, g: 0, b: 0, a: 0.19607843}
+  CommandBackground: {r: 0.18823531, g: 0.18823531, b: 0.18823531, a: 1}
+  CommandSelectedBackground: {r: 0.341, g: 0.682, b: 1, a: 1}
+  Size: 120
+  CircleThicknessValue: 0.25
+  ActionScale: 1.5
+  ShowSpeed: 10
+  btnRegenerateTextures: 
+  IsShown: 0
 --- !u!1 &219895025
 GameObject:
   m_ObjectHideFlags: 0
@@ -1480,6 +1533,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881633f67c4578f4284aa1fdeee164fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectionBoxColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 0.25}
+  SelectionBoxBorderColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 1}
+  SelectionBoxBorderWidth: 2
   SelectedColor: {r: 0.25, g: 0.69962263, b: 1, a: 1}
   AlmostSelectedColor: {r: 0.7028302, g: 0.9005066, b: 1, a: 1}
   CursorSelect:
@@ -1658,7 +1714,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &804759454
 Transform:
   m_ObjectHideFlags: 0
@@ -2946,6 +3002,7 @@ Transform:
   - {fileID: 712866115}
   - {fileID: 994274802}
   - {fileID: 804759454}
+  - {fileID: 196294526}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

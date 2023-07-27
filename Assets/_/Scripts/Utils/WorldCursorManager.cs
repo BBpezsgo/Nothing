@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using Utilities;
-
 namespace Game.Managers
 {
     internal class WorldCursorManager : SingleInstance<WorldCursorManager>
@@ -14,7 +12,7 @@ namespace Game.Managers
         // [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedWorldCursor = new MonoBehaviour[0];
         // [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedDirectWorldCursor = new MonoBehaviour[0];
 
-        AdvancedPriorityMouse LeftMouseButton;
+        InputUtils.AdvancedMouse LeftMouseButton;
 
         static readonly CursorPriorityComparer CursorPriorityComparer = new();
 
@@ -23,9 +21,8 @@ namespace Game.Managers
 
         void Start()
         {
-            LeftMouseButton = new AdvancedPriorityMouse(MouseButton.Left, 9, MouseCondition);
+            LeftMouseButton = new InputUtils.AdvancedMouse(MouseButton.Left, 9, MouseCondition);
             LeftMouseButton.OnClick += OnLeftMouseButtonClick;
-            MouseManager.RegisterMouse(LeftMouseButton);
         }
 
         void FixedUpdate()
@@ -77,7 +74,7 @@ namespace Game.Managers
             !BuildingManager.Instance.IsBuilding &&
             (SelectionManager.Instance.Selected == null || SelectionManager.Instance.Selected.Length == 0);
 
-        void OnLeftMouseButtonClick(Vector2 position)
+        void OnLeftMouseButtonClick(Vector2 position, float holdTime)
         {
             if (!MouseManager.MouseOnWindow) return;
 

@@ -3,8 +3,6 @@ using Game.Managers;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using Utilities;
-
 namespace Game.UI
 {
     public class MenuScenes : MonoBehaviour
@@ -12,11 +10,11 @@ namespace Game.UI
         [SerializeField, ReadOnly] UIDocument UI;
         [SerializeField] VisualTreeAsset SceneElement;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, 10, InputCondition);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 10, InputCondition);
             KeyEsc.OnDown += OnKeyEsc;
         }
 

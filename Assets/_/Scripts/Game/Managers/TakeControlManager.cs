@@ -12,8 +12,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using Utilities;
-
 namespace Game.Managers
 {
     public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
@@ -38,7 +36,7 @@ namespace Game.Managers
 
         [SerializeField] LayerMask CursorHitLayer;
 
-        AdvancedPriorityMouse LeftMouse;
+        InputUtils.AdvancedMouse LeftMouse;
 
         ICanTakeControl[] units = new ICanTakeControl[0];
 
@@ -56,7 +54,7 @@ namespace Game.Managers
         [SerializeField, ReadOnly] UIDocument UI;
         [SerializeField] VisualTreeAsset ProjectileButton;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         ProgressBar BarHealth;
 
@@ -98,13 +96,12 @@ namespace Game.Managers
             HideCursor(IngameCursorBlue);
             HideCursor(IngameCursorRed);
 
-            LeftMouse = new AdvancedPriorityMouse(Utilities.MouseButton.Left, 11, InputCondition);
+            LeftMouse = new InputUtils.AdvancedMouse(MouseButton.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
-            MouseManager.RegisterMouse(LeftMouse);
 
             CursorImageManager.Instance.Register(this);
 
-            KeyEsc = new PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
             KeyEsc.OnDown += OnKeyEsc;
 
             ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -268,7 +265,7 @@ namespace Game.Managers
             return null;
         }
 
-        void OnLeftMouseDown(Vector2 position)
+        void OnLeftMouseDown(Vector2 position, float holdTime)
         {
             if (!Input.GetKey(KeyCode.LeftControl)) return;
             if (!MouseManager.MouseOnWindow) return;

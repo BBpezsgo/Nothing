@@ -1,3 +1,5 @@
+using InputUtils;
+
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -9,8 +11,7 @@ namespace Game.Managers
     {
         static MouseManager Instance;
 
-        List<Utilities.AdvancedPriorityMouse> Mouses;
-        static readonly Utilities.AdvancedPriorityMouseComparer Comparer = new();
+        List<AdvancedMouse> Mouses;
 
         [SerializeField, ReadOnly] float TimeToNextUICollecting = 1f;
         [SerializeField, ReadOnly, NonReorderable] UIDocument[] UIDocuments;
@@ -44,7 +45,7 @@ namespace Game.Managers
                 return;
             }
             Instance = this;
-            Mouses = new List<Utilities.AdvancedPriorityMouse>();
+            Mouses = new List<AdvancedMouse>();
         }
 
         void Update()
@@ -65,16 +66,10 @@ namespace Game.Managers
             }
         }
 
-        void RegisterMouse_(Utilities.AdvancedPriorityMouse mouse)
+        void RegisterMouse_(AdvancedMouse mouse)
         {
             Mouses.Add(mouse);
-            Mouses.Sort(Comparer);
-        }
-
-        void DeregisterMouse_(Utilities.AdvancedPriorityMouse mouse)
-        {
-            Mouses.Remove(mouse);
-            Mouses.Sort(Comparer);
+            Mouses.Sort();
         }
 
         bool IsPointerOverUI_(Vector2 screenPosition)
@@ -113,9 +108,7 @@ namespace Game.Managers
         internal static bool IsPointerOverUI()
             => Instance.IsPointerOverUI_(Input.mousePosition);
 
-        internal static void RegisterMouse(Utilities.AdvancedPriorityMouse mouse)
+        internal static void RegisterMouse(AdvancedMouse mouse)
             => Instance.RegisterMouse_(mouse);
-        internal static void DeregisterMouse(Utilities.AdvancedPriorityMouse mouse)
-            => Instance.DeregisterMouse_(mouse);
     }
 }

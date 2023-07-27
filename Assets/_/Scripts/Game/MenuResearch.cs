@@ -20,9 +20,9 @@ namespace Game.UI
         ScrollView ScrollviewResearchables;
         Researchable[] researchables;
 
-        List<ResearchableProgressbar> ResearchableProgressbars = new();
+        readonly List<ResearchableProgressbar> ResearchableProgressbars = new();
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         class ResearchableProgressbar
         {
@@ -55,7 +55,7 @@ namespace Game.UI
 
         void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, 3, () => gameObject != null && gameObject.activeSelf);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 3, () => gameObject != null && gameObject.activeSelf);
             KeyEsc.OnDown += OnKeyEsc;
         }
 

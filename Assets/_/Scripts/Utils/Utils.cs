@@ -6,12 +6,10 @@ using System.Linq;
 using UnityEngine;
 
 using Unity.Netcode;
-using Unity.Collections;
 
 using Game.Components;
 using Game.Managers;
 
-using Networking.Managers;
 using Networking;
 
 #if UNITY_EDITOR
@@ -116,6 +114,50 @@ internal struct Triangle
         {
             return edge3Pt;
         }
+    }
+}
+
+internal readonly struct RectUtils
+{
+    internal static Rect Center(Vector2 center, Vector2 size)
+        => new(center - (size * .5f), size);
+}
+
+internal static class GLUtils
+{
+    internal static void DrawLine(Vector2 a, Vector2 b, float thickness, Color color)
+    {
+        Vector2 diff = b - a;
+        if (diff.x < 1 &&
+            diff.x > -1 &&
+            diff.y < 1 &&
+            diff.y > -1)
+        { return; }
+
+        Vector2 direction = diff.normalized;
+
+        Vector2 left = new(-direction.y, direction.x);
+        Vector2 right = new(direction.y, -direction.x);
+
+        Vector2 pointA = a + (left * thickness);
+        Vector2 pointB = a + (right * thickness);
+
+        Vector2 pointC = b + (right * thickness);
+        Vector2 pointD = b + (left * thickness);
+
+        GL.Begin(GL.TRIANGLES);
+
+        GL.Color(color);
+
+        GL.Vertex(pointA);
+        GL.Vertex(pointB);
+        GL.Vertex(pointC);
+
+        GL.Vertex(pointA);
+        GL.Vertex(pointC);
+        GL.Vertex(pointD);
+
+        GL.End();
     }
 }
 
@@ -1292,7 +1334,9 @@ namespace Utilities
         /// <summary>
         /// Square with edge of length 1
         /// </summary>
+#pragma warning disable IDE0052 // Remove unread private members
         static readonly Vector4[] s_UnitSquare =
+#pragma warning restore IDE0052 // Remove unread private members
         {
             new Vector4(-0.5f, 0.5f, 0, 1),
             new Vector4(0.5f, 0.5f, 0, 1),
@@ -1460,194 +1504,6 @@ namespace Utilities
             Debug.DrawLine(position - right, position + right, color, duration);
             Debug.DrawLine(position - forward, position + forward, color, duration);
         }
-    }
-
-    internal delegate bool InputConditionEnabler();
-
-    internal class AdvancedMouse
-    {
-        internal delegate void OnDragEvent(Vector2 start, Vector2 current);
-        internal delegate void OnDraggedEvent(Vector2 start, Vector2 end);
-        internal delegate void OnClickEvent(Vector2 position);
-        internal delegate void OnDownEvent(Vector2 position);
-
-        internal readonly int ButtonID;
-
-        internal event OnDragEvent OnDrag;
-        internal event OnDraggedEvent OnDragged;
-        internal event OnClickEvent OnClick;
-        internal event OnDownEvent OnDown;
-
-        internal Vector2 DraggingStartPosition => PositionBeforeDrag;
-        internal bool IsDragging => Drag && !ClickedOnUI;
-
-        /// <summary>
-        /// This must be squared!
-        /// </summary>
-        internal const float DRAG_THRESHOLD = 5f;
-
-        readonly InputConditionEnabler conditionEnabler;
-
-        Vector2 PositionBeforeDrag;
-        bool Drag;
-
-        bool ClickedOnUI;
-
-        static Vector2 Position => Input.mousePosition;
-
-        public AdvancedMouse(int buttonId)
-        {
-            this.ButtonID = buttonId;
-            this.conditionEnabler = null;
-        }
-
-        public AdvancedMouse(int buttonId, InputConditionEnabler conditionEnabler)
-        {
-            this.ButtonID = buttonId;
-            this.conditionEnabler = conditionEnabler;
-        }
-
-        internal void Update()
-        {
-            if ((conditionEnabler != null && !conditionEnabler.Invoke()))
-            {
-                Reset();
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(ButtonID))
-            {
-                PositionBeforeDrag = Position;
-                Drag = false;
-
-                ClickedOnUI = MouseManager.IsPointerOverUI(PositionBeforeDrag);
-
-                if (!ClickedOnUI) OnDown?.Invoke(PositionBeforeDrag);
-            }
-            else if (Input.GetMouseButtonUp(ButtonID))
-            {
-                if (Drag)
-                {
-                    if (!ClickedOnUI) OnDragged?.Invoke(PositionBeforeDrag, Position);
-                }
-                else
-                {
-                    if (!ClickedOnUI) OnClick?.Invoke(Position);
-                }
-
-                PositionBeforeDrag = Position;
-                Drag = false;
-            }
-            else if (Input.GetMouseButton(ButtonID))
-            {
-                if (!Drag && (new Vector2(Position.x, Position.y) - PositionBeforeDrag).sqrMagnitude > DRAG_THRESHOLD)
-                { Drag = true; }
-
-                if (Drag)
-                {
-                    if (!ClickedOnUI) OnDrag?.Invoke(PositionBeforeDrag, Position);
-                }
-            }
-        }
-
-        internal void Reset()
-        {
-            this.PositionBeforeDrag = Vector2.zero;
-            this.ClickedOnUI = false;
-            this.Drag = false;
-        }
-    }
-
-    internal class AdvancedPriorityMouse : AdvancedMouse
-    {
-        internal readonly int Priority;
-
-        public AdvancedPriorityMouse(int buttonId, int priority) : base(buttonId)
-        {
-            this.Priority = priority;
-        }
-
-        public AdvancedPriorityMouse(int buttonId, int priority, InputConditionEnabler conditionEnabler) : base(buttonId, conditionEnabler)
-        {
-            this.Priority = priority;
-        }
-    }
-
-    internal class AdvancedPriorityMouseComparer : Comparer<AdvancedPriorityMouse>
-    {
-        public override int Compare(AdvancedPriorityMouse a, AdvancedPriorityMouse b)
-            => Comparer.Default.Compare(b.Priority, a.Priority);
-    }
-
-    [Serializable]
-    internal class PriorityKey : IComparable<PriorityKey>
-    {
-        internal delegate void KeyEvent();
-
-        readonly InputConditionEnabler ConditionEnabler;
-
-        [SerializeField, ReadOnly] internal KeyCode Key;
-        [SerializeField, ReadOnly] internal int Priority;
-        internal event KeyEvent OnDown;
-        internal event KeyEvent OnHold;
-        internal event KeyEvent OnUp;
-
-        public PriorityKey(KeyCode key, int priority)
-        {
-            this.Key = key;
-            this.Priority = priority;
-            this.ConditionEnabler = null;
-            KeyboardManager.Register(this);
-        }
-
-        public PriorityKey(KeyCode key, int priority, InputConditionEnabler conditionEnabler) : this(key, priority)
-        {
-            this.ConditionEnabler = conditionEnabler;
-        }
-
-        internal bool Update()
-        {
-            if (ConditionEnabler != null && !ConditionEnabler.Invoke())
-            { return false; }
-
-            bool consumed = false;
-
-            if (OnDown != null && Input.GetKeyDown(Key))
-            {
-                OnDown.Invoke();
-                consumed = true;
-            }
-
-            if (OnHold != null && Input.GetKey(Key))
-            {
-                OnHold.Invoke();
-                consumed = true;
-            }
-
-            if (OnUp != null && Input.GetKeyUp(Key))
-            {
-                OnUp.Invoke();
-                consumed = true;
-            }
-
-            return consumed;
-        }
-
-        public int CompareTo(PriorityKey other)
-            => Comparer.Default.Compare(other.Priority, this.Priority);
-    }
-
-    internal class PriorityKeyComparer : Comparer<PriorityKey>
-    {
-        public override int Compare(PriorityKey a, PriorityKey b)
-            => a.CompareTo(b);
-    }
-
-    internal static class MouseButton
-    {
-        internal const int Left = 0;
-        internal const int Right = 1;
-        internal const int Middle = 2;
     }
 
     internal struct AI
@@ -2054,4 +1910,223 @@ public class SearcherCoroutine<T>
 
         isRunning = false;
     }
+}
+
+namespace InputUtils
+{
+    internal delegate bool InputConditionEnabler();
+
+    internal class AdvancedInput
+    {
+        protected readonly InputConditionEnabler ConditionEnabler;
+        internal readonly int Priority;
+
+        public AdvancedInput(int priority)
+            : this(priority, null) { }
+
+        public AdvancedInput(int priority, InputConditionEnabler conditionEnabler)
+        {
+            this.Priority = priority;
+            this.ConditionEnabler = conditionEnabler;
+        }
+    }
+
+    internal class AdvancedMouse : AdvancedInput, IComparable<AdvancedMouse>
+    {
+        internal delegate void DragEvent(Vector2 start, Vector2 current);
+        internal delegate void DraggedEvent(Vector2 start, Vector2 end);
+        internal delegate void ClickEvent(Vector2 position, float holdTime);
+        internal delegate void DownEvent(Vector2 position, float holdTime);
+
+        internal event DragEvent OnDrag;
+        internal event DraggedEvent OnDragged;
+        internal event ClickEvent OnClick;
+        internal event DownEvent OnDown;
+
+        internal readonly int ButtonID;
+
+        static Vector2 Position => Input.mousePosition;
+
+        bool ClickedOnUI;
+
+        internal Vector2 DragStart { get; private set; }
+        internal bool IsActive { get; private set; }
+        internal bool IsDragging => Drag && !ClickedOnUI;
+        bool Drag;
+        internal const float DragThreshold = 25f;
+        internal static readonly float DragThresholdSqr = Mathf.Sqrt(DragThreshold);
+
+        float PressedAt;
+        readonly float UpTimeout;
+
+        bool DownInvoked;
+        bool UpInvoked;
+
+        internal float HoldTime => Time.unscaledTime - PressedAt;
+
+        internal AdvancedMouse(int buttonId, int priority)
+            : this(buttonId, priority, null, 0f) { }
+
+        internal AdvancedMouse(int buttonId, int priority, InputConditionEnabler conditionEnabler)
+            : this(buttonId, priority, conditionEnabler, 0f) { }
+
+        internal AdvancedMouse(int buttonId, int priority, float upTimeout)
+            : this(buttonId, priority, null, upTimeout) { }
+
+        internal AdvancedMouse(int buttonId, int priority, InputConditionEnabler conditionEnabler, float upTimeout)
+            : base(priority, conditionEnabler)
+        {
+            this.ButtonID = buttonId;
+            this.UpTimeout = upTimeout;
+            MouseManager.RegisterMouse(this);
+        }
+
+        internal void Update()
+        {
+            if (!(ConditionEnabler?.Invoke() ?? true))
+            {
+                Reset();
+                return;
+            }
+
+            this.IsActive = true;
+
+            if (Input.GetMouseButtonDown(ButtonID))
+            { Down(); }
+            else if (Input.GetMouseButtonUp(ButtonID))
+            { Up(); }
+            else if (Input.GetMouseButton(ButtonID))
+            { Hold(); }
+        }
+
+        internal void Reset()
+        {
+            this.DragStart = Vector2.zero;
+            this.ClickedOnUI = false;
+            this.Drag = false;
+            this.UpInvoked = true;
+            this.DownInvoked = false;
+            this.PressedAt = 0f;
+            this.IsActive = false;
+        }
+
+        void Down()
+        {
+            DownInvoked = true;
+            DragStart = Position;
+            Drag = false;
+            PressedAt = Time.unscaledTime;
+            UpInvoked = false;
+            ClickedOnUI = MouseManager.IsPointerOverUI(Position);
+
+            if (!ClickedOnUI)
+            { OnDown?.Invoke(Position, HoldTime); }
+        }
+
+        void Hold()
+        {
+            if (!DownInvoked)
+            { return; }
+
+            if (!Drag && (Position - DragStart).sqrMagnitude > DragThresholdSqr)
+            { Drag = true; }
+
+            if (Drag)
+            {
+                if (!ClickedOnUI)
+                { OnDrag?.Invoke(DragStart, Position); }
+            }
+
+            if (UpTimeout != 0f && UpTimeout < HoldTime)
+            { Up(); }
+        }
+
+        void Up()
+        {
+            if (!DownInvoked)
+            { return; }
+
+            if (!UpInvoked)
+            {
+                if (Drag)
+                {
+                    if (!ClickedOnUI)
+                    { OnDragged?.Invoke(DragStart, Position); }
+                }
+                else
+                {
+                    if (!ClickedOnUI)
+                    { OnClick?.Invoke(Position, HoldTime); }
+                }
+            }
+
+            DragStart = Vector2.zero;
+            Drag = false;
+            UpInvoked = true;
+            PressedAt = 0f;
+            IsActive = false;
+        }
+
+        public int CompareTo(AdvancedMouse other)
+            => Comparer.DefaultInvariant.Compare(other.Priority, this.Priority);
+    }
+
+    internal class PriorityKey : AdvancedInput, IComparable<PriorityKey>
+    {
+        internal delegate void KeyEvent();
+
+        internal event KeyEvent OnDown;
+        internal event KeyEvent OnHold;
+        internal event KeyEvent OnUp;
+
+        internal readonly KeyCode Key;
+
+        internal PriorityKey(KeyCode key, int priority)
+            : this(key, priority, null) { }
+
+        internal PriorityKey(KeyCode key, int priority, InputConditionEnabler conditionEnabler)
+            : base(priority, conditionEnabler)
+        {
+            this.Key = key;
+            KeyboardManager.Register(this);
+        }
+
+        internal bool Update()
+        {
+            if (ConditionEnabler != null && !ConditionEnabler.Invoke())
+            { return false; }
+
+            bool consumed = false;
+
+            if (OnDown != null && Input.GetKeyDown(Key))
+            {
+                OnDown.Invoke();
+                consumed = true;
+            }
+
+            if (OnHold != null && Input.GetKey(Key))
+            {
+                OnHold.Invoke();
+                consumed = true;
+            }
+
+            if (OnUp != null && Input.GetKeyUp(Key))
+            {
+                OnUp.Invoke();
+                consumed = true;
+            }
+
+            return consumed;
+        }
+
+        public int CompareTo(PriorityKey other)
+            => Comparer.DefaultInvariant.Compare(other.Priority, this.Priority);
+    }
+}
+
+internal readonly struct MouseButton
+{
+    internal const int Left = 0;
+    internal const int Right = 1;
+    internal const int Middle = 2;
 }

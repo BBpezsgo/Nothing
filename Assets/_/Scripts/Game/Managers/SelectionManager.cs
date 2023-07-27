@@ -1,5 +1,4 @@
 using Game.Components;
-using Game.Managers;
 using Game.UI;
 
 using System.Collections.Generic;
@@ -19,10 +18,17 @@ namespace Game.Managers
         // bool DragFinished = false;
         float AlmostSelectTimer = 0f;
 
+        [Header("UI - Selection Box")]
+        [SerializeField] internal Color SelectionBoxColor = new(.8f, .8f, .95f, .25f);
+        [SerializeField] internal Color SelectionBoxBorderColor = new(.8f, .8f, .95f);
+        [SerializeField, Min(0f)] internal float SelectionBoxBorderWidth = 2f;
+
+        [Header("UI - Game")]
         [SerializeField] internal Color SelectedColor;
         [SerializeField] internal Color AlmostSelectedColor;
         // MeshCollider SelectionMeshCollider;
 
+        [Header("Cursors")]
         [SerializeField] CursorConfig CursorSelect;
         [SerializeField] CursorConfig CursorGoTo;
 
@@ -31,8 +37,8 @@ namespace Game.Managers
         bool selectionChanged = false;
         internal event SelectionChangedEvent OnSelectionChanged;
 
-        Utilities.AdvancedPriorityMouse MouseLeftButton;
-        Utilities.AdvancedPriorityMouse MouseRightButton;
+        InputUtils.AdvancedMouse MouseLeftButton;
+        InputUtils.AdvancedMouse MouseRightButton;
 
         public int CursorPriority => 4;
 
@@ -42,20 +48,17 @@ namespace Game.Managers
             if (CommandManager == null)
             { Debug.LogWarning($"[{nameof(SelectionManager)}]: {nameof(CommandManager)} is null"); }
 
-            MouseLeftButton = new Utilities.AdvancedPriorityMouse(Utilities.MouseButton.Left, 10, MouseCondition);
-            MouseLeftButton.OnDragged += OnDragged;
-            MouseLeftButton.OnClick += OnClicked;
+            MouseLeftButton = new InputUtils.AdvancedMouse(MouseButton.Left, 10, MouseCondition);
+            MouseLeftButton.OnDragged += OnLeftDragged;
+            MouseLeftButton.OnClick += OnLeftClicked;
 
-            MouseRightButton = new Utilities.AdvancedPriorityMouse(Utilities.MouseButton.Right, 10, MouseCondition);
+            MouseRightButton = new InputUtils.AdvancedMouse(MouseButton.Right, 10, MouseCondition);
             MouseRightButton.OnClick += OnRightClicked;
-
-            MouseManager.RegisterMouse(MouseLeftButton);
-            MouseManager.RegisterMouse(MouseRightButton);
 
             CursorImageManager.Instance.Register(this);
         }
 
-        void OnRightClicked(Vector2 position)
+        void OnRightClicked(Vector2 position, float holdTime)
         {
             ClearSelection();
         }
@@ -64,7 +67,9 @@ namespace Game.Managers
             CameraController.Instance != null &&
             (!CameraController.Instance.IsFollowing || CameraController.Instance.JustFollow) &&
             !TakeControlManager.Instance.IsControlling &&
-            !BuildingManager.Instance.IsBuilding;
+            !BuildingManager.Instance.IsBuilding &&
+            !QuickCommandManager.Instance.IsShown &&
+            !MenuManager.AnyMenuVisible;
 
         void FixedUpdate()
         {
@@ -75,7 +80,6 @@ namespace Game.Managers
             }
 
             if (!MouseCondition()) return;
-            if (MenuManager.AnyMenuVisible) return;
 
             if (AlmostSelectTimer <= 0f)
             {
@@ -83,7 +87,7 @@ namespace Game.Managers
                 if (MouseLeftButton.IsDragging)
                 {
                     // if (SelectionMeshCollider == null)
-                    OnDrag(MouseLeftButton.DraggingStartPosition, Input.mousePosition);
+                    OnDrag(MouseLeftButton.DragStart, Input.mousePosition);
                 }
                 else
                 {
@@ -119,8 +123,9 @@ namespace Game.Managers
             }
         }
 
-        void OnClicked(Vector2 screenPosition)
+        void OnLeftClicked(Vector2 screenPosition, float holdTime)
         {
+            if (holdTime >= QuickCommandManager.HOLD_TIME_REQUIREMENT) return;
             Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(screenPosition, out RaycastHit[] hits);
             for (int i = 0; i < hits.Length; i++)
             {
@@ -185,7 +190,7 @@ namespace Game.Managers
             */
         }
 
-        void OnDragged(Vector2 positionA, Vector2 positionB)
+        void OnLeftDragged(Vector2 positionA, Vector2 positionB)
         {
             if (!Input.GetKey(KeyCode.LeftShift)) ClearSelection();
             Vector2 min = Vector2.Min(positionA, positionB);
@@ -289,12 +294,12 @@ namespace Game.Managers
 
         void OnGUI()
         {
-            if (MouseLeftButton.IsDragging && !MenuManager.AnyMenuVisible)
-            {
-                var rect = Utilities.Utils.GetScreenRect(MouseLeftButton.DraggingStartPosition, Input.mousePosition);
-                Utilities.Utils.DrawScreenRect(rect, new Color(.8f, .8f, .95f, .25f));
-                Utilities.Utils.DrawScreenRectBorder(rect, 2f, new Color(.8f, .8f, .95f));
-            }
+            if (!MouseLeftButton.IsDragging || !MouseLeftButton.IsActive)
+            { return; }
+
+            Rect rect = Utilities.Utils.GetScreenRect(MouseLeftButton.DragStart, Input.mousePosition);
+            Utilities.Utils.DrawScreenRect(rect, SelectionBoxColor);
+            Utilities.Utils.DrawScreenRectBorder(rect, SelectionBoxBorderWidth, SelectionBoxBorderColor);
         }
 
         /// <summary>
@@ -363,19 +368,19 @@ namespace Game.Managers
         {
             Vector3[] vertices = new Vector3[8];
             int[] triangles = {
-            0, 1, 2,
-            2, 1, 3,
-            4, 6, 0,
-            0, 6, 2,
-            6, 7, 2,
-            2, 7, 3,
-            7, 5, 3,
-            3, 5, 1,
-            5, 0, 1,
-            1, 4, 0,
-            4, 5, 6,
-            6, 5, 7,
-        };
+                0, 1, 2,
+                2, 1, 3,
+                4, 6, 0,
+                0, 6, 2,
+                6, 7, 2,
+                2, 7, 3,
+                7, 5, 3,
+                3, 5, 1,
+                5, 0, 1,
+                1, 4, 0,
+                4, 5, 6,
+                6, 5, 7,
+            };
 
             for (int i = 0; i < 4; i++)
             {
@@ -397,6 +402,7 @@ namespace Game.Managers
         public bool YouCanChangeCursor()
         {
             if (!MouseCondition()) return false;
+
             if (MouseLeftButton.IsDragging)
             {
                 Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);

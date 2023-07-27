@@ -1,3 +1,5 @@
+using InputUtils;
+
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -8,8 +10,7 @@ namespace Game.Managers
     {
         static KeyboardManager Instance;
 
-        [SerializeField, ReadOnly, NonReorderable] List<Utilities.PriorityKey> Keys;
-        static readonly Utilities.PriorityKeyComparer Comparer = new();
+        [SerializeField, ReadOnly, NonReorderable] List<PriorityKey> Keys;
 
         void Awake()
         {
@@ -20,7 +21,7 @@ namespace Game.Managers
                 return;
             }
             Instance = this;
-            Keys = new List<Utilities.PriorityKey>();
+            Keys = new List<PriorityKey>();
         }
 
         void Update()
@@ -32,23 +33,23 @@ namespace Game.Managers
             }
         }
 
-        void RegisterMouse_(Utilities.PriorityKey key)
+        void RegisterMouse_(PriorityKey key)
         {
             Keys.Add(key);
             Keys.Sort();
         }
 
-        void DeregisterMouse_(Utilities.PriorityKey key)
+        void DeregisterMouse_(PriorityKey key)
         {
             Keys.Remove(key);
         }
 
-        internal static void Register(Utilities.PriorityKey key)
+        internal static void Register(PriorityKey key)
         {
             if (Instance == null) return;
             Instance.RegisterMouse_(key);
         }
-        internal static void Deregister(Utilities.PriorityKey key)
+        internal static void Deregister(PriorityKey key)
         {
             if (Instance == null) return;
             Instance.DeregisterMouse_(key);

@@ -1,5 +1,4 @@
 using Game.Components;
-using Game.Managers;
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace Game.Managers
 
         public bool IsBuilding => SelectedBuilding != null && SelectedBuilding.Building != null;
 
-        AdvancedPriorityMouse LeftMouse;
+        InputUtils.AdvancedMouse LeftMouse;
 
         [Header("Buildings")]
         [SerializeField, ReadOnly, NonReorderable] PlayerData.ConstructableBuilding[] Buildings;
@@ -47,7 +46,7 @@ namespace Game.Managers
         [Header("UI")]
         [SerializeField] UIDocument BuildingUI;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void Awake()
         {
@@ -62,11 +61,10 @@ namespace Game.Managers
 
         void Start()
         {
-            LeftMouse = new AdvancedPriorityMouse(0, 12, MouseCondition);
+            LeftMouse = new InputUtils.AdvancedMouse(0, 12, MouseCondition);
             LeftMouse.OnClick += LeftMouse_OnClick;
-            MouseManager.RegisterMouse(LeftMouse);
 
-            KeyEsc = new PriorityKey(KeyCode.Escape, 3, () => IsBuilding || BuildingUI.gameObject.activeSelf);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 3, () => IsBuilding || BuildingUI.gameObject.activeSelf);
             KeyEsc.OnDown += OnKeyEsc;
         }
 
@@ -102,7 +100,7 @@ namespace Game.Managers
         bool MouseCondition()
             => IsBuilding;
 
-        void LeftMouse_OnClick(Vector2 position)
+        void LeftMouse_OnClick(Vector2 position, float holdTime)
         {
             if (SelectedBuilding == null || SelectedBuilding.Building == null) return;
             if (!MouseManager.MouseOnWindow) return;
@@ -205,7 +203,7 @@ namespace Game.Managers
                 }
             }
 
-            if (Input.GetMouseButtonDown(Utilities.MouseButton.Right) && (IsBuilding || BuildingUI.gameObject.activeSelf))
+            if (Input.GetMouseButtonDown(MouseButton.Right) && (IsBuilding || BuildingUI.gameObject.activeSelf))
             {
                 Hide();
             }

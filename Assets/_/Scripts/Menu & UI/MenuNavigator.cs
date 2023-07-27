@@ -1,10 +1,6 @@
 using Game.Managers;
 
-using System;
-
 using UnityEngine;
-
-using Utilities;
 
 namespace Game.UI
 {
@@ -12,11 +8,11 @@ namespace Game.UI
     {
         [ReadOnly] public bool IsPaused;
 
-        PriorityKey KeyEsc;
+        InputUtils.PriorityKey KeyEsc;
 
         void Start()
         {
-            KeyEsc = new PriorityKey(KeyCode.Escape, -10, EscKeyCondition);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, -10, EscKeyCondition);
             KeyEsc.OnDown += OnKeyEsc;
         }
 
