@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -82,7 +81,8 @@ public class ObjectPool : SingleInstance<ObjectPool>
 
             if (Instances.Count >= MaxSize)
             {
-                Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance);
+                if (ObjectPool.Instance.SizeExceedWarnings)
+                { Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance); }
                 return null;
             }
 
@@ -93,6 +93,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
     }
 
     internal List<Pool> Pools = new();
+    [SerializeField] internal bool SizeExceedWarnings = true;
 
     public PooledObject GeneratePool(GameObject prefab)
     {

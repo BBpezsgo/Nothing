@@ -61,9 +61,10 @@ namespace Game.Components
             Gizmos.DrawLine(GroundOrigin - Vector3.forward, GroundOrigin + Vector3.forward);
         }
 
-        internal void Repair(float v)
+        internal bool Repair(float v)
         {
             HP = Mathf.Min(_maxHp, HP + v);
+            return HP >= _maxHp;
         }
     }
 }

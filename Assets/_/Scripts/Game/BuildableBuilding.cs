@@ -75,10 +75,10 @@ namespace Game.Components
             BuildingProcess = newValue;
         }
 
-        internal void Build(float progress)
+        internal bool Build(float progress)
         {
             if (IsConstructed)
-            { return; }
+            { return true; }
 
             if (Particles != null)
             { Particles.Emit(Mathf.RoundToInt(ParticlesAmmount * progress)); }
@@ -93,6 +93,8 @@ namespace Game.Components
 
             if (NetcodeUtils.IsServer)
             { NetBuildingProcess.Value = BuildingProcess; }
+
+            return BuildingProcess >= BuildingProcessRequied;
         }
 
         internal void SetMaterial(Material material)

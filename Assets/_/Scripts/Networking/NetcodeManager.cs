@@ -175,7 +175,7 @@ namespace Networking.Managers
                 NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
                 NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
 
-                Debug.Log($"[{nameof(NetcodeManager)}]: Base events registered", this);
+                // Debug.Log($"[{nameof(NetcodeManager)}]: Base events registered", this);
             }
 
             if (!SceneEventsRegistered && NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
@@ -190,7 +190,7 @@ namespace Networking.Managers
                 NetworkManager.Singleton.SceneManager.OnUnloadComplete += OnSceneUnloadComplete;
                 NetworkManager.Singleton.SceneManager.OnUnloadEventCompleted += OnSceneUnloadEventCompleted;
 
-                Debug.Log($"[{nameof(NetcodeManager)}]: Scene events registered", this);
+                // Debug.Log($"[{nameof(NetcodeManager)}]: Scene events registered", this);
             }
         }
 
