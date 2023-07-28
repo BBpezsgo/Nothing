@@ -46,13 +46,13 @@ namespace Game.Managers
 
                 float baseTop = _photographyPosition.y - (_photographySize / 2);
 
-                Bounds bounds = GetSummedBounds(placedObject);
+                Bounds bounds = placedObject.GetRendererBounds();
 
                 float scale = _photographySize / Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
 
                 placedObject.transform.localScale = scale * Vector3.one;
 
-                bounds = GetSummedBounds(placedObject);
+                bounds = placedObject.GetRendererBounds();
 
                 placedObject.transform.position = new Vector3(_photographyPosition.x, baseTop + bounds.extents.y, _photographyPosition.z) - bounds.center;
 
@@ -144,19 +144,6 @@ namespace Game.Managers
                     }
                 }
             }
-        }
-
-        internal static Bounds GetSummedBounds(GameObject @object)
-        {
-            Bounds result = new(new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f));
-            Renderer[] renderers = @object.GetComponentsInChildren<Renderer>(false);
-            if (renderers.Length == 0) return result;
-            result = renderers[0].bounds;
-            for (int i = 1; i < renderers.Length; i++)
-            {
-                result.Encapsulate(renderers[i].bounds);
-            }
-            return result;
         }
 
         void OnDrawGizmosSelected()

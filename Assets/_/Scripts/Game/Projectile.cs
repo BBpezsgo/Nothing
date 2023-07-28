@@ -152,6 +152,8 @@ namespace Game.Components
         [SerializeField, ReadOnly] internal Vector3 positionDelta;
         [SerializeField, ReadOnly] internal Vector3 TargetPosition;
 
+        int ticksUntilTrailClear = 0;
+
         void OnEnable()
         {
             if (Register) RegisteredObjects.Projectiles.Add(this);
@@ -191,6 +193,19 @@ namespace Game.Components
         void FixedUpdate()
         {
             if (destroyed) return;
+
+            if (ticksUntilTrailClear > 0 && ticksUntilTrailClear != int.MaxValue)
+            {
+                ticksUntilTrailClear--;
+
+                if (ticksUntilTrailClear <= 0)
+                {
+                    ticksUntilTrailClear = int.MaxValue;
+
+                    if (trail != null && trail.TryGetComponent(out TrailRenderer trailRenderer))
+                    { trailRenderer.Clear(); }
+                }
+            }
 
             Lifetime += Time.fixedDeltaTime;
 
@@ -439,6 +454,7 @@ namespace Game.Components
         {
             if (trail == null) return;
             if (trailData.Parent == null) return;
+            ticksUntilTrailClear = 2;
 
             if (trail.transform.parent.gameObject != trailData.Parent.gameObject)
             { trail.transform.SetParent(transform); }

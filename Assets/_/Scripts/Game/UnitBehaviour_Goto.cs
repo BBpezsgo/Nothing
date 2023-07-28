@@ -1,5 +1,7 @@
 using AssetManager;
 
+using Unity.Netcode;
+
 using UnityEngine;
 
 namespace Game.Components
@@ -9,7 +11,26 @@ namespace Game.Components
         internal const float DISTANCE_TO_STOP = 4f;
         internal const float BRAKING_DISTANCE_ERROR = .5f;
 
-        [SerializeField, ReadOnly] internal Vector3 Target;
+        internal Vector3 Target
+        {
+            get
+            {
+                if (NetcodeUtils.IsClient)
+                { return NetTarget.Value; }
+
+                return target;
+            }
+            set
+            {
+                if (NetcodeUtils.IsClient)
+                { return; }
+
+                target = value;
+                NetTarget.Value = value;
+            }
+        }
+        [SerializeField, ReadOnly] Vector3 target;
+        readonly NetworkVariable<Vector3> NetTarget = new();
 
         [Header("Movement")]
         [SerializeField, AssetField] float maxDistanceToReverse = 32f;

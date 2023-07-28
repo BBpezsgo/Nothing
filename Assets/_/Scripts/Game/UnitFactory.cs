@@ -75,7 +75,7 @@ namespace Game.Components
             Queue.RemoveAt(0);
 
             if (UnitFactoryManager.Instance.SelectedFactory == this)
-            { UnitFactoryManager.Instance.RefreshQueue(); }
+            { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
         }
 
         void OnUnitDone(QueuedUnit unit)
@@ -120,7 +120,7 @@ namespace Game.Components
                 });
 
                 if (UnitFactoryManager.Instance.SelectedFactory == this)
-                { UnitFactoryManager.Instance.RefreshQueue(); }
+                { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
 
                 RefreshRequest_ClientRpc();
             }
@@ -141,7 +141,7 @@ namespace Game.Components
         void RefreshRequest_ClientRpc()
         {
             if (UnitFactoryManager.Instance.SelectedFactory == this)
-            { UnitFactoryManager.Instance.RefreshQueue(); }
+            { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
         }
     }
 }

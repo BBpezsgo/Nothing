@@ -424,11 +424,13 @@ namespace Game.Components
                 { targetAngle = theta_.Value * Mathf.Rad2Deg; }
 
                 Vector3 directionToTarget = targetPosition - transform.position;
-                directionToTarget = Vector3.ProjectOnPlane(directionToTarget, cannon.up);
+                if (cannon != null)
+                {
+                    directionToTarget = Vector3.ProjectOnPlane(directionToTarget, cannon.up);
+                    targetAngle += CannonRotationFix;
+                }
 
                 turretRotation = Quaternion.LookRotation(directionToTarget).eulerAngles.y;
-
-                targetAngle += CannonRotationFix;
 
                 cannonAngle = Mathf.Clamp(targetAngle, -Mathf.Abs(cannonLowestAngle), Mathf.Abs(cannonHighestAngle));
             }

@@ -1,24 +1,43 @@
-using Game.Managers;
-
 using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
-    internal Bounds Bounds
+    internal Bounds RendererBounds
     {
         get
         {
-            float t = Time.time - lastRefresh;
+            float t = Time.time - lastRendererRefresh;
             if (t > 1f)
             {
-                Bounds bounds = PhotographyStudio.GetSummedBounds(gameObject);
-                lastRefresh = Time.time;
-                localBounds = new Bounds(transform.InverseTransformPoint(bounds.center), bounds.size);
+                Bounds bounds = gameObject.GetRendererBounds();
+                lastRendererRefresh = Time.time;
+                localRendererBounds = new Bounds(transform.InverseTransformPoint(bounds.center), bounds.size);
                 return bounds;
             }
             else
             {
-                Bounds bounds = localBounds;
+                Bounds bounds = localRendererBounds;
+                bounds.center = transform.TransformPoint(bounds.center);
+                return bounds;
+            }
+        }
+    }
+
+    internal Bounds ColliderBounds
+    {
+        get
+        {
+            float t = Time.time - lastColliderRefresh;
+            if (t > 1f)
+            {
+                Bounds bounds = gameObject.GetColliderBounds();
+                lastColliderRefresh = Time.time;
+                localColliderBounds = new Bounds(transform.InverseTransformPoint(bounds.center), bounds.size);
+                return bounds;
+            }
+            else
+            {
+                Bounds bounds = localColliderBounds;
                 bounds.center = transform.TransformPoint(bounds.center);
                 return bounds;
             }
@@ -27,10 +46,15 @@ public class Hitbox : MonoBehaviour
 
     void Start()
     {
-        lastRefresh = 0f;
-        _ = Bounds;
+        lastRendererRefresh = 0f;
+        _ = RendererBounds;
+        lastColliderRefresh = 0f;
+        _ = ColliderBounds;
     }
 
-    float lastRefresh;
-    Bounds localBounds;
+    float lastRendererRefresh;
+    Bounds localRendererBounds;
+
+    float lastColliderRefresh;
+    Bounds localColliderBounds;
 }

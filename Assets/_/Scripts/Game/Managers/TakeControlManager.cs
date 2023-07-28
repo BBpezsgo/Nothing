@@ -72,6 +72,10 @@ namespace Game.Managers
         float reloadedAt = 0f;
         float targetedAt = 0f;
         bool lastTargeted = false;
+        Rect targetRect = Rect.zero;
+
+        static readonly (float Inner, float Outer) CrossSize = (4f, 12f);
+        static readonly Color ShadowColor = new(0f, 0f, 0f, .8f);
 
         InputUtils.PriorityKey KeyEsc;
 
@@ -772,9 +776,13 @@ namespace Game.Managers
             Vector2 targetPosition = Vector2.zero;
             Vector2 predictedTargetPosition = Vector2.zero;
 
+            bool showReload = false;
+
             if (ControllingObject is ICanTakeControlAndHasTurret hasTurret &&
                 hasTurret.Turret != null)
             {
+                showReload = hasTurret.Turret.reloadTime >= .5f;
+
                 Vector3 _targetPosition = hasTurret.Turret.TargetPosition;
                 if (_targetPosition != Vector3.zero)
                 {
@@ -805,7 +813,7 @@ namespace Game.Managers
                 if (hasTurret.Turret.TargetTransform != null &&
                     hasTurret.Turret.TargetTransform.TryGetComponent(out Hitbox hitbox))
                 {
-                    Bounds bounds = hitbox.Bounds;
+                    Bounds bounds = hitbox.ColliderBounds;
 
                     if (bounds.size.magnitude > 50f)
                     {
@@ -819,12 +827,27 @@ namespace Game.Managers
                         {
                             targetRect = RectFromCorners(corners.TopLeft, corners.BottomRight);
 
-                            targetRect.Padding(8f);
+                            targetRect = targetRect.Padding(8f);
 
                             targetRect.position = GUIUtils.TransformPoint(targetRect.position);
                             targetRect.position = new Vector2(targetRect.position.x, targetRect.position.y - targetRect.height);
                         }
                     }
+                }
+            }
+
+            if (this.targetRect == Rect.zero)
+            { this.targetRect = targetRect; }
+            else
+            {
+                if (!hasTargetRect)
+                { this.targetRect = Rect.zero; }
+                else
+                {
+                    this.targetRect.x = Mathf.MoveTowards(this.targetRect.x, targetRect.x, 1f);
+                    this.targetRect.y = Mathf.MoveTowards(this.targetRect.y, targetRect.y, 1f);
+                    this.targetRect.width = Mathf.MoveTowards(this.targetRect.width, targetRect.width, 1f);
+                    this.targetRect.height = Mathf.MoveTowards(this.targetRect.height, targetRect.height, 1f);
                 }
             }
 
@@ -853,26 +876,14 @@ namespace Game.Managers
                 }
             }
 
-            Color shadowColor = new(0f, 0f, 0f, .8f);
+            Vector2 reloadIndicatorCenter = hasTargetRect ? this.targetRect.center : mousePosition;
 
             GL.PushMatrix();
             if (GLUtils.SolidMaterial.SetPass(0))
             {
-                float innerSize = 4f;
-                float outerSize = 12f;
-
                 if (targetPosition != Vector2.zero)
                 {
-                    if (predictedTargetPosition != Vector2.zero)
-                    {
-                        DrawCross(predictedTargetPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
-                        DrawCross(predictedTargetPosition, innerSize, outerSize, 1f, CrosshairColorPrediction);
-                    }
-                    else
-                    {
-                        DrawCross(targetPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
-                        DrawCross(targetPosition, innerSize, outerSize, 1f, CrosshairColorPrediction);
-                    }
+                    DrawCross((predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction, ShadowColor);
                 }
 
                 if (mousePosition != Vector2.zero)
@@ -880,36 +891,54 @@ namespace Game.Managers
                     float animation = Mathf.Clamp01((Time.time - targetedAt) * TargetLockAnimationSpeed);
                     if (!lastTargeted)
                     { animation = 1f - animation; }
-
-                    if (hasTargetRect && animation != 0f)
-                    {
-                        if (animation != 1f)
-                        {
-                            DrawCornerBoxFromCross(targetRect.center, targetRect.size, 8f, mousePosition, innerSize, outerSize, animation, CrosshairColor);
-                        }
-                        else
-                        {
-                            DrawCornerBox(targetRect.center + Vector2.one, targetRect.size, 8f, shadowColor);
-                            DrawCornerBox(targetRect.center, targetRect.size, 8f, CrosshairColor);
-                        }
-                    }
-                    else
-                    {
-                        DrawCross(mousePosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
-                        DrawCross(mousePosition, innerSize, outerSize, 1f, CrosshairColor);
-                    }
+                    DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, hasTargetRect ? this.targetRect : null, animation, CrosshairColor, ShadowColor);
                 }
 
                 if (predictedHitPosition != Vector2.zero)
                 {
-                    DrawCross(predictedHitPosition + Vector2.one, innerSize, outerSize, 1f, shadowColor);
-                    DrawCross(predictedHitPosition, innerSize, outerSize, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
+                    DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate, ShadowColor);
                 }
+
+                if (showReload)
+                { DrawReloadIndicator(reloadPercent, reloadIndicatorCenter, ShadowColor); }
             }
             GL.PopMatrix();
+        }
 
-            if (reloadPercent != 1f)
+        void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
+        {
+            if (!rect.HasValue || animation == 0f)
             {
+                DrawCross(cross, innerSize, outerSize, 1f, color, shadowColor);
+                return;
+            }
+
+            Rect _rect = rect.Value;
+            if (animation != 1f)
+            {
+                DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
+                DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
+            }
+            else
+            {
+                DrawCornerBox(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
+                DrawCornerBox(_rect.center, _rect.size, 8f, color);
+            }
+        }
+
+        void DrawCross(Vector2 center, float innerSize, float outerSize, float thickness, Color color, Color shadowColor)
+        {
+            DrawCross(center + Vector2.one, innerSize, outerSize, thickness, shadowColor);
+            DrawCross(center, innerSize, outerSize, thickness, color);
+        }
+
+        void DrawReloadIndicator(float value, Vector2 center, Color shadowColor)
+        {
+            if (value != 1f)
+            {
+                GLUtils.DrawCircle(center + Vector2.one, ReloadDotsRadius, 2f, shadowColor, value, 24);
+                GLUtils.DrawCircle(center, ReloadDotsRadius, 2f, Color.white, value, 24);
+                /*
                 float step = 1f / (float)ReloadDots;
 
                 for (int i = 0; i < ReloadDots; i++)
@@ -919,16 +948,17 @@ namespace Game.Managers
                     float rad = 2 * Mathf.PI * normalizedIndex;
                     Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
 
-                    float multiplier = Mathf.Clamp01((reloadPercent - normalizedIndex) / step);
+                    float multiplier = Mathf.Clamp01((value - normalizedIndex) / step);
 
                     if (multiplier <= .01f)
                     { continue; }
 
                     float size = ReloadDotsSize * multiplier;
 
-                    GUI.DrawTexture(RectUtils.Center(mousePosition + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
-                    GUI.DrawTexture(RectUtils.Center(mousePosition + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
+                    GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
+                    GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
                 }
+                */
             }
             else
             {
@@ -936,6 +966,8 @@ namespace Game.Managers
 
                 if (fadeOutPercent > .0001f)
                 {
+                    GLUtils.DrawCircle(center, ReloadDotsRadius + ((1f - fadeOutPercent) * 4f), 2f + ((1f - fadeOutPercent) * 4f), Color.white.Opacity(fadeOutPercent), value, 24);
+                    /*
                     for (int i = 0; i < ReloadDots; i++)
                     {
                         float normalizedIndex = (float)i / (float)ReloadDots;
@@ -952,8 +984,9 @@ namespace Game.Managers
                         offset += direction * ReloadDotsRadius;
                         offset += direction * ((1f - fadeOutPercent) * 4f);
 
-                        GUI.DrawTexture(RectUtils.Center(mousePosition + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
+                        GUI.DrawTexture(RectUtils.Center(center + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
                     }
+                    */
                 }
             }
         }
@@ -973,6 +1006,9 @@ namespace Game.Managers
 
         void DrawCornerBox(Vector2 center, Vector2 size, float cornerSize, Color color)
         {
+            if (size.x <= .1f || size.y <= .1f)
+            { return; }
+
             Vector2 halfSize = size / 2;
 
             float cornerSizeWidth = Mathf.Min(halfSize.x, cornerSize);

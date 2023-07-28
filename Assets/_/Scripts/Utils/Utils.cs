@@ -135,6 +135,9 @@ internal static class GLUtils
             return _solidMaterial;
         }
     }
+
+    const int CircleSegmentCount = 32;
+
     internal static void DrawLine(Vector2 a, Vector2 b, float thickness, Color color)
     {
         if (thickness <= 0f)
@@ -196,6 +199,130 @@ internal static class GLUtils
 
         GL.End();
     }
+
+    internal static void DrawCircle(Vector2 center, float radius, float thickness, Color color, int segmentCount = CircleSegmentCount)
+    {
+        if (thickness <= 1f)
+        {
+            DrawCircle(center, radius, color, segmentCount);
+            return;
+        }
+
+        GL.Begin(GL.TRIANGLE_STRIP);
+        GL.Color(color);
+
+        for (int i = 0; i < segmentCount; i++)
+        {
+            {
+                float rad = 2 * Mathf.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * (radius + thickness)));
+                GL.Vertex(center + (direction * (radius)));
+            }
+
+            {
+                float rad = 2 * Mathf.PI * ((float)(i + 1) / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * (radius + thickness)));
+                GL.Vertex(center + (direction * (radius)));
+            }
+        }
+        GL.End();
+    }
+    internal static void DrawCircle(Vector2 center, float radius, float thickness, Color color, float fillAmmount, int segmentCount = CircleSegmentCount)
+    {
+        if (fillAmmount >= .99f)
+        {
+            DrawCircle(center, radius, thickness, color, segmentCount);
+            return;
+        }
+
+        if (thickness <= 1f)
+        {
+            DrawCircle(center, radius, color, segmentCount);
+            return;
+        }
+
+        int segments = Mathf.FloorToInt(fillAmmount * segmentCount);
+        float step = 1f / (float)segmentCount;
+
+        GL.Begin(GL.TRIANGLE_STRIP);
+        GL.Color(color);
+
+        for (int i = 0; i < segments; i++)
+        {
+            {
+                float rad = 2 * Mathf.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * (radius + thickness)));
+                GL.Vertex(center + (direction * (radius)));
+            }
+
+            {
+                float next = 1 + Mathf.Clamp01((fillAmmount - ((float)(i + 1) / (float)segmentCount)) / step);
+
+                float rad = 2 * Mathf.PI * ((float)(i + next) / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * (radius + thickness)));
+                GL.Vertex(center + (direction * (radius)));
+            }
+        }
+        GL.End();
+    }
+
+    internal static void DrawCircle(Vector2 center, float radius, Color color, int segmentCount = CircleSegmentCount)
+    {
+        GL.Begin(GL.LINE_STRIP);
+        GL.Color(color);
+
+        for (int i = 0; i < segmentCount; i++)
+        {
+            float rad = 2 * Mathf.PI * ((float)i / (float)segmentCount);
+            Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+            GL.Vertex(center + (direction * radius));
+        }
+        GL.End();
+    }
+    internal static void DrawCircle(Vector2 center, float radius, Color color, float fillAmmount, int segmentCount = CircleSegmentCount)
+    {
+        if (fillAmmount >= .99f)
+        {
+            DrawCircle(center, radius, color, segmentCount);
+            return;
+        }
+
+        int segments = Mathf.FloorToInt(fillAmmount * segmentCount);
+        float step = 1f / (float)segmentCount;
+
+        GL.Begin(GL.LINE_STRIP);
+        GL.Color(color);
+
+        for (int i = 0; i < segments; i++)
+        {
+            {
+                float rad = 2 * Mathf.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * radius));
+            }
+
+            {
+                float next = 1 + Mathf.Clamp01((fillAmmount - ((float)(i + 1) / (float)segmentCount)) / step);
+
+                float rad = 2 * Mathf.PI * ((float)(i + next) / (float)segmentCount);
+                Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                GL.Vertex(center + (direction * radius));
+            }
+        }
+        GL.End();
+    }
+
 }
 
 internal readonly struct GUIUtils

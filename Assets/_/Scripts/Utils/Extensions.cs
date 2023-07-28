@@ -9,6 +9,53 @@ using UnityEngine;
 
 internal static class UnclassifiedExtensions
 {
+    internal static bool TryGetRendererBounds(this GameObject @object, out Bounds bounds)
+    {
+        MeshRenderer[] renderers = @object.GetComponentsInChildren<MeshRenderer>(false);
+
+        if (renderers.Length == 0)
+        {
+            bounds = new Bounds(new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f));
+            return false;
+        }
+
+        Bounds result = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        { result.Encapsulate(renderers[i].bounds); }
+
+        bounds = result;
+        return true;
+    }
+
+    internal static Bounds GetRendererBounds(this GameObject @object)
+    {
+        TryGetRendererBounds(@object, out Bounds bounds);
+        return bounds;
+    }
+    internal static bool TryGetColliderBounds(this GameObject @object, out Bounds bounds)
+    {
+        Collider[] colliders = @object.GetComponentsInChildren<Collider>(false);
+
+        if (colliders.Length == 0)
+        {
+            bounds = new Bounds(new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f));
+            return false;
+        }
+
+        Bounds result = colliders[0].bounds;
+        for (int i = 1; i < colliders.Length; i++)
+        { result.Encapsulate(colliders[i].bounds); }
+
+        bounds = result;
+        return true;
+    }
+
+    internal static Bounds GetColliderBounds(this GameObject @object)
+    {
+        TryGetColliderBounds(@object, out Bounds bounds);
+        return bounds;
+    }
+
     public static Rect Padding(this Rect rect, float padding)
     {
         float halfPadding = padding / 2;

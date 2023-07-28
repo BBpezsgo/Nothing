@@ -50,17 +50,18 @@ namespace Game.Managers
 
         InputUtils.PriorityKey KeyEsc;
 
-        void ListUnits()
+        void ListUnits(ProducableUnit[] units)
         {
-            var container = FactoryUI.rootVisualElement.Q<VisualElement>("unity-content-container");
+            VisualElement container = FactoryUI.rootVisualElement.Q<VisualElement>("unity-content-container");
             container.Clear();
-            for (int i = 0; i < Units.Length; i++)
+
+            for (int i = 0; i < units.Length; i++)
             {
                 TemplateContainer newElement = ProducableElement.Instantiate();
 
-                newElement.Q<Label>().text = Units[i].PrefabID;
+                newElement.Q<Label>().text = units[i].PrefabID;
 
-                if (PlayerData.TryGetThumbnail(Units[i].ThumbnailID, out Texture2D thumbnail))
+                if (PlayerData.TryGetThumbnail(units[i].ThumbnailID, out Texture2D thumbnail))
                 { newElement.Q<VisualElement>("image").style.backgroundImage = new StyleBackground(thumbnail); }
 
                 newElement.Q<Button>().name = $"btn-{i}";
@@ -82,11 +83,16 @@ namespace Game.Managers
 
         internal void Show(UnitFactory factory)
         {
+            if (factory == null)
+            { return; }
+
             Units = GetUnits();
 
             SelectedFactory = factory;
             FactoryUI.gameObject.SetActive(true);
-            ListUnits();
+            ListUnits(Units);
+
+            RefreshQueue(SelectedFactory.Queue.ToArray());
 
             BarProgress = FactoryUI.rootVisualElement.Q<ProgressBar>("progressbar-progress");
         }
@@ -130,14 +136,12 @@ namespace Game.Managers
             FactoryUI.gameObject.SetActive(false);
         }
 
-        internal void RefreshQueue()
+        internal void RefreshQueue(UnitFactory.QueuedUnit[] queue)
         {
             ScrollView container = FactoryUI.rootVisualElement.Q<ScrollView>("scrollview-queue");
             container.Clear();
 
             if (SelectedFactory == null) return;
-
-            UnitFactory.QueuedUnit[] queue = SelectedFactory.Queue.ToArray();
 
             for (int i = 0; i < queue.Length; i++)
             {
