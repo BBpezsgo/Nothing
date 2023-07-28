@@ -293,13 +293,13 @@ MonoBehaviour:
     Particles: {fileID: 5220818771854075135, guid: 17c513c42962f19469b78a03345229fc,
       type: 3}
     UseNormal: 1
-    Hoe: {fileID: 179531623064346593, guid: 252fe6fc0299df646bce00136809c58a, type: 3}
+    Hoe: {fileID: 0}
   - MaterialID: Metal
     Sound: {fileID: 0}
     Particles: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
       type: 3}
     UseNormal: 1
-    Hoe: {fileID: 179531623064346593, guid: fa896e01193c6f743adb120133c44d28, type: 3}
+    Hoe: {fileID: 0}
   - MaterialID: Concrete
     Sound: {fileID: 0}
     Particles: {fileID: 7690606633279578764, guid: 333214152a1848c4288d56d05285f6f5,

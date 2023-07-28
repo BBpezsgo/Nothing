@@ -98,18 +98,18 @@ MonoBehaviour:
   impactEffect: {fileID: 9033517131993547254, guid: 26dde45b2e36d7b4bbd23da11fa09712,
     type: 3}
   ImpactEffects:
-  - MaterialID: Water
-    Sound: {fileID: 0}
-    Particles: {fileID: 3714180705142066515, guid: 3653051462f469d45b7215e286b62f26,
-      type: 3}
-    UseNormal: 0
-    Hoe: {fileID: 0}
   - MaterialID: Dirt
     Sound: {fileID: 0}
     Particles: {fileID: 9033517131993547254, guid: e9257a0eae21d4e46be9e5e874e261c0,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 5117192577485989853, guid: 3a1db7ce8d51853408d58d3d91ef391b, type: 3}
+  - MaterialID: Water
+    Sound: {fileID: 0}
+    Particles: {fileID: 3714180705142066515, guid: 3653051462f469d45b7215e286b62f26,
+      type: 3}
+    UseNormal: 0
+    Hoe: {fileID: 0}
   trail: {fileID: 5034372190212571699}
   RicochetEffect: {fileID: 0}
   rotationSpeedX: 0

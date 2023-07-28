@@ -3759,6 +3759,10 @@ MonoBehaviour:
     Unit: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd, type: 3}
     ProgressRequied: 10
     ThumbnailID: tank
+  - Hash: 48
+    Unit: {fileID: 8062244046001752334, guid: d6cc4e5438db13d44aec59fb38f1f0a0, type: 3}
+    ProgressRequied: 5
+    ThumbnailID: drone
   ConstructableBuildings:
   - Hash: 332
     SpaceNeed: {x: 20, y: 5, z: 20}

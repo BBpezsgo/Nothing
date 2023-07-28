@@ -236,6 +236,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   BaseObject: {fileID: 0}
+  EnableTargetLocking: 1
+  TargetLockingThreshold: 10
   turret: {fileID: 8062244046070208250}
   ScopeSensitivity: 1
   HullRotationStabilizer: 0

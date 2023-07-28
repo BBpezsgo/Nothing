@@ -293,7 +293,7 @@ MonoBehaviour:
     Particles: {fileID: 5220818771854075135, guid: b53a9d9128c83554880403b289bced90,
       type: 3}
     UseNormal: 1
-    Hoe: {fileID: 3169069149930557525, guid: 2c5132bfb71e4364ab218ddb1a58981c, type: 3}
+    Hoe: {fileID: 0}
   - MaterialID: Metal
     Sound: {fileID: 0}
     Particles: {fileID: 3366955980197198301, guid: a9ed9a2c2d4e80a4a847ac46de38b9e6,
