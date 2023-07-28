@@ -31,16 +31,26 @@ namespace Game.Components
         /// </summary>
         public float AngularVelocity => rb.angularVelocity.y;
 
+        Vector3 lastSpeed = Vector3.zero;
+        [SerializeField, ReadOnly] Vector3 acceleration = Vector3.zero;
+        public Vector3 Acceleration => acceleration;
+
         protected virtual void Start()
         {
             if (!TryGetComponent(out rb))
             { Debug.LogError($"[{nameof(MovementEngine)}]: {nameof(rb)} is null", this); }
         }
 
-        internal virtual float CalculateBrakingDistance()
+        protected virtual void FixedUpdate()
         {
-            return Utilities.Acceleration.DistanceToStop(Velocity.magnitude, Drag);
+            Vector3 speed = Velocity;
+            Vector3 speedDifference = lastSpeed - speed;
+            acceleration = speedDifference / Time.fixedDeltaTime;
+            lastSpeed = speed;
         }
+
+        internal virtual float CalculateBrakingDistance()
+            => Utilities.Acceleration.DistanceToStop(Velocity.magnitude, Drag);
 
         internal abstract void DoUserInput();
     }

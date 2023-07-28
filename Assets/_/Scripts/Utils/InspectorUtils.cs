@@ -1,7 +1,7 @@
-using UnityEngine;
-
 using System;
 using System.Reflection;
+
+using UnityEngine;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 public class LinkAttribute : PropertyAttribute
@@ -22,6 +22,13 @@ public class UnityTimeSpan : UnityEngine.Object
 
     public static implicit operator TimeSpan(UnityTimeSpan v) => v.v;
     public static implicit operator UnityTimeSpan(TimeSpan v) => new(v);
+}
+
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public class TimeSpanAttribute : PropertyAttribute
+{
+    public TimeSpanAttribute()
+    { }
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
@@ -231,6 +238,33 @@ namespace InspectorDrawers
             {
                 System.Diagnostics.Process.Start(link);
             }
+        }
+    }
+
+    [CustomPropertyDrawer(typeof(TimeSpanAttribute))]
+    public class TimeSpanDrawer : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            if (property.type != "float")
+            {
+                EditorGUI.HelpBox(position, "[TimeSpanAttribute] is only valid on float fields!", MessageType.Error);
+                return;
+            }
+
+            float secs = property.floatValue;
+
+            Rect content = EditorGUI.PrefixLabel(position, label);
+
+            if (secs == 0)
+            {
+                EditorGUI.LabelField(content, "00:00:00", new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.gray } });
+                return;
+            }
+
+            TimeSpan time = TimeSpan.FromSeconds(secs);
+
+            EditorGUI.LabelField(content, $"{time.Hours.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}:{time.Minutes.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}:{time.Seconds.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}.{time.Milliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture)}", new GUIStyle(GUI.skin.label));
         }
     }
 

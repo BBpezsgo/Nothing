@@ -121,6 +121,9 @@ internal readonly struct RectUtils
 {
     internal static Rect Center(Vector2 center, Vector2 size)
         => new(center - (size * .5f), size);
+
+    internal static Rect FromCorners(Vector2 topLeft, Vector2 bottomRight)
+        => new(topLeft, bottomRight - topLeft);
 }
 
 internal static class GLUtils
@@ -410,6 +413,94 @@ namespace Utilities
 
     internal static class Utils
     {
+        internal static (Vector3 TopLeft, Vector3 BottomRight) GetCorners(Vector3[] points)
+        {
+            Vector3 topLeft = points[0];
+            Vector3 bottomRight = points[0];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 p = points[i];
+
+                if (p.x < topLeft.x)
+                { topLeft.x = p.x; }
+
+                if (p.y < topLeft.y)
+                { topLeft.y = p.y; }
+
+                if (p.z < topLeft.z)
+                { topLeft.z = p.z; }
+
+                if (p.x > bottomRight.x)
+                { bottomRight.x = p.x; }
+
+                if (p.y > bottomRight.y)
+                { bottomRight.y = p.y; }
+
+                if (p.z > bottomRight.z)
+                { bottomRight.z = p.z; }
+            }
+
+            return (topLeft, bottomRight);
+        }
+
+        internal static (Vector2 TopLeft, Vector2 BottomRight) GetScreenCorners(Vector3[] points)
+        {
+            Vector2 topLeft = points[0];
+            Vector2 bottomRight = points[0];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 p = points[i];
+
+                if (p.x < topLeft.x)
+                { topLeft.x = p.x; }
+
+                if (p.y < topLeft.y)
+                { topLeft.y = p.y; }
+
+                if (p.x > bottomRight.x)
+                { bottomRight.x = p.x; }
+
+                if (p.y > bottomRight.y)
+                { bottomRight.y = p.y; }
+            }
+
+            return (topLeft, bottomRight);
+        }
+
+        internal static bool GetScreenCorners(Vector3[] points, out (Vector2 TopLeft, Vector2 BottomRight) corners)
+        {
+            Vector2 topLeft = points[0];
+            Vector2 bottomRight = points[0];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 p = points[i];
+
+                if (p.z < 0)
+                {
+                    corners = (Vector2.zero, Vector2.zero);
+                    return false;
+                }
+
+                if (p.x < topLeft.x)
+                { topLeft.x = p.x; }
+
+                if (p.y < topLeft.y)
+                { topLeft.y = p.y; }
+
+                if (p.x > bottomRight.x)
+                { bottomRight.x = p.x; }
+
+                if (p.y > bottomRight.y)
+                { bottomRight.y = p.y; }
+            }
+
+            corners = (topLeft, bottomRight);
+            return true;
+        }
+
         /// <summary>
         /// Normalizes the angle <paramref name="a"/> between -180 .. 180
         /// </summary>
@@ -1487,7 +1578,7 @@ namespace Utilities
         }
 
         /// <returns>Aim offset</returns>
-        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 bulletPosition, float projectileVelocity, float projectileAcceleration)
+        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, float projectileAcceleration)
         {
             float distance;
             float time = 0f;
@@ -1495,9 +1586,46 @@ namespace Utilities
             int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(bulletPosition, targetPosition + (targetVelocity * time));
+                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
                 time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
+            }
+
+            return targetVelocity * time;
+        }
+
+        /// <returns>Aim offset</returns>
+        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 targetAcceleration, Vector2 projectilePosition, float projectileVelocity, float projectileAcceleration)
+        {
+            Vector2 targetOriginalVelocity = targetVelocity;
+            float distance;
+            float time = 0f;
+
+            int iterations = 4;
+            for (int i = 0; i < iterations; i++)
+            {
+                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
+                time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
+                targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
+            }
+
+            return targetVelocity * time;
+        }
+
+        /// <returns>Aim offset</returns>
+        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 targetAcceleration, Vector2 projectilePosition, float projectileVelocity)
+        {
+            Vector2 targetOriginalVelocity = targetVelocity;
+            float distance;
+            float time = 0f;
+
+            int iterations = 4;
+            for (int i = 0; i < iterations; i++)
+            {
+                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                time = Velocity.CalculateTime(distance, projectileVelocity);
+                targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
             }
 
             return targetVelocity * time;
@@ -1529,7 +1657,7 @@ namespace Utilities
         }
 
         /// <returns>Aim offset</returns>
-        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 bulletPosition, float projectileVelocity)
+        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity)
         {
             float distance;
             float time = 0f;
@@ -1537,24 +1665,24 @@ namespace Utilities
             int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(bulletPosition, targetPosition + (targetVelocity * time));
+                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 time = CalculateTime(distance, projectileVelocity);
             }
 
             return targetVelocity * time;
         }
         /// <returns>Aim offset</returns>
-        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 bulletPosition, float projectileVelocity, Math.Circle circle)
+        internal static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, Math.Circle circle)
         {
             float p = 1 / projectileVelocity;
 
-            float distance = Vector2.Distance(bulletPosition, targetPosition);
+            float distance = Vector2.Distance(projectilePosition, targetPosition);
             float time = distance * p;
 
-            distance = Vector2.Distance(bulletPosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
+            distance = Vector2.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
             time = distance * p;
 
-            distance = Vector2.Distance(bulletPosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
+            distance = Vector2.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
             time = distance * p;
 
             Vector2 aim = circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition));
@@ -1941,6 +2069,7 @@ namespace Game
 
 internal readonly struct ProfilerMarkers
 {
+    internal static readonly Unity.Profiling.ProfilerMarker Animations = new("Utilities.Animations");
     internal static readonly Unity.Profiling.ProfilerMarker UnitsBehaviour = new("Game.Units.Behaviour");
     internal static readonly Unity.Profiling.ProfilerMarker Wheels = new("Game.VehicleEngine.Wheels");
     internal static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");

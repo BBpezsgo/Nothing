@@ -419,7 +419,7 @@ namespace Game.Managers
             {
                 for (int i = 0; i < Selected.Length; i++)
                 {
-                    if (Selected[i].GetObject().HasComponent<VehicleEngine>())
+                    if (((Component)Selected[i]).HasComponent<VehicleEngine>())
                     {
                         CursorGoTo.SetCursor();
                         return true;
@@ -446,7 +446,7 @@ namespace Game.Managers
 
 namespace Game.Components
 {
-    public interface ISelectable : IAmObject
+    public interface ISelectable : IComponent
     {
         public enum State : int
         {

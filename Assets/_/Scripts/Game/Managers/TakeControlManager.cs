@@ -30,11 +30,6 @@ namespace Game.Managers
 
         [SerializeField, ReadOnly] CameraController CameraController;
         [SerializeField] ICanTakeControl ControllingObject;
-        [SerializeField] Transform IngameCursorBlue;
-        [SerializeField] Transform IngameCursorRed;
-        [SerializeField] float IngameCursorScale;
-
-        [SerializeField] Transform[] CursorPriorities = new Transform[0];
 
         [SerializeField] LayerMask CursorHitLayer;
 
@@ -69,8 +64,6 @@ namespace Game.Managers
         [SerializeField, Min(.01f)] float TargetLockAnimationSpeed = 2f;
 
         Texture2D SphereFilled;
-        float reloadedAt = 0f;
-        float targetedAt = 0f;
         bool lastTargeted = false;
         Rect targetRect = Rect.zero;
 
@@ -81,9 +74,17 @@ namespace Game.Managers
 
         ProgressBar BarHealth;
 
+        [SerializeField] SimpleAnimation ReloadIndicatorFadeoutAnimation;
+        [SerializeField] SimpleReversableAnimation TargetLockingAnimation;
+        [SerializeField] PingPongAnimationController TargetLockingAnimationController;
+
         void OnEnable()
         {
             CameraController.OnCameraModeChanged += OnCameraModeChanged;
+            ReloadIndicatorFadeoutAnimation = new SimpleAnimation(ReloadDotsFadeoutSpeed, AnimationFunctions.Square);
+
+            TargetLockingAnimationController = new PingPongAnimationController();
+            TargetLockingAnimation = new SimpleReversableAnimation(TargetLockAnimationSpeed, TargetLockingAnimationController, v => v);
         }
 
         void OnDisable()
@@ -119,9 +120,6 @@ namespace Game.Managers
                 else if (!takeControlUiObject.TryGetComponent(out UI))
                 { Debug.LogError($"[{nameof(TakeControlManager)}]: UI does not have an UIDocument", takeControlUiObject); }
             }
-
-            HideCursor(IngameCursorBlue);
-            HideCursor(IngameCursorRed);
 
             LeftMouse = new InputUtils.AdvancedMouse(MouseButton.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
@@ -168,7 +166,7 @@ namespace Game.Managers
             }
 
             TakeControlClient(unit);
-            Debug.Log($"[{nameof(TakeControlManager)}]: Controlling object {unit}", unit.GetObject().gameObject);
+            Debug.Log($"[{nameof(TakeControlManager)}]: Controlling object {unit}", ((Component)unit).gameObject);
         }
 
         void OnKeyEsc()
@@ -241,17 +239,6 @@ namespace Game.Managers
 
             if (IsControlling)
             {
-                if (ControllingObject is ICanTakeControlAndHasTurret hasTurret)
-                {
-                    if (hasTurret.Turret != null) SetCursor(IngameCursorRed, hasTurret.Turret.PredictImpact() ?? hasTurret.Turret.TargetPosition);
-                    else HideCursor(IngameCursorRed);
-                }
-
-                if (MouseManager.MouseOnWindow)
-                {
-                    SetCursor(IngameCursorBlue, MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition, CursorHitLayer));
-                }
-
                 if (ControllingObject is Unit controllingUnit)
                 {
                     BarHealth.value = controllingUnit.NormalizedHP;
@@ -301,7 +288,7 @@ namespace Game.Managers
 
             var controllable = GetControllableAt(worldPosition);
 
-            if (controllable.GetObject() != null)
+            if ((Object)controllable != null)
             {
                 EnableMouseCooldown = 1f;
                 TakeControl(controllable);
@@ -311,33 +298,6 @@ namespace Game.Managers
         void OnCameraModeChanged(CameraMode mode)
         {
             SetWindowCursor();
-        }
-
-        void SetCursor(Transform cursor, Vector3 position)
-        {
-            /*
-            for (int i = 0; i < CursorPriorities.Length; i++)
-            {
-                if (cursor == CursorPriorities[i])
-                { break; }
-                if (Vector3.Distance(CursorPriorities[i].position, position) < 1f)
-                {
-                    HideCursor(cursor);
-                    return;
-                }
-            }
-            if (!cursor.gameObject.activeSelf) cursor.gameObject.SetActive(true);
-            cursor.position = position;
-            cursor.localScale = IngameCursorScale * Mathf.Clamp(Vector3.Distance(CameraController.CameraPosition, position) * .1f, .1f, 20f) * Vector3.one;
-            */
-        }
-
-        void HideCursor(Transform cursor)
-        {
-            /*
-            cursor.position = new Vector3(0f, -50f, 0f);
-            cursor.localScale = Vector3.one * .5f;
-            */
         }
 
         void SetWindowCursor()
@@ -352,14 +312,14 @@ namespace Game.Managers
         {
             if (unit.SomebodyElseControllingThis())
             {
-                Debug.Log($"[{nameof(TakeControlManager)}]: Somebody else controlling this", unit.GetObject());
+                Debug.Log($"[{nameof(TakeControlManager)}]: Somebody else controlling this", (Object)unit);
                 return;
             }
 
             if (IsClient)
             {
-                Debug.Log($"[{nameof(TakeControlManager)}]: Send take control request to server (trying to take control over object {unit.GetObject().GetComponent<NetworkObject>().NetworkObjectId})");
-                WantToTakeControl_ServerRpc(unit.GetObject().GetComponent<NetworkObject>().NetworkObjectId);
+                Debug.Log($"[{nameof(TakeControlManager)}]: Send take control request to server (trying to take control over object {((Component)unit).GetComponent<NetworkObject>().NetworkObjectId})");
+                WantToTakeControl_ServerRpc(((Component)unit).GetComponent<NetworkObject>().NetworkObjectId);
                 return;
             }
 
@@ -374,8 +334,8 @@ namespace Game.Managers
             CameraController.JustFollow = false;
             ControllingObject = unit;
 
-            if (ControllingObject.GetObject() != null &&
-                ControllingObject.GetObject().TryGetComponent(out HoveringLabel label) &&
+            if ((Object)ControllingObject != null &&
+                ((Component)ControllingObject).TryGetComponent(out HoveringLabel label) &&
                 AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
             {
                 label.Show(remoteAccounts.Get(NetworkManager.LocalClientId)?.DisplayName);
@@ -384,7 +344,7 @@ namespace Game.Managers
             if (NetworkManager.Singleton != null &&
                 NetworkManager.IsListening)
             {
-                ControllingObjects.Set((int)NetworkManager.LocalClientId, unit.GetObject().GetComponent<NetworkObject>().NetworkObjectId, ulong.MaxValue);
+                ControllingObjects.Set((int)NetworkManager.LocalClientId, ((Component)unit).GetComponent<NetworkObject>().NetworkObjectId, ulong.MaxValue);
             }
 
             UI.gameObject.SetActive(true);
@@ -454,7 +414,7 @@ namespace Game.Managers
         {
             if (unit.SomebodyElseControllingThis())
             {
-                Debug.Log($"[{nameof(TakeControlManager)}]: Somebody else controlling this", unit.GetObject());
+                Debug.Log($"[{nameof(TakeControlManager)}]: Somebody else controlling this", (Object)unit);
                 return;
             }
 
@@ -574,9 +534,9 @@ namespace Game.Managers
         {
             if (IsClient)
             {
-                if (ControllingObject.GetObject() != null)
+                if ((Object)ControllingObject != null)
                 {
-                    Debug.Log($"[{nameof(TakeControlManager)}]: Send lose control request to server (trying to lose control over object {ControllingObject.GetObject().GetComponent<NetworkObject>().NetworkObjectId})");
+                    Debug.Log($"[{nameof(TakeControlManager)}]: Send lose control request to server (trying to lose control over object {((Component)ControllingObject).GetComponent<NetworkObject>().NetworkObjectId})");
                     LoseControl_ServerRpc();
                 }
                 return;
@@ -594,12 +554,10 @@ namespace Game.Managers
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
 
-            HideCursor(IngameCursorBlue);
-            HideCursor(IngameCursorRed);
             UnityEngine.Cursor.lockState = CursorLockMode.None;
-            if (ControllingObject.GetObject() == null) return;
+            if ((Object)ControllingObject == null) return;
 
-            if (ControllingObject.GetObject().TryGetComponent(out HoveringLabel label))
+            if (((Component)ControllingObject).TryGetComponent(out HoveringLabel label))
             {
                 label.Hide();
             }
@@ -619,10 +577,8 @@ namespace Game.Managers
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
 
-            HideCursor(IngameCursorBlue);
-            HideCursor(IngameCursorRed);
             UnityEngine.Cursor.lockState = CursorLockMode.None;
-            if (ControllingObject.GetObject() == null) return;
+            if ((Object)ControllingObject == null) return;
 
             CameraController.FollowObject = null;
             ControllingObject = null;
@@ -713,15 +669,15 @@ namespace Game.Managers
         internal bool IAmControlling(ICanTakeControl @this)
         {
             if (NetcodeUtils.IsOffline)
-            { return ControllingObject.GetObject() == @this.GetObject(); }
+            { return (Object)ControllingObject == (Object)@this; }
 
             if ((int)NetworkManager.LocalClientId >= ControllingObjects.Count ||
                 (int)NetworkManager.LocalClientId < 0)
             { return false; }
 
-            if (!@this.GetObject().TryGetComponent(out NetworkObject networkObject))
+            if (!((Component)@this).TryGetComponent(out NetworkObject networkObject))
             {
-                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", @this.GetObject());
+                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", (Object)@this);
                 return false;
             }
 
@@ -737,14 +693,14 @@ namespace Game.Managers
             try
             {
                 if (NetcodeUtils.IsOffline)
-                { return ControllingObject.GetObject() == @this.GetObject(); }
+                { return (Object)ControllingObject == (Object)@this; }
             }
             catch (System.NullReferenceException)
             { return false; }
 
-            if (!@this.GetObject().TryGetComponent(out NetworkObject networkObject))
+            if (!((Component)@this).TryGetComponent(out NetworkObject networkObject))
             {
-                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", @this.GetObject());
+                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", (Object)@this);
                 return false;
             }
 
@@ -801,9 +757,9 @@ namespace Game.Managers
                 { predictedHitPosition = GUIUtils.TransformPoint(screenPos); }
 
                 if (hasTurret.Turret.ReloadPercent < 1f)
-                { reloadedAt = 0f; }
-                else if (reloadedAt == 0f)
-                { reloadedAt = Time.unscaledTime; }
+                { ReloadIndicatorFadeoutAnimation.Reset(); }
+                else
+                { ReloadIndicatorFadeoutAnimation.Start(); }
 
                 if (hasTurret.Turret.reloadTime > 0.01f)
                 { reloadPercent = 1f - Mathf.Clamp01(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime); }
@@ -825,7 +781,7 @@ namespace Game.Managers
 
                         if (hasTargetRect)
                         {
-                            targetRect = RectFromCorners(corners.TopLeft, corners.BottomRight);
+                            targetRect = RectUtils.FromCorners(corners.TopLeft, corners.BottomRight);
 
                             targetRect = targetRect.Padding(8f);
 
@@ -836,12 +792,20 @@ namespace Game.Managers
                 }
             }
 
+            TargetLockingAnimationController.Refresh(!hasTargetRect);
+            TargetLockingAnimation.Refresh();
+
             if (this.targetRect == Rect.zero)
             { this.targetRect = targetRect; }
             else
             {
                 if (!hasTargetRect)
-                { this.targetRect = Rect.zero; }
+                {
+                    if (!TargetLockingAnimation.IsStarted || TargetLockingAnimation.IsFinished)
+                    {
+                        this.targetRect = Rect.zero;
+                    }
+                }
                 else
                 {
                     this.targetRect.x = Mathf.MoveTowards(this.targetRect.x, targetRect.x, 1f);
@@ -859,12 +823,13 @@ namespace Game.Managers
                 targetPosition == Vector2.zero)
             { return; }
 
+            /*
             if (lastTargeted)
             {
                 if (!hasTargetRect)
                 {
                     lastTargeted = false;
-                    targetedAt = Time.time;
+                    TargetLockingAnimation.Restart();
                 }
             }
             else
@@ -872,11 +837,13 @@ namespace Game.Managers
                 if (hasTargetRect)
                 {
                     lastTargeted = true;
-                    targetedAt = Time.time;
+                    TargetLockingAnimation.Restart();
                 }
             }
+            TargetLockingAnimation.Reverse(hasTargetRect);
+            */
 
-            Vector2 reloadIndicatorCenter = hasTargetRect ? this.targetRect.center : mousePosition;
+            Vector2 reloadIndicatorCenter = mousePosition;
 
             GL.PushMatrix();
             if (GLUtils.SolidMaterial.SetPass(0))
@@ -888,10 +855,16 @@ namespace Game.Managers
 
                 if (mousePosition != Vector2.zero)
                 {
-                    float animation = Mathf.Clamp01((Time.time - targetedAt) * TargetLockAnimationSpeed);
-                    if (!lastTargeted)
-                    { animation = 1f - animation; }
-                    DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, hasTargetRect ? this.targetRect : null, animation, CrosshairColor, ShadowColor);
+                    float animation = TargetLockingAnimation.Percent;
+                    if (hasTargetRect || animation > 0f)
+                    {
+                        DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor, ShadowColor);
+                        reloadIndicatorCenter = Vector2.Lerp(mousePosition, this.targetRect.center, animation);
+                    }
+                    else
+                    {
+                        DrawCross(mousePosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColor, ShadowColor);
+                    }
                 }
 
                 if (predictedHitPosition != Vector2.zero)
@@ -962,7 +935,7 @@ namespace Game.Managers
             }
             else
             {
-                float fadeOutPercent = 1f - Mathf.Clamp01((Time.unscaledTime - reloadedAt) * ReloadDotsFadeoutSpeed);
+                float fadeOutPercent = ReloadIndicatorFadeoutAnimation.PercentInverted;
 
                 if (fadeOutPercent > .0001f)
                 {
@@ -1132,47 +1105,12 @@ namespace Game.Managers
                 GL.End();
             }
         }
-
-        static Rect RectFromCorners(Vector2 topLeft, Vector2 bottomRight)
-            => new(topLeft, bottomRight - topLeft);
-
-        static bool GetScreenCorners(Vector3[] points, out (Vector2 TopLeft, Vector2 BottomRight) corners)
-        {
-            Vector2 topLeft = points[0];
-            Vector2 bottomRight = points[0];
-
-            for (int i = 0; i < points.Length; i++)
-            {
-                Vector3 p = points[i];
-
-                if (p.z < 0)
-                {
-                    corners = (Vector2.zero, Vector2.zero);
-                    return false;
-                }
-
-                if (p.x < topLeft.x)
-                { topLeft.x = p.x; }
-
-                if (p.y < topLeft.y)
-                { topLeft.y = p.y; }
-
-                if (p.x > bottomRight.x)
-                { bottomRight.x = p.x; }
-
-                if (p.y > bottomRight.y)
-                { bottomRight.y = p.y; }
-            }
-
-            corners = (topLeft, bottomRight);
-            return true;
-        }
     }
 }
 
 namespace Game.Components
 {
-    public interface ICanTakeControl : IAmObject
+    public interface ICanTakeControl : IComponent
     {
         void DoInput();
         void DoFrequentInput();
@@ -1185,7 +1123,7 @@ namespace Game.Components
         public Turret Turret { get; }
     }
 
-    public interface IAmObject
+    public interface IComponent
     {
 
     }
@@ -1230,9 +1168,4 @@ public static class ICanTakeControlExtensions
         { return "nobody"; }
         return TakeControlManager.Instance.AnybodyControlling(self, out ulong controllingBy) ? $"client {controllingBy}" : "nobody";
     }
-}
-
-public static class IAmObjectExtensions
-{
-    public static Component GetObject(this IAmObject self) => (Component)self;
 }

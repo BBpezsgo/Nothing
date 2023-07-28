@@ -370,9 +370,14 @@ namespace Game.Components
                 else
                 {
                     Vector3 targetVelocity = Vector3.zero;
+                    Vector3 targetAcceleration = Vector3.zero;
                     if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out Rigidbody targetRigidbody))
-                    { targetVelocity = targetRigidbody.velocity; }
-                    input = CalculateInputVector(targetPosition, targetVelocity);
+                    {
+                        targetVelocity = targetRigidbody.velocity;
+                        if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out MovementEngine movementEngine))
+                        { targetAcceleration = movementEngine.Acceleration; }
+                    }
+                    input = CalculateInputVector(targetPosition, targetVelocity, targetAcceleration);
                     this.input = input;
                 }
 
@@ -386,7 +391,7 @@ namespace Game.Components
             // Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.fixedDeltaTime);
         }
 
-        Vector2 CalculateInputVector(Vector3 targetPosition, Vector3 targetVelocity)
+        Vector2 CalculateInputVector(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration)
         {
             float turretRotation;
             float cannonAngle;

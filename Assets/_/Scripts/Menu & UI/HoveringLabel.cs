@@ -17,7 +17,9 @@ namespace Game.UI.Components
                 if (NetcodeUtils.IsOfflineOrServer)
                 {
                     _visible = value;
-                    NetworkedVisible.Value = value;
+
+                    if (NetcodeUtils.IsServer)
+                    { NetworkedVisible.Value = value; }
                 }
             }
             get => _visible;
@@ -29,7 +31,9 @@ namespace Game.UI.Components
                 if (NetcodeUtils.IsOfflineOrServer)
                 {
                     GUIContent = (value == null) ? GUIContent.none : new GUIContent(value);
-                    NetworkedText.Value = value ?? "";
+
+                    if (NetcodeUtils.IsServer)
+                    { NetworkedText.Value = value ?? ""; }
                 }
             }
             get => GUIContent.text ?? null;

@@ -317,8 +317,10 @@ namespace Game.Components
             rb.angularVelocity = Vector3.zero;
         }
 
-        void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             InWater = Collider.bounds.min.y <= WaterManager.WaterLevel;
 
             FlippedOverValue = Vector3.Dot(Vector3.up, transform.up);

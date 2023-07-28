@@ -34,7 +34,7 @@ namespace Game.Managers
 
             for (int i = 0; i < SelectionManager.Selected.Length; i++)
             {
-                if (SelectionManager.Selected[i].GetObject().TryGetComponent(out Components.UnitBehaviour_Goto @goto))
+                if (((Component)SelectionManager.Selected[i]).TryGetComponent(out Components.UnitBehaviour_Goto @goto))
                 {
                     @goto.Target = worldPosition;
                     RefreshGotoPositions();
@@ -63,7 +63,7 @@ namespace Game.Managers
 
             for (int i = 0; i < SelectionManager.Selected.Length; i++)
             {
-                if (SelectionManager.Selected[i].GetObject().TryGetComponent(out Components.UnitBehaviour_Goto @goto))
+                if (((Component)SelectionManager.Selected[i]).TryGetComponent(out Components.UnitBehaviour_Goto @goto))
                 {
                     SeekTargetInstances[i].transform.position = @goto.Target + new Vector3(0f, 0.05f, 0f);
                     if (@goto.Target != Vector3.zero)

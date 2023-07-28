@@ -191,9 +191,9 @@ internal static class UnclassifiedExtensions
         return v[closestI];
     }
 
-    internal static System.ValueTuple<int, float> ClosestI(this Transform[] v, Vector3 origin)
+    internal static ValueTuple<int, float> ClosestI(this Transform[] v, Vector3 origin)
     {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -208,11 +208,11 @@ internal static class UnclassifiedExtensions
             }
         }
 
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
     }
-    internal static System.ValueTuple<int, float> ClosestI(this Component[] v, Vector3 origin)
+    internal static ValueTuple<int, float> ClosestI(this Component[] v, Vector3 origin)
     {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -227,11 +227,11 @@ internal static class UnclassifiedExtensions
             }
         }
 
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
     }
-    internal static System.ValueTuple<int, float> ClosestI(this IAmObject[] v, Vector3 origin)
+    internal static ValueTuple<int, float> ClosestI(this IComponent[] v, Vector3 origin)
     {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -246,11 +246,11 @@ internal static class UnclassifiedExtensions
             }
         }
 
-        return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
     }
-    internal static System.ValueTuple<int, float> ClosestI(this GameObject[] v, Vector3 origin)
+    internal static ValueTuple<int, float> ClosestI(this GameObject[] v, Vector3 origin)
     {
-        if (v.Length == 0) return new System.ValueTuple<int, float>(-1, 0f);
+        if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
         int closestI = -1;
 

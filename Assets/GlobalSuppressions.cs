@@ -5,4 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>", Scope = "module")]
+[assembly: SuppressMessage("Style", "IDE0270", Justification = "<Pending>", Scope = "module")]
+[assembly: SuppressMessage("Style", "IDE0042", Justification = "<Pending>", Scope = "module")]
