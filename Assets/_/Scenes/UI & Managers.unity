@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
-  m_FogDensity: 0.01
+  m_Fog: 1
+  m_FogColor: {r: 0.7971698, g: 0.90677327, b: 1, a: 1}
+  m_FogMode: 2
+  m_FogDensity: 0.0013
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -33,7 +33,7 @@ RenderSettings:
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
-  m_DefaultReflectionResolution: 128
+  m_DefaultReflectionResolution: 16
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000002, guid: 6e4093880a0725c42827fb8bc10dd7c0,
+  m_LightingDataAsset: {fileID: 112000002, guid: 3cc46ddb6c58c1140ad9c973900391e9,
     type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 788ae872255e37741a3372bcc8a2f164,
     type: 2}
@@ -286,7 +286,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &149810441
 GameObject:
@@ -369,7 +369,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &196294525
 GameObject:
@@ -739,7 +739,7 @@ Transform:
   - {fileID: 989274990}
   - {fileID: 333429772}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &317416679
 GameObject:
@@ -822,7 +822,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &326525615
 GameObject:
@@ -1359,7 +1359,7 @@ Transform:
   m_Children:
   - {fileID: 42618974}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 46.25, z: 0}
 --- !u!1 &365012114
 GameObject:
@@ -2403,6 +2403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39c7f517a4726b2448f040374147db61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SizeExceedWarnings: 0
 --- !u!1 &728120205
 GameObject:
   m_ObjectHideFlags: 0
@@ -2509,6 +2510,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be0a286f2d9a2224aa19e50bf622046d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &775425245
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_Name
+      value: Unit Destroy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 32.829697
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.008058548
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -80.06995
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2576850171094146374, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8c71f7a1d9ff4f846ac535d075a21dac, type: 3}
 --- !u!1 &804759453
 GameObject:
   m_ObjectHideFlags: 0
@@ -2699,7 +2769,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &853663601
 GameObject:
@@ -3574,12 +3644,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CameraController: {fileID: 345478515}
-  IngameCursorBlue: {fileID: 317416683}
-  IngameCursorRed: {fileID: 149810444}
-  IngameCursorScale: 0.2
-  CursorPriorities:
-  - {fileID: 149810444}
-  - {fileID: 317416683}
   CursorHitLayer:
     serializedVersion: 2
     m_Bits: 65
@@ -3604,6 +3668,15 @@ MonoBehaviour:
   ReloadDotsSize: 4
   ReloadDotsFadeoutSpeed: 5
   TargetLockAnimationSpeed: 5
+  ReloadIndicatorFadeoutAnimation:
+    startedAt: 0
+  TargetLockingAnimation:
+    startedAt: 0
+    IsReversed: 0
+  TargetLockingAnimationController:
+    condition: 0
+    lastCondition: 0
+    IsChanged: 0
 --- !u!4 &1222227741
 Transform:
   m_ObjectHideFlags: 0
@@ -3874,7 +3947,7 @@ Transform:
   - {fileID: 196294526}
   - {fileID: 2130527467}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1376606806
 GameObject:
@@ -3910,7 +3983,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1376606810
 MonoBehaviour:

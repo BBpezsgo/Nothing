@@ -56,6 +56,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AmbientOcclusion: 1
     - _Depth: -5.26
     - _Displacement: 0.5
     - _Displacement_Scroll_Speed: 0.005
@@ -63,11 +64,13 @@ Material:
     - _QueueOffset: -1
     - _Shorline_Density: 10
     - _Shorline_Speed: -0.1
+    - _Smoothness: 1
     - _Strength: 0.14
     - _Wave_Speed_Main: 0.01
     - _Wave_Speed_Secondary: -0.01
     m_Colors:
     - _Deep_Color: {r: 0.24148276, g: 0.31132078, b: 0.22761661, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 0}
     - _Shallow_Color: {r: 0.24474901, g: 0.41509432, b: 0.36142388, a: 0}
     - _Waves_Strength: {r: 0, g: 0.37, b: 0, a: 0}
   m_BuildTextureStacks: []
