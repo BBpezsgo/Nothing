@@ -77,7 +77,5 @@ crashlytics-build.properties
 *.meta
 /Packages/packages-lock.json
 *.exr
-/Assets/_/Scenes/UI & Managers/LightingData.asset
-/Assets/_/Scenes/Testing/LightingData.asset
-/Assets/_/Scenes/Testing/ReflectionProbe-0.exr
+*LightingData.asset
 /Assets/ProBuilder Data
