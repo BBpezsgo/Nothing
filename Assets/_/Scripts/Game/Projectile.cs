@@ -203,7 +203,10 @@ namespace Game.Components
                     ticksUntilTrailClear = int.MaxValue;
 
                     if (trail != null && trail.TryGetComponent(out TrailRenderer trailRenderer))
-                    { trailRenderer.Clear(); }
+                    {
+                        trailRenderer.Clear();
+                        trailRenderer.emitting = true;
+                    }
                 }
             }
 
@@ -232,12 +235,14 @@ namespace Game.Components
 
                 for (int i = 0; i < hitCount; i++)
                 {
-                    if (hits[i].collider.isTrigger &&
-                        !hits[i].collider.gameObject.HasComponent<Projectile>() &&
-                        (hits[i].collider.gameObject.name != "Water" || !DieInWater))
+                    if (!hits[i].collider.gameObject.HasComponent<Projectile>())
                     {
-                        continue;
+                        if (hits[i].collider.isTrigger &&
+                            (hits[i].collider.gameObject.name != "Water" || !DieInWater))
+                        { continue; }
                     }
+                    else if (PropabilityOfProjectileIntersection <= 0f)
+                    { continue; }
 
                     if (hits[i].transform == transform)
                     { continue; }
@@ -321,6 +326,8 @@ namespace Game.Components
                     return;
                 }
             }
+            else if (PropabilityOfProjectileIntersection <= 0f)
+            { return; }
 
             if (ignoreCollision.Contains(other.transform)) return;
             Vector3 point = other.ClosestPointOnBounds(Position);
@@ -336,10 +343,10 @@ namespace Game.Components
                 if (!collision.gameObject.HasComponent<Projectile>())
                 {
                     if (collision.gameObject.name != "Water" || !DieInWater)
-                    {
-                        return;
-                    }
+                    { return; }
                 }
+                else if (PropabilityOfProjectileIntersection <= 0f)
+                { return; }
             }
             if (ignoreCollision.Contains(collision.transform)) return;
             Vector3 point;
@@ -454,18 +461,18 @@ namespace Game.Components
         {
             if (trail == null) return;
             if (trailData.Parent == null) return;
-            ticksUntilTrailClear = 2;
+            ticksUntilTrailClear = 1;
+
+            if (trail.TryGetComponent(out TrailRenderer trailRenderer))
+            {
+                trailRenderer.emitting = false;
+                trailRenderer.Clear();
+            }
 
             if (trail.transform.parent.gameObject != trailData.Parent.gameObject)
             { trail.transform.SetParent(transform); }
 
             trail.transform.localPosition = trailData.LocalPosition;
-
-            if (trail.TryGetComponent(out TrailRenderer trailRenderer))
-            {
-                trailRenderer.emitting = true;
-                trailRenderer.Clear();
-            }
 
             if (trail.TryGetComponent(out ParticleSystem particleSystem))
             {

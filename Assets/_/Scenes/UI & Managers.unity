@@ -558,6 +558,8 @@ MonoBehaviour:
   projectile: {fileID: 1893550291513682336, guid: 1fd7710a55d4930449dc7c74b11ceb27,
     type: 3}
   Projectiles: []
+  Randomness: 0
+  BulletCount: {x: 1, y: 1}
   SelectedProjectile: 0
   ShootEffects:
   - {fileID: 8990596160454144657, guid: 60f5e7c895ff69c40a7a3f3f25ac0e17, type: 3}

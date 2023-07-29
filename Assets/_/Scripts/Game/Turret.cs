@@ -100,6 +100,8 @@ namespace Game.Components
         PooledObject PooledProjectile;
         [SerializeField, AssetField] internal GameObject[] Projectiles;
         PooledObject[] PooledProjectiles;
+        [SerializeField] float Randomness = 0f;
+        [SerializeField] Vector2Int BulletCount = Vector2Int.one;
 
         internal float CurrentProjectileLifetime
         {
@@ -615,6 +617,8 @@ namespace Game.Components
             return Shoot(requiedShoots, t.Value);
         }
         internal bool Shoot(RequiredShoots requiedShoots, float impactTime)
+            => ShootInternal(requiedShoots, impactTime, UnityEngine.Random.Range(BulletCount.x, BulletCount.y));
+        bool ShootInternal(RequiredShoots requiedShoots, float impactTime, int bulletCount)
         {
             if (reload > 0f)
             { return false; }
@@ -626,71 +630,88 @@ namespace Game.Components
                 BarrelRotationSpeed < RequiedBarrelRotationSpeed)
             { return false; }
 
-            GameObject newProjectile = CurrentProjectile.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
-
-            if (newProjectile == null)
-            { return false; }
-
-            if (newProjectile.TryGetComponent(out Rigidbody rb))
+            bool instantiatedAnyProjectile = false;
+            for (int i = 0; i < bulletCount; i++)
             {
-                rb.velocity = shootPosition.forward * projectileVelocity;
-            }
+                GameObject newProjectile = CurrentProjectile.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
 
-            if (newProjectile.TryGetComponent(out Projectile _projectile))
-            {
-                _projectile.TargetPosition = TargetPosition;
+                if (newProjectile == null)
+                { continue; }
 
-                _projectile.lastPosition = shootPosition.position;
+                instantiatedAnyProjectile = true;
 
-                _projectile.ignoreCollision = projectileIgnoreCollision.ToArray();
-                _projectile.OwnerTeamHash = @base.TeamHash;
-                _projectile.Owner = @base;
-
-                _projectile.LifeLeft = CurrentProjectileLifetime;
-                _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
-
-                _projectile.Shot = new Projectile.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
-
-                Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
-
-                shots.Add((_projectile, predictedImpactPosition));
-
-                if (IsAccurateShoot)
+                if (newProjectile.TryGetComponent(out Rigidbody rb))
                 {
-                    if (requiedShoots != null)
+                    Vector3 velocityResult = shootPosition.forward * projectileVelocity;
+
+                    if (Randomness > 0f)
                     {
-                        float predictedDamage = 0f;
-                        if (requiedShoots.HasComponent<Projectile>())
-                        {
-                            predictedDamage = 1f;
-                        }
-                        else
-                        {
-                            predictedDamage += _projectile.ImpactDamage;
-                            predictedDamage += _projectile.ExploisonDamage * .2f;
-                        }
-                        requiedShoots.Shoot(impactTime, predictedDamage);
+                        Vector3 randomRotation = UnityEngine.Random.insideUnitSphere * Randomness;
+                        velocityResult += randomRotation;
                     }
-                    else if (targetTransform != null &&
-                        targetTransform.gameObject.TryGetComponent(out requiedShoots))
+
+                    rb.velocity = velocityResult;
+                }
+
+                if (newProjectile.TryGetComponent(out Projectile _projectile))
+                {
+                    _projectile.TargetPosition = TargetPosition;
+
+                    _projectile.lastPosition = shootPosition.position;
+
+                    _projectile.ignoreCollision = projectileIgnoreCollision.ToArray();
+                    _projectile.OwnerTeamHash = @base.TeamHash;
+                    _projectile.Owner = @base;
+
+                    _projectile.LifeLeft = CurrentProjectileLifetime;
+                    _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
+
+                    _projectile.Shot = new Projectile.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
+
+                    Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
+
+                    shots.Add((_projectile, predictedImpactPosition));
+
+                    if (IsAccurateShoot)
                     {
-                        if ((predictedImpactPosition - TargetPosition).sqrMagnitude < 1f)
+                        if (requiedShoots != null)
                         {
-                            float? predictedImpactTime_ = Utilities.Ballistics.CalculateTime(projectileVelocity, CannonLocalRotation * Mathf.Deg2Rad, ShootHeight);
-                            if (predictedImpactTime_.HasValue)
+                            float predictedDamage = 0f;
+                            if (requiedShoots.HasComponent<Projectile>())
                             {
-                                float predictedImpactTime = predictedImpactTime_.Value;
-                                float predictedDamage = _projectile.ImpactDamage;
+                                predictedDamage = 1f;
+                            }
+                            else
+                            {
+                                predictedDamage += _projectile.ImpactDamage;
                                 predictedDamage += _projectile.ExploisonDamage * .2f;
-                                requiedShoots.Shoot(predictedImpactTime, predictedDamage);
+                            }
+                            requiedShoots.Shoot(impactTime, predictedDamage);
+                        }
+                        else if (targetTransform != null &&
+                            targetTransform.gameObject.TryGetComponent(out requiedShoots))
+                        {
+                            if ((predictedImpactPosition - TargetPosition).sqrMagnitude < 1f)
+                            {
+                                float? predictedImpactTime_ = Utilities.Ballistics.CalculateTime(projectileVelocity, CannonLocalRotation * Mathf.Deg2Rad, ShootHeight);
+                                if (predictedImpactTime_.HasValue)
+                                {
+                                    float predictedImpactTime = predictedImpactTime_.Value;
+                                    float predictedDamage = _projectile.ImpactDamage;
+                                    predictedDamage += _projectile.ExploisonDamage * .2f;
+                                    requiedShoots.Shoot(predictedImpactTime, predictedDamage);
+                                }
                             }
                         }
                     }
                 }
             }
 
+            if (!instantiatedAnyProjectile)
+            { return false; }
+
             if (IsServer)
-            { OnShoot_ClientRpc(new Vector2(TurretLocalRotation, CannonLocalRotation)); }
+            { OnShoot_ClientRpc(new Vector2(TurretLocalRotation, CannonLocalRotation), bulletCount); }
 
             if (CannonKnockback != 0f)
             {
@@ -764,7 +785,7 @@ namespace Game.Components
         }
 
         [ClientRpc]
-        void OnShoot_ClientRpc(Vector2 input)
+        void OnShoot_ClientRpc(Vector2 input, int bulletCount)
         {
             this.input = input;
             currentError = CalculateError(input);
@@ -772,7 +793,7 @@ namespace Game.Components
             RotateTurretInstant(input.x);
             RotateCannonInstant(input.y);
             reload = 0f;
-            Shoot();
+            ShootInternal(null, 0f, bulletCount);
         }
 
         internal void ShootRequest()

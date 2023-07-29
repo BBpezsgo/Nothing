@@ -415,18 +415,6 @@ namespace Game.Managers
                 mousePosition.y == int.MinValue)
             { return false; }
 
-            if (Selected != null && Selected.Length > 0)
-            {
-                for (int i = 0; i < Selected.Length; i++)
-                {
-                    if (((Component)Selected[i]).HasComponent<VehicleEngine>())
-                    {
-                        CursorGoTo.SetCursor();
-                        return true;
-                    }
-                }
-            }
-
             Ray ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
             float maxDistance = 500f;
             RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance);
@@ -439,6 +427,18 @@ namespace Game.Managers
                     return true;
                 }
             }
+            if (Selected != null && Selected.Length > 0)
+            {
+                for (int i = 0; i < Selected.Length; i++)
+                {
+                    if (((Component)Selected[i]).HasComponent<VehicleEngine>())
+                    {
+                        CursorGoTo.SetCursor();
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
     }

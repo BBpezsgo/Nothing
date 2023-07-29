@@ -651,6 +651,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TimeScale: 0.05
+  btnRefresh: 
 --- !u!4 &496674158
 Transform:
   m_ObjectHideFlags: 0
@@ -736,7 +737,7 @@ PrefabInstance:
     - target: {fileID: 8062244046001752373, guid: d6cc4e5438db13d44aec59fb38f1f0a0,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1096718672
+      value: 1596533863
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d6cc4e5438db13d44aec59fb38f1f0a0, type: 3}
@@ -1221,6 +1222,7 @@ Transform:
   m_Children:
   - {fileID: 1285350885}
   - {fileID: 1428071916}
+  - {fileID: 1416881261}
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1450,6 +1452,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   Thing: {fileID: 5278498343419542869, guid: 8c3c45102458da94bb5eb8919a4bc1eb, type: 3}
+  Things: []
+  MinThings: 1
+  NextSpawn: 1
+  Area: {x: 100, y: 100}
+  Team: scav
+--- !u!1 &1416881260
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1416881261}
+  - component: {fileID: 1416881262}
+  m_Layer: 0
+  m_Name: Spawner 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1416881261
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416881260}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 292.2, y: 0, z: -260.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 951541516}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1416881262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416881260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6600c06ae4b37943b5cae845122b43d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Terrain: {fileID: 0}
+  Thing: {fileID: 8289170899940005791, guid: 2ca74966a54ce0c498ff772f51441b54, type: 3}
   Things: []
   MinThings: 1
   NextSpawn: 1
