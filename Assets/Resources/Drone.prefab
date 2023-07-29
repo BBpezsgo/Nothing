@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 8062244046001752377}
   - component: {fileID: 8062244046001752378}
   - component: {fileID: 9144028623863636501}
+  - component: {fileID: 4402330003049463441}
   m_Layer: 0
   m_Name: Drone
   m_TagString: Untagged
@@ -97,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  acceleration: {x: 0, y: 0, z: 0}
   HoveringHeight: 10
   SpringStrength: 10
   SpringDamper: 5
@@ -141,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority: 0
   MovementEngine: {fileID: 0}
-  Target: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
   maxDistanceToReverse: 4
   useBrakingCalculations: 1
   currentlyStopping: 0
@@ -410,6 +412,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4402330003049463441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062244046001752334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8062244046070208244
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,6 +501,9 @@ MonoBehaviour:
   projectile: {fileID: 4399164710629436118, guid: c5ebc875782f6004fadd32cdeb00fe8b,
     type: 3}
   Projectiles: []
+  Randomness: 0
+  BulletCount: {x: 1, y: 1}
+  Shells: {fileID: 0}
   SelectedProjectile: 0
   ShootEffects:
   - {fileID: 3494347763345842717, guid: cc771034620aa114787ee5f89b4f19fc, type: 3}

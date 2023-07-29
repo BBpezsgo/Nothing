@@ -650,6 +650,60 @@ namespace Utilities
         /// </summary>
         public static Vector2 GVector => new(0f, -G);
 
+        public readonly struct Trajectory
+        {
+            /// <summary>
+            /// In degrees
+            /// </summary>
+            public readonly float Angle;
+            /// <summary>
+            /// In degrees
+            /// </summary>
+            public readonly float Direction;
+            public readonly float Velocity;
+            public readonly Vector3 StartPosition;
+
+            public Trajectory(float angle, float direction, float velocity, Vector3 startPosition)
+            {
+                Angle = angle;
+                Direction = direction;
+                Velocity = velocity;
+                StartPosition = startPosition;
+            }
+
+            public Vector2 Velocity2D()
+                => new(Velocity * Mathf.Cos(Angle * Mathf.Deg2Rad), Velocity * Mathf.Sin(Angle * Mathf.Deg2Rad));
+
+            public Vector3 Velocity3D()
+            {
+                Vector3 result = Vector3.zero;
+                result.x = Mathf.Sin(Direction * Mathf.Deg2Rad);
+                result.y = Mathf.Sin(Angle * Mathf.Deg2Rad);
+                result.z = Mathf.Cos(Direction * Mathf.Deg2Rad);
+                return result;
+            }
+
+            public Vector3 Position(float t)
+            {
+                Vector2 displacement = Utilities.Ballistics.Displacement(Angle * Mathf.Deg2Rad, Velocity, t);
+                Vector3 displacement3D = Vector3.zero;
+
+                displacement3D.x = displacement.x * Mathf.Sin(Direction * Mathf.Deg2Rad);
+                displacement3D.y = displacement.y;
+                displacement3D.z = displacement.x * Mathf.Cos(Direction * Mathf.Deg2Rad);
+
+                displacement3D += StartPosition;
+
+                return displacement3D;
+            }
+
+            public static Vector2 TransformPositionToPlane(Vector3 position, float directionRad) => new()
+            {
+                y = position.y,
+                x = position.x * Mathf.Cos(directionRad) + position.y * Mathf.Sin(directionRad),
+            };
+        }
+
         /// <param name="v">
         /// Projectile's initial velocity
         /// </param>
@@ -1041,6 +1095,81 @@ namespace Utilities
             return time_of_flight;
         }
         */
+
+        public static (Vector3 PredictedPosition, float TimeToReach)? CalculateInterceptCourse(float projectileVelocity, float projectileLifetime, Vector3 shootPosition, Trajectory targetTrajectory)
+        {
+            float? angle_;
+            float? t;
+            Vector3 targetPosition;
+            int iterations = 3;
+
+            using (ProfilerMarkers.TrajectoryMath.Auto())
+            {
+                projectileVelocity *= .95f;
+
+                float lifetime = projectileLifetime + Time.fixedDeltaTime;
+
+                float? projectileTimeOfFlight = Ballistics.CalculateTime(targetTrajectory.Velocity, targetTrajectory.Angle * Mathf.Deg2Rad, targetTrajectory.StartPosition.y);
+
+                if (projectileTimeOfFlight.HasValue && (projectileTimeOfFlight - lifetime) < .5f)
+                { return null; }
+
+                targetPosition = targetTrajectory.Position(lifetime);
+
+                float distance = Vector2.Distance(shootPosition.To2D(), targetPosition.To2D());
+
+                angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
+
+                t = angle_.HasValue ? Ballistics.TimeToReachDistance(projectileVelocity, angle_.Value, distance) : null;
+
+                for (int i = 0; i < iterations; i++)
+                {
+                    if (!angle_.HasValue) break;
+                    if (!t.HasValue) break;
+
+                    targetPosition = targetTrajectory.Position(lifetime + t.Value);
+
+                    distance = Vector2.Distance(shootPosition.To2D(), targetPosition.To2D());
+
+                    angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
+
+                    t = angle_.HasValue ? Ballistics.TimeToReachDistance(projectileVelocity, angle_.Value, distance) : null;
+                }
+            }
+
+            return (targetPosition, t.Value);
+        }
+
+        public static Vector2? CalculateInterceptCourse(Vector2 projectilePosition, float projectileVelocity, Vector2 targetPosition, Vector2 targetVelocity)
+        {
+            float time = 0f;
+            int iterations = 3;
+            Vector2 targetOriginalPosition = targetPosition;
+
+            float height = projectilePosition.y - targetPosition.y;
+
+            using (ProfilerMarkers.TrajectoryMath.Auto())
+            {
+                projectileVelocity *= .95f;
+
+                for (int i = 0; i < iterations; i++)
+                {
+                    float? _angle = Ballistics.AngleOfReach2(projectileVelocity, projectilePosition, targetPosition);
+                    if (!_angle.HasValue)
+                    { return null; }
+                    float angle = _angle.Value;
+
+                    float? _time = Ballistics.CalculateTime(projectileVelocity, angle, height);
+                    if (!_time.HasValue)
+                    { return null; }
+                    time = _time.Value;
+
+                    targetPosition = targetOriginalPosition + (targetVelocity * time);
+                }
+            }
+
+            return targetVelocity * time;
+        }
     }
 
     internal struct Line
@@ -1982,6 +2111,7 @@ namespace Game
         static Transform game;
         static Transform effects;
         static Transform projectiles;
+        static Transform items;
 
         public static Transform Game
         {
@@ -2019,6 +2149,18 @@ namespace Game
                 { obj = new GameObject("Projectiles"); }
                 projectiles = obj.transform;
                 return projectiles;
+            }
+        }
+
+        public static Transform Items
+        {
+            get
+            {
+                GameObject obj = GameObject.Find("Items");
+                if (obj == null)
+                { obj = new GameObject("Items"); }
+                items = obj.transform;
+                return items;
             }
         }
     }

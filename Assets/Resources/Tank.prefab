@@ -9868,6 +9868,9 @@ MonoBehaviour:
   Projectiles:
   - {fileID: 4399164710629436118, guid: 575b4cf4819c3fa40a95050e6b416019, type: 3}
   - {fileID: 4399164710629436118, guid: bcd21039f53d4cc4c92f4c4417b98d34, type: 3}
+  Randomness: 0
+  BulletCount: {x: 1, y: 1}
+  Shells: {fileID: 0}
   SelectedProjectile: 0
   ShootEffects:
   - {fileID: 8990596160454144657, guid: 33cb7bc4982dcab48abed671c2896b6d, type: 3}
@@ -9967,6 +9970,7 @@ GameObject:
   - component: {fileID: 3413199833213572951}
   - component: {fileID: 1269857257918406634}
   - component: {fileID: 7518325145530454443}
+  - component: {fileID: 8161849761146861834}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -10039,6 +10043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  acceleration: {x: 0, y: 0, z: 0}
   unit: {fileID: 0}
   input: {x: 0, y: 0}
   CenterOfMass: 0
@@ -10104,7 +10109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority: 0
   MovementEngine: {fileID: 0}
-  Target: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
   maxDistanceToReverse: 8
   useBrakingCalculations: 1
   currentlyStopping: 0
@@ -10266,7 +10271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -10478,6 +10483,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8161849761146861834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2619412345589989143

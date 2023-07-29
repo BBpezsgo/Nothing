@@ -18,6 +18,12 @@ namespace Game.Managers
 {
     public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
     {
+        internal enum ReloadIndicatorStyle
+        {
+            Dots,
+            Circle,
+        }
+
         static TakeControlManager instance;
 
         internal static TakeControlManager Instance => instance;
@@ -62,9 +68,9 @@ namespace Game.Managers
         [SerializeField, Min(.5f)] float ReloadDotsSize = 4f;
         [SerializeField, Min(.01f)] float ReloadDotsFadeoutSpeed = 5f;
         [SerializeField, Min(.01f)] float TargetLockAnimationSpeed = 2f;
+        [SerializeField] ReloadIndicatorStyle reloadIndicatorStyle = ReloadIndicatorStyle.Circle;
 
         Texture2D SphereFilled;
-        bool lastTargeted = false;
         Rect targetRect = Rect.zero;
 
         static readonly (float Inner, float Outer) CrossSize = (4f, 12f);
@@ -909,38 +915,15 @@ namespace Game.Managers
         {
             if (value != 1f)
             {
-                GLUtils.DrawCircle(center + Vector2.one, ReloadDotsRadius, 2f, shadowColor, value, 24);
-                GLUtils.DrawCircle(center, ReloadDotsRadius, 2f, Color.white, value, 24);
-                /*
-                float step = 1f / (float)ReloadDots;
-
-                for (int i = 0; i < ReloadDots; i++)
+                if (reloadIndicatorStyle == ReloadIndicatorStyle.Circle)
                 {
-                    float normalizedIndex = (float)i / (float)ReloadDots;
-
-                    float rad = 2 * Mathf.PI * normalizedIndex;
-                    Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
-
-                    float multiplier = Mathf.Clamp01((value - normalizedIndex) / step);
-
-                    if (multiplier <= .01f)
-                    { continue; }
-
-                    float size = ReloadDotsSize * multiplier;
-
-                    GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
-                    GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
+                    GLUtils.DrawCircle(center + Vector2.one, ReloadDotsRadius, 2f, shadowColor, value, 24);
+                    GLUtils.DrawCircle(center, ReloadDotsRadius, 2f, Color.white, value, 24);
                 }
-                */
-            }
-            else
-            {
-                float fadeOutPercent = ReloadIndicatorFadeoutAnimation.PercentInverted;
-
-                if (fadeOutPercent > .0001f)
+                else if (reloadIndicatorStyle == ReloadIndicatorStyle.Dots)
                 {
-                    GLUtils.DrawCircle(center, ReloadDotsRadius + ((1f - fadeOutPercent) * 4f), 2f + ((1f - fadeOutPercent) * 4f), Color.white.Opacity(fadeOutPercent), value, 24);
-                    /*
+                    float step = 1f / (float)ReloadDots;
+
                     for (int i = 0; i < ReloadDots; i++)
                     {
                         float normalizedIndex = (float)i / (float)ReloadDots;
@@ -948,18 +931,49 @@ namespace Game.Managers
                         float rad = 2 * Mathf.PI * normalizedIndex;
                         Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
 
-                        float size = ReloadDotsSize;
+                        float multiplier = Mathf.Clamp01((value - normalizedIndex) / step);
 
-                        size += (1f - fadeOutPercent) * 4f;
+                        if (multiplier <= .01f)
+                        { continue; }
 
-                        Vector2 offset = Vector2.zero;
+                        float size = ReloadDotsSize * multiplier;
 
-                        offset += direction * ReloadDotsRadius;
-                        offset += direction * ((1f - fadeOutPercent) * 4f);
-
-                        GUI.DrawTexture(RectUtils.Center(center + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
+                        GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
+                        GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
                     }
-                    */
+                }
+            }
+            else
+            {
+                float fadeOutPercent = ReloadIndicatorFadeoutAnimation.PercentInverted;
+
+                if (fadeOutPercent > .0001f)
+                {
+                    if (reloadIndicatorStyle == ReloadIndicatorStyle.Circle)
+                    {
+                        GLUtils.DrawCircle(center, ReloadDotsRadius + ((1f - fadeOutPercent) * 4f), 2f + ((1f - fadeOutPercent) * 4f), Color.white.Opacity(fadeOutPercent), value, 24);
+                    }
+                    else if (reloadIndicatorStyle == ReloadIndicatorStyle.Dots)
+                    {
+                        for (int i = 0; i < ReloadDots; i++)
+                        {
+                            float normalizedIndex = (float)i / (float)ReloadDots;
+
+                            float rad = 2 * Mathf.PI * normalizedIndex;
+                            Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+
+                            float size = ReloadDotsSize;
+
+                            size += (1f - fadeOutPercent) * 4f;
+
+                            Vector2 offset = Vector2.zero;
+
+                            offset += direction * ReloadDotsRadius;
+                            offset += direction * ((1f - fadeOutPercent) * 4f);
+
+                            GUI.DrawTexture(RectUtils.Center(center + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
+                        }
+                    }
                 }
             }
         }

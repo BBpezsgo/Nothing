@@ -156,8 +156,9 @@ namespace Game.Components
             { Debug.LogError($"[{nameof(DroneEngine)}]: {nameof(Collider)} is null", this); }
         }
 
-        void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
             DoBasicPhysics();
 
             SmoothSteeringInput = Mathf.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);

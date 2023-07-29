@@ -5144,6 +5144,7 @@ MonoBehaviour:
   Projectiles: []
   Randomness: 50
   BulletCount: {x: 4, y: 7}
+  Shells: {fileID: 0}
   SelectedProjectile: 0
   ShootEffects:
   - {fileID: 8350691597614361660, guid: 70fe468e1eb932f4f8fd2a14beff9bd9, type: 3}
@@ -5274,6 +5275,8 @@ GameObject:
   - component: {fileID: 8289170899940005789}
   - component: {fileID: 8289170899940005788}
   - component: {fileID: 3908571360721944348}
+  - component: {fileID: 8263731243809967905}
+  - component: {fileID: -4308669744550821362}
   m_Layer: 0
   m_Name: Scavenger 3
   m_TagString: Untagged
@@ -5774,6 +5777,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8263731243809967905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8289170899940005791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-4308669744550821362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8289170899940005791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 898f081804eee854395a3256a0d14969, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Loots:
+  - ItemID: scrap
+    Ammount: {x: 1, y: 1}
+    Propability: 0.2
 --- !u!1001 &7155704815949478884
 PrefabInstance:
   m_ObjectHideFlags: 0

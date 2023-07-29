@@ -103,6 +103,8 @@ namespace Game.Components
         [SerializeField] float Randomness = 0f;
         [SerializeField] Vector2Int BulletCount = Vector2Int.one;
 
+        [SerializeField] ParticleSystem Shells;
+
         internal float CurrentProjectileLifetime
         {
             get
@@ -407,8 +409,16 @@ namespace Game.Components
             {
                 if (targetVelocity.To2D().sqrMagnitude > .1f)
                 {
-                    Vector2 offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity);
-                    Vector3 offset3 = offset.To3D() * 1.01f;
+                    Vector2 offset;
+                    /*
+                    Vector2? ballisticOffset = Ballistics.CalculateInterceptCourse(ShootPosition, projectileVelocity, targetPosition, targetVelocity); ;
+
+                    if (ballisticOffset.HasValue)
+                    { offset = ballisticOffset.Value; }
+                    else*/
+                    { offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity); }
+
+                    Vector3 offset3 = offset.To3D();
                     predictedOffset = offset3;
 
                     targetPosition += offset3;
@@ -666,7 +676,7 @@ namespace Game.Components
                     _projectile.LifeLeft = CurrentProjectileLifetime;
                     _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
 
-                    _projectile.Shot = new Projectile.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
+                    _projectile.Shot = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
 
                     Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
 
@@ -709,6 +719,9 @@ namespace Game.Components
 
             if (!instantiatedAnyProjectile)
             { return false; }
+
+            if (Shells != null)
+            { Shells.Emit(1); }
 
             if (IsServer)
             { OnShoot_ClientRpc(new Vector2(TurretLocalRotation, CannonLocalRotation), bulletCount); }

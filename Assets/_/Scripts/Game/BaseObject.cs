@@ -66,5 +66,14 @@ namespace Game.Components
             serializer.SerializeValue(ref TeamHash);
             UpdateTeam();
         }
+
+        protected void TryDropLoot()
+        {
+            if (!NetcodeUtils.IsOfflineOrServer)
+            { return; }
+
+            if (TryGetComponent(out ItemLoot itemLoot))
+            { itemLoot.DropLoots(); }
+        }
     }
 }

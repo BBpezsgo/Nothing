@@ -176,7 +176,7 @@ namespace Game.Components
             { avoidObstacles.IgnoreCollision = null; }
         }
 
-        private void OnDrawGizmosSelected()
+        void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(transform.position, DistanceToBuild);

@@ -29,61 +29,6 @@ namespace Game.Components
             [SerializeField] internal GameObject Hoe;
         }
 
-        public readonly struct Trajectory
-        {
-            /// <summary>
-            /// In degrees
-            /// </summary>
-            public readonly float ShootAngle;
-            /// <summary>
-            /// In degrees
-            /// </summary>
-            public readonly float ShootDirection;
-            public readonly float Velocity;
-            public readonly Vector3 ShootPosition;
-
-            public Trajectory(float shootAngle, float shootDirection, float velocity, Vector3 shootPosition)
-            {
-                ShootAngle = shootAngle;
-                ShootDirection = shootDirection;
-                Velocity = velocity;
-                ShootPosition = shootPosition;
-            }
-
-            public Vector2 Velocity2D()
-                => new(Velocity * Mathf.Cos(ShootAngle * Mathf.Deg2Rad), Velocity * Mathf.Sin(ShootAngle * Mathf.Deg2Rad));
-
-            public Vector3 Velocity3D()
-            {
-                Vector3 result = Vector3.zero;
-                result.x = Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
-                result.y = Mathf.Sin(ShootAngle * Mathf.Deg2Rad);
-                result.z = Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
-                return result;
-            }
-
-            public Vector3 Position(float t)
-            {
-                Vector2 displacement = Utilities.Ballistics.Displacement(ShootAngle * Mathf.Deg2Rad, Velocity, t);
-                Vector3 displacement3D = Vector3.zero;
-
-                displacement3D.x = displacement.x * Mathf.Sin(ShootDirection * Mathf.Deg2Rad);
-                displacement3D.y = displacement.y;
-                displacement3D.z = displacement.x * Mathf.Cos(ShootDirection * Mathf.Deg2Rad);
-
-                displacement3D += ShootPosition;
-
-                return displacement3D;
-            }
-
-            public static Vector2 TransformPositionToPlane(Vector3 position, float directionRad)
-                => new()
-                {
-                    y = position.y,
-                    x = position.x * Mathf.Cos(directionRad) + position.y * Mathf.Sin(directionRad),
-                };
-        }
-
         [SerializeField] bool Register;
         [SerializeField, ReadOnly] AudioSource AudioSource;
 
@@ -143,7 +88,7 @@ namespace Game.Components
 
         internal Vector3 Position => rb.position + (rb.velocity * Time.fixedDeltaTime);
 
-        internal Trajectory Shot;
+        internal Ballistics.Trajectory Shot;
 
         [SerializeField, ReadOnly] bool destroyed = false;
 

@@ -39,16 +39,19 @@ namespace Game.Components
         public void Damage(float ammount)
         {
             HP -= ammount;
+
             if (HP <= 0f)
-            {
-                Destroy();
-            }
+            { Destroy(); }
         }
 
         void Destroy()
         {
             if (NetcodeUtils.IsOfflineOrServer)
-            { GameObject.Destroy(gameObject); }
+            {
+                base.TryDropLoot();
+
+                GameObject.Destroy(gameObject);
+            }
         }
 
         protected virtual void OnDrawGizmosSelected()

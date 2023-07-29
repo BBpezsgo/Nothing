@@ -66,6 +66,9 @@ namespace Game.Components
                 { return false; }
             }
 
+            var predictedAim = Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition, projectile.Shot);
+            
+            /*
             float? angle_;
             float? t;
             Vector3 projPosition;
@@ -107,20 +110,21 @@ namespace Game.Components
                     t = angle_.HasValue ? Ballistics.TimeToReachDistance(v, angle_.Value, d) : null;
                 }
             }
+            */
 
             // Debug.DrawLine(projectile.Position, projPosition, Color.red, Time.fixedDeltaTime, false);
 
-            if (angle_.HasValue && t.HasValue)
+            if (predictedAim.HasValue)
             {
-                Debug3D.DrawSphere(projPosition, 2f, Color.red, t ?? Time.fixedDeltaTime);
+                // Debug3D.DrawSphere(predictedAim.Value.PredictedPosition, 2f, Color.red, predictedAim.Value.TimeToReach);
 
                 // Vector3 predictedTargetPos = turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Mathf.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f;
 
                 // Debug.DrawLine(turret.ShootPosition, predictedTargetPos, Color.white, Time.fixedDeltaTime, false);
 
                 // turret.Input = new Vector2(0f, angle_.Value * Mathf.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Mathf.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
-                turret.RequiedProjectileLifetime = t.Value - Time.fixedDeltaTime;
-                turret.SetTarget(projPosition);
+                turret.RequiedProjectileLifetime = predictedAim.Value.TimeToReach - Time.fixedDeltaTime;
+                turret.SetTarget(predictedAim.Value.PredictedPosition);
             }
             else
             {
@@ -128,15 +132,14 @@ namespace Game.Components
                 turret.SetTarget(Vector3.zero);
             }
 
-
             // turret.target = transform.position + relativePosition;
 
             turret.LoseTarget();
 
             if (turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
             {
-                if (t.HasValue && requiredShoots != null)
-                { turret.Shoot(requiredShoots, t.Value); }
+                if (predictedAim.HasValue && requiredShoots != null)
+                { turret.Shoot(requiredShoots, predictedAim.Value.TimeToReach); }
                 else
                 { turret.Shoot(); }
             }
