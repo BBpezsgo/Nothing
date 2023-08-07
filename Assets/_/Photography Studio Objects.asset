@@ -48,3 +48,9 @@ MonoBehaviour:
   - Name: turret-rocket
     Object: {fileID: 4273319253527134430, guid: 9c15fdf5485b1844f8594fda053e798b,
       type: 3}
+  - Name: truck
+    Object: {fileID: 6276130072880698484, guid: 25d8c1d2b945b04418bd3bda58ff16ea,
+      type: 3}
+  - Name: smelter
+    Object: {fileID: 1029036110833637850, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
+      type: 3}

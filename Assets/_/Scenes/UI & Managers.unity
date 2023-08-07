@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44748962, g: 0.4974426, b: 0.5753028, a: 1}
+  m_IndirectSpecularColor: {r: 0.18097387, g: 0.22653282, b: 0.30726108, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -172,6 +172,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TimeToNextUICollecting: 1
   UIDocuments: []
+  ShowDebugStuff: 1
 --- !u!114 &16150923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -721,6 +722,51 @@ Transform:
   m_Father: {fileID: 1358086404}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &277554302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 277554303}
+  - component: {fileID: 277554304}
+  m_Layer: 0
+  m_Name: Touch Joystick
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &277554303
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277554302}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 24
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &277554304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 277554302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35d41cad0b062894e9e6a600528596dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NormalizedInput: {x: 0, y: 0}
 --- !u!1 &283742170
 GameObject:
   m_ObjectHideFlags: 0
@@ -3815,10 +3861,14 @@ MonoBehaviour:
     Unit: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd, type: 3}
     ProgressRequied: 10
     ThumbnailID: tank
-  - Hash: 48
+  - Hash: 1864
     Unit: {fileID: 8062244046001752334, guid: d6cc4e5438db13d44aec59fb38f1f0a0, type: 3}
     ProgressRequied: 5
     ThumbnailID: drone
+  - Hash: 1142
+    Unit: {fileID: 6276130072880698484, guid: 25d8c1d2b945b04418bd3bda58ff16ea, type: 3}
+    ProgressRequied: 8
+    ThumbnailID: truck
   ConstructableBuildings:
   - Hash: 332
     SpaceNeed: {x: 20, y: 5, z: 20}
@@ -3862,6 +3912,12 @@ MonoBehaviour:
       type: 3}
     ProgressRequied: 30
     ThumbnailID: turret-minigun
+  - Hash: 166
+    SpaceNeed: {x: 9, y: 10, z: 9}
+    Building: {fileID: 1029036110833637850, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
+      type: 3}
+    ProgressRequied: 18
+    ThumbnailID: smelter
   btn_GenHash: 
 --- !u!4 &1356665773
 Transform:
@@ -3930,6 +3986,7 @@ Transform:
   - {fileID: 196294526}
   - {fileID: 2130527467}
   - {fileID: 96634724}
+  - {fileID: 277554303}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
