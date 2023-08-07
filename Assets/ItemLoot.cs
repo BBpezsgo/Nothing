@@ -11,7 +11,7 @@ namespace Game.Components
             [SerializeField] internal Vector2Int Ammount = Vector2Int.one;
             [SerializeField, Range(0.00001f, 1f)] internal float Propability = 1f;
 
-            internal int Evaulate()
+            internal int Evaluate()
             {
                 float evaulatedPropability = Random.value;
 
@@ -34,7 +34,7 @@ namespace Game.Components
             for (int i = 0; i < Loots.Length; i++)
             {
                 Loot loot = Loots[i];
-                int dropCount = loot.Evaulate();
+                int dropCount = loot.Evaluate();
                 if (dropCount <= 0)
                 { continue; }
 

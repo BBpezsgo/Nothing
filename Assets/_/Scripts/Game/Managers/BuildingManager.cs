@@ -1,5 +1,5 @@
 using Game.Components;
-
+using InputUtils;
 using System;
 using System.Collections.Generic;
 
@@ -113,14 +113,14 @@ namespace Game.Managers
         bool MouseCondition()
             => IsBuilding;
 
-        void LeftMouse_OnClick(Vector2 position, float holdTime)
+        void LeftMouse_OnClick(AdvancedMouse sender)
         {
             if (SelectedBuilding == null || SelectedBuilding.Building == null) return;
             if (!MouseManager.MouseOnWindow) return;
             if (MenuManager.AnyMenuVisible) return;
             if (!IsValidPosition) return;
 
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position);
 
             worldPosition.y = TheTerrain.Height(worldPosition);
 

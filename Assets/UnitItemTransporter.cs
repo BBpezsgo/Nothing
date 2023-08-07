@@ -28,6 +28,8 @@ namespace Game.Components
                 { continue; }
                 if (itemID != null && items[i].ItemID != itemID)
                 { continue; }
+                if (items[i].IsPickedUp)
+                { continue; }
                 Targets.Add(items[i]);
             }
         }
@@ -37,6 +39,10 @@ namespace Game.Components
             base.FixedUpdate();
             if (this.AnybodyControllingThis())
             { return; }
+
+
+            if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
+            { avoidObstacles.IgnoreCollision = null; }
 
             if ((Targets.Count > 0 || TransportingItem != null) && (CurrentItemNeeder != null && (Object)CurrentItemNeeder != null))
             {
@@ -105,16 +111,18 @@ namespace Game.Components
             }
             else
             {
-                if ((Targets[0].transform.position - transform.position).To2D().sqrMagnitude <= (ReachDistance * ReachDistance))
+                if (Targets[0].IsPickedUp)
+                {
+                    Targets.RemoveAt(0);
+                    if (TryGetComponent(out UnitBehaviour_Seek seek))
+                    { seek.Target = Vector3.zero; }
+                }
+                else if ((Targets[0].transform.position - transform.position).To2D().sqrMagnitude <= (ReachDistance * ReachDistance))
                 {
                     TransportingItem = Targets[0];
                     Targets.RemoveAt(0);
 
-                    if (TransportingItem.TryGetComponent(out Rigidbody itemRigidbody))
-                    { Rigidbody.Destroy(itemRigidbody); }
-
-                    TransportingItem.transform.SetParent(CargoPosition);
-                    TransportingItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    TransportingItem.PickUp(CargoPosition);
 
                     if (TryGetComponent(out UnitBehaviour_Seek seek))
                     { seek.Target = Vector3.zero; }

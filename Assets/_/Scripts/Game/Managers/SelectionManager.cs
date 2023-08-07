@@ -1,6 +1,6 @@
 using Game.Components;
 using Game.UI;
-
+using InputUtils;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,8 +37,8 @@ namespace Game.Managers
         bool selectionChanged = false;
         internal event SelectionChangedEvent OnSelectionChanged;
 
-        InputUtils.AdvancedMouse MouseLeftButton;
-        InputUtils.AdvancedMouse MouseRightButton;
+        AdvancedMouse MouseLeftButton;
+        AdvancedMouse MouseRightButton;
 
         public int CursorPriority => 4;
 
@@ -48,17 +48,17 @@ namespace Game.Managers
             if (CommandManager == null)
             { Debug.LogWarning($"[{nameof(SelectionManager)}]: {nameof(CommandManager)} is null"); }
 
-            MouseLeftButton = new InputUtils.AdvancedMouse(MouseButton.Left, 10, MouseCondition);
+            MouseLeftButton = new AdvancedMouse(MouseButton.Left, 10, MouseCondition);
             MouseLeftButton.OnDragged += OnLeftDragged;
             MouseLeftButton.OnClick += OnLeftClicked;
 
-            MouseRightButton = new InputUtils.AdvancedMouse(MouseButton.Right, 10, MouseCondition);
+            MouseRightButton = new AdvancedMouse(MouseButton.Right, 10, MouseCondition);
             MouseRightButton.OnClick += OnRightClicked;
 
             CursorImageManager.Instance.Register(this);
         }
 
-        void OnRightClicked(Vector2 position, float holdTime)
+        void OnRightClicked(AdvancedMouse sender)
         {
             ClearSelection();
         }
@@ -123,10 +123,10 @@ namespace Game.Managers
             }
         }
 
-        void OnLeftClicked(Vector2 screenPosition, float holdTime)
+        void OnLeftClicked(AdvancedMouse sender)
         {
-            if (holdTime >= QuickCommandManager.HOLD_TIME_REQUIREMENT) return;
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(screenPosition, out RaycastHit[] hits);
+            if (sender.HoldTime >= QuickCommandManager.HOLD_TIME_REQUIREMENT) return;
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, out RaycastHit[] hits);
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].transform.gameObject.TryGetComponent<ISelectable>(out var unit))

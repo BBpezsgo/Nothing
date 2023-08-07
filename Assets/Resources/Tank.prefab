@@ -10068,7 +10068,7 @@ MonoBehaviour:
   isHaveTracks: 1
   speedAndSteer: 10
   turnFactor: 1
-  steeringSpeed: 1
+  steeringSpeed: 20
   SteeringInput: 0
   SmoothSteeringInput: 0
   Steering: 0

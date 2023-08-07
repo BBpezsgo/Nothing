@@ -9,13 +9,16 @@ namespace Game.Components
     public class ThingSpawner : NetworkBehaviour
     {
         [SerializeField, ReadOnly] Terrain Terrain;
+        [SerializeField, NonReorderable, ReadOnly] List<GameObject> things = new();
+        internal IReadOnlyList<GameObject> Things => things;
+
+        [Header("Auto Spawn")]
+        [SerializeField] bool EnableAutoSpawn;
         [SerializeField] protected GameObject Thing;
-
-        [SerializeField, NonReorderable, ReadOnly] List<GameObject> Things = new();
-
         [SerializeField, Min(0)] int MinThings = 1;
         [SerializeField, ReadOnly] float NextSpawn = 1f;
 
+        [Header("Properties")]
         [SerializeField] Vector2 Area;
 
         void Start()
@@ -28,9 +31,12 @@ namespace Game.Components
             if (!NetcodeUtils.IsOfflineOrServer)
             { return; }
 
-            Things.PurgeObjects();
+            things.PurgeObjects();
 
-            if (Things.Count >= MinThings)
+            if (!EnableAutoSpawn)
+            { return; }
+
+            if (things.Count >= MinThings)
             { return; }
 
             if (NextSpawn > 0f)
@@ -39,31 +45,24 @@ namespace Game.Components
                 return;
             }
 
-            TrySpawn();
-        }
-
-        void TrySpawn()
-        {
-            if (NextSpawn > 0f)
-            { return; }
             NextSpawn = 1f;
 
-            GameObject newThing = Spawn();
-            Things.Add(newThing);
+            GameObject newThing = Spawn(Thing);
+            things.Add(newThing);
         }
 
         protected Vector3 GetPosition()
         {
-            Vector3 position = new Vector3(Random.Range(-Area.x, Area.x), 0f, Random.Range(-Area.y, Area.y));
+            Vector3 position = new(Random.Range(-Area.x, Area.x), 0f, Random.Range(-Area.y, Area.y));
             position += transform.position;
             position.y = Terrain.SampleHeight(position) + Terrain.transform.position.y;
             position.y += 2f;
             return position;
         }
 
-        protected virtual GameObject Spawn()
+        internal virtual GameObject Spawn(GameObject prefab)
         {
-            GameObject newThing = GameObject.Instantiate(Thing, GetPosition(), Quaternion.identity, transform);
+            GameObject newThing = GameObject.Instantiate(prefab, GetPosition(), Quaternion.identity, transform);
             newThing.SpawnOverNetwork();
             return newThing;
         }

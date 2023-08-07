@@ -1,6 +1,6 @@
 using Game.Components;
 using Game.Managers;
-
+using InputUtils;
 using UnityEngine;
 
 using Utilities;
@@ -78,6 +78,8 @@ namespace Game.Managers
 
         internal static Vector2 MouseDelta => new(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
+        TouchZoom TouchZoom;
+
         private void Awake()
         {
             if (Instance != null)
@@ -101,6 +103,49 @@ namespace Game.Managers
             Rotation = transform.rotation.eulerAngles.y;
 
             lastCameraMode = cameraMode;
+
+            TouchZoom = new TouchZoom(1, () => !MenuManager.AnyMenuVisible);
+            TouchZoom.OnZoom += OnTouchZoom;
+            TouchZoom.OnMove += OnTouchMove;
+        }
+
+        void OnTouchMove(AdvancedTouch sender)
+        {
+            Vector2 delta = sender.PositionDelta / AdvancedInput.ScreenSize;
+
+            delta *= 50f;
+
+            switch (cameraMode)
+            {
+                case CameraMode.Normal:
+                    {
+                        TargetRotation += delta.x * inputAngleMultiplier;
+                        TargetAngle = Mathf.Clamp(TargetAngle - (delta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                        break;
+                    }
+                case CameraMode.TopDown:
+                    {
+                        TargetRotation += delta.x * inputAngleMultiplier;
+                        TargetAngle = 80f;
+                        break;
+                    }
+                case CameraMode.ZoomBased:
+                    {
+                        TargetRotation += delta.x * inputAngleMultiplier;
+                        TargetAngle = Mathf.Clamp(Zoom * .5f, 10f, 80f);
+                        break;
+                    }
+            }
+        }
+
+        void OnTouchZoom(TouchZoom sender, float delta)
+        {
+            float zoomInput = delta * 30f;
+            zoomInput *= Mathf.Max(Mathf.Log(ZoomValue), 1f);
+
+            TargetZoom = Mathf.Max(TargetZoom + zoomInput, 0f);
+
+            Zoom = Mathf.Max(TargetZoom, 0f);
         }
 
         void Update()
@@ -153,8 +198,15 @@ namespace Game.Managers
         {
             if (!MenuManager.AnyMenuVisible)
             {
-                MovementInput.x = Input.GetAxisRaw("Vertical");
-                MovementInput.y = Input.GetAxisRaw("Horizontal");
+                if (TouchJoystick.Instance.IsActiveAndCaptured)
+                {
+                    MovementInput = TouchJoystick.Instance.NormalizedInput;
+                }
+                else
+                {
+                    MovementInput.x = Input.GetAxisRaw("Vertical");
+                    MovementInput.y = Input.GetAxisRaw("Horizontal");
+                }
 
                 TargetVelocity = MovementInput * maxSpeed;
 

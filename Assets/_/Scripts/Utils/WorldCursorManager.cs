@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using InputUtils;
 using UnityEngine;
 
 namespace Game.Managers
@@ -74,11 +74,11 @@ namespace Game.Managers
             !BuildingManager.Instance.IsBuilding &&
             (SelectionManager.Instance.Selected == null || SelectionManager.Instance.Selected.Length == 0);
 
-        void OnLeftMouseButtonClick(Vector2 position, float holdTime)
+        void OnLeftMouseButtonClick(AdvancedMouse sender)
         {
             if (!MouseManager.MouseOnWindow) return;
 
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position);
             float maxDistance = 500f;
             if (!Physics.Raycast(ray, out var hit, maxDistance))
             { return; }

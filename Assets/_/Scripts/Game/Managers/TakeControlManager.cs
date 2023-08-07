@@ -4,7 +4,7 @@ using Game.Components;
 using Game.Managers;
 using Game.UI;
 using Game.UI.Components;
-
+using InputUtils;
 using System.Linq;
 
 using Unity.Netcode;
@@ -285,12 +285,12 @@ namespace Game.Managers
             return null;
         }
 
-        void OnLeftMouseDown(Vector2 position, float holdTime)
+        void OnLeftMouseDown(AdvancedMouse sender)
         {
             if (!Input.GetKey(KeyCode.LeftControl)) return;
             if (!MouseManager.MouseOnWindow) return;
 
-            var worldPosition = MainCamera.Camera.ScreenToWorldPosition(position, CursorHitLayer);
+            var worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
 
             var controllable = GetControllableAt(worldPosition);
 

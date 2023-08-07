@@ -1,6 +1,6 @@
 using Game;
 using Game.Managers;
-
+using InputUtils;
 using UnityEngine;
 
 public class QuickCommandManager : SingleInstance<QuickCommandManager>
@@ -29,13 +29,13 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     public bool IsShown;
     float ShownAt;
 
-    InputUtils.AdvancedMouse LeftMouse;
+    AdvancedMouse LeftMouse;
 
     void Start()
     {
         RegenerateTextures();
 
-        LeftMouse = new InputUtils.AdvancedMouse(MouseButton.Left, 14, MouseCondition, HOLD_TIME_REQUIREMENT);
+        LeftMouse = new AdvancedMouse(MouseButton.Left, 14, MouseCondition, HOLD_TIME_REQUIREMENT);
         LeftMouse.OnClick += LeftMouse_OnClick;
     }
 
@@ -83,12 +83,12 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         !TakeControlManager.Instance.IsControlling &&
         !BuildingManager.Instance.IsBuilding;
 
-    void LeftMouse_OnClick(Vector2 position, float holdTime)
+    void LeftMouse_OnClick(AdvancedMouse sender)
     {
-        if (holdTime < HOLD_TIME_REQUIREMENT) return;
-        Origin = position;
+        if (sender.HoldTime < HOLD_TIME_REQUIREMENT) return;
+        Origin = AdvancedMouse.Position;
         ShownAt = Time.unscaledTime;
-        WorldPosition = MainCamera.Camera.ScreenToWorldPosition(position);
+        WorldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position);
 
         IsShown = true;
     }
@@ -203,7 +203,8 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
                     projectedWorldPosition.y < .5)
                 {
                     projectedWorldPosition.y = 0;
-                } else if (projectedWorldPosition.x > projectedWorldPosition.y &&
+                }
+                else if (projectedWorldPosition.x > projectedWorldPosition.y &&
                     projectedWorldPosition.x >= .5)
                 {
                     projectedWorldPosition.x = 1;

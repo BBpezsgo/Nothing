@@ -1,7 +1,5 @@
-using InputUtils;
-
 using System.Collections.Generic;
-
+using InputUtils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,9 +10,12 @@ namespace Game.Managers
         static MouseManager Instance;
 
         List<AdvancedMouse> Mouses;
+        List<AdvancedTouch> Touches;
 
         [SerializeField, ReadOnly] float TimeToNextUICollecting = 1f;
         [SerializeField, ReadOnly, NonReorderable] UIDocument[] UIDocuments;
+
+        [SerializeField] bool ShowDebugStuff;
 
         public static bool MouseOnWindow
         {
@@ -45,7 +46,11 @@ namespace Game.Managers
                 return;
             }
             Instance = this;
+
             Mouses = new List<AdvancedMouse>();
+            Touches = new List<AdvancedTouch>();
+
+            Input.simulateMouseWithTouches = false;
         }
 
         void Update()
@@ -54,6 +59,9 @@ namespace Game.Managers
 
             for (int i = 0; i < Mouses.Count; i++)
             { Mouses[i].Update(); }
+
+            for (int i = 0; i < Touches.Count; i++)
+            { Touches[i].Update(); }
         }
 
         void FixedUpdate()
@@ -64,12 +72,6 @@ namespace Game.Managers
                 TimeToNextUICollecting = 10f;
                 UIDocuments = GameObject.FindObjectsOfType<UIDocument>(true);
             }
-        }
-
-        void RegisterMouse_(AdvancedMouse mouse)
-        {
-            Mouses.Add(mouse);
-            Mouses.Sort();
         }
 
         bool IsPointerOverUI_(Vector2 screenPosition)
@@ -102,13 +104,68 @@ namespace Game.Managers
             return false;
         }
 
-        internal static bool IsPointerOverUI(Vector2 screenPosition)
+        internal static bool IsOverUI(Vector2 screenPosition)
             => Instance.IsPointerOverUI_(screenPosition);
 
         internal static bool IsPointerOverUI()
             => Instance.IsPointerOverUI_(Input.mousePosition);
 
-        internal static void RegisterMouse(AdvancedMouse mouse)
-            => Instance.RegisterMouse_(mouse);
+        internal static void RegisterInput(AdvancedMouse mouse)
+        {
+            Instance.Mouses.Add(mouse);
+            Instance.Mouses.Sort();
+        }
+
+        internal static void RegisterInput(AdvancedTouch mouse)
+        {
+            Instance.Touches.Add(mouse);
+            Instance.Touches.Sort();
+        }
+
+        internal static bool IsTouchCaptured(int touchID)
+        {
+            AdvancedTouch[] touches = Instance.Touches.ToArray();
+            for (int i = 0; i < touches.Length; i++)
+            {
+                if (touches[i].FingerID == touchID && touches[i].IsCaptured)
+                { return true; }
+            }
+            return false;
+        }
+
+        internal static bool IsTouchCaptured(int touchID, AdvancedTouch sender)
+        {
+            AdvancedTouch[] touches = Instance.Touches.ToArray();
+            for (int i = 0; i < touches.Length; i++)
+            {
+                if (AdvancedTouch.ReferenceEquals(touches[i], sender)) continue;
+
+                if (touches[i].FingerID == touchID && touches[i].IsCaptured)
+                { return true; }
+            }
+            return false;
+        }
+
+        void OnGUI()
+        {
+            if (!ShowDebugStuff) return;
+
+            GL.PushMatrix();
+            if (GLUtils.SolidMaterial.SetPass(0))
+            {
+                for (int i = 0; i < Mouses.Count; i++)
+                {
+                    if (!Mouses[i].Enabled) continue;
+                    Mouses[i].DebugDraw();
+                    break;
+                }
+
+                for (int i = 0; i < Touches.Count; i++)
+                {
+                    Touches[i].DebugDraw();
+                }
+            }
+            GL.PopMatrix();
+        }
     }
 }

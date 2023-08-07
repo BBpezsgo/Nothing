@@ -749,6 +749,11 @@ internal static class ListEx
         for (int i = v.Count - 1; i >= 0; i--)
         { if ((UnityEngine.Object)v[i] == null) v.RemoveAt(i); }
     }
+    internal static void PurgeObjects(this IList<GameObject> v)
+    {
+        for (int i = v.Count - 1; i >= 0; i--)
+        { if (v[i] == null) v.RemoveAt(i); }
+    }
 
     internal static T[] Purge<T>(this T[] v) where T : class
     {

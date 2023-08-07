@@ -93,21 +93,19 @@ namespace Utilities.Editor
             GUILayout.Label($"Platforms to Build", EditorStyles.boldLabel);
 
             int numEnabled = 0;
+            foreach (BuildTarget target in AvailableTargets)
             {
-                foreach (var target in AvailableTargets)
-                {
-                    GUILayout.BeginVertical(EditorStyles.helpBox);
-                    GUILayout.Label(target.ToString(), EditorStyles.boldLabel);
+                GUILayout.BeginVertical(EditorStyles.helpBox);
+                GUILayout.Label(target.ToString(), EditorStyles.boldLabel);
 
-                    GUILayout.Label("Options", EditorStyles.boldLabel);
-                    TargetsToBuild[target].DevelopmentBuild = EditorGUILayout.Toggle("Developer Build", TargetsToBuild[target].DevelopmentBuild);
-                    TargetsToBuild[target].ProductionBuild = EditorGUILayout.Toggle("Production Build", TargetsToBuild[target].ProductionBuild);
+                GUILayout.Label("Options", EditorStyles.boldLabel);
+                TargetsToBuild[target].DevelopmentBuild = EditorGUILayout.Toggle("Development Build", TargetsToBuild[target].DevelopmentBuild);
+                TargetsToBuild[target].ProductionBuild = EditorGUILayout.Toggle("Production Build", TargetsToBuild[target].ProductionBuild);
 
-                    if (TargetsToBuild[target].ProductionBuild) numEnabled++;
-                    if (TargetsToBuild[target].DevelopmentBuild) numEnabled++;
+                if (TargetsToBuild[target].ProductionBuild) numEnabled++;
+                if (TargetsToBuild[target].DevelopmentBuild) numEnabled++;
 
-                    GUILayout.EndVertical();
-                }
+                GUILayout.EndVertical();
             }
 
             GUI.enabled = numEnabled > 0;

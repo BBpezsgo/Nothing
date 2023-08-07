@@ -10,6 +10,7 @@ namespace Game.Components
     {
         internal const float DISTANCE_TO_STOP = 4f;
         internal const float BRAKING_DISTANCE_ERROR = .5f;
+        internal const float DISTANCE_TO_STOP_BRUH = 4f;
 
         [SerializeField, AssetField] bool FollowCursor;
 
@@ -37,11 +38,18 @@ namespace Game.Components
 
         Vector2 CalculateInputVector()
         {
-            // Stop?
             if (currentlyStopping) return Vector2.zero;
 
+            if (useBrakingCalculations)
+            { BrakingDistance = MovementEngine.CalculateBrakingDistance(); }
+
+            return UnitBehaviour_Seek.CalculateInputVector(transform, Target, useBrakingCalculations ? BrakingDistance : null, maxDistanceToReverse, MovementEngine);
+        }
+
+        internal static Vector2 CalculateInputVector(Transform transform, Vector3 target, float? brakingDistance, float maxDistanceToReverse, MovementEngine movementEngine)
+        {
             // Get destination
-            Vector3 destinationPosition = Target;
+            Vector3 destinationPosition = target;
 
             // No destination?
             if (destinationPosition == Vector3.zero) return Vector2.zero;
@@ -49,14 +57,14 @@ namespace Game.Components
             float distanceToDestination = Vector3.Distance(transform.position, destinationPosition);
 
             // === Braking ===
-            if (useBrakingCalculations)
+            if (distanceToDestination <= DISTANCE_TO_STOP_BRUH)
+            { return Vector2.zero; }
+            else if (brakingDistance.HasValue)
             {
-                BrakingDistance = MovementEngine.CalculateBrakingDistance();
-
-                if (distanceToDestination < Mathf.Abs(BrakingDistance) + BRAKING_DISTANCE_ERROR)
+                if (distanceToDestination <= Mathf.Abs(brakingDistance.Value) + BRAKING_DISTANCE_ERROR)
                 { return Vector2.zero; }
             }
-            else if (distanceToDestination < DISTANCE_TO_STOP)
+            else if (distanceToDestination <= DISTANCE_TO_STOP)
             { return Vector2.zero; }
             // === ===
 
@@ -90,7 +98,18 @@ namespace Game.Components
 
                 // ===  ===
 
-                float torque = distanceToDestination > 16f ? 1f : (1f - Mathf.Abs(steerAmount) + 0.5f);
+                float torque;
+
+                if (distanceToDestination > 32f)
+                { torque = 1f; }
+                else if (transform.TryGetComponent(out VehicleEngine vehicleEngine) && vehicleEngine.isHaveTracks)
+                {
+                    steerAmount = Mathf.Clamp(steerAmount * 16, -1, 1);
+                    torque = Mathf.Abs(steerAmount) < .01f ? 1f : 0f;
+                }
+                else
+                { torque = 1f - Mathf.Abs(steerAmount) + 0.5f; }
+
 
                 // === Reversing 2 ===
                 if (
@@ -105,7 +124,7 @@ namespace Game.Components
                 }
                 // ===  ===
 
-                if (MovementEngine.IsReverse) steerAmount *= -1;
+                if (movementEngine.IsReverse) steerAmount *= -1;
                 return new Vector2(steerAmount, torque);
             }
             // === ===

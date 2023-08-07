@@ -6,9 +6,9 @@ namespace Game.Components
     {
         [SerializeField] string Team;
 
-        protected override GameObject Spawn()
+        internal override GameObject Spawn(GameObject prefab)
         {
-            GameObject newThing = GameObject.Instantiate(Thing, GetPosition(), Quaternion.identity, transform);
+            GameObject newThing = GameObject.Instantiate(prefab, GetPosition(), Quaternion.identity, transform);
 
             if (newThing.TryGetComponent(out BaseObject @object))
             { @object.Team = Team; }

@@ -1,0 +1,46 @@
+{
+	"friendlyName": "Huawei P30 lite",
+	"version": 1,
+	"screens": [
+		{
+			"width": 1080,
+			"height": 2312,
+			"navigationBarHeight": 64,
+			"dpi": 415.0,
+			"presentation": {
+				"overlayPath": "huawei-p30-lite.png",
+				"borderSize": {
+					"x": 39.0,
+					"y": 52.0,
+					"z": 46.0,
+					"w": 88.0
+				}
+			}
+		}
+	],
+	"systemInfo": {
+		"deviceModel": "P30Lite,MAR-LX1M,MAR-LX2J",
+		"deviceType": 1,
+		"operatingSystem": "Android 9.0 Pie",
+		"operatingSystemFamily": 0,
+		"processorCount": 4,
+		"processorFrequency": 2200,
+		"supportsAccelerometer": true,
+		"supportsAudio": true,
+		"supportsGyroscope": true,
+		"supportsLocationService": true,
+		"supportsVibration": true,
+		"systemMemorySize": 4096,
+		"unsupportedIdentifier": "n/a",
+		"graphicsDependentData": [
+			{
+				"graphicsDeviceType": 11,
+				"graphicsMemorySize": 1024,
+				"graphicsDeviceName": "ARM Mali-G51 MP4",
+				"graphicsDeviceVendor": "Mali",
+				"graphicsDeviceID": 0,
+				"graphicsDeviceVendorID": 0
+			}
+		]
+	}
+}

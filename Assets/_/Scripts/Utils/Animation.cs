@@ -26,9 +26,11 @@ namespace Utilities
             get
             {
                 return RawPercent;
+                /*
                 if (Function == null)
                 { return RawPercent; }
                 return Function.Invoke(RawPercent);
+                */
             }
         }
 

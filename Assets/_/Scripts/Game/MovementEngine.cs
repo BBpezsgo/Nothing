@@ -14,7 +14,7 @@ namespace Game.Components
         /// <summary>
         /// Returns <see langword="true"/> if the dot product of <see cref="Transform.forward"/> and <see cref="Rigidbody2D.velocity"/> is less than 0
         /// </summary>
-        public bool IsReverse => Vector3.Dot(transform.forward, rb.velocity) < 0f;
+        public bool IsReverse => rb.velocity.sqrMagnitude > .001f && Vector3.Dot(transform.forward, rb.velocity) < 0f;
 
         /// <summary>
         /// Coefficient of drag

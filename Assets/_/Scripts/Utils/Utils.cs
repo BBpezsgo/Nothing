@@ -11,6 +11,8 @@ using Game.Components;
 using Game.Managers;
 
 using Networking;
+using TMPro;
+using UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -2455,10 +2457,17 @@ namespace InputUtils
 {
     internal delegate bool InputConditionEnabler();
 
-    internal class AdvancedInput
+    internal delegate void SimpleInputEvent<T>(T sender);
+
+    internal class AdvancedInput : IComparable<AdvancedInput>
     {
+        internal static float ScreenSize => Mathf.Sqrt(Mathf.Pow(Screen.width, 2) + Mathf.Pow(Screen.height, 2));
+
         protected readonly InputConditionEnabler ConditionEnabler;
         internal readonly int Priority;
+        protected readonly Type OwnedBy;
+
+        internal virtual bool Enabled => ConditionEnabler?.Invoke() ?? true;
 
         public AdvancedInput(int priority)
             : this(priority, null) { }
@@ -2467,39 +2476,53 @@ namespace InputUtils
         {
             this.Priority = priority;
             this.ConditionEnabler = conditionEnabler;
+
+            System.Diagnostics.StackTrace stack = new(false);
+            for (int i = 0; i < stack.FrameCount; i++)
+            {
+                System.Diagnostics.StackFrame frame = stack.GetFrame(i);
+                System.Reflection.MethodBase method = frame.GetMethod();
+                if (method.IsConstructor)
+                { continue; }
+                Type declaringType = method.DeclaringType;
+                OwnedBy = declaringType;
+                break;
+            }
         }
+
+        public int CompareTo(AdvancedInput other)
+            => Comparer.DefaultInvariant.Compare(other.Priority, this.Priority);
     }
 
-    internal class AdvancedMouse : AdvancedInput, IComparable<AdvancedMouse>
+    [Serializable]
+    internal class AdvancedMouse : AdvancedInput
     {
         internal delegate void DragEvent(Vector2 start, Vector2 current);
         internal delegate void DraggedEvent(Vector2 start, Vector2 end);
-        internal delegate void ClickEvent(Vector2 position, float holdTime);
-        internal delegate void DownEvent(Vector2 position, float holdTime);
 
         internal event DragEvent OnDrag;
         internal event DraggedEvent OnDragged;
-        internal event ClickEvent OnClick;
-        internal event DownEvent OnDown;
+        internal event SimpleInputEvent<AdvancedMouse> OnClick;
+        internal event SimpleInputEvent<AdvancedMouse> OnDown;
 
         internal readonly int ButtonID;
 
-        static Vector2 Position => Input.mousePosition;
+        internal static Vector2 Position => Input.mousePosition;
 
-        bool ClickedOnUI;
+        [SerializeField, ReadOnly] bool ClickedOnUI;
 
         internal Vector2 DragStart { get; private set; }
         internal bool IsActive { get; private set; }
         internal bool IsDragging => Drag && !ClickedOnUI;
-        bool Drag;
+        [SerializeField, ReadOnly] bool Drag;
         internal const float DragThreshold = 25f;
         internal static readonly float DragThresholdSqr = Mathf.Sqrt(DragThreshold);
 
         float PressedAt;
         readonly float UpTimeout;
 
-        bool DownInvoked;
-        bool UpInvoked;
+        [SerializeField, ReadOnly] bool DownInvoked;
+        [SerializeField, ReadOnly] bool UpInvoked;
 
         internal float HoldTime => Time.unscaledTime - PressedAt;
 
@@ -2517,12 +2540,12 @@ namespace InputUtils
         {
             this.ButtonID = buttonId;
             this.UpTimeout = upTimeout;
-            MouseManager.RegisterMouse(this);
+            MouseManager.RegisterInput(this);
         }
 
         internal void Update()
         {
-            if (!(ConditionEnabler?.Invoke() ?? true))
+            if (!Enabled)
             {
                 Reset();
                 return;
@@ -2556,10 +2579,10 @@ namespace InputUtils
             Drag = false;
             PressedAt = Time.unscaledTime;
             UpInvoked = false;
-            ClickedOnUI = MouseManager.IsPointerOverUI(Position);
+            ClickedOnUI = MouseManager.IsOverUI(Position);
 
             if (!ClickedOnUI)
-            { OnDown?.Invoke(Position, HoldTime); }
+            { OnDown?.Invoke(this); }
         }
 
         void Hold()
@@ -2595,7 +2618,7 @@ namespace InputUtils
                 else
                 {
                     if (!ClickedOnUI)
-                    { OnClick?.Invoke(Position, HoldTime); }
+                    { OnClick?.Invoke(this); }
                 }
             }
 
@@ -2606,11 +2629,425 @@ namespace InputUtils
             IsActive = false;
         }
 
-        public int CompareTo(AdvancedMouse other)
-            => Comparer.DefaultInvariant.Compare(other.Priority, this.Priority);
+        internal void DebugDraw()
+        {
+            Vector2 outerPointV = Vector2.up * 10;
+            Vector2 outerPointH = Vector2.left * 10;
+
+            Vector2 position = AdvancedMouse.Position;
+            position = GUIUtils.TransformPoint(position);
+
+            Color color = Color.white;
+
+            if (ClickedOnUI)
+            { color = Color.red; }
+
+            position += new Vector2(1, -1);
+
+            GLUtils.DrawLine(position - outerPointH, position + outerPointH, 1.5f, color);
+            GLUtils.DrawLine(position - outerPointV, position + outerPointV, 1.5f, color);
+
+            GUI.Label(new Rect(position - new Vector2(0, 20), new Vector2(200, 20)), $"{this.HoldTime:####.00} ms");
+            GUI.Label(new Rect(position - new Vector2(0, 40), new Vector2(200, 20)), this.OwnedBy.Name);
+        }
     }
 
-    internal class PriorityKey : AdvancedInput, IComparable<PriorityKey>
+    [Serializable]
+    internal class AdvancedTouch : AdvancedInput
+    {
+        internal event SimpleInputEvent<AdvancedTouch> OnClick;
+        internal event SimpleInputEvent<AdvancedTouch> OnDown;
+        internal event SimpleInputEvent<AdvancedTouch> OnMove;
+        internal event SimpleInputEvent<AdvancedTouch> OnUp;
+        internal event SimpleInputEvent<AdvancedTouch> OnCancelled;
+
+        [SerializeField, ReadOnly] Touch Touch;
+
+        internal TouchPhase Phase => Touch.phase;
+
+        internal Vector2 Position => Touch.position;
+
+        internal Vector2 PositionDelta => Touch.deltaPosition;
+
+        [SerializeField, ReadOnly] internal int FingerID;
+        internal bool IsActive => FingerID != -1;
+        internal bool IsActiveAndCaptured => IsCaptured && IsActive;
+
+        [SerializeField, ReadOnly] bool ClickedOnUI;
+
+        float PressedAt;
+        readonly float UpTimeout;
+        readonly RectInt ValidScreenRect;
+        bool DownInvoked;
+        bool UpInvoked;
+
+        internal bool IsCaptured;
+
+        internal bool IsHolding { get; private set; }
+
+        internal AdvancedTouch(int priority) : base(priority)
+        {
+            MouseManager.RegisterInput(this);
+            ValidScreenRect = new RectInt(0, 0, 0, 0);
+        }
+
+        internal AdvancedTouch(int priority, InputConditionEnabler conditionEnabler) : base(priority, conditionEnabler)
+        {
+            MouseManager.RegisterInput(this);
+            ValidScreenRect = new RectInt(0, 0, 0, 0);
+        }
+
+        internal AdvancedTouch(int priority, RectInt validScreenRect) : base(priority)
+        {
+            MouseManager.RegisterInput(this);
+            ValidScreenRect = validScreenRect;
+        }
+
+        internal AdvancedTouch(int priority, InputConditionEnabler conditionEnabler, RectInt validScreenRect) : base(priority, conditionEnabler)
+        {
+            MouseManager.RegisterInput(this);
+            ValidScreenRect = validScreenRect;
+        }
+
+        internal float HoldTime => Time.unscaledTime - PressedAt;
+
+        internal void Update()
+        {
+            // if (!Input.touchSupported) return;
+            if (!Enabled)
+            {
+                FingerID = -1;
+                Touch = default;
+                IsCaptured = false;
+                IsHolding = false;
+                return;
+            }
+
+            Touch[] touches = Input.touches;
+
+            if (FingerID != -1)
+            {
+                if (!MouseManager.IsTouchCaptured(this.FingerID, this))
+                {
+                    for (int i = 0; i < touches.Length; i++)
+                    {
+                        if (touches[i].fingerId == FingerID)
+                        {
+                            Touch = touches[i];
+                            UpdateInternal();
+                            return;
+                        }
+                    }
+                }
+
+                FingerID = -1;
+                Touch = default;
+                IsCaptured = false;
+                IsHolding = false;
+            }
+
+            for (int i = 0; i < touches.Length; i++)
+            {
+                if (MouseManager.IsTouchCaptured(touches[i].fingerId, this))
+                { continue; }
+
+                Touch = touches[i];
+
+                if (ValidScreenRect.size == Vector2Int.zero || ValidScreenRect.Contains(new Vector2Int(Mathf.RoundToInt(Position.x), Mathf.RoundToInt(Position.y))))
+                {
+                    FingerID = Touch.fingerId;
+                    UpdateInternal();
+                    return;
+                }
+            }
+
+            FingerID = -1;
+            Touch = default;
+            IsCaptured = false;
+            IsHolding = false;
+        }
+
+        void UpdateInternal()
+        {
+            switch (Touch.phase)
+            {
+                case TouchPhase.Began:
+                    OnBegan();
+                    break;
+                case TouchPhase.Moved:
+                    OnMoved();
+                    break;
+                case TouchPhase.Stationary:
+                    OnStationary();
+                    break;
+                case TouchPhase.Ended:
+                    OnEnded();
+                    break;
+                case TouchPhase.Canceled:
+                    OnCanceled();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void OnBegan()
+        {
+            DownInvoked = true;
+            PressedAt = Time.unscaledTime;
+            UpInvoked = false;
+            ClickedOnUI = MouseManager.IsOverUI(Position);
+            IsHolding = true;
+
+            if (ClickedOnUI) return;
+
+            OnDown?.Invoke(this);
+        }
+
+        void OnMoved()
+        {
+            IsHolding = false;
+
+            if (ClickedOnUI) return;
+
+            OnMove?.Invoke(this);
+        }
+
+        void OnStationary()
+        {
+            if (ClickedOnUI) return;
+
+            if (UpTimeout != 0f && UpTimeout < HoldTime)
+            {
+                OnEnded();
+                return;
+            }
+        }
+
+        void OnEnded()
+        {
+            if (!DownInvoked) return;
+
+            if (!UpInvoked)
+            {
+                if (!ClickedOnUI)
+                {
+                    OnClick?.Invoke(this);
+                    OnUp?.Invoke(this);
+                }
+            }
+
+            UpInvoked = true;
+            PressedAt = 0f;
+            FingerID = -1;
+            IsCaptured = false;
+            IsHolding = false;
+        }
+
+        void OnCanceled()
+        {
+            if (!ClickedOnUI)
+            { OnCancelled?.Invoke(this); }
+
+            UpInvoked = true;
+            PressedAt = 0f;
+            FingerID = -1;
+            IsCaptured = false;
+            IsHolding = false;
+        }
+
+        internal void Reset()
+        {
+            ClickedOnUI = false;
+            UpInvoked = true;
+            DownInvoked = false;
+            PressedAt = 0f;
+            FingerID = -1;
+            IsCaptured = false;
+            IsHolding = false;
+        }
+
+        internal void DebugDraw()
+        {
+            if (!IsActive) return;
+
+            Vector2 position = this.Position;
+
+            Color color;
+
+            if (ClickedOnUI)
+            {
+                color = Color.red;
+            }
+            else
+            {
+                color = Phase switch
+                {
+                    TouchPhase.Began => Color.cyan,
+                    TouchPhase.Moved => Color.blue,
+                    TouchPhase.Stationary => Color.white,
+                    TouchPhase.Ended => Color.yellow,
+                    TouchPhase.Canceled => Color.magenta,
+                    _ => Color.white,
+                };
+            }
+
+            Vector2 guiPosition = GUIUtils.TransformPoint(position);
+
+            float radius = 20;
+
+            GLUtils.DrawCircle(guiPosition / 4.3f, radius, 2, color, 16);
+
+            GUIStyle style = new(IMGUIManager.Instance.Skin.label)
+            {
+                fontSize = 48,
+                fontStyle = FontStyle.Bold,
+            };
+
+            Vector2 textOffset = new Vector2(radius, -radius);
+            textOffset *= 4.3f / 1.4f;
+
+            int line = 1;
+
+            void Label(string text)
+            {
+                GUI.enabled = false;
+                GUI.Label(new Rect(guiPosition + textOffset + new Vector2(0, style.fontSize * -line), new Vector2(Screen.width, style.fontSize)), text, style);
+                GUI.enabled = true;
+                line++;
+            }
+
+            Label($"{this.HoldTime:####.00} ms");
+            Label(this.OwnedBy.Name);
+
+            if (IsCaptured)
+            { Label("Captured"); }
+            else
+            { Label("Not Captured"); }
+
+            if (IsHolding)
+            { Label("Holding"); }
+            else
+            { Label("Moving"); }
+        }
+    }
+
+    internal class TouchZoom : AdvancedInput
+    {
+        internal delegate void ZoomEvent(TouchZoom sender, float delta);
+
+        internal event ZoomEvent OnZoom;
+        internal event SimpleInputEvent<AdvancedTouch> OnMove;
+
+        readonly AdvancedTouch Touch1;
+        readonly AdvancedTouch Touch2;
+
+        (Vector2 Start, Vector2 Current) Touch1Position;
+        (Vector2 Start, Vector2 Current) Touch2Position;
+
+        float StartDistance;
+        float LastDistanceDiff;
+        float Distance => Vector2.Distance(Touch1Position.Current, Touch2Position.Current);
+
+        internal bool BothTouchActive => Touch1.IsActive && Touch2.IsActive;
+        internal bool BothTouchActiveAndCaptured => Touch1.IsActiveAndCaptured && Touch2.IsActiveAndCaptured;
+
+        internal Vector2 PositionDelta
+        {
+            get
+            {
+                if (BothTouchActive) return Vector2.zero;
+                if (Touch1.IsActive) return Touch1.PositionDelta;
+                if (Touch2.IsActive) return Touch2.PositionDelta;
+                return Vector2.zero;
+            }
+        }
+
+        internal TouchZoom(int priority, InputConditionEnabler condition) : base(priority, condition)
+        {
+            Touch1 = new AdvancedTouch(priority, condition);
+            Touch2 = new AdvancedTouch(priority, condition);
+
+            Touch1.OnDown += OnDown1;
+            Touch2.OnDown += OnDown2;
+
+            Touch1.OnMove += OnMove1;
+            Touch2.OnMove += OnMove2;
+        }
+
+        internal TouchZoom(int priority) : this(priority, null)
+        { }
+
+        void OnDown1(AdvancedTouch sender)
+        {
+            Touch1Position = (sender.Position, sender.Position);
+            StartZooming();
+        }
+
+        void OnDown2(AdvancedTouch sender)
+        {
+            Touch2Position = (sender.Position, sender.Position);
+            StartZooming();
+        }
+
+        void StartZooming()
+        {
+            StartDistance = Vector2.Distance(Touch1Position.Start, Touch2Position.Start);
+            LastDistanceDiff = Distance - StartDistance;
+        }
+
+        void OnMove1(AdvancedTouch sender)
+        {
+            sender.IsCaptured = true;
+            if (!Touch2.IsActive)
+            {
+                OnMove?.Invoke(sender);
+
+                Touch1Position = (sender.Position, sender.Position);
+                StartZooming();
+                return;
+            }
+
+            Touch1Position.Current = sender.Position;
+            UpdateInternal();
+        }
+
+        void OnMove2(AdvancedTouch sender)
+        {
+            sender.IsCaptured = true;
+            if (!Touch1.IsActive)
+            {
+                OnMove?.Invoke(sender);
+
+                Touch2Position = (sender.Position, sender.Position);
+                StartZooming();
+                return;
+            }
+
+            Touch2Position.Current = sender.Position;
+            UpdateInternal();
+        }
+
+        void UpdateInternal()
+        {
+            if (!BothTouchActiveAndCaptured) return;
+
+            if (StartDistance == 0)
+            {
+                StartDistance = Distance;
+                return;
+            }
+
+            float distanceDiff = Distance - StartDistance;
+            float distanceDelta = LastDistanceDiff - distanceDiff;
+
+            OnZoom?.Invoke(this, distanceDelta / ScreenSize);
+
+            LastDistanceDiff = distanceDiff;
+        }
+    }
+
+    internal class PriorityKey : AdvancedInput
     {
         internal delegate void KeyEvent();
 
@@ -2632,7 +3069,7 @@ namespace InputUtils
 
         internal bool Update()
         {
-            if (ConditionEnabler != null && !ConditionEnabler.Invoke())
+            if (!Enabled)
             { return false; }
 
             bool consumed = false;
@@ -2657,9 +3094,6 @@ namespace InputUtils
 
             return consumed;
         }
-
-        public int CompareTo(PriorityKey other)
-            => Comparer.DefaultInvariant.Compare(other.Priority, this.Priority);
     }
 }
 
