@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 410087040}
-  m_IndirectSpecularColor: {r: 0.18097387, g: 0.22653282, b: 0.30726108, a: 1}
+  m_IndirectSpecularColor: {r: 0.46251827, g: 0.51327306, b: 0.59022903, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -603,6 +603,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tank
       objectReference: {fileID: 0}
+    - target: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4420155354252969548, guid: f3eb8de6ca84409448c3357a9943d4cd,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -734,6 +739,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Drone
       objectReference: {fileID: 0}
+    - target: {fileID: 8062244046001752334, guid: d6cc4e5438db13d44aec59fb38f1f0a0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8062244046001752373, guid: d6cc4e5438db13d44aec59fb38f1f0a0,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -823,6 +833,7 @@ Transform:
   - {fileID: 36405857}
   - {fileID: 4690245383765046806}
   - {fileID: 2759722349122641146}
+  - {fileID: 1394818235}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -959,7 +970,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &771639910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1585,6 +1596,91 @@ MonoBehaviour:
   NextSpawn: 1
   Area: {x: 100, y: 100}
   Team: scav
+--- !u!1001 &1394818234
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 656072535}
+    m_Modifications:
+    - target: {fileID: -3430128879076549079, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: Team
+      value: a
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998939, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_Name
+      value: Factory
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -53.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.008060455
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 9.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3190057481564433997, guid: bfc523d2d2500a847bf8551940258919,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 158450257
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bfc523d2d2500a847bf8551940258919, type: 3}
+--- !u!4 &1394818235 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2759722349239998941, guid: bfc523d2d2500a847bf8551940258919,
+    type: 3}
+  m_PrefabInstance: {fileID: 1394818234}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1416881260
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,6 +1898,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Truck
       objectReference: {fileID: 0}
+    - target: {fileID: 6276130072880698484, guid: 25d8c1d2b945b04418bd3bda58ff16ea,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6276130072880698486, guid: 25d8c1d2b945b04418bd3bda58ff16ea,
         type: 3}
       propertyPath: m_RootOrder
@@ -1886,6 +1987,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Smelter
+      objectReference: {fileID: 0}
+    - target: {fileID: 1029036110833637850, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1029036110833637852, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
         type: 3}
@@ -1982,6 +2088,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Builder
+      objectReference: {fileID: 0}
+    - target: {fileID: 4690245384110751948, guid: d35e67d154dc0e6468bf4096c5d64330,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4690245384110751950, guid: d35e67d154dc0e6468bf4096c5d64330,
         type: 3}
@@ -2175,6 +2286,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Turret Howitzer
+      objectReference: {fileID: 0}
+    - target: {fileID: 6226412810010601917, guid: 1e1dd8781f09e2146bca38d4122eb17f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6226412810287194996, guid: 1e1dd8781f09e2146bca38d4122eb17f,
         type: 3}

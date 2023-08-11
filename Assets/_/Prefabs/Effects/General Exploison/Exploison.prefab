@@ -15001,7 +15001,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationX:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -15054,7 +15054,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -15107,8 +15107,8 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotation:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
+      minMaxState: 3
+      scalar: 6.283185
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -19377,7 +19377,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 384f422bb6a4abb44a61aaf9ef16003c, type: 2}
+  - {fileID: 2100000, guid: 9a182c76687c8e140b8df8149ed5ee21, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -19440,7 +19440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
+  ParticleSystems: []
 --- !u!82 &7260350319816418103
 AudioSource:
   m_ObjectHideFlags: 0
@@ -34045,7 +34045,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fa2cb792dcff1fc46906944cf1261d0c, type: 2}
+  - {fileID: 2100000, guid: 9a182c76687c8e140b8df8149ed5ee21, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

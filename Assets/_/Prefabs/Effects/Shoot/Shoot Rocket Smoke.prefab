@@ -551,7 +551,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 3
       scalar: 6.283185
-      minScalar: 0.017453292
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4819,7 +4819,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bc31a91e016d1fc42a4f91867e607273, type: 2}
+  - {fileID: 2100000, guid: 9a182c76687c8e140b8df8149ed5ee21, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

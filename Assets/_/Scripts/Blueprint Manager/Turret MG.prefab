@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 4739022589844902103}
   - component: {fileID: 4739022589844902102}
   - component: {fileID: 3386987064260239949}
+  - component: {fileID: 4987826834242064094}
   m_Layer: 0
   m_Name: Turret MG
   m_TagString: Untagged
@@ -125,6 +126,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3abb4954eade84d4bb840541aadbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Knockback: 1
+  CannonKnockback: 0
+  CannonKnockbackRestoreSpeed: 1
+  CannonKnockbackSpeed: 1
+  UseBarrelInstead: 0
+  CannonKnockbackState: 0
+  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
+  AudioSource: {fileID: 0}
+  ShootSound: {fileID: 0}
+  Barrel: {fileID: 0}
+  HasBarrel: 0
+  RequiedBarrelRotationSpeed: 0
+  BarrelRotationAcceleration: 0
+  BarrelRotationSpeed: 0
+  PrepareShooting: 0
   cannon: {fileID: 4739022588412649828}
   cannonRotationSpeed: 20
   cannonLowestAngle: -10
@@ -134,11 +150,16 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 1
-  ProjectileLifetime2: -1
+  RequiedProjectileLifetime: -1
   projectileIgnoreCollision: []
   shootPosition: {fileID: 4739022589452011797}
   projectile: {fileID: 4399164710629436118, guid: fb0ffcdcd67310b418a89528270621a0,
     type: 3}
+  Projectiles: []
+  Randomness: 0
+  BulletCount: {x: 1, y: 1}
+  Shells: {fileID: 0}
+  SelectedProjectile: 0
   ShootEffects:
   - {fileID: 3494347763345842717, guid: b407ec4ed25e6dc43b7a74eb6cf253be, type: 3}
   IsBallisticProjectile: 1
@@ -152,6 +173,21 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+--- !u!114 &4987826834242064094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4739022589844902101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c31791fe7a35d54da03371f4269b156, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Renderers:
+  - {fileID: 6326567767408026980}
+  - {fileID: 6326567765678118064}
 --- !u!1001 &4739022588282347485
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -227,6 +263,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4739022588282347485}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &6326567765678118064 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7635826562936255635, guid: 7e08d69c1905f524baba56754a953fa2,
+    type: 3}
+  m_PrefabInstance: {fileID: 4739022588282347485}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4739022589848710665
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -299,6 +341,12 @@ PrefabInstance:
 --- !u!4 &5066226954068724194 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9441af8983709984397c811b2fd7c328,
+    type: 3}
+  m_PrefabInstance: {fileID: 4739022589848710665}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6326567767408026980 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7635826562936255635, guid: 9441af8983709984397c811b2fd7c328,
     type: 3}
   m_PrefabInstance: {fileID: 4739022589848710665}
   m_PrefabAsset: {fileID: 0}

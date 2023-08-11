@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 6781448590573974222}
   - component: {fileID: 7549379785641869298}
   - component: {fileID: -8743434979589827768}
+  - component: {fileID: -2959113221603772200}
   m_Layer: 0
   m_Name: Simple Body
   m_TagString: Untagged
@@ -180,7 +181,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0.01
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -199,6 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  acceleration: {x: 0, y: 0, z: 0}
   unit: {fileID: 0}
   input: {x: 0, y: 0}
   CenterOfMass: -0.65
@@ -309,6 +311,20 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   TimeToCheck: 0.1
+--- !u!114 &-2959113221603772200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2886764276924491870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c31791fe7a35d54da03371f4269b156, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Renderers:
+  - {fileID: 4469753232986757378}
 --- !u!1 &2886764277334233448
 GameObject:
   m_ObjectHideFlags: 0
@@ -5524,6 +5540,12 @@ PrefabInstance:
 --- !u!4 &3424250490812659076 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bae70de24fc5f734283598f2b3dbe4b2,
+    type: 3}
+  m_PrefabInstance: {fileID: 2886764276991988335}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4469753232986757378 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7635826562936255635, guid: bae70de24fc5f734283598f2b3dbe4b2,
     type: 3}
   m_PrefabInstance: {fileID: 2886764276991988335}
   m_PrefabAsset: {fileID: 0}

@@ -196,28 +196,27 @@ namespace Game.Managers
 
         void HandleMovementInput()
         {
-            if (!MenuManager.AnyMenuVisible)
-            {
-                if (TouchJoystick.Instance.IsActiveAndCaptured)
-                {
-                    MovementInput = TouchJoystick.Instance.NormalizedInput;
-                }
-                else
-                {
-                    MovementInput.x = Input.GetAxisRaw("Vertical");
-                    MovementInput.y = Input.GetAxisRaw("Horizontal");
-                }
-
-                TargetVelocity = MovementInput * maxSpeed;
-
-                if (Input.GetKey(KeyCode.LeftShift))
-                { TargetVelocity *= SpeedBonusOnShift; }
-            }
-            else
+            if (MenuManager.AnyMenuVisible)
             {
                 MovementInput = Vector2.zero;
                 TargetVelocity = Vector2.zero;
+                return;
             }
+
+            if (TouchJoystick.Instance != null && TouchJoystick.Instance.IsActiveAndCaptured)
+            {
+                MovementInput = TouchJoystick.Instance.NormalizedInput;
+            }
+            else
+            {
+                MovementInput.x = Input.GetAxisRaw("Vertical");
+                MovementInput.y = Input.GetAxisRaw("Horizontal");
+            }
+
+            TargetVelocity = MovementInput * maxSpeed;
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            { TargetVelocity *= SpeedBonusOnShift; }
         }
 
         void HandleRotationInput()
@@ -309,28 +308,33 @@ namespace Game.Managers
 
             Velocity = Vector2.MoveTowards(Velocity, TargetVelocity, deltaTime * acceleration / 2);
 
-            // float heightMultiplier = Mathf.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
-            float heightMultiplier = Mathf.Max(.2f, Mathf.Log(ZoomValue));
+            if (Velocity != Vector2.zero)
+            {
+                // float heightMultiplier = Mathf.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
+                float heightMultiplier = Mathf.Max(.2f, Mathf.Log(ZoomValue));
 
-            Vector2 scaledVelocity = Velocity * heightMultiplier;
+                Vector2 scaledVelocity = Velocity * heightMultiplier;
 
-            Vector3 forwardVelocity = transform.forward * scaledVelocity.x;
-            Vector3 rightVelocity = transform.right * scaledVelocity.y;
+                Vector3 forwardVelocity = transform.forward * scaledVelocity.x;
+                Vector3 rightVelocity = transform.right * scaledVelocity.y;
 
-            float verticalVelocity = Height - transform.position.y;
+                float verticalVelocity = Height - transform.position.y;
 
-            Vector3 transition = (forwardVelocity + rightVelocity + new Vector3(0f, verticalVelocity, 0f)) * deltaTime;
+                Vector3 transition = (forwardVelocity + rightVelocity + new Vector3(0f, verticalVelocity, 0f)) * deltaTime;
 
-            if (!float.IsNaN(transition.x) &&
-                !float.IsNaN(transition.y) &&
-                !float.IsNaN(transition.z))
-            { transform.Translate(transition, Space.World); }
+                if (!float.IsNaN(transition.x) &&
+                    !float.IsNaN(transition.y) &&
+                    !float.IsNaN(transition.z))
+                { transform.Translate(transition, Space.World); }
+            }
 
             Velocity = Vector2.MoveTowards(Velocity, TargetVelocity, deltaTime * acceleration / 2);
         }
 
         void DoRotation(float deltaTime)
         {
+            if (Rotation == TargetRotation) return;
+
             Rotation = Mathf.LerpAngle(Rotation, TargetRotation, 1f - Mathf.Pow(.5f, rotationSpeed * deltaTime));
             transform.rotation = Quaternion.Euler(0f, Rotation, 0f);
         }
@@ -341,6 +345,8 @@ namespace Game.Managers
             Zoom = Mathf.Max(Zoom, 0f);
 
             float zoomTransition = Zoom - ZoomValue;
+
+            if (zoomTransition == 0) return;
 
             theCamera.transform.Translate(new Vector3(0f, 0f, -zoomTransition), Space.Self);
         }

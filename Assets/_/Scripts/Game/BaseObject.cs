@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using AssetManager;
 
 using DataUtilities.Serializer;
@@ -74,6 +76,15 @@ namespace Game.Components
 
             if (TryGetComponent(out ItemLoot itemLoot))
             { itemLoot.DropLoots(); }
+        }
+
+        internal void CollectTeamRenderers()
+        {
+            TeamRenderer[] teamRenderers = gameObject.GetComponentsInChildren<TeamRenderer>(false);
+            List<MeshRenderer> renderers = new();
+            for (int i = 0; i < teamRenderers.Length; i++)
+            { renderers.AddRange(teamRenderers[i].Renderers ?? new MeshRenderer[0]); }
+            this.teamRenderers = renderers.ToArray();
         }
     }
 }

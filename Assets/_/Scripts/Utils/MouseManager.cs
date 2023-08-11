@@ -74,18 +74,24 @@ namespace Game.Managers
             }
         }
 
-        bool IsPointerOverUI_(Vector2 screenPosition)
+        internal static bool IsOverUI(Vector2 screenPosition)
         {
+            UIDocument[] uiDocuments = Instance.UIDocuments;
+
             Vector2 pointerUiPos = new(screenPosition.x, Screen.height - screenPosition.y);
-            for (int i = 0; i < UIDocuments.Length; i++)
+
+            if (GUIUtility.hotControl != 0)
+            { return true; }
+
+            for (int i = 0; i < uiDocuments.Length; i++)
             {
-                if (UIDocuments[i] == null) continue;
-                if (!UIDocuments[i].gameObject.activeSelf) continue;
-                if (!UIDocuments[i].isActiveAndEnabled) continue;
-                if (UIDocuments[i].rootVisualElement == null) continue;
+                if (uiDocuments[i] == null) continue;
+                if (!uiDocuments[i].gameObject.activeSelf) continue;
+                if (!uiDocuments[i].isActiveAndEnabled) continue;
+                if (uiDocuments[i].rootVisualElement == null) continue;
 
                 List<VisualElement> picked = new();
-                UIDocuments[i].rootVisualElement.panel.PickAll(pointerUiPos, picked);
+                uiDocuments[i].rootVisualElement.panel.PickAll(pointerUiPos, picked);
                 for (int j = 0; j < picked.Count; j++)
                 {
                     if (picked[j] == null) continue;
@@ -96,19 +102,11 @@ namespace Game.Managers
                 }
             }
 
-            if (GUIUtility.hotControl != 0)
-            {
-                return true;
-            }
-
             return false;
         }
 
-        internal static bool IsOverUI(Vector2 screenPosition)
-            => Instance.IsPointerOverUI_(screenPosition);
-
         internal static bool IsPointerOverUI()
-            => Instance.IsPointerOverUI_(Input.mousePosition);
+            => MouseManager.IsOverUI(Input.mousePosition);
 
         internal static void RegisterInput(AdvancedMouse mouse)
         {

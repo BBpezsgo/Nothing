@@ -1,14 +1,9 @@
-using AssetManager;
-
-using Game.Managers;
-
 using System;
 using System.Collections.Generic;
-
+using AssetManager;
+using Game.Managers;
 using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
@@ -78,7 +73,7 @@ namespace Game.Components
         [SerializeField, Range(0f, 1f)] float TireGripFactor = 1f;
         [SerializeField] float TireMass = 1f;
         [SerializeField, Min(0)] float EngineForce = 1f;
-        [SerializeField, Range(0f, 1f)] float Handbrake = .2f;
+        [SerializeField, Range(0f, 1f)] float Handbrake = 1f;
 
         [Header("Engine")]
         [AssetField] public float moveAccelerationFactor = 30.0f;
@@ -323,6 +318,9 @@ namespace Game.Components
 
             InWater = Collider.bounds.min.y <= WaterManager.WaterLevel;
 
+            if (InWater)
+            { rb.AddForce(rb.velocity * -0.2f); }
+
             FlippedOverValue = Vector3.Dot(Vector3.up, transform.up);
 
             if (FlippedOverValue < .5f) return;
@@ -419,7 +417,7 @@ namespace Game.Components
                         force += desiredAcceleration * TireMass * steeringDirection;
                     }
 
-                    if (IsHandbraking || IsAutoHandbraking)
+                    if (isHandbraking || IsAutoHandbraking)
                     {
                         Vector3 steeringDirection;
                         if (wheel.MaxSteerAngle == 0f)
@@ -438,7 +436,6 @@ namespace Game.Components
                         float desiredAcceleration = desiredVelocityChange / Time.fixedDeltaTime;
 
                         force += desiredAcceleration * TireMass * steeringDirection;
-                        // force += SpeedSigned * -Handbrake * wheel.Forward;
                     }
                     else
                     {
@@ -658,7 +655,7 @@ namespace Game.Components
         void InputRequest_ServerRpc(Vector2 input, bool handbrake)
         {
             InputVector = input;
-            IsHandbraking = handbrake;
+            isHandbraking = handbrake;
         }
 
         internal override void DoUserInput()
@@ -672,7 +669,7 @@ namespace Game.Components
             if (NetcodeUtils.IsOfflineOrServer)
             {
                 InputVector = input;
-                IsHandbraking = handbrake;
+                isHandbraking = handbrake;
                 return;
             }
 

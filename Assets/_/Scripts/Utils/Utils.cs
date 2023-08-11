@@ -13,6 +13,7 @@ using Game.Managers;
 using Networking;
 using TMPro;
 using UI;
+using System.Runtime.CompilerServices;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -3108,4 +3109,28 @@ internal readonly struct EditorUtils
 {
     internal static string ProjectPath => System.IO.Path.GetDirectoryName(Application.dataPath);
     internal static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
+}
+
+internal class Queuev2<T> : List<T>
+{
+    public Queuev2() : base() { }
+    public Queuev2(IEnumerable<T> collection) : base(collection) { }
+    public Queuev2(int capacity) : base(capacity) { }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool Equals(object obj) => base.Equals(obj);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override int GetHashCode() => base.GetHashCode();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Enqueue(T element) => base.Add(element);
+
+    public T Dequeue()
+    {
+        T element = base[0];
+        base.RemoveAt(0);
+        return element;
+    }
+
+    public T First => base[0];
 }

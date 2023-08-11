@@ -54,3 +54,6 @@ MonoBehaviour:
   - Name: smelter
     Object: {fileID: 1029036110833637850, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
       type: 3}
+  - Name: part-turret-granate
+    Object: {fileID: 4739022589844902101, guid: 6151741502a139c428f8650fa5d2ea1b,
+      type: 3}

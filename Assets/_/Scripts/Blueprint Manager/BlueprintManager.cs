@@ -1,19 +1,13 @@
-using AssetManager;
-
-using DataUtilities.ReadableFileFormat;
-using DataUtilities.Serializer;
-
-using Game.Components;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using AssetManager;
+using DataUtilities.ReadableFileFormat;
+using DataUtilities.Serializer;
+using Game.Components;
 using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Blueprints
@@ -1057,6 +1051,9 @@ namespace Game.Blueprints
                         break;
                 }
             }
+
+            if (result.TryGetComponent(out BaseObject baseObject))
+            { baseObject.CollectTeamRenderers(); }
 
             return result;
         }

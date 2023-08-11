@@ -1,7 +1,6 @@
-using Game.UI;
-
+using System;
 using System.Collections.Generic;
-
+using Game.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,7 +8,7 @@ namespace Game.Managers
 {
     public class MenuManager : SingleInstance<MenuManager>
     {
-        internal enum MainMenuType
+        internal enum MainMenuType : int
         {
             None,
 
@@ -45,14 +44,14 @@ namespace Game.Managers
             Game_Research,
         }
 
-        internal enum IntermediateMenuType
+        internal enum IntermediateMenuType : int
         {
             None,
 
             Scenes,
         }
 
-        internal enum StatusType
+        internal enum StatusType : int
         {
             None,
 
@@ -64,13 +63,13 @@ namespace Game.Managers
             LoadingNetwork,
         }
 
-        internal enum PanelType
+        internal enum PanelType : int
         {
             None,
         }
 
-        [System.Serializable]
-        public class MainMenu<T> where T : struct, System.Enum
+        [Serializable]
+        public class MainMenu<T> where T : struct
         {
             [Header("Info")]
 
@@ -192,7 +191,7 @@ namespace Game.Managers
                 {
                     if (MenuNavigator.instance.IsPaused)
                     { return MainMenuType.Pause; }
-                    else 
+                    else
                     if (Input.GetKey(KeyCode.Alpha0))
                     { return MainMenuType.Room; }
                 }
@@ -251,12 +250,12 @@ namespace Game.Managers
             set => currentPanel = value;
         }
 
-        void UpdateMenus<T>(MainMenu<T>[] menus, T currentMenu) where T : struct, System.Enum
+        void UpdateMenus<T>(MainMenu<T>[] menus, T currentMenu) where T : struct
         {
             for (int i = 0; i < menus.Length; i++)
             {
-                menus[i].Enabled = currentMenu.Equals(menus[i].Type);
-                menus[i].Update(); //Time.deltaTime, lerpAmmount, minScale);
+                menus[i].Enabled = EqualityComparer<T>.Default.Equals(currentMenu, menus[i].Type);
+                menus[i].Update();
             }
         }
 

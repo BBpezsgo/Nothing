@@ -1,10 +1,8 @@
-using DataUtilities.ReadableFileFormat;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using DataUtilities.ReadableFileFormat;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
@@ -405,8 +403,10 @@ namespace AssetManager
                 if (CurrentScene.HasValue)
                 { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, CurrentScene.Value); }
 
+                instance.transform.SetPositionAndRotation(position, rotation);
+
                 if (NetcodeSynchronizer.Instance != null && instance.HasComponent<NetcodeView>())
-                { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, Vector3.zero, true); }
+                { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, position, true); }
 
                 onInstantiated?.Invoke(instance);
             });
@@ -419,7 +419,7 @@ namespace AssetManager
         /// If the prefab already loaded <see cref="InstantiatePrefab(Value, DataUtilities.FilePacker.IFile, bool)"/> is called.<br/>
         /// If none of these, this will load the corresponding file, parses it and calls the <see cref="InstantiatePrefab(Value, FileInfo, bool)"/> method.
         /// </summary>
-        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="SingletonNotExistException{AssetManager}"></exception>
         public static GameObject InstantiatePrefab(string prefabName, bool spawnOverNetwork, Vector3 position, Quaternion rotation)
         {
@@ -438,8 +438,10 @@ namespace AssetManager
                     if (CurrentScene.HasValue)
                     { UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, CurrentScene.Value); }
 
+                    instance.transform.SetPositionAndRotation(position, rotation);
+
                     if (NetcodeSynchronizer.Instance != null && instance.HasComponent<NetcodeView>())
-                    { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, Vector3.zero, true); }
+                    { NetcodeSynchronizer.Instance.RegisterObjectInstance(instance, instance.name, position, true); }
 
                     return instance;
                 }

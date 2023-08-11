@@ -1,12 +1,8 @@
-using AssetManager;
-
-using Game.Managers;
-
 using System;
 using System.Collections.Generic;
-
+using AssetManager;
+using Game.Managers;
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -30,7 +26,7 @@ namespace Game.Components
             }
         }
 
-        internal List<QueuedUnit> Queue;
+        internal Queuev2<QueuedUnit> Queue;
         public int CursorPriority => 0;
 
         public float Progress
@@ -38,7 +34,7 @@ namespace Game.Components
             get
             {
                 if (Queue.Count == 0) return 0f;
-                var producing = Queue[0];
+                var producing = Queue.First;
                 return Mathf.Clamp01(producing.Progress / producing.RequiedProgress);
             }
         }
@@ -54,7 +50,7 @@ namespace Game.Components
         {
             base.Start();
 
-            Queue = new List<QueuedUnit>();
+            Queue = new Queuev2<QueuedUnit>();
             UpdateTeam();
         }
 
@@ -66,13 +62,12 @@ namespace Game.Components
             if (Queue.Count <= 0)
             { return; }
 
-            Queue[0].Progress += Time.fixedDeltaTime;
+            Queue.First.Progress += Time.fixedDeltaTime;
 
-            if (Queue[0].Progress < Queue[0].RequiedProgress)
+            if (Queue.First.Progress < Queue.First.RequiedProgress)
             { return; }
 
-            OnUnitDone(Queue[0]);
-            Queue.RemoveAt(0);
+            OnUnitDone(Queue.Dequeue());
 
             if (UnitFactoryManager.Instance.SelectedFactory == this)
             { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
@@ -86,7 +81,7 @@ namespace Game.Components
             {
                 instance.transform.SetParent(transform.parent);
 
-                if (instance.TryGetComponent<Collider>(out var collider))
+                if (instance.TryGetComponent(out Collider collider))
                 {
                     instance.transform.position = new Vector3(
                         instance.transform.position.x,
@@ -98,6 +93,9 @@ namespace Game.Components
                 { baseObject.Team = Team; }
 
                 instance.SetActive(true);
+
+                if (NetworkManager.IsListening && instance.TryGetComponent(out NetworkObject networkObject))
+                { networkObject.Spawn(true); }
             });
         }
 
@@ -111,7 +109,7 @@ namespace Game.Components
         {
             if (NetcodeUtils.IsOfflineOrServer)
             {
-                Queue.Add(new QueuedUnit()
+                Queue.Enqueue(new QueuedUnit()
                 {
                     Progress = 0f,
                     RequiedProgress = unit.ProgressRequied,
