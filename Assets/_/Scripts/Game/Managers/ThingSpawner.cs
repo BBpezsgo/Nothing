@@ -28,8 +28,7 @@ namespace Game.Components
 
         void FixedUpdate()
         {
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
             things.PurgeObjects();
 
@@ -62,8 +61,10 @@ namespace Game.Components
 
         internal virtual GameObject Spawn(GameObject prefab)
         {
+            if (!NetcodeUtils.IsOfflineOrServer) return null;
+
             GameObject newThing = GameObject.Instantiate(prefab, GetPosition(), Quaternion.identity, transform);
-            newThing.SpawnOverNetwork();
+            newThing.SpawnOverNetwork(true);
             return newThing;
         }
 

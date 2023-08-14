@@ -19,8 +19,6 @@ GameObject:
   - component: {fileID: 8858920348296688437}
   - component: {fileID: 4329731264087408715}
   - component: {fileID: 4329731264087408714}
-  - component: {fileID: 4329731264087408725}
-  - component: {fileID: 8765060842146390248}
   - component: {fileID: 1819566531665296375}
   - component: {fileID: 9089273655404864247}
   - component: {fileID: 1089206618555930990}
@@ -254,6 +252,7 @@ MonoBehaviour:
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 20
+  buttonDestroy: 
   ToBeBuilt: []
   ToBeRepair: []
   nearestToBeBuilt: -1
@@ -275,54 +274,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 0
---- !u!114 &4329731264087408725
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4690245384110751948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80435dd05cfba2843aa594c6b62ee949, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _updateComponentsButton: 
-  _observedComponents: []
-  _id: 0
-  netcodeSynchronizer: {fileID: 0}
-  IsRegistered: 0
---- !u!114 &8765060842146390248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4690245384110751948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 0
-  SynchronizePosition: 0
-  SynchronizeXPosition: 1
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 1
-  SynchronizeRotation: 0
-  SynchronizeXRotation: 0
-  SynchronizeYRotation: 1
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
 --- !u!114 &1819566531665296375
 MonoBehaviour:
   m_ObjectHideFlags: 0

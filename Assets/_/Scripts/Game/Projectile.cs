@@ -19,7 +19,14 @@ namespace Game.Components
         {
             [SerializeField] internal string MaterialID;
 
-            [SerializeField] internal AudioClip Sound;
+            [SerializeField] internal AudioClip[] Sounds;
+
+            internal AudioClip GetRandomSound()
+            {
+                if (Sounds.Length == 0) return null;
+                if (Sounds.Length == 1) return Sounds[0];
+                return Sounds[Random.Range(0, Sounds.Length - 1)];
+            }
 
             [Header("Particles")]
             [SerializeField] internal GameObject Particles;
@@ -123,7 +130,7 @@ namespace Game.Components
             }
 
             rb = GetComponent<Rigidbody>();
-            AudioSource = GetComponent<AudioSource>();
+            AudioSource = GetComponentInChildren<AudioSource>();
 
             if (trail != null)
             {
@@ -481,6 +488,23 @@ namespace Game.Components
                     if (ImpactEffects[i].Hoe != null)
                     {
                         GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform);
+                    }
+
+                    var sound = ImpactEffects[i].GetRandomSound();
+                    if (sound != null)
+                    {
+                        AudioSource.PlayClipAtPoint(sound, transform.position);
+
+                        /*
+                        if (AudioSource == null)
+                        {
+                            Debug.LogWarning($"[{nameof(Projectile)}]: {nameof(AudioSource)} is null", this);
+                        }
+                        else
+                        {
+                            AudioSource.PlayClipAtPoint(sound, transform.position);
+                        }
+                        */
                     }
                 }
             }

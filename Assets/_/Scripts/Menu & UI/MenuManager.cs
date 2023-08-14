@@ -195,7 +195,7 @@ namespace Game.Managers
                     if (Input.GetKey(KeyCode.Alpha0))
                     { return MainMenuType.Room; }
                 }
-                else if (!Networking.OfflineManager.IsOffline)
+                else if (!Networking.OfflineManager.IsActiveOffline)
                 {
                     return MainMenuType.Lobby;
                 }

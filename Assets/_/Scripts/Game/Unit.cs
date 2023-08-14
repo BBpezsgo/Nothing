@@ -2,8 +2,6 @@ using AssetManager;
 
 using Game.Managers;
 
-using Unity.Netcode;
-
 using UnityEngine;
 
 using Utilities;
@@ -55,6 +53,9 @@ namespace Game.Components
                 }
             }
         }
+
+        [Header("Debug")]
+        [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
 
         void Awake()
         {
@@ -176,9 +177,13 @@ namespace Game.Components
             if (NetcodeUtils.IsOfflineOrServer)
             {
                 base.TryDropLoot();
-
+                this.OnUnitDestroy();
                 GameObject.Destroy(gameObject);
             }
         }
+
+        protected virtual void OnUnitDestroy() { }
+
+        void DebugDestroy() => Destroy();
     }
 }

@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1231462533266746986
 Transform:
@@ -121,7 +121,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2759722349239998941
 Transform:
@@ -135,7 +135,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4962209138425430465}
+  - {fileID: 3954113661172323284}
   - {fileID: 1231462533266746986}
   - {fileID: 7657099949244250535}
   - {fileID: 6491478849947534040}
@@ -219,11 +219,11 @@ GameObject:
   - component: {fileID: 6304169866861924646}
   - component: {fileID: 8374073841837070485}
   m_Layer: 0
-  m_Name: Spot Light (1)
+  m_Name: Light 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2136084743587519725
 Transform:
@@ -334,11 +334,11 @@ GameObject:
   - component: {fileID: 3448423824176664617}
   - component: {fileID: 8870144559935413122}
   m_Layer: 0
-  m_Name: Spot Light
+  m_Name: Light 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6491478849947534040
 Transform:
@@ -447,11 +447,11 @@ GameObject:
   m_Component:
   - component: {fileID: 7657099949244250535}
   m_Layer: 0
-  m_Name: DebotSpawn
+  m_Name: Unit Spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7657099949244250535
 Transform:
@@ -468,44 +468,12 @@ Transform:
   m_Father: {fileID: 2759722349239998941}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6027154862256299450
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4962209138425430465}
-  m_Layer: 0
-  m_Name: Model
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4962209138425430465
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6027154862256299450}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3954113661172323284}
-  m_Father: {fileID: 2759722349239998941}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3554866304119698495
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 4962209138425430465}
+    m_TransformParent: {fileID: 2759722349239998941}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
@@ -515,7 +483,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
@@ -535,7 +503,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
@@ -565,7 +533,17 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
         type: 3}
       propertyPath: m_Name
-      value: factory
+      value: Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8bc67c2b011c4a4a906dfaf5d6d3560, type: 3}

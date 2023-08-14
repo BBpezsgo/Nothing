@@ -34,17 +34,18 @@ namespace Game.UI
             UI.rootVisualElement.Q<Button>("button-disconnect").clicked += ButtonDisconnect;
             PlayersScrollView = UI.rootVisualElement.Q<ScrollView>("players");
 
-            if (NetcodeUtils.IsOffline)
+            if (NetcodeUtils.IsActiveOffline)
             {
                 UI.rootVisualElement.Q<VisualElement>("players-container").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-                LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+                // LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
+                LabelRoomName.text = "Offline";
 
                 UI.rootVisualElement.Q<Button>("button-disconnect").text = "Exit";
             }
             else
             {
                 UI.rootVisualElement.Q<VisualElement>("players-container").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-                LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
+                // LabelRoomName.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
 
                 if (NetworkManager.Singleton.IsServer)
                 { UI.rootVisualElement.Q<Button>("button-disconnect").text = "Stop Server"; }
@@ -122,26 +123,25 @@ namespace Game.UI
 
         void ButtonDisconnect()
         {
-            OfflineManager.IsOffline = false;
-            Debug.Log($"[{nameof(MenuRoom)}]: Shutting down ...");
+            Debug.Log($"[{nameof(MenuRoom)}]: Shutting down ...", this);
             NetworkManager.Singleton.Shutdown();
-            Debug.Log($"[{nameof(MenuRoom)}]: Shut down");
+            Debug.Log($"[{nameof(MenuRoom)}]: Shut down", this);
             MenuNavigator.Instance.IsPaused = false;
         }
 
         void FixedUpdate()
         {
-            if (!string.IsNullOrWhiteSpace(NetworkManager.Singleton.ConnectedHostname))
-            { LabelRoomName.text = NetworkManager.Singleton.ConnectedHostname; }
-            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
-            { LabelRoomName.text = $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
-            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
-            { LabelRoomName.text = $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
-            else
-            { LabelRoomName.text = "?"; }
-
-            if (!NetcodeUtils.IsOffline)
+            if (!NetcodeUtils.IsActiveOffline)
             {
+                if (!string.IsNullOrWhiteSpace(NetworkManager.Singleton.ConnectedHostname))
+                { LabelRoomName.text = NetworkManager.Singleton.ConnectedHostname; }
+                else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
+                { LabelRoomName.text = $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
+                else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
+                { LabelRoomName.text = $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
+                else
+                { LabelRoomName.text = "?"; }
+
                 UpdatePlayersTimer -= Time.fixedDeltaTime;
                 if (UpdatePlayersTimer <= 0f)
                 {

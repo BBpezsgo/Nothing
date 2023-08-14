@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Blueprints
@@ -9,13 +10,23 @@ namespace Game.Blueprints
         public PartTurretBuiltin[] Turrets;
         public PartControllerBuiltin[] Controllers;
 
-        public bool TryGetPart(string id, out PartBodyBuiltin part)
+        [SerializeField, Button(nameof(GenerateGUIDs), true, false, "Generate GUIDs")] string buttonGenerateGUIDs;
+
+        public bool TryGetPart<T>(string id, out T part) where T : BlueprintPart
+            => TryGetPart(GetBlueprintParts(), id, out part);
+        static bool TryGetPart<T>(BlueprintPart[] parts, string id, out T part) where T : BlueprintPart
         {
-            for (int i = 0; i < Bodies.Length; i++)
+            for (int i = 0; i < parts.Length; i++)
             {
-                if (Bodies[i].ID == id)
+                if (parts[i].ID == id)
                 {
-                    part = Bodies[i];
+                    if (parts[i] is not T _part)
+                    {
+                        part = null;
+                        return false;
+                    }
+
+                    part = _part;
                     return true;
                 }
             }
@@ -24,13 +35,21 @@ namespace Game.Blueprints
             return false;
         }
 
-        public bool TryGetPart(string id, out PartTurretBuiltin part)
+        public bool TryGetPart<T>(byte guid, out T part) where T : BlueprintPart
+            => TryGetPart(GetBlueprintParts(), guid, out part);
+        static bool TryGetPart<T>(BlueprintPart[] parts, byte guid, out T part) where T : BlueprintPart
         {
-            for (int i = 0; i < Turrets.Length; i++)
+            for (int i = 0; i < parts.Length; i++)
             {
-                if (Turrets[i].ID == id)
+                if (parts[i].GUID == guid)
                 {
-                    part = Turrets[i];
+                    if (parts[i] is not T _part)
+                    {
+                        part = null;
+                        return false;
+                    }
+
+                    part = _part;
                     return true;
                 }
             }
@@ -39,43 +58,69 @@ namespace Game.Blueprints
             return false;
         }
 
-        public bool TryGetPart(string id, out PartControllerBuiltin part)
+        BlueprintPart[] GetBlueprintParts()
         {
-            for (int i = 0; i < Controllers.Length; i++)
+            List<BlueprintPart> result = new();
+            result.AddRange(Bodies);
+            result.AddRange(Turrets);
+            result.AddRange(Controllers);
+            return result.ToArray();
+        }
+
+        bool IsUnique(BlueprintPart part)
+            => IsUnique(part, GetBlueprintParts());
+
+        bool IsUnique(BlueprintPart part, BlueprintPart[] parts)
+        {
+            for (int i = 0; i < parts.Length; i++)
             {
-                if (Controllers[i].ID == id)
+                if (object.ReferenceEquals(part, parts[i]))
                 {
-                    part = Controllers[i];
-                    return true;
+                    continue;
+                }
+
+                if (part.GUID == parts[i].GUID)
+                {
+                    return false;
                 }
             }
-
-            part = null;
-            return false;
+            return true;
         }
-       
-        public bool TryGetPart(string id, out BlueprintPart part)
+
+        byte GenerateGUID()
         {
-            if (TryGetPart(id, out PartBodyBuiltin body))
+            return (byte)Random.Range(byte.MinValue, byte.MaxValue);
+        }
+
+        int UniqueGUIDCapacity => Mathf.Abs(byte.MinValue) + Mathf.Abs(byte.MaxValue) + 1;
+
+        void GenerateGUIDs()
+        {
+            BlueprintPart[] parts = GetBlueprintParts();
+            int maxGenerateIterations = 32;
+
+            if (parts.Length > UniqueGUIDCapacity)
             {
-                part = body;
-                return true;
+                Debug.LogError($"Impossible to generate unique GUIDs", this);
+                return;
             }
 
-            if (TryGetPart(id, out PartTurretBuiltin turret))
+            for (int i = 0; i < parts.Length; i++)
             {
-                part = turret;
-                return true;
-            }
+                var part = parts[i];
 
-            if (TryGetPart(id, out PartControllerBuiltin controller))
-            {
-                part = controller;
-                return true;
-            }
+                int maxIterations = maxGenerateIterations;
+                while (!IsUnique(part, parts))
+                {
+                    if (maxIterations-- < 0)
+                    {
+                        Debug.LogError($"Failed to generate GUID: max iterations exeed", this);
+                        break;
+                    }
 
-            part = null;
-            return false;
+                    part.GUID = GenerateGUID();
+                }
+            }
         }
     }
 }

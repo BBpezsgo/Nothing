@@ -9796,8 +9796,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2619412344863678372}
   - component: {fileID: 2619412344863678371}
-  - component: {fileID: 8665515333328489291}
-  - component: {fileID: 6459562339341115691}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -9886,61 +9884,6 @@ MonoBehaviour:
   Range: 9176.791
   ShowRadius: 0
   currentError: 1
---- !u!114 &8665515333328489291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412344863678373}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 1
-  SynchronizePosition: 0
-  SynchronizeXPosition: 0
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 0
-  SynchronizeRotation: 1
-  SynchronizeXRotation: 0
-  SynchronizeYRotation: 1
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
---- !u!114 &6459562339341115691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412344863678373}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!1 &2619412345505571582
 GameObject:
   m_ObjectHideFlags: 0
@@ -9963,8 +9906,6 @@ GameObject:
   - component: {fileID: 1857563574725348185}
   - component: {fileID: 5615466198774182121}
   - component: {fileID: 4420155354252969548}
-  - component: {fileID: 5431036141511123921}
-  - component: {fileID: -5289328005374519403}
   - component: {fileID: 1849051629192169190}
   - component: {fileID: 9074750142406875483}
   - component: {fileID: 3413199833213572951}
@@ -10205,6 +10146,7 @@ MonoBehaviour:
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 80
+  buttonDestroy: 
   Attacker: {fileID: 0}
 --- !u!114 &6449386879822076090
 MonoBehaviour:
@@ -10277,48 +10219,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 0
---- !u!114 &5431036141511123921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412345505571582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80435dd05cfba2843aa594c6b62ee949, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _updateComponentsButton: 
-  _observedComponents: []
-  _id: 0
-  netcodeSynchronizer: {fileID: 0}
-  IsRegistered: 0
---- !u!114 &-5289328005374519403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412345505571582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 0
-  SynchronizePosition: 1
-  SynchronizeXPosition: 1
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 1
-  SynchronizeRotation: 1
-  SynchronizeXRotation: 0
-  SynchronizeYRotation: 1
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
 --- !u!114 &1849051629192169190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10506,8 +10406,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2619412345589989142}
-  - component: {fileID: 3301021722331904811}
-  - component: {fileID: 7720926322565544147}
   m_Layer: 0
   m_Name: Cannon
   m_TagString: Untagged
@@ -10532,61 +10430,6 @@ Transform:
   m_Father: {fileID: 2619412344863678372}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3301021722331904811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412345589989143}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 1
-  SynchronizePosition: 0
-  SynchronizeXPosition: 0
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 0
-  SynchronizeRotation: 1
-  SynchronizeXRotation: 1
-  SynchronizeYRotation: 0
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
---- !u!114 &7720926322565544147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412345589989143}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotAngleX: 1
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!1 &2619412345703143841
 GameObject:
   m_ObjectHideFlags: 0

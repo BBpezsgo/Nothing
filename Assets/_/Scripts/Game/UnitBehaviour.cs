@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour : MonoBehaviour
+    public class UnitBehaviour : MonoBehaviour, ICopiable<UnitBehaviour>
     {
         [SerializeField, Button(nameof(SetBehaviours), true, true, "Set Behaviours")] string btn_0;
         [SerializeField, ReadOnly, NonReorderable] UnitBehaviour_Base[] Behaviours = new UnitBehaviour_Base[0];
@@ -42,6 +42,12 @@ namespace Game.Components
         void Start()
         {
             SetBehaviours();
+        }
+
+        public void CopyTo(object destination) => this.CopyTo<UnitBehaviour>(destination);
+        public void CopyTo(UnitBehaviour destination)
+        {
+
         }
     }
 }

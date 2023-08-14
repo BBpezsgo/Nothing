@@ -1,7 +1,5 @@
 using AssetManager;
 
-using System;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -15,6 +13,9 @@ namespace Game.Components
         internal float NormalizedHP => HP / _maxHp;
 
         float _maxHp;
+
+        [Header("Debug")]
+        [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
 
         public override void OnDestroy()
         {
@@ -46,13 +47,14 @@ namespace Game.Components
 
         void Destroy()
         {
-            if (NetcodeUtils.IsOfflineOrServer)
-            {
-                base.TryDropLoot();
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
-                GameObject.Destroy(gameObject);
-            }
+            base.TryDropLoot();
+            this.OnUnitDestroy();
+            GameObject.Destroy(gameObject);
         }
+
+        protected virtual void OnUnitDestroy() { }
 
         protected virtual void OnDrawGizmosSelected()
         {
@@ -69,5 +71,7 @@ namespace Game.Components
             HP = Mathf.Min(_maxHp, HP + v);
             return HP >= _maxHp;
         }
+
+        void DebugDestroy() => Destroy();
     }
 }

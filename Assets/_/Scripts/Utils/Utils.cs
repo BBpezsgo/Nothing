@@ -11,9 +11,7 @@ using Game.Components;
 using Game.Managers;
 
 using Networking;
-using TMPro;
 using UI;
-using System.Runtime.CompilerServices;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -37,6 +35,13 @@ internal struct Triangle
     public Vector3 A;
     public Vector3 B;
     public Vector3 C;
+
+    public Triangle(Vector3 a, Vector3 b, Vector3 c)
+    {
+        A = a;
+        B = b;
+        C = c;
+    }
 
     public static implicit operator (Vector3 a, Vector3 b, Vector3 c)(Triangle triangle)
         => (triangle.A, triangle.B, triangle.C);
@@ -205,6 +210,11 @@ internal static class GLUtils
 
         GL.End();
     }
+
+    internal static void DrawLine(Utilities.Line line, float thickness, Color color)
+        => DrawLine(line.PointA, line.PointB, thickness, color);
+    internal static void DrawLine(Utilities.Line line, Color color)
+        => DrawLine(line.PointA, line.PointB, color);
 
     internal static void DrawCircle(Vector2 center, float radius, float thickness, Color color, int segmentCount = CircleSegmentCount)
     {
@@ -1177,6 +1187,31 @@ namespace Utilities
 
     internal struct Line
     {
+        public Vector2 PointA;
+        public Vector2 PointB;
+
+        public Line(Vector2 pointA, Vector2 pointB)
+        {
+            PointA = pointA;
+            PointB = pointB;
+        }
+
+        public static Line Zero => new(Vector2.zero, Vector2.zero);
+
+        public static implicit operator (Vector2, Vector2)(Line v)
+            => (v.PointA, v.PointB);
+        public static implicit operator Line((Vector2, Vector2) v)
+            => (v.Item1, v.Item2);
+
+        public static Line operator +(Line a, Vector2 b)
+            => new(a.PointA + b, a.PointB + b);
+        public static Line operator -(Line a, Vector2 b)
+            => new(a.PointA - b, a.PointB - b);
+        public static Line operator *(Line a, Vector2 b)
+            => new(a.PointA * b, a.PointB * b);
+        public static Line operator *(Line a, float b)
+            => new(a.PointA * b, a.PointB * b);
+
         public static Vector2? Line2LineIntersection(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
         {
             // Line AB represented as a1x + b1y = c1
@@ -2222,45 +2257,20 @@ internal readonly struct ProfilerMarkers
 
 internal static class NetcodeUtils
 {
-    public static bool IsServer
-    {
-        get
-        {
-            if (NetcodeUtils.IsOffline) return false;
-            return NetworkManager.Singleton.IsServer;
-        }
-    }
+    public static bool IsServer => !IsOffline && NetworkManager.Singleton.IsServer;
 
-    public static bool IsOfflineOrServer
-    {
-        get
-        {
-            if (NetcodeUtils.IsOffline) return true;
-            return NetworkManager.Singleton.IsServer;
-        }
-    }
+    public static bool IsOfflineOrServer => IsOffline || NetworkManager.Singleton.IsServer;
+
+    public static bool IsActiveOfflineOrServer => IsActiveOffline || NetworkManager.Singleton.IsServer;
 
     /// <summary>
     /// Returns <see langword="true"/> if there is <b>no <see cref="NetworkManager.Singleton"/></b>, if it is running in <b>offline mode</b>, or if the <see cref="NetworkManager"/> is <b>not listening</b>.
     /// </summary>
-    public static bool IsOffline
-    {
-        get
-        {
-            if (OfflineManager.IsOffline) return true;
-            if (!NetworkManager.Singleton.IsListening) return true;
-            return false;
-        }
-    }
+    public static bool IsOffline => IsActiveOffline || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening;
 
-    internal static bool IsClient
-    {
-        get
-        {
-            if (NetcodeUtils.IsOffline) return false;
-            return NetworkManager.Singleton.IsConnectedClient;
-        }
-    }
+    public static bool IsActiveOffline => OfflineManager.IsActiveOffline;
+
+    internal static bool IsClient => !IsOffline && NetworkManager.Singleton.IsClient;
 
     public static bool FindNetworkObject(ulong id, out NetworkObject networkObject)
     {
@@ -2583,7 +2593,12 @@ namespace InputUtils
             ClickedOnUI = MouseManager.IsOverUI(Position);
 
             if (!ClickedOnUI)
-            { OnDown?.Invoke(this); }
+            {
+                try
+                { OnDown?.Invoke(this); }
+                catch (Exception exception)
+                { Debug.LogException(exception); }
+            }
         }
 
         void Hold()
@@ -2597,7 +2612,12 @@ namespace InputUtils
             if (Drag)
             {
                 if (!ClickedOnUI)
-                { OnDrag?.Invoke(DragStart, Position); }
+                {
+                    try
+                    { OnDrag?.Invoke(DragStart, Position); }
+                    catch (Exception exception)
+                    { Debug.LogException(exception); }
+                }
             }
 
             if (UpTimeout != 0f && UpTimeout < HoldTime)
@@ -2614,12 +2634,22 @@ namespace InputUtils
                 if (Drag)
                 {
                     if (!ClickedOnUI)
-                    { OnDragged?.Invoke(DragStart, Position); }
+                    {
+                        try
+                        { OnDragged?.Invoke(DragStart, Position); }
+                        catch (Exception exception)
+                        { Debug.LogException(exception); }
+                    }
                 }
                 else
                 {
                     if (!ClickedOnUI)
-                    { OnClick?.Invoke(this); }
+                    {
+                        try
+                        { OnClick?.Invoke(this); }
+                        catch (Exception exception)
+                        { Debug.LogException(exception); }
+                    }
                 }
             }
 
@@ -2905,7 +2935,7 @@ namespace InputUtils
                 fontStyle = FontStyle.Bold,
             };
 
-            Vector2 textOffset = new Vector2(radius, -radius);
+            Vector2 textOffset = new(radius, -radius);
             textOffset *= 4.3f / 1.4f;
 
             int line = 1;
@@ -3111,26 +3141,111 @@ internal readonly struct EditorUtils
     internal static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
 }
 
-internal class Queuev2<T> : List<T>
+internal interface ICopiable<T> : ICopiable
 {
-    public Queuev2() : base() { }
-    public Queuev2(IEnumerable<T> collection) : base(collection) { }
-    public Queuev2(int capacity) : base(capacity) { }
+    public void CopyTo(T destination);
+}
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object obj) => base.Equals(obj);
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => base.GetHashCode();
+internal interface ICopiable
+{
+    public void CopyTo(object destination);
+}
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Enqueue(T element) => base.Add(element);
-
-    public T Dequeue()
+internal static class UnityCopiables
+{
+    internal static void CopyTo(Rigidbody source, Rigidbody destination)
     {
-        T element = base[0];
-        base.RemoveAt(0);
-        return element;
+        destination.angularDrag = source.angularDrag;
+        destination.angularVelocity = source.angularVelocity;
+        destination.centerOfMass = source.centerOfMass;
+        destination.collisionDetectionMode = source.collisionDetectionMode;
+        destination.constraints = source.constraints;
+        destination.drag = source.drag;
+        destination.freezeRotation = source.freezeRotation;
+        destination.inertiaTensor = source.inertiaTensor;
+        destination.inertiaTensorRotation = source.inertiaTensorRotation;
+        destination.interpolation = source.interpolation;
+        destination.isKinematic = source.isKinematic;
+        destination.mass = source.mass;
+        destination.maxAngularVelocity = source.maxAngularVelocity;
+        destination.maxDepenetrationVelocity = source.maxDepenetrationVelocity;
+        destination.sleepThreshold = source.sleepThreshold;
+        destination.useGravity = source.useGravity;
+    }
+}
+
+
+internal static class CopiableExtensions
+{
+    internal static bool CopyTo<T>(this ICopiable<T> source, object destination)
+    {
+        if (destination is not T _destination)
+        {
+            Debug.LogError($"[{nameof(CopiableExtensions)}]: Invalid destination type");
+            return false;
+        }
+        source.CopyTo(_destination);
+        return true;
+    }
+}
+
+/// <summary>
+/// This can be converted into <see cref="Component"/>
+/// </summary>
+public interface IComponent
+{ }
+
+public static class IObjectExtensions
+{
+    public static GameObject GetGameObject(this IComponent self)
+        => (self as Component).gameObject;
+
+    public static ulong? GetNetworkID(this IComponent self)
+    {
+        if (!self.TryGetComponentInChildren(out NetworkObject networkObject))
+        {
+            Debug.LogError($"Object {self.GetGameObject()} does not have a {nameof(NetworkObject)} component", self.GetGameObject());
+            return null;
+        }
+        return networkObject.NetworkObjectId;
     }
 
-    public T First => base[0];
+    public static ulong GetNetworkIDForce(this IComponent self)
+    {
+        if (!self.TryGetComponentInChildren(out NetworkObject networkObject))
+        { throw new MissingComponentException($"Object {self.GetGameObject()} does not have a {nameof(NetworkObject)} component"); }
+
+        return networkObject.NetworkObjectId;
+    }
+
+    public static bool TryGetNetworkID(this IComponent self, out ulong networkID)
+    {
+        if (!self.TryGetComponentInChildren(out NetworkObject networkObject))
+        {
+            networkID = default;
+            return false;
+        }
+        networkID = networkObject.NetworkObjectId;
+        return true;
+    }
+
+    public static T GetComponent<T>(this IComponent self)
+    {
+        if (!(self as Component).TryGetComponent(out T component))
+        { return default; }
+        return component;
+    }
+
+    public static bool TryGetComponent<T>(this IComponent self, out T component)
+        => (self as Component).TryGetComponent(out component);
+
+    public static T GetComponentInChildren<T>(this IComponent self)
+    {
+        if (!(self as Component).TryGetComponentInChildren(out T component))
+        { return default; }
+        return component;
+    }
+
+    public static bool TryGetComponentInChildren<T>(this IComponent self, out T component)
+        => (self as Component).TryGetComponentInChildren(out component);
 }

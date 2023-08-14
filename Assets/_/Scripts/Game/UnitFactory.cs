@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using AssetManager;
 using Game.Managers;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,13 +10,15 @@ namespace Game.Components
     internal class UnitFactory : Building, INeedDirectWorldCursor
     {
         [Serializable]
-        internal class QueuedUnit : INetworkSerializable
+        internal struct QueuedUnit : INetworkSerializable, IEquatable<QueuedUnit>
         {
-            [SerializeField, ReadOnly] internal string PrefabID;
+            [SerializeField, ReadOnly] internal FixedString32Bytes PrefabID;
             [SerializeField, ReadOnly] internal float RequiedProgress;
-            [SerializeField, ReadOnly] internal string ThumbnailID;
+            [SerializeField, ReadOnly] internal FixedString32Bytes ThumbnailID;
 
             [SerializeField, ReadOnly] internal float Progress;
+
+            public readonly bool Equals(QueuedUnit other) => this.PrefabID == other.PrefabID;
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
@@ -26,7 +28,8 @@ namespace Game.Components
             }
         }
 
-        internal Queuev2<QueuedUnit> Queue;
+        internal NetworkList<QueuedUnit> Queue;
+
         public int CursorPriority => 0;
 
         public float Progress
@@ -34,7 +37,7 @@ namespace Game.Components
             get
             {
                 if (Queue.Count == 0) return 0f;
-                var producing = Queue.First;
+                QueuedUnit producing = Queue[0];
                 return Mathf.Clamp01(producing.Progress / producing.RequiedProgress);
             }
         }
@@ -46,26 +49,31 @@ namespace Game.Components
         void OnDisable()
         { WorldCursorManager.Instance.Deregister(this); }
 
-        protected override void Start()
+        void Awake()
         {
-            base.Start();
+            Queue = new NetworkList<QueuedUnit>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+            Queue.OnListChanged += OnQueueChanged;
+        }
 
-            Queue = new Queuev2<QueuedUnit>();
-            UpdateTeam();
+        void OnQueueChanged(NetworkListEvent<QueuedUnit> changeEvent)
+        {
+            if (NetcodeUtils.IsOfflineOrServer) return;
+
+            if (UnitFactoryManager.Instance.SelectedFactory == this)
+            { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
         }
 
         void FixedUpdate()
         {
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
-            if (Queue.Count <= 0)
-            { return; }
+            if (Queue.Count <= 0) return;
 
-            Queue.First.Progress += Time.fixedDeltaTime;
+            QueuedUnit first = Queue[0];
+            first.Progress += Time.fixedDeltaTime;
+            Queue[0] = first;
 
-            if (Queue.First.Progress < Queue.First.RequiedProgress)
-            { return; }
+            if (first.Progress < first.RequiedProgress) return;
 
             OnUnitDone(Queue.Dequeue());
 
@@ -77,7 +85,7 @@ namespace Game.Components
         {
             Vector3 spawnAt = DepotSpawn.position;
             spawnAt.y = TheTerrain.Height(spawnAt);
-            AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID, true, spawnAt, DepotSpawn.rotation, instance =>
+            AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID.ToString(), true, spawnAt, DepotSpawn.rotation, instance =>
             {
                 instance.transform.SetParent(transform.parent);
 
@@ -89,13 +97,13 @@ namespace Game.Components
                         instance.transform.position.z);
                 }
 
-                if (instance.TryGetComponent(out BaseObject baseObject))
+                BaseObject baseObject = instance.GetComponentInChildren<BaseObject>(false);
+                if (baseObject != null)
                 { baseObject.Team = Team; }
 
                 instance.SetActive(true);
 
-                if (NetworkManager.IsListening && instance.TryGetComponent(out NetworkObject networkObject))
-                { networkObject.Spawn(true); }
+                instance.SpawnOverNetwork(true);
             });
         }
 
@@ -107,39 +115,30 @@ namespace Game.Components
 
         internal void QueueUnit(UnitFactoryManager.ProducableUnit unit)
         {
-            if (NetcodeUtils.IsOfflineOrServer)
-            {
-                Queue.Enqueue(new QueuedUnit()
-                {
-                    Progress = 0f,
-                    RequiedProgress = unit.ProgressRequied,
-                    PrefabID = unit.PrefabID,
-                    ThumbnailID = unit.ThumbnailID,
-                });
-
-                if (UnitFactoryManager.Instance.SelectedFactory == this)
-                { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
-
-                RefreshRequest_ClientRpc();
-            }
-            else
+            if (!NetcodeUtils.IsOfflineOrServer)
             {
                 QueueUnitRequest_ServerRpc(unit);
+                return;
             }
+
+            Queue.Enqueue(new QueuedUnit()
+            {
+                Progress = 0f,
+                RequiedProgress = unit.ProgressRequied,
+                PrefabID = unit.PrefabID ?? string.Empty,
+                ThumbnailID = unit.ThumbnailID ?? string.Empty,
+            });
+
+            if (UnitFactoryManager.Instance.SelectedFactory == this)
+            { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
         }
 
         [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
         void QueueUnitRequest_ServerRpc(UnitFactoryManager.ProducableUnit unit)
         {
-            if (NetcodeUtils.IsOfflineOrServer)
-            { QueueUnit(unit); }
-        }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
-        [ClientRpc]
-        void RefreshRequest_ClientRpc()
-        {
-            if (UnitFactoryManager.Instance.SelectedFactory == this)
-            { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
+            QueueUnit(unit);
         }
     }
 }

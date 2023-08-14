@@ -1,9 +1,6 @@
-using Game.Managers;
-
 using System.Collections.Generic;
-
+using Game.Managers;
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -139,14 +136,11 @@ namespace Game.Components
 
         void FixedUpdate()
         {
-            if (!IsConstructed)
-            { return; }
+            if (!IsConstructed) return;
 
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
-            if (BuildingProcess < BuildingProcessRequied)
-            { return; }
+            if (BuildingProcess < BuildingProcessRequied) return;
 
             if (Building == null)
             { Debug.LogWarning($"[{nameof(BuildingHologram)}]: Building is null"); }

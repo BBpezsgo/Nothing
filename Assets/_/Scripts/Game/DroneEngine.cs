@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class DroneEngine : MovementEngine
+    public class DroneEngine : MovementEngine, ICopiable<DroneEngine>
     {
         [SerializeField, AssetField] float HoveringHeight = 5f;
         [SerializeField, AssetField] float SpringStrength = 10f;
@@ -275,6 +275,28 @@ namespace Game.Components
                 InputRequest_ServerRpc(input);
                 return;
             }
+        }
+
+        public void CopyTo(object destination) => this.CopyTo<DroneEngine>(destination);
+        public void CopyTo(DroneEngine destination)
+        {
+            destination.brake = brake;
+            destination.Collider = Collider;
+            destination.engineBrake = engineBrake;
+            destination.handbrake = handbrake;
+            destination.HoveringHeight = HoveringHeight;
+            destination.isHandbraking = isHandbraking;
+            destination.moveAccelerationFactor = moveAccelerationFactor;
+            destination.moveSpeedMax = moveSpeedMax;
+            destination.rb = rb;
+            destination.SmoothSteeringInput = SmoothSteeringInput;
+            destination.SpringDamper = SpringDamper;
+            destination.SpringStrength = SpringStrength;
+            destination.Steering = Steering;
+            destination.SteeringInput = SteeringInput;
+            destination.steeringSpeed = steeringSpeed;
+            destination.TorqueInput = TorqueInput;
+            destination.turnFactor = turnFactor;
         }
     }
 }

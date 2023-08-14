@@ -147,8 +147,8 @@ namespace Game.Managers
             {
                 TemplateContainer newElement = QueueElement.Instantiate();
 
-                newElement.Q<Label>().text = queue[i].PrefabID;
-                if (PlayerData.TryGetThumbnail(queue[i].ThumbnailID, out Texture2D thumbnail))
+                newElement.Q<Label>().text = queue[i].PrefabID.ToString();
+                if (PlayerData.TryGetThumbnail(queue[i].ThumbnailID.ToString(), out Texture2D thumbnail))
                 { newElement.Q<VisualElement>("image").style.backgroundImage = new StyleBackground(thumbnail); }
 
                 container.Add(newElement);

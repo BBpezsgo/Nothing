@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class VehicleEngine : MovementEngine, IHaveAssetFields
+    public class VehicleEngine : MovementEngine, IHaveAssetFields, ICopiable<VehicleEngine>
     {
         [SerializeField, ReadOnly] Unit unit;
 
@@ -269,7 +269,7 @@ namespace Game.Components
         {
             base.Start();
 
-            if (!TryGetComponent(out Collider))
+            if (!this.TryGetComponentInChildren(out Collider))
             { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(Collider)} is null", this); }
 
             if (!TryGetComponent(out unit))
@@ -678,6 +678,55 @@ namespace Game.Components
                 InputRequest_ServerRpc(input, handbrake);
                 return;
             }
+        }
+
+        public void CopyTo(object destination) => this.CopyTo<VehicleEngine>(destination);
+        public void CopyTo(VehicleEngine destination)
+        {
+            destination.brake = brake;
+            destination.CenterOfMass = CenterOfMass;
+            destination.Collider = Collider;
+            destination.driftFactor = driftFactor;
+            destination.driftFactorWithHandbrake = driftFactorWithHandbrake;
+            destination.DustEmissionRate = DustEmissionRate;
+            destination.dustParticles = dustParticles;
+            destination.dustParticlesEmission = dustParticlesEmission;
+            destination.engineBrake = engineBrake;
+            destination.EngineForce = EngineForce;
+            destination.FlippedOverValue = FlippedOverValue;
+            destination.Handbrake = Handbrake;
+            destination.handbrake = handbrake;
+            destination.HasDustParticles = HasDustParticles;
+            destination.HasTrailRenderers = HasTrailRenderers;
+            destination.HasWaterParticles = HasWaterParticles;
+            destination.input = input;
+            destination.InWater = InWater;
+            destination.isBraking = isBraking;
+            destination.IsGrounded = IsGrounded;
+            destination.isHandbraking = isHandbraking;
+            destination.isHaveTracks = isHaveTracks;
+            destination.moveAccelerationFactor = moveAccelerationFactor;
+            destination.moveSpeedMax = moveSpeedMax;
+            destination.NextGroundCheck = NextGroundCheck;
+            destination.rb = rb;
+            destination.SmoothSteeringInput = SmoothSteeringInput;
+            destination.speedAndSteer = speedAndSteer;
+            destination.SpringDamper = SpringDamper;
+            destination.SpringStrength = SpringStrength;
+            destination.Steering = Steering;
+            destination.SteeringInput = SteeringInput;
+            destination.steeringSpeed = steeringSpeed;
+            destination.TireGripFactor = TireGripFactor;
+            destination.TireMass = TireMass;
+            destination.Torque = Torque;
+            destination.TorqueInput = TorqueInput;
+            destination.TrailEmission = TrailEmission;
+            destination.turnFactor = turnFactor;
+            destination.unit = unit;
+            destination.WaterEmissionRate = WaterEmissionRate;
+            destination.waterParticles = waterParticles;
+            destination.waterParticlesEmission = waterParticlesEmission;
+            destination.Wheels = Wheels;
         }
     }
 }

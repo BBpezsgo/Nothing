@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Game.Components
 {
     [RequireComponent(typeof(UnitBehaviour))]
-    public class UnitBehaviour_Base : NetworkBehaviour, IComparable<UnitBehaviour_Base>, IHaveAssetFields
+    public class UnitBehaviour_Base : NetworkBehaviour, IComparable<UnitBehaviour_Base>, IHaveAssetFields, ICopiable<UnitBehaviour_Base>
     {
         [SerializeField, AssetField] internal float Priority;
         [SerializeField, ReadOnly] protected MovementEngine MovementEngine;
@@ -30,5 +30,11 @@ namespace Game.Components
         /// </summary>
         internal virtual Vector2? GetOutput()
             => null;
+
+        public virtual void CopyTo(object destination) => this.CopyTo<UnitBehaviour_Base>(destination);
+        public void CopyTo(UnitBehaviour_Base destination)
+        {
+            destination.Priority = Priority;
+        }
     }
 }

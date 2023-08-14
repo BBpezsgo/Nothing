@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using AssetManager;
 
@@ -71,8 +70,7 @@ namespace Game.Components
 
         protected void TryDropLoot()
         {
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
             if (TryGetComponent(out ItemLoot itemLoot))
             { itemLoot.DropLoots(); }

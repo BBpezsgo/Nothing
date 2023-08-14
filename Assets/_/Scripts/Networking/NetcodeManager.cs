@@ -72,7 +72,7 @@ namespace Networking.Managers
 
             Window = IMGUIManager.Instance.CreateWindow(new Rect(5f, 5f, 250f, 150f));
             Window.Title = "Netcode Scenes";
-            Window.Visible = true;
+            Window.Visible = false;
             Window.DrawContent = OnWindowGUI;
         }
 

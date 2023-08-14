@@ -1,3 +1,4 @@
+using Netcode.Transports.Offline;
 using Netcode.Transports.WebSocket;
 
 using Networking;
@@ -62,7 +63,23 @@ namespace Game.UI
 
         private void ButtonOffline()
         {
-            OfflineManager.IsOffline = true;
+            if (!NetworkManager.Singleton.gameObject.TryGetComponent(out OfflineTransport transport))
+            {
+                LabelSocketError.text = "Offline mode not supported :(";
+                return;
+            }
+
+            NetworkManager.Singleton.NetworkConfig.NetworkTransport = transport;
+            Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(OfflineTransport)}", this);
+
+            { Debug.Log($"[{nameof(MenuLobby)}]: Start server on {GetSocket()} ...", this); }
+            bool success = NetworkManager.Singleton.StartServer();
+            if (success)
+            { Debug.Log($"[{nameof(MenuLobby)}]: Server started on {GetSocket()}", this); }
+            else
+            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {GetSocket()}", this); }
+
+            NetworkDiscovery.Instance.StopDiscovery();
         }
 
         void OnDisable()
@@ -96,16 +113,16 @@ namespace Game.UI
             if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
             {
                 unityTransport.SetConnectionData(address, port, address);
-                Debug.Log($"[{nameof(MenuLobby)}]: Start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port} ...");
+                Debug.Log($"[{nameof(MenuLobby)}]: Start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port} ...", this);
             }
             else
             { throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}"); }
 
             bool success = NetworkManager.Singleton.StartClient();
             if (success)
-            { Debug.Log($"[{nameof(MenuLobby)}]: Client started on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"); }
+            { Debug.Log($"[{nameof(MenuLobby)}]: Client started on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}", this); }
             else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"); }
+            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}", this); }
 
             NetworkDiscovery.Instance.StopDiscovery();
         }
@@ -216,10 +233,10 @@ namespace Game.UI
                 }
 
                 NetworkManager.Singleton.NetworkConfig.NetworkTransport = unityTransport;
-                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(UnityTransport)}");
+                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(UnityTransport)}", this);
 
                 unityTransport.SetConnectionData(address.ToString(), (ushort)uri.Port, address.ToString());
-                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}");
+                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}", this);
                 return true;
             }
 
@@ -244,7 +261,7 @@ namespace Game.UI
                 }
 
                 NetworkManager.Singleton.NetworkConfig.NetworkTransport = webSocketTransport;
-                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(WebSocketTransport)}");
+                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(WebSocketTransport)}", this);
 
                 webSocketTransport.AllowForwardedRequest = false;
                 webSocketTransport.CertificateBase64String = "";
@@ -253,7 +270,7 @@ namespace Game.UI
                 webSocketTransport.SecureConnection = (uri.Scheme == "wss");
                 webSocketTransport.Path = uri.AbsolutePath;
 
-                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}");
+                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}", this);
                 return true;
             }
 
@@ -267,6 +284,8 @@ namespace Game.UI
             { return $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
             else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
             { return $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
+            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is OfflineTransport)
+            { return "offline"; }
             else
             { throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}"); }
         }
@@ -280,14 +299,14 @@ namespace Game.UI
             }
 
 
-            Debug.Log($"[{nameof(MenuLobby)}]: Start server on {GetSocket()} ...");
+            Debug.Log($"[{nameof(MenuLobby)}]: Start server on {GetSocket()} ...", this);
             bool success = NetworkManager.Singleton.StartServer();
             if (success)
             {
-                Debug.Log($"[{nameof(MenuLobby)}]: Server started on {GetSocket()}");
+                Debug.Log($"[{nameof(MenuLobby)}]: Server started on {GetSocket()}", this);
             }
             else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {GetSocket()}"); }
+            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {GetSocket()}", this); }
 
             NetworkDiscovery.Instance.StopDiscovery();
         }
@@ -300,12 +319,12 @@ namespace Game.UI
                 return;
             }
 
-            { Debug.Log($"[{nameof(MenuLobby)}]: Start client on {GetSocket()} ..."); }
+            { Debug.Log($"[{nameof(MenuLobby)}]: Start client on {GetSocket()} ...", this); }
             bool success = NetworkManager.Singleton.StartClient();
             if (success)
-            { Debug.Log($"[{nameof(MenuLobby)}]: Client started on {GetSocket()}"); }
+            { Debug.Log($"[{nameof(MenuLobby)}]: Client started on {GetSocket()}", this); }
             else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start client on {GetSocket()}"); }
+            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start client on {GetSocket()}", this); }
 
             NetworkDiscovery.Instance.StopDiscovery();
         }

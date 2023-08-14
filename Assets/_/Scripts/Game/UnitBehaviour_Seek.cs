@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields
+    public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields, ICopiable<UnitBehaviour_Seek>
     {
         internal const float DISTANCE_TO_STOP = 4f;
         internal const float BRAKING_DISTANCE_ERROR = .5f;
@@ -128,6 +128,15 @@ namespace Game.Components
                 return new Vector2(steerAmount, torque);
             }
             // === ===
+        }
+
+        public override void CopyTo(object destination) => this.CopyTo<UnitBehaviour_Seek>(destination);
+        public void CopyTo(UnitBehaviour_Seek destination)
+        {
+            base.CopyTo(destination);
+            destination.FollowCursor = this.FollowCursor;
+            destination.maxDistanceToReverse = this.maxDistanceToReverse;
+            destination.useBrakingCalculations = this.useBrakingCalculations;
         }
     }
 }

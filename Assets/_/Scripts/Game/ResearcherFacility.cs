@@ -20,8 +20,7 @@ namespace Game.Components
 
         void FixedUpdate()
         {
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
             if (string.IsNullOrEmpty(ResearchingID))
             {

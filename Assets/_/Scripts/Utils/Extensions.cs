@@ -1,10 +1,7 @@
-﻿using Game.Components;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-
+using Game.Components;
 using Unity.Netcode;
-
 using UnityEngine;
 
 internal static class UnclassifiedExtensions
@@ -105,10 +102,16 @@ internal static class UnclassifiedExtensions
     {
         if (NetworkManager.Singleton == null)
         { return; }
+
         if (!NetworkManager.Singleton.IsListening)
         { return; }
-        if (!gameObject.TryGetComponent<NetworkObject>(out var networkObject))
+
+        if (!gameObject.TryGetComponent(out NetworkObject networkObject))
         { return; }
+
+        if (networkObject.IsSpawned)
+        { return; }
+
         networkObject.Spawn(destroyWithScene);
     }
 
@@ -657,6 +660,38 @@ public static class DataChunk
 
 internal static class ListEx
 {
+    internal static void Enqueue<T>(this ICollection<T> v, T element)
+    {
+        v.Add(element);
+    }
+
+    internal static T Dequeue<T>(this IList<T> v)
+    {
+        T element = v[0];
+        v.RemoveAt(0);
+        return element;
+    }
+
+    internal static void Enqueue<T>(this NetworkList<T> v, T element) where T : unmanaged, IEquatable<T>
+    {
+        v.Add(element);
+    }
+
+    internal static T[] ToArray<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
+    {
+        T[] result = new T[v.Count];
+        for (int i = 0; i < result.Length; i++)
+        { result[i] = v[i]; }
+        return result;
+    }
+
+    internal static T Dequeue<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
+    {
+        T element = v[0];
+        v.RemoveAt(0);
+        return element;
+    }
+
     internal static bool TryGetValue<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key, out TValue value)
         where TKey : IEquatable<TKey>
     {
@@ -812,7 +847,7 @@ internal static class ListEx
         v.Add(result);
         return result;
     }
-}
+} 
 
 internal static class RigidbodyEx
 {
@@ -841,6 +876,30 @@ internal static class GameObjectEx
 
     internal static bool HasComponent<T>(this GameObject obj) where T : Component => obj.TryGetComponent<T>(out _);
     internal static bool HasComponent(this GameObject obj, Type type) => obj.TryGetComponent(type, out _);
+
+    internal static bool TryGetComponentInChildren<T>(this GameObject obj, out T component)
+    {
+        if (obj.TryGetComponent<T>(out component))
+        {
+            return true;
+        }
+
+        component = obj.GetComponentInChildren<T>();
+
+        return component != null;
+    }
+
+    internal static bool TryGetComponentInChildren<T>(this Component obj, out T component)
+    {
+        if (obj.TryGetComponent<T>(out component))
+        {
+            return true;
+        }
+
+        component = obj.GetComponentInChildren<T>();
+
+        return component != null;
+    }
 
     internal static bool TryGetComponent(this GameObject obj, string componentName, out Component component)
     {

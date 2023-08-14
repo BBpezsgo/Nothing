@@ -289,31 +289,50 @@ MonoBehaviour:
     type: 3}
   ImpactEffects:
   - MaterialID: Dirt
-    Sound: {fileID: 0}
+    Sounds:
+    - {fileID: 8300000, guid: 24e54d7ed8ab9914ebcf1b8a6577b636, type: 3}
+    - {fileID: 8300000, guid: 8d3a7cc049f68f7409d7290f4c53cf21, type: 3}
+    - {fileID: 8300000, guid: 02043ebe69912d54fb6fe205eb726529, type: 3}
+    - {fileID: 8300000, guid: 1caa0768e8de3bb468dbb52eca642184, type: 3}
+    - {fileID: 8300000, guid: e19f3caef37784a44b340f5766250997, type: 3}
+    - {fileID: 8300000, guid: d2cbc927f6223fd449c785ae59b76247, type: 3}
+    - {fileID: 8300000, guid: 417aeb90718e8a94d8c4b170979a1301, type: 3}
+    - {fileID: 8300000, guid: 140b8c29e907a1a449bf55fd282b3c01, type: 3}
+    - {fileID: 8300000, guid: 98b85750f95e57844999b68ff57ce962, type: 3}
     Particles: {fileID: 5220818771854075135, guid: 17c513c42962f19469b78a03345229fc,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}
   - MaterialID: Metal
-    Sound: {fileID: 0}
+    Sounds:
+    - {fileID: 8300000, guid: 405f2dbe63742b247b659da4828eea4f, type: 3}
+    - {fileID: 8300000, guid: 4ad0a500e0bdd9f4abaf8b40b9b66e8f, type: 3}
+    - {fileID: 8300000, guid: 33f27deef9c93fa4898299e19169f265, type: 3}
+    - {fileID: 8300000, guid: d1a03b61b7a0c5c43b90dde2344936ba, type: 3}
     Particles: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}
   - MaterialID: Concrete
-    Sound: {fileID: 0}
+    Sounds:
+    - {fileID: 8300000, guid: df5da14a8a8280246bc1dbf2dc8a56e1, type: 3}
+    - {fileID: 8300000, guid: 79ccf4d2b3863e741a0a8f353f99f14e, type: 3}
+    - {fileID: 8300000, guid: 4a0b30bbf9927db45988edc937debce1, type: 3}
     Particles: {fileID: 7690606633279578764, guid: 333214152a1848c4288d56d05285f6f5,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}
   - MaterialID: Water
-    Sound: {fileID: 0}
+    Sounds:
+    - {fileID: 8300000, guid: 3108903f820b8fe48aeeb80917ba6f02, type: 3}
+    - {fileID: 8300000, guid: 61beece1b1490e54dad6d3c1aab370c6, type: 3}
+    - {fileID: 8300000, guid: 51157112ea5d4b44da44b7b84e15b3b2, type: 3}
     Particles: {fileID: 7944883426860124920, guid: 783eb12d07beaac488a5207cfff12cf1,
       type: 3}
     UseNormal: 0
     Hoe: {fileID: 0}
   - MaterialID: Creature
-    Sound: {fileID: 0}
+    Sounds: []
     Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
       type: 3}
     UseNormal: 1

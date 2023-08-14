@@ -59,8 +59,7 @@ namespace Game.Components
 
         bool ThinkOnTarget(Projectile projectile)
         {
-            RequiredShoots requiredShoots = null;
-            if (projectile.TryGetComponent(out requiredShoots) && requiredShoots.EstimatedHP < -2f)
+            if (projectile.TryGetComponent(out RequiredShoots requiredShoots) && requiredShoots.EstimatedHP < -2f)
             {
                 if ((projectile.Position - transform.position).sqrMagnitude >= (5f * 5f))
                 { return false; }

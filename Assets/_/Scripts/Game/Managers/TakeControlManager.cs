@@ -1,18 +1,15 @@
+using System.Linq;
 using Authentication;
-
 using Game.Components;
 using Game.Managers;
 using Game.UI;
 using Game.UI.Components;
 using InputUtils;
-using System.Linq;
-
 using Unity.Netcode;
-
 using UnityEngine;
 using UnityEngine.UIElements;
-
 using Utilities;
+using Utilities.Drawers;
 
 namespace Game.Managers
 {
@@ -22,6 +19,13 @@ namespace Game.Managers
         {
             Dots,
             Circle,
+        }
+
+        internal enum CrossStyle
+        {
+            Cross,
+            DiagonalCross,
+            Cross3,
         }
 
         static TakeControlManager instance;
@@ -39,7 +43,7 @@ namespace Game.Managers
 
         [SerializeField] LayerMask CursorHitLayer;
 
-        InputUtils.AdvancedMouse LeftMouse;
+        AdvancedMouse LeftMouse;
 
         ICanTakeControl[] units = new ICanTakeControl[0];
 
@@ -69,6 +73,7 @@ namespace Game.Managers
         [SerializeField, Min(.01f)] float ReloadDotsFadeoutSpeed = 5f;
         [SerializeField, Min(.01f)] float TargetLockAnimationSpeed = 2f;
         [SerializeField] ReloadIndicatorStyle reloadIndicatorStyle = ReloadIndicatorStyle.Circle;
+        [SerializeField] CrossStyle CurrentCrossStyle = CrossStyle.Cross;
 
         Texture2D SphereFilled;
         Rect targetRect = Rect.zero;
@@ -76,7 +81,7 @@ namespace Game.Managers
         static readonly (float Inner, float Outer) CrossSize = (4f, 12f);
         static readonly Color ShadowColor = new(0f, 0f, 0f, .8f);
 
-        InputUtils.PriorityKey KeyEsc;
+        PriorityKey KeyEsc;
 
         ProgressBar BarHealth;
 
@@ -127,12 +132,12 @@ namespace Game.Managers
                 { Debug.LogError($"[{nameof(TakeControlManager)}]: UI does not have an UIDocument", takeControlUiObject); }
             }
 
-            LeftMouse = new InputUtils.AdvancedMouse(MouseButton.Left, 11, InputCondition);
+            LeftMouse = new AdvancedMouse(MouseButton.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
 
             CursorImageManager.Instance.Register(this);
 
-            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
+            KeyEsc = new PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
             KeyEsc.OnDown += OnKeyEsc;
 
             ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -157,14 +162,14 @@ namespace Game.Managers
                 return;
             }
 
-            if (!NetcodeUtils.FindGameObject(controllingThis, out var controlling))
+            if (!NetcodeUtils.FindGameObject(controllingThis, out GameObject controlling))
             {
                 Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object {controlling} not found", this);
                 LoseControlClient();
                 return;
             }
 
-            if (!controlling.TryGetComponent<ICanTakeControl>(out var unit))
+            if (!controlling.TryGetComponent(out ICanTakeControl unit))
             {
                 Debug.LogError($"[{nameof(TakeControlManager)}]: Object {controlling} does not have a {nameof(ICanTakeControl)} component", controlling);
                 LoseControlClient();
@@ -324,8 +329,10 @@ namespace Game.Managers
 
             if (IsClient)
             {
-                Debug.Log($"[{nameof(TakeControlManager)}]: Send take control request to server (trying to take control over object {((Component)unit).GetComponent<NetworkObject>().NetworkObjectId})");
-                WantToTakeControl_ServerRpc(((Component)unit).GetComponent<NetworkObject>().NetworkObjectId);
+                ulong unitID = unit.GetNetworkIDForce();
+
+                Debug.Log($"[{nameof(TakeControlManager)}]: Send take control request to server (trying to take control over object \"{unit.GetGameObject()}\" (networkID: {unitID}))", this);
+                WantToTakeControl_ServerRpc(unitID);
                 return;
             }
 
@@ -350,7 +357,8 @@ namespace Game.Managers
             if (NetworkManager.Singleton != null &&
                 NetworkManager.IsListening)
             {
-                ControllingObjects.Set((int)NetworkManager.LocalClientId, ((Component)unit).GetComponent<NetworkObject>().NetworkObjectId, ulong.MaxValue);
+                ulong unitID = unit.GetNetworkIDForce();
+                ControllingObjects.Set((int)NetworkManager.LocalClientId, unitID, ulong.MaxValue);
             }
 
             UI.gameObject.SetActive(true);
@@ -542,7 +550,8 @@ namespace Game.Managers
             {
                 if ((Object)ControllingObject != null)
                 {
-                    Debug.Log($"[{nameof(TakeControlManager)}]: Send lose control request to server (trying to lose control over object {((Component)ControllingObject).GetComponent<NetworkObject>().NetworkObjectId})");
+                    ulong unitID = ControllingObject.GetNetworkIDForce();
+                    Debug.Log($"[{nameof(TakeControlManager)}]: Send lose control request to server (trying to lose control over object \"{ControllingObject.GetGameObject()}\" (networkID: {unitID}))", this);
                     LoseControl_ServerRpc();
                 }
                 return;
@@ -681,13 +690,13 @@ namespace Game.Managers
                 (int)NetworkManager.LocalClientId < 0)
             { return false; }
 
-            if (!((Component)@this).TryGetComponent(out NetworkObject networkObject))
+            if (!@this.TryGetComponentInChildren(out NetworkObject netUnit))
             {
-                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", (Object)@this);
+                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object \"{@this}\" does not have a {nameof(NetworkObject)} component", (Object)@this);
                 return false;
             }
 
-            return networkObject.NetworkObjectId == ControllingObjects[(int)NetworkManager.LocalClientId];
+            return netUnit.NetworkObjectId == ControllingObjects[(int)NetworkManager.LocalClientId];
         }
 
         internal bool AnybodyControlling(ICanTakeControl @this)
@@ -704,15 +713,9 @@ namespace Game.Managers
             catch (System.NullReferenceException)
             { return false; }
 
-            if (!((Component)@this).TryGetComponent(out NetworkObject networkObject))
-            {
-                Debug.LogWarning($"Object {@this} does not have a {nameof(NetworkObject)} component", (Object)@this);
-                return false;
-            }
-
             for (int i = 0; i < ControllingObjects.Count; i++)
             {
-                if (ControllingObjects[i] == networkObject.NetworkObjectId)
+                if (ControllingObjects[i] == NetworkObjectId)
                 {
                     clientID = (ulong)i;
                     return true;
@@ -829,26 +832,6 @@ namespace Game.Managers
                 targetPosition == Vector2.zero)
             { return; }
 
-            /*
-            if (lastTargeted)
-            {
-                if (!hasTargetRect)
-                {
-                    lastTargeted = false;
-                    TargetLockingAnimation.Restart();
-                }
-            }
-            else
-            {
-                if (hasTargetRect)
-                {
-                    lastTargeted = true;
-                    TargetLockingAnimation.Restart();
-                }
-            }
-            TargetLockingAnimation.Reverse(hasTargetRect);
-            */
-
             Vector2 reloadIndicatorCenter = mousePosition;
 
             GL.PushMatrix();
@@ -856,7 +839,7 @@ namespace Game.Managers
             {
                 if (targetPosition != Vector2.zero)
                 {
-                    DrawCross((predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction, ShadowColor);
+                    DrawCross((predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction);
                 }
 
                 if (mousePosition != Vector2.zero)
@@ -864,51 +847,24 @@ namespace Game.Managers
                     float animation = TargetLockingAnimation.Percent;
                     if (hasTargetRect || animation > 0f)
                     {
-                        DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor, ShadowColor);
+                        DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor);
                         reloadIndicatorCenter = Vector2.Lerp(mousePosition, this.targetRect.center, animation);
                     }
                     else
                     {
-                        DrawCross(mousePosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColor, ShadowColor);
+                        DrawCross(mousePosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColor);
                     }
                 }
 
                 if (predictedHitPosition != Vector2.zero)
                 {
-                    DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate, ShadowColor);
+                    DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
                 }
 
                 if (showReload)
                 { DrawReloadIndicator(reloadPercent, reloadIndicatorCenter, ShadowColor); }
             }
             GL.PopMatrix();
-        }
-
-        void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
-        {
-            if (!rect.HasValue || animation == 0f)
-            {
-                DrawCross(cross, innerSize, outerSize, 1f, color, shadowColor);
-                return;
-            }
-
-            Rect _rect = rect.Value;
-            if (animation != 1f)
-            {
-                DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
-                DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
-            }
-            else
-            {
-                DrawCornerBox(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
-                DrawCornerBox(_rect.center, _rect.size, 8f, color);
-            }
-        }
-
-        void DrawCross(Vector2 center, float innerSize, float outerSize, float thickness, Color color, Color shadowColor)
-        {
-            DrawCross(center + Vector2.one, innerSize, outerSize, thickness, shadowColor);
-            DrawCross(center, innerSize, outerSize, thickness, color);
         }
 
         void DrawReloadIndicator(float value, Vector2 center, Color shadowColor)
@@ -980,143 +936,37 @@ namespace Game.Managers
 
         void DrawCross(Vector2 center, float innerSize, float outerSize, float thickness, Color color)
         {
-            Vector2 innerPointV = Vector2.up * innerSize;
-            Vector2 outerPointV = Vector2.up * outerSize;
-            Vector2 innerPointH = Vector2.left * innerSize;
-            Vector2 outerPointH = Vector2.left * outerSize;
-
-            GLUtils.DrawLine(center + innerPointV, center + outerPointV, thickness, color);
-            GLUtils.DrawLine(center - innerPointV, center - outerPointV, thickness, color);
-            GLUtils.DrawLine(center + innerPointH, center + outerPointH, thickness, color);
-            GLUtils.DrawLine(center - innerPointH, center - outerPointH, thickness, color);
-        }
-
-        void DrawCornerBox(Vector2 center, Vector2 size, float cornerSize, Color color)
-        {
-            if (size.x <= .1f || size.y <= .1f)
-            { return; }
-
-            Vector2 halfSize = size / 2;
-
-            float cornerSizeWidth = Mathf.Min(halfSize.x, cornerSize);
-            float cornerSizeHeight = Mathf.Min(halfSize.y, cornerSize);
-
-            Vector2 topleft = new(-halfSize.x, -halfSize.y);
-            Vector2 topright = new(halfSize.x, -halfSize.y);
-            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
-            Vector2 bottomright = new(halfSize.x, halfSize.y);
-
+            switch (CurrentCrossStyle)
             {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + new Vector2(topleft.x + cornerSizeWidth, topleft.y));
-                GL.Vertex(center + topleft);
-                GL.Vertex(center + new Vector2(topleft.x, topleft.y + cornerSizeHeight));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + new Vector2(topright.x - cornerSizeWidth, topright.y));
-                GL.Vertex(center + topright);
-                GL.Vertex(center + new Vector2(topright.x, topright.y + cornerSizeHeight));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + new Vector2(bottomleft.x + cornerSizeWidth, bottomleft.y));
-                GL.Vertex(center + bottomleft);
-                GL.Vertex(center + new Vector2(bottomleft.x, bottomleft.y - cornerSizeHeight));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + new Vector2(bottomright.x - cornerSizeWidth, bottomright.y));
-                GL.Vertex(center + bottomright);
-                GL.Vertex(center + new Vector2(bottomright.x, bottomright.y - cornerSizeHeight));
-                GL.End();
+                case CrossStyle.Cross:
+                    CrossDrawer.Draw(center, innerSize, outerSize, thickness, color, ShadowColor);
+                    break;
+                case CrossStyle.DiagonalCross:
+                    DiagonalCrossDrawer.Draw(center, innerSize, outerSize, thickness, color, ShadowColor);
+                    break;
+                case CrossStyle.Cross3:
+                    Cross3Drawer.Draw(center, innerSize, outerSize, thickness, color, ShadowColor);
+                    break;
+                default:
+                    break;
             }
         }
 
-        void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
+        void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color)
         {
-            Vector2 halfSize = boxSize / 2;
-
-            float boxCornerSizeWidth = Mathf.Min(halfSize.x, boxCornerSize);
-            float boxCornerSizeHeight = Mathf.Min(halfSize.y, boxCornerSize);
-
-            Vector2 innerPointV = Vector2.up * crossInnerSize;
-            Vector2 outerPointV = Vector2.up * crossOuterSize;
-            Vector2 innerPointH = Vector2.left * crossInnerSize;
-            Vector2 outerPointH = Vector2.left * crossOuterSize;
-
-            (Vector2 Inner, Vector2 Outer) crossUp = (innerPointV, outerPointV);
-            (Vector2 Inner, Vector2 Outer) crossDown = (-innerPointV, -outerPointV);
-            (Vector2 Inner, Vector2 Outer) crossRight = (innerPointH, outerPointH);
-            (Vector2 Inner, Vector2 Outer) crossLeft = (-innerPointH, -outerPointH);
-
-            Vector2 center = Vector2.Lerp(crossCenter, boxCenter, t);
-
+            switch (CurrentCrossStyle)
             {
-                GL.Begin(GL.LINES);
-                GL.Color(color);
-
-                Vector2 crossLeftOuter = new(Mathf.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
-                Vector2 crossRightOuter = new(Mathf.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
-
-                GL.Vertex(center + Vector2.Lerp(crossLeft.Inner, crossLeftOuter, t));
-                GL.Vertex(center + crossLeftOuter);
-
-                GL.Vertex(center + Vector2.Lerp(crossRight.Inner, crossRightOuter, t));
-                GL.Vertex(center + crossRightOuter);
-
-                GL.End();
-            }
-
-            Vector2 topleft = new(-halfSize.x, -halfSize.y);
-            Vector2 topright = new(halfSize.x, -halfSize.y);
-            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
-            Vector2 bottomright = new(halfSize.x, halfSize.y);
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topleft.x + boxCornerSizeWidth, topleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topleft.x, topleft.y + boxCornerSizeHeight), t));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topright.x - boxCornerSizeWidth, topright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topright, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topright.x, topright.y + boxCornerSizeHeight), t));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomleft.x + boxCornerSizeWidth, bottomleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomleft.x, bottomleft.y - boxCornerSizeHeight), t));
-                GL.End();
-            }
-
-            {
-                GL.Begin(GL.LINE_STRIP);
-                GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomright.x - boxCornerSizeWidth, bottomright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomright, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomright.x, bottomright.y - boxCornerSizeHeight), t));
-                GL.End();
+                case CrossStyle.Cross:
+                    CrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
+                    break;
+                case CrossStyle.DiagonalCross:
+                    DiagonalCrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
+                    break;
+                case CrossStyle.Cross3:
+                    Cross3Drawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -1135,11 +985,6 @@ namespace Game.Components
     public interface ICanTakeControlAndHasTurret : ICanTakeControl
     {
         public Turret Turret { get; }
-    }
-
-    public interface IComponent
-    {
-
     }
 }
 

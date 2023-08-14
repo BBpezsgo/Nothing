@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &303259353847967489
 Transform:
@@ -4881,7 +4881,6 @@ GameObject:
   - component: {fileID: 411381399658772132}
   - component: {fileID: 3011470535786950724}
   - component: {fileID: 7158176234996842188}
-  - component: {fileID: 6226412810010601892}
   - component: {fileID: 1851574223832857102}
   - component: {fileID: 7130314546047162097}
   m_Layer: 0
@@ -4889,7 +4888,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6226412810010601888
 Transform:
@@ -4934,6 +4933,7 @@ MonoBehaviour:
     type: 3}
   HP: 40
   GroundOrigin: {x: 0, y: -1.18, z: 0}
+  buttonDestroy: 
   controllingByUser: 0
   UiSelected: {fileID: 1412896013760419886}
   Attacker: {fileID: 0}
@@ -5028,24 +5028,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 0
---- !u!114 &6226412810010601892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6226412810010601917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80435dd05cfba2843aa594c6b62ee949, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _updateComponentsButton: 
-  _observedComponents:
-  - {fileID: 0}
-  _id: 0
-  netcodeSynchronizer: {fileID: 0}
-  IsRegistered: 0
 --- !u!82 &1851574223832857102
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5210,7 +5192,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6226412810287194995}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.489, z: 0}
+  m_LocalPosition: {x: 0.833, y: 0.79, z: 0.515}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5227,8 +5209,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6226412810601977228}
   - component: {fileID: 6226412810601977229}
-  - component: {fileID: 6226412810601977230}
-  - component: {fileID: 8995651011207144196}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -5315,61 +5295,6 @@ MonoBehaviour:
   Range: 141.42136
   ShowRadius: 0
   currentError: 1
---- !u!114 &6226412810601977230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6226412810601977227}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 1
-  SynchronizePosition: 0
-  SynchronizeXPosition: 0
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 0
-  SynchronizeRotation: 1
-  SynchronizeXRotation: 0
-  SynchronizeYRotation: 1
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
---- !u!114 &8995651011207144196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6226412810601977227}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!1 &6226412811004420655
 GameObject:
   m_ObjectHideFlags: 0
@@ -5411,8 +5336,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6226412811056753592}
-  - component: {fileID: 6226412811056753593}
-  - component: {fileID: 2249124340293977016}
   m_Layer: 0
   m_Name: Cannon
   m_TagString: Untagged
@@ -5437,61 +5360,6 @@ Transform:
   m_Father: {fileID: 6226412810601977228}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6226412811056753593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6226412811056753591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9d20ed99fcf0542aca4b122f577ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  netcodeView: {fileID: 0}
-  UseLocal: 1
-  SynchronizePosition: 0
-  SynchronizeXPosition: 0
-  SynchronizeYPosition: 0
-  SynchronizeZPosition: 0
-  SynchronizeRotation: 1
-  SynchronizeXRotation: 1
-  SynchronizeYRotation: 0
-  SynchronizeZRotation: 0
-  NetworkPosition: {x: 0, y: 0, z: 0}
-  NetworkRotation: {x: 0, y: 0, z: 0}
---- !u!114 &2249124340293977016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6226412811056753591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 0
-  SyncPositionY: 0
-  SyncPositionZ: 0
-  SyncRotAngleX: 1
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!1 &6226412811103407186
 GameObject:
   m_ObjectHideFlags: 0
@@ -5838,7 +5706,17 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e8d40ee8f5b98f848a796b1696d1d81f,
         type: 3}
       propertyPath: m_Name
-      value: large_base
+      value: Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e8d40ee8f5b98f848a796b1696d1d81f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: e8d40ee8f5b98f848a796b1696d1d81f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e8d40ee8f5b98f848a796b1696d1d81f, type: 3}

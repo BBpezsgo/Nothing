@@ -8,6 +8,8 @@ namespace Game.Components
 
         internal override GameObject Spawn(GameObject prefab)
         {
+            if (!NetcodeUtils.IsOfflineOrServer) return null;
+
             GameObject newThing = GameObject.Instantiate(prefab, GetPosition(), Quaternion.identity, transform);
 
             if (newThing.TryGetComponent(out BaseObject @object))

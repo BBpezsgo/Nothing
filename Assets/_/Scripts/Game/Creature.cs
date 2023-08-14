@@ -1,11 +1,7 @@
-using Game.Managers;
-
 using System.Collections.Generic;
-
+using Game.Managers;
 using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
@@ -44,7 +40,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] protected float NextFleePosition = 0f;
 
         [Header("Sounds")]
-        [SerializeField] Vector2 IdleSoundInterval = new Vector2(3f, 9f);
+        [SerializeField] Vector2 IdleSoundInterval = new(3f, 9f);
         [SerializeField, ReadOnly] float IdleSoundTimer = 6f;
         [SerializeField] AudioClip[] IdleSounds = new AudioClip[0];
         [SerializeField] AudioClip[] DamageSounds = new AudioClip[0];
@@ -276,10 +272,10 @@ namespace Game.Components
 
         void Destroy()
         {
-            if (NetcodeUtils.IsOfflineOrServer)
-            {
-                GameObject.Destroy(gameObject);
-            }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
+
+
+            GameObject.Destroy(gameObject);
         }
 
         void OnDrawGizmosSelected()

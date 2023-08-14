@@ -301,33 +301,52 @@ namespace InspectorDrawers
     [CustomPropertyDrawer(typeof(ButtonAttribute))]
     public class ButtonDrawer : PropertyDrawer
     {
+        static MethodInfo FindMethod(Type type, string name)
+        {
+            MethodInfo method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            if (method != null)
+            { return method; }
+
+            if (type == typeof(MonoBehaviour))
+            { return null; }
+
+            if (type == typeof(Component))
+            { return null; }
+
+            return FindMethod(type.BaseType, name);
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var attr = attribute as ButtonAttribute;
-            var methodName = attr.MethodName;
-            var target = property.serializedObject.targetObject;
-            var type = target.GetType();
-            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            ButtonAttribute attr = attribute as ButtonAttribute;
+            Type type = property.serializedObject.targetObject.GetType();
+            MethodInfo method = FindMethod(type, attr.MethodName);
+            
             if (method == null)
             {
-                GUI.Label(position, "Method could not be found.");
+                EditorGUI.HelpBox(position, $"Method \"{attr.MethodName}\" could not be found", MessageType.Error);
                 return;
             }
+
             if (method.GetParameters().Length > 0)
             {
-                GUI.Label(position, "Method cannot have parameters.");
+                EditorGUI.HelpBox(position, $"Method \"{attr.MethodName}\" should not have parameters", MessageType.Error);
                 return;
             }
-            bool enabledSaved = GUI.enabled;
+
+            bool wasEnabled = GUI.enabled;
+
             if ((!attr.WorksInPlaytime && Application.isPlaying) || (!attr.WorksInEditor && !Application.isPlaying))
             {
                 GUI.enabled = false;
             }
+
             if (GUI.Button(position, attr.Label))
             {
-                method.Invoke(target, null);
+                method.Invoke(property.serializedObject.targetObject, null);
             }
-            GUI.enabled = enabledSaved;
+
+            GUI.enabled = wasEnabled;
         }
     }
 

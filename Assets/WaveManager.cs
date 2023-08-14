@@ -19,8 +19,7 @@ namespace Game.Managers
 
         void FixedUpdate()
         {
-            if (!NetcodeUtils.IsOfflineOrServer)
-            { return; }
+            if (!NetcodeUtils.IsOfflineOrServer) return;
 
             if (Spawner.Things.Count > 0)
             { return; }

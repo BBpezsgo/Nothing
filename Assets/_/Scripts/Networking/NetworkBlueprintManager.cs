@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace Game.Blueprints
 {
-    public class NetworkBlueprintManager : NetworkBehaviour
+    public class NetworkBlueprintManager : PrivateSingleNetworkInstance<NetworkBlueprintManager>
     {
-        static NetworkBlueprintManager instance;
-
         [SerializeField, ReadOnly, NonReorderable] List<Blueprint> blueprints = new();
         [SerializeField] string blueprintId;
         [SerializeField, Button(nameof(Test), false, true, "Sync")] string btnSync;
@@ -27,17 +25,6 @@ namespace Game.Blueprints
                 BlueprintID = blueprintID;
                 OnDone = onDone;
             }
-        }
-
-        void Awake()
-        {
-            if (instance != null)
-            {
-                Debug.LogWarning($"[{nameof(NetworkBlueprintManager)}]: Instance already registered, destroying self");
-                UnityEngine.Object.Destroy(this);
-                return;
-            }
-            instance = this;
         }
 
         void Test() => GetBlueprint_(blueprintId, null);

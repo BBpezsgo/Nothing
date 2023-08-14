@@ -112,7 +112,9 @@ namespace Game.Components
             if (NetcodeUtils.IsOfflineOrServer)
             {
                 SpitTo(targetPosition);
-                if (!NetcodeUtils.IsOffline) SpitTo_ClientRpc(targetPosition);
+
+                if (NetcodeUtils.IsServer)
+                { SpitTo_ClientRpc(targetPosition); }
             }
         }
         void SpitTo(Vector3 targetPosition)
@@ -187,7 +189,8 @@ namespace Game.Components
                             if (NetcodeUtils.IsOfflineOrServer)
                             {
                                 AudioSource.PlayOneShot(SpitSound);
-                                if (!NetcodeUtils.IsOffline) SpitSound_ClientRpc();
+                                if (!NetcodeUtils.IsServer)
+                                { SpitSound_ClientRpc(); }
                             }
                         }
                     }

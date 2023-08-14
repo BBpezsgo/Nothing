@@ -99,6 +99,8 @@ namespace Game.Blueprints
 
         public Texture2D Image;
 
+        [SerializeField, ReadOnly] internal byte GUID;
+
         public void GenerateID()
         {
             ID = Guid.NewGuid().ToString();
@@ -107,6 +109,8 @@ namespace Game.Blueprints
         public virtual void Deserialize(Deserializer deserializer)
         {
             Type = (PartType)deserializer.DeserializeByte();
+            GUID = deserializer.DeserializeByte();
+
             ID = deserializer.DeserializeString(INTEGER_TYPE.INT8);
             Name = deserializer.DeserializeString(INTEGER_TYPE.INT8);
         }
@@ -114,6 +118,8 @@ namespace Game.Blueprints
         public virtual void Serialize(Serializer serializer)
         {
             serializer.Serialize((byte)Type);
+            serializer.Serialize(GUID);
+
             serializer.Serialize(ID, INTEGER_TYPE.INT8);
             serializer.Serialize(Name, INTEGER_TYPE.INT8);
         }
@@ -122,6 +128,7 @@ namespace Game.Blueprints
         {
             Value result = Value.Object();
             result["Type"] = Type.ToString();
+            result["GUID"] = GUID;
             result["ID"] = ID;
             result["Name"] = Name;
             return result;
@@ -130,6 +137,16 @@ namespace Game.Blueprints
         public virtual void DeserializeText(Value data)
         {
             Type = Enum.Parse<PartType>(data["Type"], true);
+            var guid = data["GUID"].Int;
+
+            if (!guid.HasValue)
+            { throw new Exception($"Failed to load part: \"GUID\" is invalid: \"{data["GUID"]}\""); }
+
+            if (guid.Value < byte.MinValue || guid.Value > byte.MaxValue)
+            { throw new Exception($"Failed to load part: \"GUID\" is invalid: \"{data["GUID"]}\""); }
+
+            GUID = (byte)guid.Value;
+
             ID = data["ID"];
             Name = data["Name"];
         }
@@ -137,6 +154,7 @@ namespace Game.Blueprints
         public virtual void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Type);
+            serializer.SerializeValue(ref GUID);
             serializer.SerializeValue(ref ID);
             serializer.SerializeValue(ref Name);
         }
@@ -492,6 +510,8 @@ namespace Game.Blueprints
 
     public class BlueprintManager : SingleInstance<BlueprintManager>
     {
+        [SerializeField] GameObject BaseObjectPrefab;
+
         [SerializeField] Parts _builtinParts;
 
         static BlueprintPart[] LoadedParts = new BlueprintPart[0];
@@ -585,6 +605,80 @@ namespace Game.Blueprints
             return result;
         }
 #endif
+
+        static bool HasComponentDepencies(GameObject @object, Type component)
+            => HasComponentDepencies(@object.GetComponents<MonoBehaviour>(), component);
+
+        static bool HasComponentDepencies(MonoBehaviour[] components, Type component)
+        {
+            for (int i = components.Length - 1; i >= 0; i--)
+            {
+                Attribute _attribute = Attribute.GetCustomAttribute(components[i].GetType(), typeof(RequireComponent));
+
+                if (_attribute == null) continue;
+
+                RequireComponent attribute = (RequireComponent)_attribute;
+
+                if (attribute.m_Type0 == component)
+                {
+                    return true;
+                }
+
+                if (attribute.m_Type1 == component)
+                {
+                    return true;
+                }
+
+                if (attribute.m_Type2 == component)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static void MoveComponents(GameObject source, GameObject destination)
+        {
+            List<ICopiable> copiables = new();
+            source.GetComponents(copiables);
+
+            int iterations = 4;
+
+            while (copiables.Count > 0)
+            {
+                if (iterations-- < 0)
+                {
+                    Debug.LogWarning($"[{nameof(BlueprintManager)}]: Can not move components: max iterations exeed");
+                    break;
+                }
+
+                for (int i = copiables.Count - 1; i >= 0; i--)
+                {
+                    Type type = copiables[i].GetType();
+
+                    if (HasComponentDepencies(copiables.Select(v => (MonoBehaviour)v).ToArray(), type)) continue;
+
+                    if (!destination.TryGetComponent(type, out UnityEngine.Component componentClone))
+                    { componentClone = destination.AddComponent(type); }
+
+                    copiables[i].CopyTo(componentClone);
+
+                    Destroy((UnityEngine.Object)copiables[i]);
+                    copiables.RemoveAt(i);
+                }
+            }
+
+            if (source.TryGetComponent(out Rigidbody rigidbody))
+            {
+                if (!destination.TryGetComponent(out Rigidbody componentClone))
+                { componentClone = destination.AddComponent<Rigidbody>(); }
+
+                UnityCopiables.CopyTo(rigidbody, componentClone);
+
+                Destroy(rigidbody);
+            }
+        }
 
         static BlueprintPart LoadPart(Value data)
         {
@@ -685,61 +779,28 @@ namespace Game.Blueprints
         public static Blueprint GetBlueprint(string name)
         {
             Blueprint[] blueprints = LoadBlueprints();
-            for (int i = 0; i < blueprints.Length; i++)
-            {
-                if (blueprints[i].Name == name) return blueprints[i];
-            }
-            return null;
-        }
-        public static bool TryGetBlueprint(string name, out Blueprint blueprint)
-        {
-            Blueprint[] blueprints = LoadBlueprints();
+
             for (int i = 0; i < blueprints.Length; i++)
             {
                 if (blueprints[i].Name == name)
                 {
-                    blueprint = blueprints[i];
-                    return true;
+                    return blueprints[i];
                 }
             }
-            blueprint = null;
-            return false;
+
+            return null;
         }
 
-        public static bool TryGetPart(string id, out BlueprintPart part)
+        public static bool TryGetBlueprint(string name, out Blueprint blueprint)
         {
-            if (BuiltinParts.TryGetPart(id, out BlueprintPart builtinPart))
-            {
-                part = builtinPart;
-                return true;
-            }
-
-            for (int i = 0; i < LoadedParts.Length; i++)
-            {
-                if (LoadedParts[i].ID == id)
-                {
-                    part = LoadedParts[i];
-                    return true;
-                }
-            }
-
-            part = null;
-            return false;
+            blueprint = GetBlueprint(name);
+            return blueprint != null;
         }
 
         public static bool TryGetPart<T>(string id, out T part) where T : BlueprintPart
         {
-            if (BuiltinParts.TryGetPart(id, out BlueprintPart builtinPart))
-            {
-                if (builtinPart is not T _builtinPart)
-                {
-                    part = null;
-                    return false;
-                }
-
-                part = _builtinPart;
-                return true;
-            }
+            if (BuiltinParts.TryGetPart(id, out part))
+            { return true; }
 
             for (int i = 0; i < LoadedParts.Length; i++)
             {
@@ -755,7 +816,7 @@ namespace Game.Blueprints
                     return true;
                 }
             }
-            part = null;
+
             return false;
         }
 
@@ -820,8 +881,26 @@ namespace Game.Blueprints
         /// <exception cref="BlueprintException"/>
         public static GameObject InstantiateBlueprint(Blueprint blueprint)
         {
-            GameObject result = null;
+            GameObject baseObject = GameObject.Instantiate(Instance.BaseObjectPrefab);
+            baseObject.SetActive(false);
+            baseObject.name = $"{blueprint.Name} Instance";
 
+            if (!baseObject.TryGetComponent(out Component.BlueprintInstance blueprintInstance))
+            {
+                Debug.LogError($"[{nameof(BlueprintManager)}]: {nameof(Component.BlueprintInstance)} is null", baseObject);
+            }
+            else
+            {
+                blueprintInstance.Blueprint = blueprint;
+            }
+
+            BlueprintManager.InstantiateBlueprint(blueprint, baseObject);
+
+            return baseObject;
+        }
+
+        public static GameObject InstantiateBlueprint(Blueprint blueprint, GameObject baseObject)
+        {
             LoadParts();
 
             PartBody bodyPart = null;
@@ -831,23 +910,19 @@ namespace Game.Blueprints
 
             if (blueprint.TryGetPart(out bodyPartBuiltin))
             {
-                result = GameObject.Instantiate(bodyPartBuiltin.Prefab);
-                result.SetActive(false);
-
-                result.name = $"{blueprint.Name} Instance";
-                result.transform.position = Vector3.zero;
-                NetworkObject networkObject = result.AddComponent<NetworkObject>();
-                networkObject.AutoObjectParentSync = false;
+                GameObject body = GameObject.Instantiate(bodyPartBuiltin.Prefab, baseObject.transform);
+                body.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                MoveComponents(body, baseObject);
 
                 if (blueprint.TryGetPart(out PartTurretBuiltin turretPartBuiltin))
                 {
-                    Transform turretPositionObject = result.transform.Find("TurretPosition");
+                    Transform turretPositionObject = body.transform.Find("TurretPosition");
                     if (turretPositionObject == null)
                     {
-                        throw new BlueprintException($"Can not find child \"TurretPosition\" in body object", result);
+                        throw new BlueprintException($"Can not find child \"TurretPosition\" in body object", baseObject);
                     }
 
-                    GameObject turretObject = GameObject.Instantiate(turretPartBuiltin.Prefab, result.transform);
+                    GameObject turretObject = GameObject.Instantiate(turretPartBuiltin.Prefab, baseObject.transform);
                     turretObject.transform.localPosition = turretPositionObject.localPosition;
 
                     if (!turretObject.TryGetComponent(out Turret turret))
@@ -859,28 +934,23 @@ namespace Game.Blueprints
                     turret.rotationSpeed = 50f;
                     turret.reloadTime = .5f;
 
-                    turret.projectileIgnoreCollision.Add(result.transform);
+                    turret.projectileIgnoreCollision.Add(body.transform);
                 }
             }
             else if (blueprint.TryGetPart(out bodyPart))
             {
-                result = new($"{blueprint.Name} Instance");
-                result.SetActive(false);
-                result.transform.position = Vector3.zero;
-                result.AddComponent<NetworkObject>();
-
-                Rigidbody rigidbody = result.AddOrModifyComponent<Rigidbody>();
+                Rigidbody rigidbody = baseObject.AddOrModifyComponent<Rigidbody>();
                 rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
-                BoxCollider collider = AddCollider(bodyPart.Collider, result);
-                VehicleEngine engine = result.AddOrModifyComponent<VehicleEngine>();
-                UnitBehaviour behaviour = result.AddOrModifyComponent<UnitBehaviour>();
+                BoxCollider collider = AddCollider(bodyPart.Collider, baseObject);
+                VehicleEngine engine = baseObject.AddOrModifyComponent<VehicleEngine>();
+                UnitBehaviour behaviour = baseObject.AddOrModifyComponent<UnitBehaviour>();
 
-                LoadModel(bodyPart.Model, result.transform);
+                LoadModel(bodyPart.Model, baseObject.transform);
 
                 PartWheel[] wheels = bodyPart.Wheels;
                 Transform wheelsObject = new GameObject("Wheels").transform;
-                wheelsObject.SetParent(result.transform);
+                wheelsObject.SetParent(baseObject.transform);
                 wheelsObject.localPosition = Vector3.zero;
                 for (int i = 0; i < wheels.Length; i++)
                 {
@@ -897,7 +967,7 @@ namespace Game.Blueprints
                 if (blueprint.TryGetPart(out PartTurret turretPart))
                 {
                     GameObject turretObject = new("Turret");
-                    turretObject.transform.SetParent(result.transform);
+                    turretObject.transform.SetParent(baseObject.transform);
                     turretObject.transform.localPosition = bodyPart.TurretPosition;
 
                     LoadModel(turretPart.Model, turretObject.transform);
@@ -918,7 +988,7 @@ namespace Game.Blueprints
                     turret.cannonRotationSpeed = 50f;
                     turret.rotationSpeed = 50f;
                     turret.reloadTime = .5f;
-                    turret.projectileIgnoreCollision.Add(result.transform);
+                    turret.projectileIgnoreCollision.Add(baseObject.transform);
                     turret.projectileIgnoreCollision.Add(cannonObject.transform);
                     turret.projectileIgnoreCollision.Add(cannonObject.transform);
 
@@ -939,8 +1009,7 @@ namespace Game.Blueprints
                     { Debug.LogError($"[{nameof(BlueprintManager)}]: Builtin prefab \"effect-shoot-mg\" not found"); }
                 }
             }
-
-            if (result == null)
+            else
             {
                 throw new BlueprintException($"Failed to construct the blueprint: no body");
             }
@@ -952,11 +1021,11 @@ namespace Game.Blueprints
                     case "Attacker":
                         {
 
-                            UnitBehaviour_Seek seek = result.AddComponent<UnitBehaviour_Seek>();
-                            UnitAttacker unitAttacker = result.AddComponent<UnitAttacker>();
-                            Attacker attacker = result.AddComponent<Attacker>();
+                            UnitBehaviour_Seek seek = baseObject.AddComponent<UnitBehaviour_Seek>();
+                            UnitAttacker unitAttacker = baseObject.AddComponent<UnitAttacker>();
+                            Attacker attacker = baseObject.AddComponent<Attacker>();
 
-                            attacker.turret = result.GetComponentInChildren<Turret>(true);
+                            attacker.turret = baseObject.GetComponentInChildren<Turret>(true);
 
                             unitAttacker.turret = attacker.turret;
 
@@ -969,14 +1038,14 @@ namespace Game.Blueprints
                                 Debug.LogWarning($"Attacker needs a body part");
                             }
 
-                            if (result.transform.Find("__unit-ui-selected") != null)
+                            if (baseObject.transform.Find("__unit-ui-selected") != null)
                             {
-                                unitAttacker.UiSelected = result.transform.Find("__unit-ui-selected").gameObject;
+                                unitAttacker.UiSelected = baseObject.transform.Find("__unit-ui-selected").gameObject;
                             }
                             else if (AssetManager.AssetManager.Instance.BuiltinPrefabs.TryGetValue("unit-ui-selected", out var selectedPrefab))
                             {
                                 GameObject selectedInstance = GameObject.Instantiate(selectedPrefab);
-                                selectedInstance.transform.SetParent(result.transform);
+                                selectedInstance.transform.SetParent(baseObject.transform);
                                 unitAttacker.UiSelected = selectedInstance;
                             }
                             else
@@ -1007,11 +1076,11 @@ namespace Game.Blueprints
                     case "Attacker":
                         {
 
-                            UnitBehaviour_Seek seek = result.AddComponent<UnitBehaviour_Seek>();
-                            UnitAttacker unitAttacker = result.AddComponent<UnitAttacker>();
-                            Attacker attacker = result.AddComponent<Attacker>();
+                            UnitBehaviour_Seek seek = baseObject.AddComponent<UnitBehaviour_Seek>();
+                            UnitAttacker unitAttacker = baseObject.AddComponent<UnitAttacker>();
+                            Attacker attacker = baseObject.AddComponent<Attacker>();
 
-                            attacker.turret = result.GetComponentInChildren<Turret>(true);
+                            attacker.turret = baseObject.GetComponentInChildren<Turret>(true);
 
                             unitAttacker.turret = attacker.turret;
 
@@ -1027,7 +1096,7 @@ namespace Game.Blueprints
                             if (AssetManager.AssetManager.Instance.BuiltinPrefabs.TryGetValue("unit-ui-selected", out var selectedPrefab))
                             {
                                 var newa = GameObject.Instantiate(selectedPrefab);
-                                newa.transform.SetParent(result.transform);
+                                newa.transform.SetParent(baseObject.transform);
                                 unitAttacker.UiSelected = newa;
                             }
                             else
@@ -1052,37 +1121,23 @@ namespace Game.Blueprints
                 }
             }
 
-            if (result.TryGetComponent(out BaseObject baseObject))
-            { baseObject.CollectTeamRenderers(); }
+            if (baseObject.TryGetComponent(out BaseObject _baseObject))
+            { _baseObject.CollectTeamRenderers(); }
 
-            return result;
+            return baseObject;
         }
     }
 
     public static class Extensions
     {
-        public static bool TryGetPart(this Blueprint blueprint, string id, out BlueprintPart part)
-        {
-            for (int i = 0; i < blueprint.Parts.Count; i++)
-            {
-                if (blueprint.Parts[i] == id)
-                {
-                    return BlueprintManager.TryGetPart(id, out part);
-                }
-            }
-            part = null;
-            return false;
-        }
-
         public static bool TryGetPart<T>(this Blueprint blueprint, string id, out T part) where T : BlueprintPart
         {
             for (int i = 0; i < blueprint.Parts.Count; i++)
             {
                 if (blueprint.Parts[i] == id)
-                {
-                    return BlueprintManager.TryGetPart<T>(id, out part);
-                }
+                { return BlueprintManager.TryGetPart(id, out part); }
             }
+
             part = null;
             return false;
         }
@@ -1091,13 +1146,10 @@ namespace Game.Blueprints
         {
             for (int i = 0; i < blueprint.Parts.Count; i++)
             {
-                bool itis = BlueprintManager.TryGetPart<T>(blueprint.Parts[i], out T _part);
-                if (itis)
-                {
-                    part = _part;
-                    return true;
-                }
+                if (BlueprintManager.TryGetPart(blueprint.Parts[i], out part))
+                { return true; }
             }
+
             part = null;
             return false;
         }

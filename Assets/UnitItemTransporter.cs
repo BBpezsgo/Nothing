@@ -170,6 +170,19 @@ namespace Game.Components
             { avoidObstacles.IgnoreCollision = null; }
         }
 
+        protected override void OnUnitDestroy()
+        {
+            base.OnUnitDestroy();
+
+            if (TransportingItem != null)
+            {
+                if (TryGetComponent(out Rigidbody rb))
+                { TransportingItem.Drop(rb.velocity); }
+                else
+                { TransportingItem.Drop(); }
+            }
+        }
+
         void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.white;

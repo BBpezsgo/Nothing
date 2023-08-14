@@ -30,8 +30,6 @@ namespace Game.Managers
             }
         }
 
-        public bool IsOffline => NetcodeUtils.IsOffline;
-
         public bool Authorized => Authentication.AuthManager.IsAuthorized;
     }
 }

@@ -8696,7 +8696,7 @@ ParticleSystem:
       emitter: {fileID: 1739596643175496271}
       type: 0
       properties: 0
-      emitProbability: 1
+      emitProbability: 0.2
   LightsModule:
     enabled: 0
     ratio: 0
@@ -14517,6 +14517,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3211229806635681876, guid: 93cf482d3f7974f4d90b5f45d52d5879,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3387115980509588096, guid: 93cf482d3f7974f4d90b5f45d52d5879,
         type: 3}
       propertyPath: m_Name
