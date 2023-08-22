@@ -10146,6 +10146,8 @@ MonoBehaviour:
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 80
+  <CrossStyle>k__BackingField: 1
+  <ReloadIndicatorStyle>k__BackingField: 2
   buttonDestroy: 
   Attacker: {fileID: 0}
 --- !u!114 &6449386879822076090

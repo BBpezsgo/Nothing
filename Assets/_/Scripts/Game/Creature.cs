@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Game.Managers;
 using Unity.Netcode;
@@ -18,6 +19,8 @@ namespace Game.Components
         [SerializeField] internal GameObject ExplodeEffect;
         [SerializeField] internal float HP;
         float _maxHp;
+
+        [SerializeField, ReadOnly] protected bool IsSearchingForFood = false;
 
         internal float NormalizedHP => HP / _maxHp;
 
@@ -82,6 +85,29 @@ namespace Game.Components
 
             (int, float) closest = filteredCreatures.ClosestI(transform.position);
             return filteredCreatures[closest.Item1];
+        }
+
+        protected void FindFoodAsync(System.Action<Creature> callback)
+        {
+            if (FoodCreatures.Length == 0) return;
+            Creature[] creatures = FindObjectsOfType<Creature>(false);
+            List<Creature> filteredCreatures_ = new();
+            foreach (Creature creature in creatures)
+            {
+                foreach (string food in FoodCreatures)
+                {
+                    if (creature.CreatureName == food)
+                    {
+                        filteredCreatures_.Add(creature);
+                        break;
+                    }
+                }
+            }
+            Creature[] filteredCreatures = filteredCreatures_.ToArray();
+            if (filteredCreatures.Length == 0) return;
+
+            IsSearchingForFood = true;
+            StartCoroutine(filteredCreatures.ClosestIAsync(transform.position, (i, d) => callback.Invoke(filteredCreatures[i]), (i, d) => IsSearchingForFood = false));
         }
 
         protected virtual void Start()

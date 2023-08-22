@@ -41,6 +41,9 @@ namespace Game.Components
             }
         }
 
+        [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
+        [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }
+
         public virtual void DoInput() => Attacker.DoInput();
         public virtual void DoFrequentInput() => Attacker.DoFrequentInput();
 

@@ -54,6 +54,9 @@ namespace Game.Components
             }
         }
 
+        [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
+        [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }
+
         [Header("Debug")]
         [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
 

@@ -30,6 +30,7 @@ namespace Game.Components
         protected virtual void Awake()
         {
             NewTargetCooldown = Random.value + 1f;
+            this.Interval(TryFindTargets, 1f, TargetCondition);
         }
 
         void FindTargets()
@@ -54,6 +55,18 @@ namespace Game.Components
             targets = Utilities.AI.SortTargets(result, transform.position, this.TeamHash);
         }
 
+        void TryFindTargets()
+        {
+            if (NeedNewTargets)
+            { FindTargets(); }
+        }
+
+        bool TargetCondition() =>
+            NetcodeUtils.IsOfflineOrServer && (
+                BaseObject is not ICanTakeControl canTakeControl ||
+                !canTakeControl.AnybodyControllingThis()
+            );
+
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -66,6 +79,7 @@ namespace Game.Components
 
             if (turret != null) turret.LoseTarget();
 
+            /*
             if (NewTargetCooldown > 0f)
             {
                 NewTargetCooldown -= Time.fixedDeltaTime;
@@ -73,10 +87,9 @@ namespace Game.Components
             else
             {
                 NewTargetCooldown = 1f;
-
-                if (NeedNewTargets)
-                { FindTargets(); }
+                TryFindTargets();
             }
+            */
 
             for (int j = priorityTargets.Count - 1; j >= 0; j--)
             {

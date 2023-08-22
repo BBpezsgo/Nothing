@@ -2257,7 +2257,8 @@ internal readonly struct ProfilerMarkers
 {
     internal static readonly Unity.Profiling.ProfilerMarker Animations = new("Utilities.Animations");
     internal static readonly Unity.Profiling.ProfilerMarker UnitsBehaviour = new("Game.Units.Behaviour");
-    internal static readonly Unity.Profiling.ProfilerMarker Wheels = new("Game.VehicleEngine.Wheels");
+    internal static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Wheels = new("Game.VehicleEngine.Wheels");
+    internal static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Basic = new("Game.VehicleEngine.Basic");
     internal static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");
 }
 
@@ -3582,5 +3583,158 @@ internal static class ListUtils
         builder.Append(" }");
 
         return builder.ToString();
+    }
+}
+
+internal static class Intervals
+{
+    public delegate bool Condition();
+
+    static bool AlwaysTrue() => true;
+
+    public static void Timeout(this MonoBehaviour context, Action action, float timeout, Condition condition = null)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, timeout, condition ?? AlwaysTrue));
+    }
+
+    static IEnumerator TimeoutCoroutine(Action action, float timeout, Condition condition)
+    {
+        yield return new WaitForSeconds(timeout);
+        while (!condition.Invoke())
+        { yield return new WaitForSeconds(0.1f); }
+        action.Invoke();
+    }
+
+    public static void Timeout<T0>(this MonoBehaviour context, Action<T0> action, T0 parameter0, float timeout, Condition condition = null)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, timeout, condition ?? AlwaysTrue));
+    }
+
+    static IEnumerator TimeoutCoroutine<T0>(Action<T0> action, T0 parameter0, float timeout, Condition condition)
+    {
+        yield return new WaitForSeconds(timeout);
+        while (!condition.Invoke())
+        { yield return new WaitForSeconds(0.1f); }
+        action.Invoke(parameter0);
+    }
+
+    public static void Timeout<T0, T1>(this MonoBehaviour context, Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition condition = null)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, timeout, condition ?? AlwaysTrue));
+    }
+
+    static IEnumerator TimeoutCoroutine<T0, T1>(Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition condition)
+    {
+        yield return new WaitForSeconds(timeout);
+        while (!condition.Invoke())
+        { yield return new WaitForSeconds(0.1f); }
+        action.Invoke(parameter0, parameter1);
+    }
+
+    public static void Timeout<T0, T1, T2>(this MonoBehaviour context, Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition condition = null)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, parameter2, timeout, condition ?? AlwaysTrue));
+    }
+
+    static IEnumerator TimeoutCoroutine<T0, T1, T2>(Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition condition)
+    {
+        yield return new WaitForSeconds(timeout);
+        while (!condition.Invoke())
+        { yield return new WaitForSeconds(0.1f); }
+        action.Invoke(parameter0, parameter1, parameter2);
+    }
+
+    public static UnityIntervalDynamicCondition Interval(this MonoBehaviour context, Action action, float interval, Condition condition = null)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        UnityIntervalDynamicCondition unityInterval = new(context, action, interval, condition ?? AlwaysTrue);
+        unityInterval.Start();
+        return unityInterval;
+    }
+
+    public static UnityIntervalStaticCondition Interval(this MonoBehaviour context, Action action, float interval, bool enabled = true)
+    {
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        UnityIntervalStaticCondition unityInterval = new(context, action, interval, enabled);
+        unityInterval.Start();
+        return unityInterval;
+    }
+
+    public abstract class UnityBaseInterval
+    {
+        protected Coroutine Coroutine;
+
+        protected readonly MonoBehaviour Context;
+        protected readonly Action Action;
+
+        public float Interval;
+
+        public UnityBaseInterval(MonoBehaviour context, Action action, float interval)
+        {
+            Context = context;
+            Action = action;
+            Interval = interval;
+        }
+
+        public void Stop()
+        {
+            if (Coroutine == null) return;
+            Context.StopCoroutine(Coroutine);
+            Coroutine = null;
+        }
+
+        public void Start()
+        {
+            if (Coroutine != null) return;
+            Coroutine = Context.StartCoroutine(IntervalCoroutine());
+        }
+
+        protected abstract IEnumerator IntervalCoroutine();
+    }
+
+    public class UnityIntervalDynamicCondition : UnityBaseInterval
+    {
+        readonly Condition Condition;
+
+        public UnityIntervalDynamicCondition(MonoBehaviour context, Action action, float interval, Condition condition)
+            : base(context, action, interval)
+        {
+            Condition = condition;
+        }
+
+        protected override IEnumerator IntervalCoroutine()
+        {
+            yield return new WaitForSeconds(Interval);
+            while (true)
+            {
+                if (Condition.Invoke()) Action.Invoke();
+                yield return new WaitForSeconds(Interval);
+            }
+        }
+    }
+
+    public class UnityIntervalStaticCondition : UnityBaseInterval
+    {
+        public bool Enabled;
+
+        public UnityIntervalStaticCondition(MonoBehaviour context, Action action, float interval, bool enabled)
+            : base(context, action, interval)
+        {
+            Enabled = enabled;
+        }
+
+        protected override IEnumerator IntervalCoroutine()
+        {
+            yield return new WaitForSeconds(Interval);
+            while (true)
+            {
+                if (Enabled) Action.Invoke();
+                yield return new WaitForSeconds(Interval);
+            }
+        }
     }
 }

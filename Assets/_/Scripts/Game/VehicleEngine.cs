@@ -6,16 +6,15 @@ using Unity.Netcode;
 using UnityEngine;
 using Utilities;
 
+#pragma warning disable CS0162 // Unreachable code detected
+
 namespace Game.Components
 {
     public class VehicleEngine : MovementEngine, IHaveAssetFields, ICopiable<VehicleEngine>
     {
         [SerializeField, ReadOnly] Unit unit;
 
-#pragma warning disable IDE0052 // Remove unread private members
-        /// <summary><b>Only for debugging!</b></summary>
         [SerializeField, ReadOnly] Vector2 input = Vector2.zero;
-#pragma warning restore IDE0052 // Remove unread private members
 
         [Serializable]
         public class Wheel
@@ -66,6 +65,8 @@ namespace Game.Components
 
         [SerializeField] float CenterOfMass;
 
+        const bool EnableWheels = false;
+
         [Header("Wheels")]
         [SerializeField] Wheel[] Wheels = new Wheel[0];
         [SerializeField] float SpringDamper = 1f;
@@ -89,10 +90,7 @@ namespace Game.Components
         [SerializeField, AssetField] internal float brake = 3.0f;
         [SerializeField, AssetField] internal float handbrake = 2.5f;
         [SerializeField, ReadOnly] bool isHandbraking = false;
-#pragma warning disable IDE0052 // Remove unread private members
-        /// <summary><b>Only for debugging!</b></summary>
         [SerializeField, ReadOnly] bool isBraking = false;
-#pragma warning restore IDE0052 // Remove unread private members
 
         [Header("Steer")]
         [SerializeField, AssetField, Range(0f, 1f)] internal float driftFactor = 0.95f;
@@ -325,7 +323,8 @@ namespace Game.Components
 
             if (FlippedOverValue < .5f) return;
 
-            DoWheelPhysics();
+            if (EnableWheels)
+            { DoWheelPhysics(); }
 
             if (NextGroundCheck > 0f)
             {
@@ -341,19 +340,17 @@ namespace Game.Components
 
             DoEffects();
 
-            if (Wheels.Length > 0)
+            if (EnableWheels && Wheels.Length > 0)
             { return; }
-
-            DoBasicPhysics();
 
             SmoothSteeringInput = Mathf.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);
 
-            ApplySteering();
+            DoBasicPhysics();
         }
 
         void DoWheelPhysics()
         {
-            using (ProfilerMarkers.Wheels.Auto())
+            using (ProfilerMarkers.VehicleEngine_Wheels.Auto())
             {
                 if (Wheels.Length == 0) return;
 
@@ -464,12 +461,16 @@ namespace Game.Components
 
         void DoBasicPhysics()
         {
-            isBraking = IsBraking;
+            using (ProfilerMarkers.VehicleEngine_Basic.Auto())
+            {
+                isBraking = IsBraking;
 
-            if (!isHandbraking)
-            { ApplyEngineForce(); }
-            ApplyBraking();
-            KillOrthogonalVelocity();
+                if (!isHandbraking)
+                { ApplyEngineForce(); }
+                ApplyBraking();
+                KillOrthogonalVelocity();
+                ApplySteering();
+            }
         }
 
         void DoEffects()
@@ -504,8 +505,11 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            for (int i = 0; i < Wheels.Length; i++)
-            { Wheels[i].OnDrawGizmos(); }
+            if (EnableWheels)
+            {
+                for (int i = 0; i < Wheels.Length; i++)
+                { Wheels[i].OnDrawGizmos(); }
+            }
 
             if (Collider == null) return;
 

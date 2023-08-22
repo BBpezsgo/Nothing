@@ -148,6 +148,8 @@ MonoBehaviour:
   controllingByUser: 0
   UiSelected: {fileID: 1685135136199830838}
   Attacker: {fileID: 0}
+  <CrossStyle>k__BackingField: 1
+  <ReloadIndicatorStyle>k__BackingField: 2
 --- !u!114 &2263609535658177165
 MonoBehaviour:
   m_ObjectHideFlags: 0

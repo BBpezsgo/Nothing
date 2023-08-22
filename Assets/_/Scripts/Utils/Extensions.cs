@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Game.Components;
 using Unity.Netcode;
@@ -274,6 +275,102 @@ internal static class UnclassifiedExtensions
         }
 
         return new System.ValueTuple<int, float>(closestI, Mathf.Sqrt(closest));
+    }
+
+    internal delegate void SearchCallback<T1>(T1 p0);
+    internal delegate void SearchCallback<T1, T2>(T1 p0, T2 p1);
+
+    internal static IEnumerator ClosestIAsync(this Transform[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    {
+        if (v.Length == 0) yield break;
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if (v[i] == null) continue;
+            float d = (origin - v[i].position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+
+                intermediateCallback.Invoke(closestI, closest);
+            }
+        }
+
+        doneCallback?.Invoke(closestI, closest);
+    }
+    internal static IEnumerator ClosestIAsync(this Component[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    {
+        if (v.Length == 0) yield break;
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 0; i < v.Length; i++)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if (v[i] == null) continue;
+            float d = (origin - v[i].transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+
+                intermediateCallback.Invoke(closestI, closest);
+            }
+        }
+
+        doneCallback?.Invoke(closestI, closest);
+    }
+    internal static IEnumerator ClosestIAsync(this IComponent[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    {
+        if (v.Length == 0) yield break;
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 0; i < v.Length; i++)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if ((UnityEngine.Object)v[i] == null) continue;
+            float d = (origin - ((Component)v[i]).transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+
+                intermediateCallback.Invoke(closestI, closest);
+            }
+        }
+
+        doneCallback?.Invoke(closestI, closest);
+    }
+    internal static IEnumerator ClosestIAsync(this GameObject[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    {
+        if (v.Length == 0) yield break;
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if (v[i] == null) continue;
+            float d = (origin - v[i].gameObject.transform.position).sqrMagnitude;
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+
+                intermediateCallback.Invoke(closestI, closest);
+            }
+        }
+
+        doneCallback?.Invoke(closestI, closest);
     }
 
     const float ScreenRayMaxDistance = 500f;

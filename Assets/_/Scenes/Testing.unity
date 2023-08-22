@@ -1137,7 +1137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &799445615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1152,7 +1152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   things: []
-  EnableAutoSpawn: 0
+  EnableAutoSpawn: 1
   Thing: {fileID: 8461085159954064377, guid: f4984e580e9455b4394f21ea486dc3bd, type: 3}
   MinThings: 1
   NextSpawn: 1
@@ -1331,7 +1331,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &924264485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1346,7 +1346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   things: []
-  EnableAutoSpawn: 0
+  EnableAutoSpawn: 1
   Thing: {fileID: 5588413864294271967, guid: a80b7bcab6cd8c44fb261789053efa69, type: 3}
   MinThings: 1
   NextSpawn: 1

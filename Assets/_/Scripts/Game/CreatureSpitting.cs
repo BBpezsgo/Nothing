@@ -46,7 +46,8 @@ namespace Game.Components
             {
                 if (Food == null)
                 {
-                    Food = FindFood();
+                    if (!IsSearchingForFood)
+                    { FindFoodAsync(v => Food = v); }
                     base.Thinking();
                     return;
                 }

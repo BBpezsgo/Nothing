@@ -15,14 +15,16 @@ namespace Game.Managers
 {
     public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
     {
-        internal enum ReloadIndicatorStyle
+        public enum ReloadIndicatorStyle
         {
+            None,
             Dots,
             Circle,
         }
 
-        internal enum CrossStyle
+        public enum CrossStyle
         {
+            None,
             Cross,
             DiagonalCross,
             Cross3,
@@ -72,8 +74,8 @@ namespace Game.Managers
         [SerializeField, Min(.5f)] float ReloadDotsSize = 4f;
         [SerializeField, Min(.01f)] float ReloadDotsFadeoutSpeed = 5f;
         [SerializeField, Min(.01f)] float TargetLockAnimationSpeed = 2f;
-        [SerializeField] ReloadIndicatorStyle reloadIndicatorStyle = ReloadIndicatorStyle.Circle;
-        [SerializeField] CrossStyle CurrentCrossStyle = CrossStyle.Cross;
+        [SerializeField, ReadOnly] ReloadIndicatorStyle CurrentReloadIndicatorStyle = ReloadIndicatorStyle.Circle;
+        [SerializeField, ReadOnly] CrossStyle CurrentCrossStyle = CrossStyle.Cross;
 
         Texture2D SphereFilled;
         Rect targetRect = Rect.zero;
@@ -339,9 +341,31 @@ namespace Game.Managers
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
 
+            if (unit is ICanTakeControlAndHasTurret hasTurret)
+            {
+                CurrentCrossStyle = hasTurret.CrossStyle;
+                CurrentReloadIndicatorStyle = hasTurret.ReloadIndicatorStyle;
+            }
+            else
+            {
+                CurrentCrossStyle = CrossStyle.None;
+                CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
+            }
+
             if ((Object)ControllingObject == (Object)unit) return;
             LoseControl();
             SetWindowCursor();
+
+            if (unit is ICanTakeControlAndHasTurret hasTurret2)
+            {
+                CurrentCrossStyle = hasTurret2.CrossStyle;
+                CurrentReloadIndicatorStyle = hasTurret2.ReloadIndicatorStyle;
+            }
+            else
+            {
+                CurrentCrossStyle = CrossStyle.None;
+                CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
+            }
 
             CameraController.FollowObject = ((Component)unit).transform;
             CameraController.JustFollow = false;
@@ -435,9 +459,31 @@ namespace Game.Managers
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
 
+            if (unit is ICanTakeControlAndHasTurret hasTurret)
+            {
+                CurrentCrossStyle = hasTurret.CrossStyle;
+                CurrentReloadIndicatorStyle = hasTurret.ReloadIndicatorStyle;
+            }
+            else
+            {
+                CurrentCrossStyle = CrossStyle.None;
+                CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
+            }
+
             if ((Object)ControllingObject == (Object)unit) return;
             LoseControl();
             SetWindowCursor();
+
+            if (unit is ICanTakeControlAndHasTurret hasTurret2)
+            {
+                CurrentCrossStyle = hasTurret2.CrossStyle;
+                CurrentReloadIndicatorStyle = hasTurret2.ReloadIndicatorStyle;
+            }
+            else
+            {
+                CurrentCrossStyle = CrossStyle.None;
+                CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
+            }
 
             CameraController.FollowObject = ((Component)unit).transform;
             CameraController.JustFollow = false;
@@ -564,6 +610,9 @@ namespace Game.Managers
                 ControllingObjects.Set((int)NetworkManager.LocalClientId, ulong.MaxValue, ulong.MaxValue);
             }
 
+            CurrentCrossStyle = CrossStyle.None;
+            CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
+
             UI.gameObject.SetActive(false);
 
             EnableMouseCooldown = 1f;
@@ -591,6 +640,9 @@ namespace Game.Managers
 
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
+
+            CurrentCrossStyle = CrossStyle.None;
+            CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
 
             UnityEngine.Cursor.lockState = CursorLockMode.None;
             if ((Object)ControllingObject == null) return;
@@ -869,14 +921,16 @@ namespace Game.Managers
 
         void DrawReloadIndicator(float value, Vector2 center, Color shadowColor)
         {
+            if (CurrentReloadIndicatorStyle == ReloadIndicatorStyle.None) return;
+
             if (value != 1f)
             {
-                if (reloadIndicatorStyle == ReloadIndicatorStyle.Circle)
+                if (CurrentReloadIndicatorStyle == ReloadIndicatorStyle.Circle)
                 {
                     GLUtils.DrawCircle(center + Vector2.one, ReloadDotsRadius, 2f, shadowColor, value, 24);
                     GLUtils.DrawCircle(center, ReloadDotsRadius, 2f, Color.white, value, 24);
                 }
-                else if (reloadIndicatorStyle == ReloadIndicatorStyle.Dots)
+                else if (CurrentReloadIndicatorStyle == ReloadIndicatorStyle.Dots)
                 {
                     float step = 1f / (float)ReloadDots;
 
@@ -905,11 +959,11 @@ namespace Game.Managers
 
                 if (fadeOutPercent > .0001f)
                 {
-                    if (reloadIndicatorStyle == ReloadIndicatorStyle.Circle)
+                    if (CurrentReloadIndicatorStyle == ReloadIndicatorStyle.Circle)
                     {
                         GLUtils.DrawCircle(center, ReloadDotsRadius + ((1f - fadeOutPercent) * 4f), 2f + ((1f - fadeOutPercent) * 4f), Color.white.Opacity(fadeOutPercent), value, 24);
                     }
-                    else if (reloadIndicatorStyle == ReloadIndicatorStyle.Dots)
+                    else if (CurrentReloadIndicatorStyle == ReloadIndicatorStyle.Dots)
                     {
                         for (int i = 0; i < ReloadDots; i++)
                         {
@@ -946,6 +1000,8 @@ namespace Game.Managers
                     break;
                 case CrossStyle.Cross3:
                     Cross3Drawer.Draw(center, innerSize, outerSize, thickness, color, ShadowColor);
+                    break;
+                case CrossStyle.None:
                     break;
                 default:
                     break;
@@ -985,6 +1041,9 @@ namespace Game.Components
     public interface ICanTakeControlAndHasTurret : ICanTakeControl
     {
         public Turret Turret { get; }
+
+        public TakeControlManager.CrossStyle CrossStyle { get; }
+        public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; }
     }
 }
 

@@ -1,7 +1,5 @@
-using AssetManager;
-
 using System.Collections.Generic;
-
+using AssetManager;
 using UnityEngine;
 
 namespace Game.Components
@@ -18,6 +16,8 @@ namespace Game.Components
         [SerializeField, AssetField] float ConstructionSpeed = 1f;
 
         [SerializeField, ReadOnly] float TimeToNextTargetSearch = 1f;
+
+        int searching = 0;
 
         void FindToBeBuilt()
         {
@@ -53,19 +53,28 @@ namespace Game.Components
             ToBeRepair = result.ToArray();
         }
 
-        int NearestToBeBuilt() => ToBeBuilt.ClosestI(transform.position).Item1;
-        int NearestToBeRepair() => ToBeRepair.ClosestI(transform.position).Item1;
+        void FindNearestToBeBuilt()
+        {
+            searching++;
+            StartCoroutine(ToBeBuilt.ClosestIAsync(transform.position, (i, d) => nearestToBeBuilt = i, (i, d) => searching--));
+        }
+
+        void FindNearestToBeRepair()
+        {
+            searching++;
+            StartCoroutine(ToBeRepair.ClosestIAsync(transform.position, (i, d) => nearestToBeRepair = i, (i, d) => searching--));
+        }
 
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
             if (this.AnybodyControllingThis()) return;
 
-            if (nearestToBeBuilt != -1 && ToBeBuilt[nearestToBeBuilt] != null)
+            if (nearestToBeBuilt != -1 && nearestToBeBuilt < ToBeBuilt.Length && ToBeBuilt[nearestToBeBuilt] != null)
             {
                 DoBuild();
             }
-            else if (nearestToBeRepair != -1 && ToBeRepair[nearestToBeRepair] != null)
+            else if (nearestToBeRepair != -1 && nearestToBeRepair < ToBeRepair.Length && ToBeRepair[nearestToBeRepair] != null)
             {
                 DoRepair();
             }
@@ -161,8 +170,8 @@ namespace Game.Components
                 if (ToBeRepair.Length != 0)
                 { ToBeRepair = ToBeRepair.PurgeObjects(); }
 
-                nearestToBeBuilt = NearestToBeBuilt();
-                nearestToBeRepair = NearestToBeRepair();
+                FindNearestToBeBuilt();
+                FindNearestToBeRepair();
 
                 TimeToNextTargetSearch = 2f;
             }
