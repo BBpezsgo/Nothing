@@ -1,14 +1,8 @@
-using Netcode.Transports.Offline;
-using Netcode.Transports.WebSocket;
-
-using Networking;
-
 using System;
-using System.Collections.Generic;
-
+using Netcode.Transports.Offline;
+using Networking;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -72,12 +66,12 @@ namespace Game.UI
             NetworkManager.Singleton.NetworkConfig.NetworkTransport = transport;
             Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(OfflineTransport)}", this);
 
-            { Debug.Log($"[{nameof(MenuLobby)}]: Start server on {GetSocket()} ...", this); }
+            { Debug.Log($"[{nameof(MenuLobby)}]: Start server on {NetcodeUtils.NetworkConfig} ...", this); }
             bool success = NetworkManager.Singleton.StartServer();
             if (success)
-            { Debug.Log($"[{nameof(MenuLobby)}]: Server started on {GetSocket()}", this); }
+            { Debug.Log($"[{nameof(MenuLobby)}]: Server started on {NetcodeUtils.NetworkConfig}", this); }
             else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {GetSocket()}", this); }
+            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {NetcodeUtils.NetworkConfig}", this); }
 
             NetworkDiscovery.Instance.StopDiscovery();
         }
@@ -180,153 +174,18 @@ namespace Game.UI
             RefreshDiscoveryUI();
         }
 
-        bool ComputeSocketInput(string input, out string error)
-        {
-            error = null;
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                error = "Input is empty";
-                return false;
-            }
-
-            input = input.Trim();
-
-            if (!Uri.TryCreate(input, UriKind.Absolute, out Uri uri))
-            {
-                error = "Failed to parse";
-                return false;
-            }
-
-            GameObject obj = NetworkManager.Singleton.gameObject;
-
-            if (uri.Scheme == "udp")
-            {
-                if (!obj.TryGetComponent(out UnityTransport unityTransport))
-                {
-                    error = $"UDP not supported :(";
-                    return false;
-                }
-
-                if (!System.Net.IPAddress.TryParse(uri.Host ?? "", out System.Net.IPAddress address))
-                {
-                    error = $"Invalid IP Address \"{uri.Host}\"";
-                    return false;
-                }
-
-                if (address.ToString() != uri.Host)
-                {
-                    error = $"Invalid IP Address \"{uri.Host}\"";
-                    return false;
-                }
-
-                if (uri.IsDefaultPort)
-                {
-                    error = $"No port specified";
-                    return false;
-                }
-
-                if (uri.Port < 1 || uri.Port > ushort.MaxValue)
-                {
-                    error = $"Invalid port {uri.Port}";
-                    return false;
-                }
-
-                NetworkManager.Singleton.NetworkConfig.NetworkTransport = unityTransport;
-                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(UnityTransport)}", this);
-
-                unityTransport.SetConnectionData(address.ToString(), (ushort)uri.Port, address.ToString());
-                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}", this);
-                return true;
-            }
-
-            if (uri.Scheme == "ws" || uri.Scheme == "wss")
-            {
-                if (!obj.TryGetComponent(out WebSocketTransport webSocketTransport))
-                {
-                    error = $"WebSocket not supported :(";
-                    return false;
-                }
-
-                if (uri.IsDefaultPort)
-                {
-                    error = $"No port specified";
-                    return false;
-                }
-
-                if (uri.Port < 1 || uri.Port > ushort.MaxValue)
-                {
-                    error = $"Invalid port {uri.Port}";
-                    return false;
-                }
-
-                NetworkManager.Singleton.NetworkConfig.NetworkTransport = webSocketTransport;
-                Debug.Log($"[{nameof(MenuLobby)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(WebSocketTransport)}", this);
-
-                webSocketTransport.AllowForwardedRequest = false;
-                webSocketTransport.CertificateBase64String = "";
-                webSocketTransport.ConnectAddress = uri.Host;
-                webSocketTransport.Port = (ushort)uri.Port;
-                webSocketTransport.SecureConnection = (uri.Scheme == "wss");
-                webSocketTransport.Path = uri.AbsolutePath;
-
-                Debug.Log($"[{nameof(MenuLobby)}]: Connection data set to {(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}", this);
-                return true;
-            }
-
-            error = $"Unknown scheme \"{uri.Scheme}\"";
-            return false;
-        }
-
-        string GetSocket()
-        {
-            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
-            { return $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
-            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
-            { return $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
-            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is OfflineTransport)
-            { return "offline"; }
-            else
-            { throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}"); }
-        }
-
         void ButtonHost()
         {
-            if (!ComputeSocketInput(InputSocket.value, out string socketError))
-            {
-                LabelSocketError.text = socketError;
-                return;
-            }
-
-
-            Debug.Log($"[{nameof(MenuLobby)}]: Start server on {GetSocket()} ...", this);
-            bool success = NetworkManager.Singleton.StartServer();
-            if (success)
-            {
-                Debug.Log($"[{nameof(MenuLobby)}]: Server started on {GetSocket()}", this);
-            }
-            else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start server on {GetSocket()}", this); }
-
+            LabelSocketError.text = string.Empty;
             NetworkDiscovery.Instance.StopDiscovery();
+            StartCoroutine(NetcodeUtils.HostAsync(InputSocket.value, error => { if (error != null) LabelSocketError.text = error; }, this));
         }
 
         void ButtonConnect()
         {
-            if (!ComputeSocketInput(InputSocket.value, out string socketError))
-            {
-                LabelSocketError.text = socketError;
-                return;
-            }
-
-            { Debug.Log($"[{nameof(MenuLobby)}]: Start client on {GetSocket()} ...", this); }
-            bool success = NetworkManager.Singleton.StartClient();
-            if (success)
-            { Debug.Log($"[{nameof(MenuLobby)}]: Client started on {GetSocket()}", this); }
-            else
-            { Debug.LogError($"[{nameof(MenuLobby)}]: Failed to start client on {GetSocket()}", this); }
-
+            LabelSocketError.text = string.Empty;
             NetworkDiscovery.Instance.StopDiscovery();
+            StartCoroutine(NetcodeUtils.ConnectAsync(InputSocket.value, error => { if (error != null) LabelSocketError.text = error; }, this));
         }
     }
 }

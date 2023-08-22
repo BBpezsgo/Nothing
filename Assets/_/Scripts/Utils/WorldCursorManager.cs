@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using InputUtils;
 using UnityEngine;
 
@@ -9,10 +10,10 @@ namespace Game.Managers
         readonly List<INeedWorldCursor> NeedWorldCursor = new();
         readonly List<INeedDirectWorldCursor> NeedDirectWorldCursor = new();
 
-        // [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedWorldCursor = new MonoBehaviour[0];
-        // [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedDirectWorldCursor = new MonoBehaviour[0];
+        [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedWorldCursor = new MonoBehaviour[0];
+        [SerializeField, ReadOnly, NonReorderable] MonoBehaviour[] _NeedDirectWorldCursor = new MonoBehaviour[0];
 
-        InputUtils.AdvancedMouse LeftMouseButton;
+        AdvancedMouse LeftMouseButton;
 
         static readonly CursorPriorityComparer CursorPriorityComparer = new();
 
@@ -21,7 +22,7 @@ namespace Game.Managers
 
         void Start()
         {
-            LeftMouseButton = new InputUtils.AdvancedMouse(MouseButton.Left, 9, MouseCondition);
+            LeftMouseButton = new AdvancedMouse(MouseButton.Left, 9, MouseCondition);
             LeftMouseButton.OnClick += OnLeftMouseButtonClick;
         }
 
@@ -41,8 +42,8 @@ namespace Game.Managers
             NeedDirectWorldCursor.Sort(CursorPriorityComparer);
             NeedWorldCursor.Sort(CursorPriorityComparer);
 
-            // _NeedDirectWorldCursor = NeedDirectWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
-            // _NeedWorldCursor = NeedWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
+            _NeedDirectWorldCursor = NeedDirectWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
+            _NeedWorldCursor = NeedWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
 
             NeedResort = false;
         }
@@ -63,10 +64,13 @@ namespace Game.Managers
         public void Deregister(INeedWorldCursor obj)
         {
             NeedWorldCursor.Remove(obj);
+            _NeedWorldCursor = NeedWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
+
         }
         public void Deregister(INeedDirectWorldCursor obj)
         {
             NeedDirectWorldCursor.Remove(obj);
+            _NeedDirectWorldCursor = NeedDirectWorldCursor.Select(v => (MonoBehaviour)v).ToArray();
         }
 
         bool MouseCondition() =>
@@ -80,33 +84,42 @@ namespace Game.Managers
 
             Ray ray = MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position);
             float maxDistance = 500f;
-            if (!Physics.Raycast(ray, out var hit, maxDistance))
-            { return; }
 
-            Vector3 point = hit.point;
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance, Utilities.DefaultLayerMasks.Solids, QueryTriggerInteraction.Collide);
 
-            for (int i = NeedDirectWorldCursor.Count - 1; i >= 0; i--)
+            if (hits.Length == 0) return;
+
+            for (int j = 0; j < hits.Length; j++)
             {
-                if (NeedDirectWorldCursor[i].gameObject == null) continue;
-                if (!NeedDirectWorldCursor[i].gameObject.activeSelf) continue;
+                var hit = hits[j];
+                Vector3 point = hit.point;
 
-                if (hit.collider != null)
+                for (int i = NeedDirectWorldCursor.Count - 1; i >= 0; i--)
                 {
-                    var v = hit.collider.gameObject.GetComponentsInParent<MonoBehaviour>(false);
-                    for (int j = 0; j < v.Length; j++)
+                    if (NeedDirectWorldCursor[i].Object() == null) continue;
+                    if (NeedDirectWorldCursor[i].gameObject == null) continue;
+                    if (!NeedDirectWorldCursor[i].gameObject.activeSelf) continue;
+
+                    if (hit.collider != null)
                     {
-                        if (v[j].gameObject == NeedDirectWorldCursor[i].gameObject)
+                        var v = hit.collider.gameObject.GetComponentsInParent<MonoBehaviour>(false);
+                        foreach (MonoBehaviour v1 in v)
                         {
-                            if (NeedDirectWorldCursor[i].OnWorldCursor(point))
-                            { return; }
+                            if (v1.gameObject == NeedDirectWorldCursor[i].gameObject)
+                            {
+                                if (NeedDirectWorldCursor[i].OnWorldCursor(point))
+                                { return; }
+                            }
                         }
                     }
                 }
             }
 
+            var firstHit = hits[0];
+
             for (int i = NeedWorldCursor.Count - 1; i >= 0; i--)
             {
-                if (NeedWorldCursor[i].OnWorldCursor(point))
+                if (NeedWorldCursor[i].OnWorldCursor(firstHit.point))
                 { return; }
             }
         }
@@ -130,7 +143,7 @@ namespace Game
         public bool OnWorldCursor(Vector3 worldPosition);
     }
 
-    internal interface INeedDirectWorldCursor
+    internal interface INeedDirectWorldCursor : IComponent
     {
         public GameObject gameObject { get; }
         public int CursorPriority { get; }

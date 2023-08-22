@@ -627,7 +627,7 @@ namespace Game.Components
                 raySize,
                 GroundHits,
                 transform.rotation,
-                DefaultLayerMasks.JustGround);
+                DefaultLayerMasks.Solids);
 
             return n > 0;
         }

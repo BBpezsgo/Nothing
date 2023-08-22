@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Game.Managers
@@ -8,14 +9,17 @@ namespace Game.Managers
         {
             get
             {
-                if (NetcodeUtils.IsOffline) return false;
-                return
-                    Unity.Netcode.NetworkManager.Singleton.IsListening && (
-                        Unity.Netcode.NetworkManager.Singleton.IsServer || (
-                            Unity.Netcode.NetworkManager.Singleton.IsClient &&
-                            Unity.Netcode.NetworkManager.Singleton.IsConnectedClient
-                        )
-                    );
+                NetworkManager net = NetworkManager.Singleton;
+
+                if (net == null) return false;
+
+                if (!net.IsListening) return false;
+
+                if (net.IsServer) return true;
+
+                if (net.IsConnectedClient) return true;
+
+                return false;
             }
         }
 
@@ -23,10 +27,15 @@ namespace Game.Managers
         {
             get
             {
-                if (NetcodeUtils.IsOffline) return false;
-                return
-                    Unity.Netcode.NetworkManager.Singleton.IsClient &&
-                    !Unity.Netcode.NetworkManager.Singleton.IsConnectedClient;
+                NetworkManager net = NetworkManager.Singleton;
+
+                if (net == null) return false;
+
+                if (net.ShutdownInProgress) return true;
+
+                if (net.IsClient && !net.IsConnectedClient) return true;
+
+                return false;
             }
         }
 

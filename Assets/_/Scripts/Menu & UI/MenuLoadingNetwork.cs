@@ -1,3 +1,5 @@
+using Netcode.Transports.Offline;
+using Netcode.Transports.WebSocket;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 
@@ -32,15 +34,17 @@ namespace Game.UI
         {
             string result = "";
 
-            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
-            {
-                result += $"Socket: {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}\n";
-            }
+            NetworkTransport transport = NetworkManager.Singleton.NetworkConfig.NetworkTransport;
+
+            if (transport is UnityTransport unityTransport)
+            { result += $"Socket: {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}\n"; }
+            else if (transport is WebSocketTransport webSocketTransport)
+            { result += $"Socket: {(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}\n"; }
+            else if (transport is OfflineTransport)
+            { result += $"Socket: none\n"; }
 
             if (NetworkManager.Singleton.ShutdownInProgress)
-            {
-                result += $"Shutdown in progress\n";
-            }
+            { result += $"Shutdown in progress\n"; }
 
             if (!NetworkManager.Singleton.IsListening)
             { result += $"Not listening\n"; }
@@ -60,7 +64,7 @@ namespace Game.UI
                 { result += $"Awaiting approval ...\n"; }
 
                 if (NetworkManager.Singleton.IsConnectedClient)
-                { result += $"Connected as client\n"; }
+                { result += $"Connected\n"; }
             }
 
             LabelStatus.text = result;

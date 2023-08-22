@@ -28,37 +28,91 @@ namespace Game.UI
             IsPaused = !IsPaused;
         }
 
+        readonly struct Hotkey
+        {
+            public enum MenuKind
+            {
+                MainMenu,
+                IntermediateMenu,
+            }
+
+            public readonly KeyCode Key;
+
+            public readonly MenuKind Kind;
+
+            public readonly MenuManager.MainMenuType MainMenuType;
+            public readonly MenuManager.IntermediateMenuType IntermediateMenuType;
+
+            Hotkey(KeyCode key) : this()
+            {
+                Key = key;
+            }
+
+            public Hotkey(KeyCode key, MenuManager.MainMenuType menu) : this(key)
+            {
+                Kind = MenuKind.MainMenu;
+                MainMenuType = menu;
+            }
+
+            public Hotkey(KeyCode key, MenuManager.IntermediateMenuType menu) : this(key)
+            {
+                Kind = MenuKind.IntermediateMenu;
+                IntermediateMenuType = menu;
+            }
+
+            public void Toggle()
+            {
+                var menu = MenuManager.Instance;
+                switch (Kind)
+                {
+                    case MenuKind.MainMenu:
+                        if (menu.CurrentStatus != MenuManager.StatusType.None)
+                        { break; }
+
+                        if (menu.CurrentPanel != MenuManager.PanelType.None)
+                        { break; }
+
+                        if (menu.CurrentIntermediateMenu != MenuManager.IntermediateMenuType.None)
+                        { break; }
+
+                        if (menu.CurrentMenu == MenuManager.MainMenuType.None)
+                        { menu.CurrentMenu = MainMenuType; }
+                        else
+                        { menu.CurrentMenu = MenuManager.MainMenuType.None; }
+
+                        break;
+                    case MenuKind.IntermediateMenu:
+                        if (menu.CurrentStatus != MenuManager.StatusType.None)
+                        { break; }
+
+                        if (menu.CurrentPanel != MenuManager.PanelType.None)
+                        { break; }
+
+                        if (menu.CurrentIntermediateMenu == MenuManager.IntermediateMenuType.None)
+                        { menu.CurrentIntermediateMenu = IntermediateMenuType; }
+                        else
+                        { menu.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.None; }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        readonly Hotkey[] Hotkeys = new[]
+        {
+            new Hotkey(KeyCode.Alpha1, MenuManager.MainMenuType.Game_BlueprintManager),
+            new Hotkey(KeyCode.Alpha2, MenuManager.IntermediateMenuType.Scenes),
+        };
+
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            for (int i = 0; i < Hotkeys.Length; i++)
             {
-                if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintManager)
-                {
-                    MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.None;
-                    return;
-                }
-
-                if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.None)
-                {
-                    MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.Game_BlueprintManager;
-                    return;
-                }
+                if (Input.GetKeyDown(Hotkeys[i].Key))
+                { Hotkeys[i].Toggle(); }
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                if (MenuManager.Instance.CurrentIntermediateMenu == MenuManager.IntermediateMenuType.Scenes)
-                {
-                    MenuManager.Instance.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.None;
-                    return;
-                }
 
-                if (MenuManager.Instance.CurrentIntermediateMenu == MenuManager.IntermediateMenuType.None &&
-                    MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.None)
-                {
-                    MenuManager.Instance.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.Scenes;
-                    return;
-                }
-            }
             /*
             else if (Input.GetKeyDown(KeyCode.Alpha4))
             {

@@ -12,6 +12,12 @@ using Game.Managers;
 
 using Networking;
 using UI;
+using System.Text;
+using System.Threading.Tasks;
+using Unity.Netcode.Transports.UTP;
+using Netcode.Transports.WebSocket;
+using Netcode.Transports.Offline;
+using System.Net;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -417,7 +423,7 @@ namespace Utilities
         /// <summary>
         /// <see cref="LayerMaskNames.Default"/> ; <see cref="LayerMaskNames.Ground"/>
         /// </summary>
-        public static int Targeting => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Ground);
+        public static int Solids => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Ground);
         /// <summary>
         /// <see cref="LayerMaskNames.Default"/> ; <see cref="LayerMaskNames.Projectile"/>
         /// </summary>
@@ -2292,6 +2298,238 @@ internal static class NetcodeUtils
         @object = networkObject.gameObject;
         return true;
     }
+
+    /// <returns>
+    ///   Current NetworkConfig as a string depending on the current transport as follows:
+    ///   <list type="table">
+    ///     <item>
+    ///       <term> <see cref="UnityTransport"/> </term>
+    ///       <description> Socket </description>
+    ///     </item>
+    ///     <item>
+    ///       <term> <see cref="WebSocketTransport"/> </term>
+    ///       <description> URL </description>
+    ///     </item>
+    ///     <item>
+    ///       <term> <see cref="OfflineTransport"/> </term>
+    ///       <description> "offline" </description>
+    ///     </item>
+    ///   </list>
+    /// </returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public static string NetworkConfig
+    {
+        get
+        {
+            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
+            { return $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
+
+            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
+            { return $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
+
+            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is OfflineTransport)
+            { return "offline"; }
+
+            throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}");
+        }
+    }
+
+    static IEnumerator SetConnectionData(string input, Action<string> callback, UnityEngine.Object context = null)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            callback?.Invoke("Input is empty");
+            yield break;
+        }
+
+        input = input.Trim();
+
+        if (!input.Contains("://"))
+        {
+            input = "udp://" + input;
+        }
+
+        if (!Uri.TryCreate(input, UriKind.Absolute, out Uri uri))
+        {
+            callback?.Invoke("Invalid URI");
+            yield break;
+        }
+
+        switch (uri.Scheme)
+        {
+            case "udp":
+                yield return SetUDPConnectionData(uri, callback, context);
+                yield break;
+
+            case "ws":
+            case "wss":
+                yield return SetWebSocketConnectionData(uri, callback, context);
+                yield break;
+
+            default:
+                callback?.Invoke($"Unknown scheme \"{uri.Scheme}\"");
+                yield break;
+        }
+    }
+
+    static IEnumerator SetUDPConnectionData(Uri uri, Action<string> callback, UnityEngine.Object context = null)
+    {
+        if (!NetworkManager.Singleton.gameObject.TryGetComponent(out UnityTransport unityTransport))
+        {
+            callback?.Invoke($"UDP not supported :(");
+            yield break;
+        }
+
+        string socketAddress = null;
+
+        if (uri.IsDefaultPort)
+        {
+            callback?.Invoke($"No port specified");
+            yield break;
+        }
+
+        if (uri.Port < 1 || uri.Port > ushort.MaxValue)
+        {
+            callback?.Invoke($"Invalid port {uri.Port}");
+            yield break;
+        }
+
+        if (!IPAddress.TryParse(uri.Host ?? "", out IPAddress address))
+        {
+            Debug.Log($"Resolving hostname \"{uri.Host}\" ...", context);
+            Task<IPHostEntry> dnsTask = Dns.GetHostEntryAsync(uri.Host);
+
+            yield return new WaitUntil(() => dnsTask.IsCompleted);
+
+            if (!dnsTask.IsCompletedSuccessfully || dnsTask.Result == null)
+            {
+                Debug.Log($"[{nameof(NetcodeUtils)}]: Failed to resolve \"{uri.Host}\"", context);
+
+                callback?.Invoke($"Failed to resolve \"{uri.Host}\"");
+                yield break;
+            }
+
+            IPHostEntry dnsResult = dnsTask.Result;
+
+            if (dnsResult.AddressList.Length == 0)
+            {
+                Debug.Log($"[{nameof(NetcodeUtils)}]: DNS entry \"{uri.Host}\" does not have any address", context);
+
+                callback?.Invoke($"DNS entry \"{uri.Host}\" does not have any address");
+                yield break;
+            }
+
+            Debug.Log($"Hostname (\"{uri.Host}\") result: {dnsResult.AddressList.ToReadableString()}", context);
+
+            socketAddress = dnsResult.AddressList[0].ToString();
+        }
+        else
+        {
+            socketAddress = address.ToString();
+
+            if (socketAddress != uri.Host)
+            {
+                callback?.Invoke($"Invalid IP Address \"{uri.Host}\"");
+                yield break;
+            }
+        }
+
+        NetworkManager.Singleton.NetworkConfig.NetworkTransport = unityTransport;
+        Debug.Log($"[{nameof(NetcodeUtils)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(UnityTransport)}", context);
+
+        unityTransport.SetConnectionData(socketAddress, (ushort)uri.Port, socketAddress);
+        Debug.Log($"[{nameof(NetcodeUtils)}]: Connection data set to {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}", context);
+        callback?.Invoke(null);
+        yield break;
+    }
+
+    static IEnumerator SetWebSocketConnectionData(Uri uri, Action<string> callback, UnityEngine.Object context = null)
+    {
+        if (!NetworkManager.Singleton.gameObject.TryGetComponent(out WebSocketTransport webSocketTransport))
+        {
+            callback?.Invoke($"WebSocket not supported :(");
+            yield break;
+        }
+
+        if (uri.IsDefaultPort)
+        {
+            callback?.Invoke($"No port specified");
+            yield break;
+        }
+
+        if (uri.Port < 1 || uri.Port > ushort.MaxValue)
+        {
+            callback?.Invoke($"Invalid port {uri.Port}");
+            yield break;
+        }
+
+        NetworkManager.Singleton.NetworkConfig.NetworkTransport = webSocketTransport;
+        Debug.Log($"[{nameof(NetcodeUtils)}]: {nameof(NetworkManager.Singleton.NetworkConfig.NetworkTransport)} set to {nameof(WebSocketTransport)}", context);
+
+        webSocketTransport.AllowForwardedRequest = false;
+        webSocketTransport.CertificateBase64String = "";
+        webSocketTransport.ConnectAddress = uri.Host;
+        webSocketTransport.Port = (ushort)uri.Port;
+        webSocketTransport.SecureConnection = (uri.Scheme == "wss");
+        webSocketTransport.Path = uri.AbsolutePath;
+
+        Debug.Log($"[{nameof(NetcodeUtils)}]: Connection data set to {(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}", context);
+        callback?.Invoke(null);
+        yield break;
+    }
+
+    public static IEnumerator HostAsync(string input, Action<string> callback, UnityEngine.Object context = null)
+    {
+        string socketComputeError = null;
+        yield return SetConnectionData(input, result => { socketComputeError = result; });
+
+        if (socketComputeError != null)
+        {
+            callback?.Invoke(socketComputeError);
+            yield break;
+        }
+
+        Debug.Log($"[{nameof(NetcodeUtils)}]: Start server on {NetworkConfig} ...", context);
+
+        bool success = NetworkManager.Singleton.StartServer();
+
+        if (success)
+        {
+            Debug.Log($"[{nameof(NetcodeUtils)}]: Server started on {NetworkConfig}", context);
+        }
+        else
+        {
+            callback?.Invoke($"Failed to start server on {NetworkConfig}");
+            Debug.LogError($"[{nameof(NetcodeUtils)}]: Failed to start server on {NetworkConfig}", context);
+        }
+    }
+
+    public static IEnumerator ConnectAsync(string input, Action<string> callback, UnityEngine.Object context = null)
+    {
+        string socketComputeError = null;
+        yield return SetConnectionData(input, result => { socketComputeError = result; });
+
+        if (socketComputeError != null)
+        {
+            callback?.Invoke(socketComputeError);
+            yield break;
+        }
+
+        Debug.Log($"[{nameof(NetcodeUtils)}]: Start client on {NetworkConfig} ...", context);
+
+        bool success = NetworkManager.Singleton.StartClient();
+
+        if (success)
+        {
+            Debug.Log($"[{nameof(NetcodeUtils)}]: Client started on {NetworkConfig}", context);
+        }
+        else
+        {
+            callback?.Invoke($"Failed to start client on {NetworkConfig}");
+            Debug.LogError($"[{nameof(NetcodeUtils)}]: Failed to start client on {NetworkConfig}", context);
+        }
+    }
+
 }
 
 /// <summary>
@@ -2309,7 +2547,7 @@ static partial class ReflectionUtility
         if (null == type)
             throw new ArgumentNullException("type");
 
-        if (typeof(System.Collections.IList).IsAssignableFrom(type))
+        if (typeof(IList).IsAssignableFrom(type))
             return true;
         foreach (var it in type.GetInterfaces())
             if (it.IsGenericType && typeof(IList<>) == it.GetGenericTypeDefinition())
@@ -2337,12 +2575,12 @@ static partial class ReflectionUtility
         // now try the non-generic way
 
         // if it's a dictionary we always return DictionaryEntry
-        if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
-            return typeof(System.Collections.DictionaryEntry);
+        if (typeof(IDictionary).IsAssignableFrom(type))
+            return typeof(DictionaryEntry);
 
         // if it's a list we look for an Item property with an int index parameter
         // where the property type is anything but object
-        if (typeof(System.Collections.IList).IsAssignableFrom(type))
+        if (typeof(IList).IsAssignableFrom(type))
         {
             foreach (var prop in type.GetProperties())
             {
@@ -2359,7 +2597,7 @@ static partial class ReflectionUtility
 
         // if it's a collection, we look for an Add() method whose parameter is 
         // anything but object
-        if (typeof(System.Collections.ICollection).IsAssignableFrom(type))
+        if (typeof(ICollection).IsAssignableFrom(type))
         {
             foreach (var meth in type.GetMethods())
             {
@@ -2371,7 +2609,7 @@ static partial class ReflectionUtility
                 }
             }
         }
-        if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
+        if (typeof(IEnumerable).IsAssignableFrom(type))
             return typeof(object);
         return null;
     }
@@ -3197,6 +3435,12 @@ public interface IComponent
 
 public static class IObjectExtensions
 {
+    public static bool HasComponent<T>(this IComponent self)
+        => (self as Component).HasComponent<T>();
+
+    public static Component Object(this IComponent self)
+        => self as Component;
+
     public static GameObject GetGameObject(this IComponent self)
         => (self as Component).gameObject;
 
@@ -3248,4 +3492,95 @@ public static class IObjectExtensions
 
     public static bool TryGetComponentInChildren<T>(this IComponent self, out T component)
         => (self as Component).TryGetComponentInChildren(out component);
+}
+
+internal static class ListUtils
+{
+    internal static string ToReadableString<T>(this NetworkList<T> self) where T : unmanaged, IEquatable<T>
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T element = self[i];
+            builder.Append(element.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T>(this T[] self)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Length; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T element = self[i];
+            builder.Append(element.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T>(this IReadOnlyList<T> self)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T element = self[i];
+            builder.Append(element.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T>(this IEnumerable<T> self)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        bool notFirst = false;
+        foreach (T element in self)
+        {
+            if (notFirst)
+            { builder.Append(", "); }
+
+            builder.Append(element.ToString());
+
+            notFirst = true;
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
 }

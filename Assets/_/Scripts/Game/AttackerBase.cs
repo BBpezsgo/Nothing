@@ -112,7 +112,7 @@ namespace Game.Components
                     if (!targetLocked)
                     {
                         var ray = MainCamera.Camera.ScreenPointToRay(screenCenter);
-                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
+                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
                         Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
 
                         if (NetcodeUtils.IsOfflineOrServer)
@@ -171,7 +171,7 @@ namespace Game.Components
                         if (!targetLocked)
                         {
                             var ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
-                            var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
+                            var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
                             Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
 
                             turret.SetTarget(point);
@@ -180,7 +180,7 @@ namespace Game.Components
                     else if (NetcodeUtils.IsClient)
                     {
                         var ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
-                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
+                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
                         Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
 
                         if ((turret.TargetPosition - point).sqrMagnitude > .5f)

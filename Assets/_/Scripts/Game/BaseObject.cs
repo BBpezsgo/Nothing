@@ -27,7 +27,9 @@ namespace Game.Components
             TeamManager.Team team = TeamManager.Instance.GetTeam(Team);
             if (team == null)
             {
-                Debug.LogWarning($"[{nameof(BaseObject)}]: Team \"{Team}\" not found", this);
+                if (!string.IsNullOrWhiteSpace(Team))
+                { Debug.LogWarning($"[{nameof(BaseObject)}]: Team \"{Team}\" not found", this); }
+                
                 UpdateColor(Color.white);
                 return;
             }

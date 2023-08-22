@@ -6,6 +6,12 @@ using UnityEngine;
 
 internal static class UnclassifiedExtensions
 {
+    public static T? PeekOrNull<T>(this Stack<T> stack) where T : struct
+        => stack.TryPeek(out T result) ? result : null;
+
+    public static T PeekOrDefault<T>(this Stack<T> stack)
+        => stack.TryPeek(out T result) ? result : default;
+
     internal static bool TryGetRendererBounds(this GameObject @object, out Bounds bounds)
     {
         MeshRenderer[] renderers = @object.GetComponentsInChildren<MeshRenderer>(false);
@@ -51,16 +57,6 @@ internal static class UnclassifiedExtensions
     {
         TryGetColliderBounds(@object, out Bounds bounds);
         return bounds;
-    }
-
-    public static Rect Padding(this Rect rect, float padding)
-    {
-        float halfPadding = padding / 2;
-        rect.x -= halfPadding;
-        rect.y -= halfPadding;
-        rect.width += padding;
-        rect.height += padding;
-        return rect;
     }
 
     public static Color Opacity(this Color c, float alpha)
@@ -113,6 +109,15 @@ internal static class UnclassifiedExtensions
         { return; }
 
         networkObject.Spawn(destroyWithScene);
+    }
+
+    internal static bool Contains(this string[] self, string v, StringComparison comparison = StringComparison.InvariantCulture)
+    {
+        for (int i = 0; i < self.Length; i++)
+        {
+            if (string.Equals(self[i], v, comparison)) return true;
+        }
+        return false;
     }
 
     internal static bool Contains<T>(this T[] self, T v) where T : IEquatable<T>
@@ -637,6 +642,20 @@ internal static class VectorEx
             return true;
         }
     }
+
+    public static bool IsUnitVector(this Vector2 vector) =>
+        vector.x >= 0 &&
+        vector.x <= 1 &&
+        vector.y >= 0 &&
+        vector.y <= 1;
+
+    public static bool IsUnitVector(this Vector3 vector) =>
+        vector.x >= 0 &&
+        vector.x <= 1 &&
+        vector.y >= 0 &&
+        vector.y <= 1 &&
+        vector.z >= 0 &&
+        vector.z <= 1;
 }
 
 public static class DataChunk
@@ -847,7 +866,7 @@ internal static class ListEx
         v.Add(result);
         return result;
     }
-} 
+}
 
 internal static class RigidbodyEx
 {
@@ -874,7 +893,7 @@ internal static class GameObjectEx
         { SetLayerRecursive(child.gameObject, layer); }
     }
 
-    internal static bool HasComponent<T>(this GameObject obj) where T : Component => obj.TryGetComponent<T>(out _);
+    internal static bool HasComponent<T>(this GameObject obj) => obj.TryGetComponent<T>(out _);
     internal static bool HasComponent(this GameObject obj, Type type) => obj.TryGetComponent(type, out _);
 
     internal static bool TryGetComponentInChildren<T>(this GameObject obj, out T component)
@@ -948,7 +967,7 @@ internal static class GameObjectEx
 
 internal static class ComponentEx
 {
-    internal static bool HasComponent<T>(this Component obj) where T : Component => obj.TryGetComponent<T>(out _);
+    internal static bool HasComponent<T>(this Component obj) => obj.TryGetComponent<T>(out _);
     internal static bool HasComponent(this Component obj, Type type) => obj.TryGetComponent(type, out _);
 }
 
@@ -956,4 +975,53 @@ internal static class ObjectEx
 {
     internal static void Destroy(this UnityEngine.Object obj) => UnityEngine.Object.Destroy(obj);
     internal static void Destroy(this UnityEngine.Object obj, float t) => UnityEngine.Object.Destroy(obj, t);
+}
+
+internal static class RectEx
+{
+    public static Rect Padding(this Rect rect, float padding)
+    {
+        float halfPadding = padding / 2;
+        rect.x -= halfPadding;
+        rect.y -= halfPadding;
+        rect.width += padding;
+        rect.height += padding;
+        return rect;
+    }
+
+    public static Vector2 TopLeft(this Rect rect) => rect.position;
+    public static Vector2 TopRight(this Rect rect) => new(rect.position.x + rect.width, rect.position.y);
+    public static Vector2 BottomLeft(this Rect rect) => new(rect.position.x, rect.position.y + rect.height);
+    public static Vector2 BottomRight(this Rect rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
+
+    public static (Vector2 TopLeft, Vector2 TopRight, Vector2 BottomLeft, Vector2 BottomRight) Corners(this Rect rect) =>
+        (rect.TopLeft(), rect.TopRight(), rect.BottomLeft(), rect.BottomRight());
+}
+
+internal static class RectIntEx
+{
+    public static RectInt Padding(this RectInt rect, int padding)
+    {
+        int halfPadding = padding / 2;
+        rect.x -= halfPadding;
+        rect.y -= halfPadding;
+        rect.width += padding;
+        rect.height += padding;
+        return rect;
+    }
+
+    public static Rect ToFloat(this RectInt rect) => new(rect.x, rect.y, rect.width, rect.height);
+
+    public static Vector2Int TopLeft(this RectInt rect) => rect.position;
+    public static Vector2Int TopRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
+    public static Vector2Int BottomLeft(this RectInt rect) => new(rect.position.x, rect.position.y + rect.height);
+    public static Vector2Int BottomRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
+
+    public static (Vector2Int TopLeft, Vector2Int TopRight, Vector2Int BottomLeft, Vector2Int BottomRight) Corners(this RectInt rect) =>
+        (rect.TopLeft(), rect.TopRight(), rect.BottomLeft(), rect.BottomRight());
+
+    public static bool Contains(this RectInt rect, Vector2 point)
+    {
+        return point.x >= rect.xMin && point.x < rect.xMax && point.y >= rect.yMin && point.y < rect.yMax;
+    }
 }

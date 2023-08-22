@@ -241,7 +241,7 @@ namespace Game.Managers
         }
         internal PanelType CurrentPanel
         {
-            private get
+            get
             {
                 if (AnyPopupVisible) return PanelType.None;
 

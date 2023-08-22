@@ -12,6 +12,8 @@ namespace Game.Managers
     {
         internal delegate void SelectionChangedEvent();
 
+        [SerializeField] bool IsEnabled = true;
+
         [SerializeField, ReadOnly, NonReorderable] internal ISelectable[] Selected = new ISelectable[0];
         [SerializeField, ReadOnly, NonReorderable] ISelectable[] AlmostSelected = new ISelectable[0];
 
@@ -64,6 +66,7 @@ namespace Game.Managers
         }
 
         bool MouseCondition() =>
+            IsEnabled &&
             CameraController.Instance != null &&
             (!CameraController.Instance.IsFollowing || CameraController.Instance.JustFollow) &&
             !TakeControlManager.Instance.IsControlling &&
@@ -257,7 +260,7 @@ namespace Game.Managers
         {
             for (int i = 0; i < AlmostSelected.Length; i++)
             {
-                if (AlmostSelected[i] == null) continue;
+                if (AlmostSelected[i].Object() == null) continue;
                 if (Selected.Contains(AlmostSelected[i])) continue;
                 AlmostSelected[i].SelectableState = ISelectable.State.None;
             }
@@ -268,7 +271,7 @@ namespace Game.Managers
         {
             for (int i = 0; i < Selected.Length; i++)
             {
-                if (Selected[i] == null) continue;
+                if (Selected[i].Object() == null) continue;
                 Selected[i].SelectableState = ISelectable.State.None;
             }
             selectionChanged = true;
@@ -421,7 +424,7 @@ namespace Game.Managers
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].collider.isTrigger) continue;
-                if (hits[i].transform.gameObject.TryGetComponent<ISelectable>(out var unit))
+                if (hits[i].transform.gameObject.HasComponent<ISelectable>())
                 {
                     CursorSelect.SetCursor();
                     return true;
@@ -431,7 +434,9 @@ namespace Game.Managers
             {
                 for (int i = 0; i < Selected.Length; i++)
                 {
-                    if (((Component)Selected[i]).HasComponent<VehicleEngine>())
+                    if (Selected[i].Object() == null) continue;
+
+                    if (Selected[i].HasComponent<VehicleEngine>())
                     {
                         CursorGoTo.SetCursor();
                         return true;

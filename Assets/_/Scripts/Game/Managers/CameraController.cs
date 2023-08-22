@@ -58,18 +58,30 @@ namespace Game.Managers
         [SerializeField] float zoomInputMultiplier = 1f;
         [SerializeField] float ZoomBonusOnShift = 1f;
         [SerializeField] float zoomSpeed = 1f;
+        [SerializeField, ReadOnly] float targetZoomSpeed;
+        [SerializeField, ReadOnly] float currentZoomSpeed;
 
         [SerializeField, ReadOnly] float TargetZoom;
         [SerializeField, ReadOnly] float Zoom;
 
         [Header("Scoping")]
-        [SerializeField, ReadOnly] internal Transform CurrentScope;
-        internal bool IsScoping => CurrentScope != null;
+        [SerializeField] internal CameraLockable LockOn;
+        internal bool IsLocked => LockOn != null;
+
+        internal bool TryOverrideLock(CameraLockable @lock, int lockPriority)
+        {
+            if (LockOn != null && LockOn.Priority > lockPriority) return false;
+
+            LockOn = @lock;
+            return true;
+        }
+
         /// <summary>
         /// From 0f to 40f
         /// </summary>
         internal float ScopeZoom => 60f - theCamera.fieldOfView;
-        [SerializeField, ReadOnly] bool ScopeTotallyLocked = false;
+        float LockedValue => (theCamera.transform.position - LockOn.position).sqrMagnitude;
+        [SerializeField, ReadOnly] bool IsTotallyLocked = false;
 
         // [Header("Other")]
         internal float ZoomValue => Mathf.Max(0f, -theCamera.transform.localPosition.z);
@@ -107,6 +119,9 @@ namespace Game.Managers
             TouchZoom = new TouchZoom(1, () => !MenuManager.AnyMenuVisible);
             TouchZoom.OnZoom += OnTouchZoom;
             TouchZoom.OnMove += OnTouchMove;
+
+            targetZoomSpeed = zoomSpeed;
+            currentZoomSpeed = zoomSpeed;
         }
 
         void OnTouchMove(AdvancedTouch sender)
@@ -150,10 +165,23 @@ namespace Game.Managers
 
         void Update()
         {
-            if (IsScoping)
+            currentZoomSpeed = Mathf.MoveTowards(currentZoomSpeed, targetZoomSpeed, 5 * Time.unscaledDeltaTime);
+
+            if (IsLocked)
             {
-                HandleAndDoScope(Time.unscaledDeltaTime);
+                HandleAndDoLocking(Time.unscaledDeltaTime);
+
+                // targetZoomSpeed = 0;
+                // currentZoomSpeed = 0;
+
+                Zoom = -theCamera.transform.localPosition.z;
+                Rotation = transform.rotation.eulerAngles.y;
+
                 return;
+            }
+            else
+            {
+                targetZoomSpeed = zoomSpeed;
             }
 
             theCamera.fieldOfView = 60f;
@@ -249,23 +277,26 @@ namespace Game.Managers
             }
         }
 
-        void HandleAndDoScope(float deltaTime)
+        void HandleAndDoLocking(float deltaTime)
         {
-            if (ScopeTotallyLocked)
+            if (IsTotallyLocked)
             {
-                transform.SetPositionAndRotation(CurrentScope.position, CurrentScope.rotation);
+                transform.SetPositionAndRotation(LockOn.position, LockOn.rotation);
                 theCamera.transform.localPosition = Vector3.zero;
             }
             else
             {
                 float lockSpeed = 50f;
+
+                lockSpeed *= Mathf.Clamp(Mathf.Sqrt(LockedValue) / 3, .001f, 10f);
+
                 {
-                    Vector3 displacement = CurrentScope.position - transform.position;
+                    Vector3 displacement = LockOn.position - transform.position;
                     displacement *= .9f;
                     displacement = Vector3.ClampMagnitude(displacement, lockSpeed * deltaTime);
                     transform.Translate(displacement, Space.World);
 
-                    transform.rotation = Quaternion.Lerp(transform.rotation, CurrentScope.rotation, rotationSpeed * deltaTime);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, LockOn.rotation, rotationSpeed * deltaTime);
                 }
 
                 {
@@ -277,11 +308,18 @@ namespace Game.Managers
 
             cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.identity, AngleSpeed * deltaTime);
 
-            Rotation = CurrentScope.rotation.eulerAngles.y;
-            TargetRotation = Rotation;
+            if (LockOn.FreeMode)
+            {
+                Rotation = LockOn.rotation.eulerAngles.y;
+                TargetRotation = Rotation;
+            }
 
-            if (!MenuManager.AnyMenuVisible && MouseManager.MouseOnWindow)
-            { theCamera.fieldOfView = Mathf.Clamp(theCamera.fieldOfView - (Input.mouseScrollDelta.y * 2f), 20f, 60f); }
+            if (LockOn.Zoomable &&
+                !MenuManager.AnyMenuVisible &&
+                MouseManager.MouseOnWindow)
+            {
+                theCamera.fieldOfView = Mathf.Clamp(theCamera.fieldOfView - (Input.mouseScrollDelta.y * 2f), 20f, 60f);
+            }
         }
 
         void DoFollowing(float deltaTime)
@@ -308,7 +346,9 @@ namespace Game.Managers
 
             Velocity = Vector2.MoveTowards(Velocity, TargetVelocity, deltaTime * acceleration / 2);
 
-            if (Velocity != Vector2.zero)
+            float verticalVelocity = Height - transform.position.y;
+
+            if (Velocity != Vector2.zero || verticalVelocity != 0f)
             {
                 // float heightMultiplier = Mathf.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
                 float heightMultiplier = Mathf.Max(.2f, Mathf.Log(ZoomValue));
@@ -317,8 +357,6 @@ namespace Game.Managers
 
                 Vector3 forwardVelocity = transform.forward * scaledVelocity.x;
                 Vector3 rightVelocity = transform.right * scaledVelocity.y;
-
-                float verticalVelocity = Height - transform.position.y;
 
                 Vector3 transition = (forwardVelocity + rightVelocity + new Vector3(0f, verticalVelocity, 0f)) * deltaTime;
 
@@ -341,7 +379,7 @@ namespace Game.Managers
 
         void DoZooming(float deltaTime)
         {
-            Zoom = Mathf.Lerp(Zoom, TargetZoom, 1f - Mathf.Pow(.5f, zoomSpeed * deltaTime));
+            Zoom = Mathf.Lerp(Zoom, TargetZoom, 1f - Mathf.Pow(.5f, currentZoomSpeed * deltaTime));
             Zoom = Mathf.Max(Zoom, 0f);
 
             float zoomTransition = Zoom - ZoomValue;
@@ -358,12 +396,12 @@ namespace Game.Managers
 
         void FixedUpdate()
         {
-            if (IsScoping)
+            if (IsLocked)
             {
-                if (!ScopeTotallyLocked)
+                if (!IsTotallyLocked)
                 {
-                    if ((theCamera.transform.position - CurrentScope.position).sqrMagnitude < .1f)
-                    { ScopeTotallyLocked = true; }
+                    if (LockedValue < .0001f)
+                    { IsTotallyLocked = true; }
                 }
 
                 return;
@@ -372,7 +410,7 @@ namespace Game.Managers
             Height = TheTerrain.Height(transform.position) + 1f;
 
             theCamera.transform.localRotation = Quaternion.identity;
-            ScopeTotallyLocked = false;
+            IsTotallyLocked = false;
 
             if (cameraMode != lastCameraMode)
             {

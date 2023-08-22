@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class QuickCommandManager : SingleInstance<QuickCommandManager>
 {
+    [SerializeField] bool IsEnabled = true;
+
     [SerializeField] Color CircleBackground = Color.gray;
     [SerializeField] Color CommandBackground = Color.white;
     [SerializeField] Color CommandSelectedBackground = Color.red;
@@ -52,6 +54,8 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
     void Update()
     {
+        if (!IsEnabled) return;
+
         if (LeftMouse.IsDragging)
         {
             LeftMouse.Reset();
@@ -78,6 +82,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     }
 
     bool MouseCondition() =>
+        IsEnabled &&
         CameraController.Instance != null &&
         (!CameraController.Instance.IsFollowing || CameraController.Instance.JustFollow) &&
         !TakeControlManager.Instance.IsControlling &&
@@ -95,8 +100,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
     void OnGUI()
     {
-        if (!IsShown)
-        { return; }
+        if (!IsShown) return;
 
         float showTime = Time.unscaledTime - ShownAt;
         float animationTime = Mathf.Clamp(showTime * ShowSpeed, 0f, 1f);

@@ -1,9 +1,6 @@
-using Game.Blueprints;
-
-using Game.Managers;
-
 using System.Collections.Generic;
-
+using Game.Blueprints;
+using Game.Managers;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -170,12 +167,6 @@ namespace Game.UI
             CurrentBlueprint = new Blueprint();
             TextFieldName.value = CurrentBlueprint.Name;
             RefreshUsedParts();
-        }
-
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1) && MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.Game_BlueprintDesigner)
-            { MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.None; }
         }
     }
 }

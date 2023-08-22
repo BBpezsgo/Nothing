@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 2120f063c6940a04b83633e925e093c7, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -185,6 +185,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e6041f42fb678246a107a553d7be1c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _NeedWorldCursor: []
+  _NeedDirectWorldCursor: []
 --- !u!1 &25512531
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,7 +293,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 42618973}
-  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -299,7 +301,7 @@ Transform:
   - {fileID: 330585546}
   m_Father: {fileID: 345478516}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!1 &48012910
 GameObject:
   m_ObjectHideFlags: 0
@@ -547,6 +549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b92388b3d1c2a244adc4c397fbac035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsEnabled: 0
   CircleBackground: {r: 0, g: 0, b: 0, a: 0.19607843}
   CommandBackground: {r: 0.18823531, g: 0.18823531, b: 0.18823531, a: 1}
   CommandSelectedBackground: {r: 0.341, g: 0.682, b: 1, a: 1}
@@ -906,28 +909,28 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.514151, g: 0.7030922, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
+  m_FocalLength: 20.78461
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.5
+  near clip plane: 0.2
   far clip plane: 1000
-  field of view: 60
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 247
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -947,7 +950,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -9.42}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -994,7 +997,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06d086d1392b09f468ad0270c183ceb8, type: 3}
   m_Name: 
@@ -1063,10 +1066,12 @@ MonoBehaviour:
   zoomInputMultiplier: 3
   ZoomBonusOnShift: 2
   zoomSpeed: 10
+  targetZoomSpeed: 0
+  currentZoomSpeed: 0
   TargetZoom: 0
   Zoom: 0
-  CurrentScope: {fileID: 0}
-  ScopeTotallyLocked: 0
+  LockOn: {fileID: 0}
+  IsTotallyLocked: 0
 --- !u!4 &345478516
 Transform:
   m_ObjectHideFlags: 0
@@ -1074,15 +1079,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 345478514}
-  m_LocalRotation: {x: 0, y: 0.39273837, z: 0, w: 0.9196503}
-  m_LocalPosition: {x: -57.7, y: 1, z: -20.2}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: -3, z: 1.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 42618974}
   m_Father: {fileID: 0}
   m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 46.25, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!1 &365012114
 GameObject:
   m_ObjectHideFlags: 0
@@ -1741,6 +1746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881633f67c4578f4284aa1fdeee164fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsEnabled: 0
   SelectionBoxColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 0.25}
   SelectionBoxBorderColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 1}
   SelectionBoxBorderWidth: 2
@@ -3516,7 +3522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartOffline: 1
-  LoadScene: Testing
+  LoadScene: 
 --- !u!114 &1376606815
 MonoBehaviour:
   m_ObjectHideFlags: 0

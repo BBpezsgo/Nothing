@@ -152,7 +152,7 @@ namespace Game.Managers
 
             Debug.Log($"[{nameof(TakeControlManager)}]: Server sent a RefreshControlling command, so ...", this);
 
-            Debug.Log($"[{nameof(TakeControlManager)}]: {nameof(ControllingObjects)} = {ControllingObjects}");
+            Debug.Log($"[{nameof(TakeControlManager)}]: {nameof(ControllingObjects)} = {ControllingObjects.ToReadableString()}");
 
             ulong controllingThis = ControllingObjects.Get((int)NetworkManager.LocalClientId, ulong.MaxValue);
             if (controllingThis == ulong.MaxValue)
@@ -269,12 +269,12 @@ namespace Game.Managers
                 { turret = obj2.Turret; }
 
                 if (turret != null)
-                { CameraController.CurrentScope = turret.Scope; }
+                { CameraController.TryOverrideLock(turret.Scope.GetComponent<CameraLockable>(), CameraLockable.Priorities.ControllableThing); }
                 else
-                { CameraController.CurrentScope = null; }
+                { CameraController.TryOverrideLock(null, CameraLockable.Priorities.ControllableThing); }
             }
             else
-            { CameraController.CurrentScope = null; }
+            { CameraController.TryOverrideLock(null, CameraLockable.Priorities.ControllableThing); }
         }
 
         ICanTakeControl GetControllableAt(Vector3 worldPosition)

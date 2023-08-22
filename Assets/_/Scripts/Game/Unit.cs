@@ -100,7 +100,7 @@ namespace Game.Components
             if (!Input.GetKey(KeyCode.LeftAlt))
             {
                 var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-                var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Targeting).Exclude(transform);
+                var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
                 Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
 
                 if (NetcodeUtils.IsOfflineOrServer)

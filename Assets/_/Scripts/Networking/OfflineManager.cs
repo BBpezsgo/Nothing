@@ -40,7 +40,7 @@ namespace Networking
 
             NetworkDiscovery.Instance.StopDiscovery();
 
-            if (LoadScene == null) return;
+            if (string.IsNullOrEmpty(LoadScene)) return;
 
             SceneManager.LoadScene(LoadScene);
         }
