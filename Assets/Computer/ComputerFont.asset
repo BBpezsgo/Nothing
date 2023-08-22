@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b127936879c8774da3930602d001f04, type: 3}
+  m_Name: ComputerFont
+  m_EditorClassIdentifier: 
+  Bitmap: {fileID: 2800000, guid: ec68cad5f9505b94a84ec7ae03c249da, type: 3}
+  Scaler: {x: 1, y: 1}
+  Spacing: {x: 0, y: 0}
+  Letters: {x: 16, y: 16}
