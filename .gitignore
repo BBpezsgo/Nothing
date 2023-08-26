@@ -79,4 +79,5 @@ crashlytics-build.properties
 *.exr
 *LightingData.asset
 /Assets/ProBuilder Data
-/Assets/Computer/html-agility-pack-master
+/Assets/Computer
+/Assets/_/Scenes/Computer.unity
