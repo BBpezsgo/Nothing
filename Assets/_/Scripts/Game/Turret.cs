@@ -232,6 +232,10 @@ namespace Game.Components
 
         float CannonRotationFix => -(90f - Vector3.SignedAngle(transform.forward, Vector3.up, transform.forward));
 
+        [SerializeField] bool ResetAfterTime;
+        [SerializeField, Min(0f)] float TimeToReset = 1f;
+        [SerializeField, ReadOnly] float IdleTime;
+
         void Start()
         {
             if (projectile != null)
@@ -358,12 +362,23 @@ namespace Game.Components
             if (targetPosition == Vector3.zero)
             {
                 predictedOffset = Vector3.zero;
-                // RotateTurret();
-                // RotateCannon();
                 currentError = 1f;
+                if (ResetAfterTime)
+                {
+                    if (IdleTime > TimeToReset)
+                    {
+                        RotateTurret();
+                        RotateCannon();
+                    }
+                    else
+                    {
+                        IdleTime += Time.fixedDeltaTime;
+                    }
+                }
             }
             else
             {
+                IdleTime = 0f;
                 Vector2 input;
                 if (overridedInput != Vector2.zero)
                 {

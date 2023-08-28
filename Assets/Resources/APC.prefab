@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 1476945729923886981}
   - component: {fileID: 7566176045427403910}
   - component: {fileID: 3352068103821660939}
+  - component: {fileID: -142435482645922943}
   m_Layer: 0
   m_Name: APC
   m_TagString: Untagged
@@ -353,7 +354,6 @@ MonoBehaviour:
   vehicleEngine: {fileID: 44472583122888732}
   turret: {fileID: 44472584589677893}
   controllingByUser: 0
-  UiSelected: {fileID: 4949440913393852923}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
@@ -397,10 +397,7 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets: []
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &5266830076556178172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,6 +594,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-142435482645922943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44472583122888728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9bd3c54cdc3c64a8c289bcee018b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UiSelected: {fileID: 4949440913393852923}
+  selectableState: 0
 --- !u!1 &44472583172699633
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +896,9 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 1
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &44472584589983556
 GameObject:
   m_ObjectHideFlags: 0

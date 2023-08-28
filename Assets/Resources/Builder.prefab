@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 9089273655404864247}
   - component: {fileID: 1089206618555930990}
   - component: {fileID: 2446189828402193636}
+  - component: {fileID: 8539614811349770126}
   m_Layer: 0
   m_Name: Builder
   m_TagString: Untagged
@@ -247,11 +248,12 @@ MonoBehaviour:
   vehicleEngine: {fileID: 4690245384110751944}
   turret: {fileID: 0}
   controllingByUser: 0
-  UiSelected: {fileID: 322520578584267400}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 20
+  <CrossStyle>k__BackingField: 0
+  <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
   ToBeBuilt: []
   ToBeRepair: []
@@ -348,6 +350,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8539614811349770126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690245384110751948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9bd3c54cdc3c64a8c289bcee018b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UiSelected: {fileID: 322520578584267400}
+  selectableState: 0
 --- !u!1 &4690245385307051920
 GameObject:
   m_ObjectHideFlags: 0

@@ -303,7 +303,7 @@ namespace Game.Managers
 
             if ((Object)controllable != null)
             {
-                EnableMouseCooldown = 1f;
+                EnableMouseCooldown = .3f;
                 TakeControl(controllable);
             }
         }

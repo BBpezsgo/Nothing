@@ -204,7 +204,6 @@ MonoBehaviour:
   vehicleEngine: {fileID: 8062244046001752368}
   turret: {fileID: 8062244046070208250}
   controllingByUser: 0
-  UiSelected: {fileID: 0}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 346126464746661311, guid: 0237e651bb612e54e8985b43e3adb5ae,
     type: 3}
@@ -254,9 +253,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  PriorityTargetCount: 0
   priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &8062244046001752373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -521,6 +519,9 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 0
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &8062244047100732455
 GameObject:
   m_ObjectHideFlags: 0

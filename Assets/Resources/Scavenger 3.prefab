@@ -5102,6 +5102,9 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 1
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &8289170899803332009
 GameObject:
   m_ObjectHideFlags: 0
@@ -5390,11 +5393,12 @@ MonoBehaviour:
   vehicleEngine: {fileID: 8289170899940005806}
   turret: {fileID: 8289170899688348689}
   controllingByUser: 0
-  UiSelected: {fileID: 0}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 40
+  <CrossStyle>k__BackingField: 0
+  <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
   Attacker: {fileID: 0}
 --- !u!114 &8289170899940005796
@@ -5432,10 +5436,7 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets: []
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &8289170899940005798
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -28,21 +28,7 @@ namespace Game.Components
                 currentSpitCooldown -= Time.fixedDeltaTime;
             }
 
-            if (FleeCooldown > 0f)
-            {
-                FleeCooldown -= Time.fixedDeltaTime;
-
-                if (NextFleePosition > 0f)
-                {
-                    NextFleePosition -= Time.fixedDeltaTime;
-                }
-                else
-                {
-                    NextFleePosition = 1f;
-                    Destination = FindFleeDestination();
-                }
-            }
-            else
+            if (!Flee())
             {
                 if (Food == null)
                 {

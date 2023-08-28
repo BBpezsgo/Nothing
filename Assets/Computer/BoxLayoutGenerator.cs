@@ -221,7 +221,7 @@ namespace BoxLayout
         int FontSize;
         float BoxScale;
 
-        RectInt Viewport;
+        // RectInt Viewport;
         HtmlDocument Document;
 
         Vector2Int MeasureText(string text, int fontSize) => TextMeasurer?.Invoke(text, fontSize) ?? Vector2Int.zero;
@@ -286,7 +286,7 @@ namespace BoxLayout
                 Stylesheets = stylesheets.ToArray(),
                 FontSize = 8,
                 BoxScale = .5f,
-                Viewport = new RectInt(area.xMin, area.yMin, area.width, area.height),
+                // Viewport = new RectInt(area.xMin, area.yMin, area.width, area.height),
                 Document = document,
             };
 

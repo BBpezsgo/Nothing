@@ -9884,6 +9884,9 @@ MonoBehaviour:
   Range: 9176.791
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 1
+  TimeToReset: 3
+  IdleTime: 0
 --- !u!1 &2619412345505571582
 GameObject:
   m_ObjectHideFlags: 0
@@ -9912,6 +9915,7 @@ GameObject:
   - component: {fileID: 1269857257918406634}
   - component: {fileID: 7518325145530454443}
   - component: {fileID: 8161849761146861834}
+  - component: {fileID: -8233328850410975369}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -10141,7 +10145,6 @@ MonoBehaviour:
   vehicleEngine: {fileID: 2619412345505571578}
   turret: {fileID: 2619412344863678371}
   controllingByUser: 0
-  UiSelected: {fileID: 6946811753196514077}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
@@ -10185,10 +10188,7 @@ MonoBehaviour:
   HullRotationStabilizer: 1
   lastRotation: 0
   rotationDelta: 0
-  targets: []
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &5615466198774182121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10399,6 +10399,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8233328850410975369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9bd3c54cdc3c64a8c289bcee018b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UiSelected: {fileID: 6946811753196514077}
+  selectableState: 0
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0

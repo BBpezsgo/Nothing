@@ -4900,6 +4900,7 @@ GameObject:
   - component: {fileID: 7506872090421376591}
   - component: {fileID: 1807053928217628118}
   - component: {fileID: 4034326892452720732}
+  - component: {fileID: 5430930951134685487}
   m_Layer: 0
   m_Name: Truck
   m_TagString: Untagged
@@ -5110,11 +5111,12 @@ MonoBehaviour:
   vehicleEngine: {fileID: 0}
   turret: {fileID: 0}
   controllingByUser: 0
-  UiSelected: {fileID: 1330673634429230640}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   HP: 15
+  <CrossStyle>k__BackingField: 0
+  <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
   Targets: []
   ReachDistance: 10
@@ -5225,6 +5227,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5430930951134685487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6276130072880698484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9bd3c54cdc3c64a8c289bcee018b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UiSelected: {fileID: 1330673634429230640}
+  selectableState: 0
 --- !u!1 &6276130074383172392
 GameObject:
   m_ObjectHideFlags: 0

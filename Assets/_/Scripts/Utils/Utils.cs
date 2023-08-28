@@ -1948,17 +1948,19 @@ namespace Utilities
         internal static void DrawSphere(Vector4 pos, float radius, Color color)
         {
             Vector4[] v = s_UnitSphere;
-            int len = s_UnitSphere.Length / 3;
+            int len = v.Length / 3;
             for (int i = 0; i < len; i++)
             {
-                var sX = pos + radius * v[0 * len + i];
-                var eX = pos + radius * v[0 * len + (i + 1) % len];
-                var sY = pos + radius * v[1 * len + i];
-                var eY = pos + radius * v[1 * len + (i + 1) % len];
-                var sZ = pos + radius * v[2 * len + i];
-                var eZ = pos + radius * v[2 * len + (i + 1) % len];
+                Vector4 sX = pos + radius * v[0 * len + i];
+                Vector4 eX = pos + radius * v[0 * len + (i + 1) % len];
                 Debug.DrawLine(sX, eX, color);
+
+                Vector4 sY = pos + radius * v[1 * len + i];
+                Vector4 eY = pos + radius * v[1 * len + (i + 1) % len];
                 Debug.DrawLine(sY, eY, color);
+
+                Vector4 sZ = pos + radius * v[2 * len + i];
+                Vector4 eZ = pos + radius * v[2 * len + (i + 1) % len];
                 Debug.DrawLine(sZ, eZ, color);
             }
         }
@@ -1966,17 +1968,19 @@ namespace Utilities
         internal static void DrawSphere(Vector4 pos, float radius, Color color, float duration)
         {
             Vector4[] v = s_UnitSphere;
-            int len = s_UnitSphere.Length / 3;
+            int len = v.Length / 3;
             for (int i = 0; i < len; i++)
             {
-                var sX = pos + radius * v[0 * len + i];
-                var eX = pos + radius * v[0 * len + (i + 1) % len];
-                var sY = pos + radius * v[1 * len + i];
-                var eY = pos + radius * v[1 * len + (i + 1) % len];
-                var sZ = pos + radius * v[2 * len + i];
-                var eZ = pos + radius * v[2 * len + (i + 1) % len];
+                Vector4 sX = pos + radius * v[0 * len + i];
+                Vector4 eX = pos + radius * v[0 * len + (i + 1) % len];
                 Debug.DrawLine(sX, eX, color, duration);
+
+                Vector4 sY = pos + radius * v[1 * len + i];
+                Vector4 eY = pos + radius * v[1 * len + (i + 1) % len];
                 Debug.DrawLine(sY, eY, color, duration);
+
+                Vector4 sZ = pos + radius * v[2 * len + i];
+                Vector4 eZ = pos + radius * v[2 * len + (i + 1) % len];
                 Debug.DrawLine(sZ, eZ, color, duration);
             }
         }
@@ -2085,7 +2089,7 @@ namespace Utilities
 
         public delegate float GetPriority<T>(T @object);
 
-        public static T[] SortTargets<T>(T[] targets, GetPriority<T> getPriority) where T : UnityEngine.Object
+        public static void SortTargets<T>(T[] targets, GetPriority<T> getPriority) where T : UnityEngine.Object
         {
             (T, float)[] priorities = new (T, float)[targets.Length];
 
@@ -2101,7 +2105,8 @@ namespace Utilities
 
             Array.Sort(priorities, new PriorityComparer<T>());
 
-            return priorities.Select(v => v.Item1).ToArray();
+            for (int i = 0; i < targets.Length; i++)
+            { targets[i] = priorities[i].Item1; }
         }
 
         public static void SortTargets<T>(IList<T> targets, GetPriority<T> getPriority) where T : UnityEngine.Object
@@ -2124,13 +2129,13 @@ namespace Utilities
             { targets[i] = priorities[i].Item1; }
         }
 
-        public static BaseObject[] SortTargets(BaseObject[] targets, Vector3 origin, string team)
+        public static void SortTargets(BaseObject[] targets, Vector3 origin, string team)
             => SortTargets(targets, target => (origin - target.transform.position).sqrMagnitude * TeamManager.Instance.GetFuckYou(target.Team, team));
 
         public static void SortTargets(IList<BaseObject> targets, Vector3 origin, string team)
             => SortTargets(targets, target => (origin - target.transform.position).sqrMagnitude * TeamManager.Instance.GetFuckYou(target.Team, team));
 
-        public static BaseObject[] SortTargets(BaseObject[] targets, Vector3 origin, int team)
+        public static void SortTargets(BaseObject[] targets, Vector3 origin, int team)
             => SortTargets(targets, target => (origin - target.transform.position).sqrMagnitude * TeamManager.Instance.GetFuckYou(target.TeamHash, team));
 
         public static void SortTargets(IList<BaseObject> targets, Vector3 origin, int team)

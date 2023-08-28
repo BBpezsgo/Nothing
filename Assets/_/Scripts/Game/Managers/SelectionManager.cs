@@ -2,7 +2,6 @@ using Game.Components;
 using Game.UI;
 using InputUtils;
 using System.Collections.Generic;
-using System.Linq;
 
 using UnityEngine;
 
@@ -14,8 +13,8 @@ namespace Game.Managers
 
         [SerializeField] bool IsEnabled = true;
 
-        [SerializeField, ReadOnly, NonReorderable] internal ISelectable[] Selected = new ISelectable[0];
-        [SerializeField, ReadOnly, NonReorderable] ISelectable[] AlmostSelected = new ISelectable[0];
+        [SerializeField, ReadOnly, NonReorderable] internal Selectable[] Selected = new Selectable[0];
+        [SerializeField, ReadOnly, NonReorderable] Selectable[] AlmostSelected = new Selectable[0];
 
         // bool DragFinished = false;
         float AlmostSelectTimer = 0f;
@@ -118,7 +117,7 @@ namespace Game.Managers
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].collider.isTrigger) continue;
-                if (hits[i].transform.gameObject.TryGetComponent<ISelectable>(out var unit))
+                if (hits[i].transform.gameObject.TryGetComponent<Selectable>(out var unit))
                 {
                     AddAlmostSelection(unit);
                     return;
@@ -132,7 +131,7 @@ namespace Game.Managers
             Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, out RaycastHit[] hits);
             for (int i = 0; i < hits.Length; i++)
             {
-                if (hits[i].transform.gameObject.TryGetComponent<ISelectable>(out var unit))
+                if (hits[i].transform.gameObject.TryGetComponent(out Selectable unit))
                 {
                     if (!Input.GetKey(KeyCode.LeftShift)) ClearSelection();
                     AddSelection(unit);
@@ -149,10 +148,10 @@ namespace Game.Managers
             ClearAlmostSelection();
             Vector2 min = Vector2.Min(positionA, positionB);
             Vector2 max = Vector2.Max(positionA, positionB);
-            ISelectable[] allUnits = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<ISelectable>().ToArray();
+            Selectable[] allUnits = FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             for (int i = 0; i < allUnits.Length; i++)
             {
-                var screenPoint = Camera.main.WorldToScreenPoint(((MonoBehaviour)allUnits[i]).transform.position);
+                var screenPoint = Camera.main.WorldToScreenPoint(allUnits[i].transform.position);
                 if (screenPoint.x < min.x) continue;
                 if (screenPoint.y < min.y) continue;
                 if (screenPoint.x > max.x) continue;
@@ -198,10 +197,10 @@ namespace Game.Managers
             if (!Input.GetKey(KeyCode.LeftShift)) ClearSelection();
             Vector2 min = Vector2.Min(positionA, positionB);
             Vector2 max = Vector2.Max(positionA, positionB);
-            ISelectable[] allUnits = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<ISelectable>().ToArray();
+            Selectable[] allUnits = FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             for (int i = 0; i < allUnits.Length; i++)
             {
-                var screenPoint = MainCamera.Camera.WorldToScreenPoint(((MonoBehaviour)allUnits[i]).transform.position);
+                var screenPoint = MainCamera.Camera.WorldToScreenPoint(allUnits[i].transform.position);
                 if (screenPoint.x < min.x) continue;
                 if (screenPoint.y < min.y) continue;
                 if (screenPoint.x > max.x) continue;
@@ -244,7 +243,7 @@ namespace Game.Managers
 
         void OnTriggerEnter(Collider other)
         {
-            if (!other.TryGetComponent(out ISelectable unit)) return;
+            if (!other.TryGetComponent(out Selectable unit)) return;
 
             //if (DragFinished)
             //{
@@ -260,39 +259,39 @@ namespace Game.Managers
         {
             for (int i = 0; i < AlmostSelected.Length; i++)
             {
-                if (AlmostSelected[i].Object() == null) continue;
+                if (AlmostSelected[i] == null) continue;
                 if (Selected.Contains(AlmostSelected[i])) continue;
-                AlmostSelected[i].SelectableState = ISelectable.State.None;
+                AlmostSelected[i].SelectableState = Selectable.State.None;
             }
-            AlmostSelected = new ISelectable[0];
+            AlmostSelected = new Selectable[0];
         }
 
         internal void ClearSelection()
         {
             for (int i = 0; i < Selected.Length; i++)
             {
-                if (Selected[i].Object() == null) continue;
-                Selected[i].SelectableState = ISelectable.State.None;
+                if (Selected[i] == null) continue;
+                Selected[i].SelectableState = Selectable.State.None;
             }
             selectionChanged = true;
-            Selected = new ISelectable[0];
+            Selected = new Selectable[0];
             ClearAlmostSelection();
         }
 
-        internal void AddAlmostSelection(ISelectable obj)
+        internal void AddAlmostSelection(Selectable obj)
         {
             if (Selected.Contains(obj)) return;
             if (AlmostSelected.Contains(obj)) return;
-            AlmostSelected = (new List<ISelectable>(AlmostSelected) { obj }).ToArray();
-            obj.SelectableState = (ISelectable.State)System.Math.Max((int)obj.SelectableState, (int)ISelectable.State.Almost);
+            AlmostSelected = (new List<Selectable>(AlmostSelected) { obj }).ToArray();
+            obj.SelectableState = (Selectable.State)System.Math.Max((int)obj.SelectableState, (int)Selectable.State.Almost);
         }
 
-        internal void AddSelection(ISelectable obj)
+        internal void AddSelection(Selectable obj)
         {
             if (Selected.Contains(obj)) return;
             selectionChanged = true;
-            Selected = (new List<ISelectable>(Selected) { obj }).ToArray();
-            obj.SelectableState = ISelectable.State.Selected;
+            Selected = (new List<Selectable>(Selected) { obj }).ToArray();
+            obj.SelectableState = Selectable.State.Selected;
         }
 
         void OnGUI()
@@ -424,7 +423,7 @@ namespace Game.Managers
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].collider.isTrigger) continue;
-                if (hits[i].transform.gameObject.HasComponent<ISelectable>())
+                if (hits[i].transform.gameObject.HasComponent<Selectable>())
                 {
                     CursorSelect.SetCursor();
                     return true;
@@ -434,7 +433,7 @@ namespace Game.Managers
             {
                 for (int i = 0; i < Selected.Length; i++)
                 {
-                    if (Selected[i].Object() == null) continue;
+                    if (Selected[i] == null) continue;
 
                     if (Selected[i].HasComponent<VehicleEngine>())
                     {
@@ -446,20 +445,5 @@ namespace Game.Managers
 
             return false;
         }
-    }
-}
-
-namespace Game.Components
-{
-    public interface ISelectable : IComponent
-    {
-        public enum State : int
-        {
-            None = 0,
-            Almost = 1,
-            Selected = 2,
-        }
-
-        public State SelectableState { get; set; }
     }
 }

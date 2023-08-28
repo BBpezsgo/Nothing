@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    internal class Unit : BaseObject, IDamagable, ISelectable, ICanTakeControlAndHasTurret
+    internal class Unit : BaseObject, IDamagable, ICanTakeControlAndHasTurret
     {
         [SerializeField, ReadOnly] Vector3 destination;
         [SerializeField, AssetField] MovementEngine vehicleEngine;
@@ -22,8 +22,6 @@ namespace Game.Components
             set => controllingByUser = value;
         }
 
-        [SerializeField, AssetField] internal GameObject UiSelected;
-
         [SerializeField, ReadOnly] internal UnitBehaviour UnitBehaviour;
 
         [SerializeField] internal GameObject DestroyEffect;
@@ -31,28 +29,6 @@ namespace Game.Components
         float _maxHp;
 
         internal float NormalizedHP => HP / _maxHp;
-
-        ISelectable.State selectableState = ISelectable.State.None;
-        public ISelectable.State SelectableState
-        {
-            get => selectableState;
-            set
-            {
-                if (this == null) return;
-                if (UiSelected == null) return;
-                selectableState = value;
-                if (selectableState == ISelectable.State.None)
-                { UiSelected.SetActive(false); }
-                else
-                {
-                    UiSelected.SetActive(true);
-                    if (selectableState == ISelectable.State.Almost)
-                    { UiSelected.GetComponent<UnityEngine.Rendering.Universal.DecalProjector>().material.SetEmissionColor(SelectionManager.Instance.AlmostSelectedColor, 1f); }
-                    else if (selectableState == ISelectable.State.Selected)
-                    { UiSelected.GetComponent<UnityEngine.Rendering.Universal.DecalProjector>().material.SetEmissionColor(SelectionManager.Instance.SelectedColor, 1f); }
-                }
-            }
-        }
 
         [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
         [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }

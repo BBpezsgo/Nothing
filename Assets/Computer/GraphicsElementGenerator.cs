@@ -175,10 +175,12 @@ namespace GraphicsElementGenerator
         public static Color FixColor(Color color)
         {
             return color;
+            /*
             if (color.grayscale >= .5f) return color;
             Color.RGBToHSV(color, out float h, out float s, out float v);
             v = Mathf.Clamp(v, .5f, 1f);
             return Color.HSVToRGB(h, s, v);
+            */
         }
 
     }

@@ -683,58 +683,28 @@ namespace Game.Blueprints
         static BlueprintPart LoadPart(Value data)
         {
             PartType partType = Enum.Parse<PartType>(data["Type"], true);
-
-            switch (partType)
+            BlueprintPart result = partType switch
             {
-                case PartType.Body:
-                    {
-                        PartBody newPart = new();
-                        newPart.DeserializeText(data);
-                        if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        {
-                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
-                            return newPart;
-                        }
+                PartType.Body => data.Deserialize(new PartBody()),
+                PartType.Turret => data.Deserialize(new PartTurret()),
+                PartType.Controller => data.Deserialize(new PartController()),
+                _ => null,
+            };
 
-                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
-                        return null;
-                    }
-
-                case PartType.Turret:
-                    {
-                        PartTurret newPart = new();
-                        newPart.DeserializeText(data);
-                        if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        {
-                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
-                            return newPart;
-                        }
-
-                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
-                        return null;
-                    }
-
-                case PartType.Controller:
-                    {
-                        PartController newPart = new();
-                        newPart.DeserializeText(data);
-                        if (!string.IsNullOrWhiteSpace(newPart.ID))
-                        {
-                            Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{newPart.ID}\" loaded");
-                            return newPart;
-                        }
-
-                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{newPart.Name}\" id is null");
-                        return null;
-                    }
-
-                case PartType.Unknown:
-                default:
-                    {
-                        Debug.LogWarning($"[{nameof(BlueprintManager)}]: Unknown part type {partType} ({(byte)partType})");
-                        return null;
-                    }
+            if (result == null)
+            {
+                Debug.LogWarning($"[{nameof(BlueprintManager)}]: Unknown part type {partType} ({(byte)partType})");
+                return null;
             }
+
+            if (!string.IsNullOrWhiteSpace(result.ID))
+            {
+                Debug.Log($"[{nameof(BlueprintManager)}]: Part is \"{result.ID}\" loaded");
+                return result;
+            }
+
+            Debug.LogWarning($"[{nameof(BlueprintManager)}]: Part \"{result.Name}\" id is null");
+            return null;
         }
 
         public static BlueprintPart[] LoadParts()
@@ -1016,6 +986,7 @@ namespace Game.Blueprints
 
             if (blueprint.TryGetPart(out controllerBuiltin))
             {
+                Selectable selectable = baseObject.AddComponent<Selectable>();
                 switch (controllerBuiltin.BehaviourType)
                 {
                     case "Attacker":
@@ -1040,13 +1011,11 @@ namespace Game.Blueprints
 
                             if (baseObject.transform.Find("__unit-ui-selected") != null)
                             {
-                                unitAttacker.UiSelected = baseObject.transform.Find("__unit-ui-selected").gameObject;
+                                selectable.UiSelected = baseObject.transform.Find("__unit-ui-selected").gameObject;
                             }
                             else if (AssetManager.AssetManager.Instance.BuiltinPrefabs.TryGetValue("unit-ui-selected", out var selectedPrefab))
                             {
-                                GameObject selectedInstance = GameObject.Instantiate(selectedPrefab);
-                                selectedInstance.transform.SetParent(baseObject.transform);
-                                unitAttacker.UiSelected = selectedInstance;
+                                selectable.UiSelected = GameObject.Instantiate(selectedPrefab, baseObject.transform);
                             }
                             else
                             {
@@ -1071,6 +1040,7 @@ namespace Game.Blueprints
             }
             else if (blueprint.TryGetPart(out controller))
             {
+                Selectable selectable = baseObject.AddComponent<Selectable>();
                 switch (controller.BehaviourType)
                 {
                     case "Attacker":
@@ -1095,9 +1065,7 @@ namespace Game.Blueprints
 
                             if (AssetManager.AssetManager.Instance.BuiltinPrefabs.TryGetValue("unit-ui-selected", out var selectedPrefab))
                             {
-                                var newa = GameObject.Instantiate(selectedPrefab);
-                                newa.transform.SetParent(baseObject.transform);
-                                unitAttacker.UiSelected = newa;
+                                selectable.UiSelected = GameObject.Instantiate(selectedPrefab, baseObject.transform);
                             }
                             else
                             {

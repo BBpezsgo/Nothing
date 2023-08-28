@@ -34,7 +34,7 @@ public class SceneManager : SingleInstance<SceneManager>
         transform.SetParent(null);
         DontDestroyOnLoad(this);
 
-
+        /*
         {
             string v = "Some Scene Info:\n" +
                 $"Active Scene: '{UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}'\n" +
@@ -51,6 +51,7 @@ public class SceneManager : SingleInstance<SceneManager>
 
             Debug.Log(v);
         }
+        */
     }
 
     public static void LoadScene(string scene)

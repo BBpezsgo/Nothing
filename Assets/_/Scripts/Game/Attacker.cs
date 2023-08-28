@@ -1,9 +1,6 @@
-using AssetManager;
-
-using Game.Managers;
-
 using System.Collections.Generic;
-
+using AssetManager;
+using Game.Managers;
 using UnityEngine;
 
 namespace Game.Components
@@ -11,9 +8,9 @@ namespace Game.Components
     internal class Attacker : AttackerBase, IHaveAssetFields
     {
         [Header("Targeting")]
-        [SerializeField, ReadOnly, NonReorderable] BaseObject[] targets = new BaseObject[5];
-        [SerializeField, ReadOnly] int PriorityTargetCount = 0;
-        [SerializeField, ReadOnly, NonReorderable] List<BaseObject> priorityTargets = new();
+        BaseObject[] targets = new BaseObject[5];
+        List<BaseObject> priorityTargets = new();
+        [SerializeField, AssetField, Min(0f)] float DetectionRadius = 300f;
 
         bool NeedNewTargets
         {
@@ -25,34 +22,53 @@ namespace Game.Components
                 return true;
             }
         }
-        [SerializeField, ReadOnly] float NewTargetCooldown = 1f;
 
         protected virtual void Awake()
         {
-            NewTargetCooldown = Random.value + 1f;
             this.Interval(TryFindTargets, 1f, TargetCondition);
+        }
+
+        void Reset()
+        {
+            targets = new BaseObject[5];
+            priorityTargets = new();
+            DetectionRadius = 300f;
         }
 
         void FindTargets()
         {
             if (TeamHash == -1) return;
-            BaseObject[] result = new BaseObject[5];
+
             int j = 0;
-            for (int i = RegisteredObjects.Units.Count - 1; i >= 0; i--)
+
+            List<Unit> allUnit = RegisteredObjects.Units;
+            List<Building> allBuilding = RegisteredObjects.Buildings;
+
+            for (int i = allUnit.Count - 1; i >= 0; i--)
             {
-                if (j >= result.Length) break;
-                if (RegisteredObjects.Units[i] == null) continue;
-                if (TeamManager.Instance.GetFuckYou(this.TeamHash, RegisteredObjects.Units[i].TeamHash) > 0f)
-                { result[j++] = RegisteredObjects.Units[i]; }
+                if (j >= targets.Length) break;
+                if (allUnit[i] == null) continue;
+                if (TeamManager.Instance.GetFuckYou(TeamHash, allUnit[i].TeamHash) <= 0f)
+                { continue; }
+                if (Vector3.Distance(transform.position, allUnit[i].transform.position) > DetectionRadius)
+                { continue; }
+
+                targets[j++] = allUnit[i];
             }
-            for (int i = RegisteredObjects.Buildings.Count - 1; i >= 0; i--)
+
+            for (int i = allBuilding.Count - 1; i >= 0; i--)
             {
-                if (j >= result.Length) break;
-                if (RegisteredObjects.Buildings[i] == null) continue;
-                if (TeamManager.Instance.GetFuckYou(this.TeamHash, RegisteredObjects.Buildings[i].TeamHash) > 0f)
-                { result[j++] = RegisteredObjects.Buildings[i]; }
+                if (j >= targets.Length) break;
+                if (allBuilding[i] == null) continue;
+                if (TeamManager.Instance.GetFuckYou(TeamHash, allBuilding[i].TeamHash) <= 0f)
+                { continue; }
+                if (Vector3.Distance(transform.position, allBuilding[i].transform.position) > DetectionRadius)
+                { continue; }
+
+                targets[j++] = allBuilding[i];
             }
-            targets = Utilities.AI.SortTargets(result, transform.position, this.TeamHash);
+
+            Utilities.AI.SortTargets(targets, transform.position, this.TeamHash);
         }
 
         void TryFindTargets()
@@ -96,7 +112,6 @@ namespace Game.Components
                 if (priorityTargets[j] == null)
                 {
                     priorityTargets.RemoveAt(j);
-                    PriorityTargetCount = priorityTargets.Count;
                     continue;
                 }
                 if (ThinkOnTarget(priorityTargets[j])) return;
@@ -156,12 +171,14 @@ namespace Game.Components
             {
                 priorityTargets.Add(source);
                 Utilities.AI.SortTargets(priorityTargets, transform.position, this.TeamHash);
-                PriorityTargetCount = priorityTargets.Count;
             }
         }
 
         void OnDrawGizmosSelected()
         {
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(transform.position, DetectionRadius);
+
             if (targets != null)
             {
                 Gizmos.color = Color.white;
@@ -171,6 +188,7 @@ namespace Game.Components
                     Gizmos.DrawWireSphere(targets[i].transform.position, 1f);
                 }
             }
+
             if (priorityTargets != null)
             {
                 Gizmos.color = Color.yellow;

@@ -211,21 +211,7 @@ namespace Game.Components
         {
             if (IsFlippedOver) return;
 
-            if (FleeCooldown > 0f)
-            {
-                FleeCooldown -= Time.fixedDeltaTime;
-
-                if (NextFleePosition > 0f)
-                {
-                    NextFleePosition -= Time.fixedDeltaTime;
-                }
-                else
-                {
-                    NextFleePosition = 1f;
-                    Destination = FindFleeDestination();
-                }
-            }
-            else
+            if (!Flee())
             {
                 if (Destination == Vector3.zero)
                 {
@@ -243,6 +229,24 @@ namespace Game.Components
             if (!IsGrounded && !InWater) return;
 
             Movement(Destination);
+        }
+
+        protected bool Flee()
+        {
+            if (FleeCooldown <= 0f) return false;
+
+            FleeCooldown -= Time.fixedDeltaTime;
+
+            if (NextFleePosition > 0f)
+            {
+                NextFleePosition -= Time.fixedDeltaTime;
+            }
+            else
+            {
+                NextFleePosition = 1f;
+                Destination = FindFleeDestination();
+            }
+            return true;
         }
 
         void Movement(Vector3 destination)

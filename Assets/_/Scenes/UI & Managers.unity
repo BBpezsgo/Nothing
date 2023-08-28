@@ -549,7 +549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b92388b3d1c2a244adc4c397fbac035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsEnabled: 0
+  IsEnabled: 1
   CircleBackground: {r: 0, g: 0, b: 0, a: 0.19607843}
   CommandBackground: {r: 0.18823531, g: 0.18823531, b: 0.18823531, a: 1}
   CommandSelectedBackground: {r: 0.341, g: 0.682, b: 1, a: 1}
@@ -1746,7 +1746,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881633f67c4578f4284aa1fdeee164fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsEnabled: 0
+  IsEnabled: 1
+  Selected: []
+  AlmostSelected: []
   SelectionBoxColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 0.25}
   SelectionBoxBorderColor: {r: 0.34117648, g: 0.68235296, b: 1, a: 1}
   SelectionBoxBorderWidth: 2
@@ -4563,6 +4565,9 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 0
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!114 &2073833688
 MonoBehaviour:
   m_ObjectHideFlags: 0

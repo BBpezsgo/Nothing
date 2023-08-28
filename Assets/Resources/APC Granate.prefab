@@ -161,6 +161,9 @@ MonoBehaviour:
   Range: 0
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 1
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &4032902049886493354
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,6 +352,7 @@ GameObject:
   - component: {fileID: 2237418352075832577}
   - component: {fileID: -3007775867245657093}
   - component: {fileID: -7051347072626573103}
+  - component: {fileID: -1539206859158037365}
   m_Layer: 0
   m_Name: APC Granate
   m_TagString: Untagged
@@ -610,7 +614,6 @@ MonoBehaviour:
   vehicleEngine: {fileID: 4032902050812513778}
   turret: {fileID: 4032902049885679787}
   controllingByUser: 0
-  UiSelected: {fileID: 8342270499660186645}
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
@@ -654,10 +657,7 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets: []
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &-2691873433320055675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -854,6 +854,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-1539206859158037365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4032902050812513782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9bd3c54cdc3c64a8c289bcee018b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UiSelected: {fileID: 8342270499660186645}
+  selectableState: 0
 --- !u!1 &4032902050905775096
 GameObject:
   m_ObjectHideFlags: 0

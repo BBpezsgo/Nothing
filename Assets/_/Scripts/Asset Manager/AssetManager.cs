@@ -1069,6 +1069,7 @@ namespace AssetManager
 
         void Start()
         {
+            /*
             Debug.Log(
                 "Some Application Info:\n" +
                 $"Application.absoluteURL: '{Application.absoluteURL}'\n" +
@@ -1080,6 +1081,7 @@ namespace AssetManager
                 $"Application.streamingAssetsPath: '{Application.streamingAssetsPath}'\n" +
                 $"Application.temporaryCachePath: '{Application.temporaryCachePath}'"
             );
+            */
 
             LoadConfig();
             window = IMGUIManager.Instance.CreateWindow(new Rect(Screen.width - 20 - 140, 20, 140, 110));
