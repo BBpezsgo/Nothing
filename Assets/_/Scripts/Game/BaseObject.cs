@@ -1,12 +1,7 @@
 using System.Collections.Generic;
 using AssetManager;
 
-using DataUtilities.Serializer;
-
 using Game.Managers;
-
-using Networking;
-using Networking.Messages;
 
 using Unity.Netcode;
 
@@ -14,12 +9,23 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class BaseObject : NetworkBehaviour, IHaveAssetFields, INetworkObservable
+    public class BaseObject : NetworkBehaviour, IHaveAssetFields
     {
+        [Header("Health")]
+        [SerializeField, AssetField] internal float HP;
+        [SerializeField, ReadOnly] float MaxHP;
+
+        internal float NormalizedHP => HP / MaxHP;
+
         [Header("Team")]
         [SerializeField] internal string Team;
         [SerializeField, ReadOnly] internal int TeamHash = -1;
         [SerializeField, AssetField] protected Renderer[] teamRenderers = new Renderer[0];
+
+        protected virtual void Awake()
+        {
+            MaxHP = HP == 0f ? 1f : HP;
+        }
 
         protected void UpdateTeam()
         {
@@ -45,24 +51,6 @@ namespace Game.Components
             }
         }
 
-        void INetworkObservable.OnRPC(RpcHeader header)
-        {
-
-        }
-
-        void INetworkObservable.OnSerializeView(Deserializer deserializer, Serializer serializer, NetcodeMessageInfo messageInfo)
-        {
-            if (messageInfo.IsReading)
-            {
-                Team = deserializer.DeserializeString();
-                UpdateTeam();
-            }
-            else if (messageInfo.IsWriting)
-            {
-                serializer.Serialize(Team);
-            }
-        }
-
         protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
         {
             serializer.SerializeValue(ref Team);
@@ -85,6 +73,12 @@ namespace Game.Components
             for (int i = 0; i < teamRenderers.Length; i++)
             { renderers.AddRange(teamRenderers[i].Renderers ?? new MeshRenderer[0]); }
             this.teamRenderers = renderers.ToArray();
+        }
+
+        internal bool Repair(float v)
+        {
+            HP = Mathf.Min(MaxHP, HP + v);
+            return HP >= MaxHP;
         }
     }
 }

@@ -996,9 +996,9 @@ namespace Game.Blueprints
                             UnitAttacker unitAttacker = baseObject.AddComponent<UnitAttacker>();
                             Attacker attacker = baseObject.AddComponent<Attacker>();
 
-                            attacker.turret = baseObject.GetComponentInChildren<Turret>(true);
+                            attacker.Turret = baseObject.GetComponentInChildren<Turret>(true);
 
-                            unitAttacker.turret = attacker.turret;
+                            unitAttacker.Turret = attacker.Turret;
 
                             if (bodyPartBuiltin != null)
                             {
@@ -1050,9 +1050,9 @@ namespace Game.Blueprints
                             UnitAttacker unitAttacker = baseObject.AddComponent<UnitAttacker>();
                             Attacker attacker = baseObject.AddComponent<Attacker>();
 
-                            attacker.turret = baseObject.GetComponentInChildren<Turret>(true);
+                            attacker.Turret = baseObject.GetComponentInChildren<Turret>(true);
 
-                            unitAttacker.turret = attacker.turret;
+                            unitAttacker.Turret = attacker.Turret;
 
                             if (bodyPart != null)
                             {

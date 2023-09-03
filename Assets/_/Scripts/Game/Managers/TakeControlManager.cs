@@ -270,7 +270,7 @@ namespace Game.Managers
                 else if (ControllingObject is Unit obj2)
                 { turret = obj2.Turret; }
 
-                if (turret != null)
+                if (turret != null && turret.Scope != null)
                 { CameraController.TryOverrideLock(turret.Scope.GetComponent<CameraLockable>(), CameraLockable.Priorities.ControllableThing); }
                 else
                 { CameraController.TryOverrideLock(null, CameraLockable.Priorities.ControllableThing); }

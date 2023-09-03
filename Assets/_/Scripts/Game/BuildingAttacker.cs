@@ -8,13 +8,7 @@ namespace Game.Components
 {
     internal class BuildingAttacker : Building, IDetailedDamagable, ICanTakeControlAndHasTurret
     {
-        public Turret Turret => Attacker.turret;
-        [SerializeField, ReadOnly] ulong controllingByUser;
-        public ulong ControllingByUser
-        {
-            get => controllingByUser;
-            set => controllingByUser = value;
-        }
+        public Turret Turret => Attacker.Turret;
 
         [SerializeField, ReadOnly] AttackerBase Attacker;
 
@@ -23,11 +17,6 @@ namespace Game.Components
 
         public virtual void DoInput() => Attacker.DoInput();
         public virtual void DoFrequentInput() => Attacker.DoFrequentInput();
-
-        void Awake()
-        {
-            this.ControllingByUser = ulong.MaxValue;
-        }
 
         protected override void Start()
         {

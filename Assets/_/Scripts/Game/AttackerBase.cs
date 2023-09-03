@@ -12,12 +12,10 @@ namespace Game.Components
 {
     public class AttackerBase : NetworkBehaviour
     {
-        [SerializeField, ReadOnly] protected Rigidbody rb;
         [SerializeField, ReadOnly] protected BaseObject BaseObject;
         ICanTakeControlAndHasTurret CanTakeControlObject;
         bool CanTakeControl;
 
-        internal string Team => BaseObject.Team;
         internal int TeamHash => BaseObject.TeamHash;
 
         [Header("Target Locking")]
@@ -26,8 +24,12 @@ namespace Game.Components
         [SerializeField] float TargetLockingThreshold = 10f;
 
         [Header("Turret")]
-        [SerializeField, AssetField] internal Turret turret;
-        public Turret Turret => turret;
+        [SerializeField, AssetField] protected Turret turret;
+        public Turret Turret
+        {
+            get => turret;
+            set => turret = value;
+        }
 
         [Header("Scope")]
         [SerializeField, AssetField] float ScopeSensitivity = 1f;
@@ -40,10 +42,6 @@ namespace Game.Components
         {
             if (!TryGetComponent(out BaseObject))
             { Debug.LogError($"[{nameof(AttackerBase)}]: {nameof(BaseObject)} is null", this); }
-
-            rb = GetComponent<Rigidbody>();
-            // if (!TryGetComponent(out rb))
-            // { Debug.LogError($"[{nameof(AttackerBase)}]: {nameof(rb)} is null", this); }
 
             if (BaseObject is ICanTakeControlAndHasTurret canTakeControl)
             {

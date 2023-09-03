@@ -10,25 +10,18 @@ namespace Game.Components
 {
     internal class Unit : BaseObject, IDamagable, ICanTakeControlAndHasTurret
     {
-        [SerializeField, ReadOnly] Vector3 destination;
         [SerializeField, AssetField] MovementEngine vehicleEngine;
-        [SerializeField, AssetField] internal Turret turret;
+        [SerializeField, AssetField] protected Turret turret;
 
-        public Turret Turret => turret;
-        [SerializeField, ReadOnly] ulong controllingByUser;
-        public ulong ControllingByUser
+        public Turret Turret
         {
-            get => controllingByUser;
-            set => controllingByUser = value;
+            get => turret;
+            set => turret = value;
         }
 
         [SerializeField, ReadOnly] internal UnitBehaviour UnitBehaviour;
 
         [SerializeField] internal GameObject DestroyEffect;
-        [SerializeField, AssetField] internal float HP;
-        float _maxHp;
-
-        internal float NormalizedHP => HP / _maxHp;
 
         [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
         [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }
@@ -36,13 +29,10 @@ namespace Game.Components
         [Header("Debug")]
         [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
 
-        void Awake()
+        protected override void Awake()
         {
-            this.ControllingByUser = ulong.MaxValue;
-
+            base.Awake();
             if (turret != null) turret.@base = this;
-
-            _maxHp = HP == 0f ? 1f : HP;
         }
 
         void Start()
@@ -52,8 +42,6 @@ namespace Game.Components
             if (!TryGetComponent(out vehicleEngine))
             { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
             UpdateTeam();
-
-            _maxHp = HP == 0f ? 1f : HP;
         }
 
         void OnEnable()

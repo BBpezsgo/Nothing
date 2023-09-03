@@ -49,8 +49,9 @@ namespace Game.Components
         void OnDisable()
         { WorldCursorManager.Instance.Deregister(this); }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             Queue = new NetworkList<QueuedUnit>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
             Queue.OnListChanged += OnQueueChanged;
         }

@@ -13,12 +13,12 @@ namespace Game.Components
 
         [SerializeField, ReadOnly] float BuildingProcessRequied = 1f;
         [SerializeField, ReadOnly] float BuildingProcess = 0f;
-        NetworkVariable<float> NetBuildingProcess = new(0f);
+        readonly NetworkVariable<float> NetBuildingProcess = new(0f);
         [SerializeField] ParticleSystem Particles;
         [SerializeField, Min(1)] float ParticlesAmmount = 1f;
         ParticleSystem.EmissionModule ParticlesEmission;
         [SerializeField, ReadOnly, NonReorderable] Material[] materials;
-        internal string Team;
+        [SerializeField, ReadOnly] internal string Team;
 
         void OnEnable()
         { RegisteredObjects.BuildableBuildings.Add(this); }

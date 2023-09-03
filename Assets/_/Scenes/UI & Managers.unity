@@ -3523,7 +3523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58e82f17a7b2c7c4dba9ce04b5f00f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartOffline: 1
+  StartOffline: 0
   LoadScene: 
 --- !u!114 &1376606815
 MonoBehaviour:

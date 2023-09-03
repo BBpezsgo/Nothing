@@ -247,7 +247,7 @@ namespace Game.Components
                 if (LifeLeft <= 0f)
                 {
                     if (Owner != null && Owner is UnitAttacker owner2)
-                    { owner2.turret.NotifyImpact(this, Position); }
+                    { owner2.Turret.NotifyImpact(this, Position); }
 
                     if (ExplodeWhenExpires)
                     {
@@ -383,7 +383,7 @@ namespace Game.Components
             { impactEffectCreated = CreateImpactEffect(obj.gameObject, at, normal, material); }
 
             if (Owner != null && Owner is UnitAttacker owner2)
-            { owner2.turret.NotifyImpact(this, at); }
+            { owner2.Turret.NotifyImpact(this, at); }
 
             if (!impactEffectCreated && impactEffect != null) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
 
@@ -586,7 +586,7 @@ namespace Game.Components
             { Explode(Position, 0f); }
 
             if (Owner != null && Owner is UnitAttacker owner2)
-            { owner2.turret.NotifyImpact(this, Position); }
+            { owner2.Turret.NotifyImpact(this, Position); }
 
             if (impactEffect != null) GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects);
 
