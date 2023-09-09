@@ -2,18 +2,15 @@
 #define DOWNLOAD_ASSETS
 #endif
 
-using DataUtilities.FilePacker;
-using DataUtilities.ReadableFileFormat;
-using DataUtilities.Serializer;
-
-using Networking;
-using Networking.Network;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using DataUtilities.FilePacker;
+using DataUtilities.ReadableFileFormat;
+using DataUtilities.Serializer;
+using Networking;
+using Networking.Network;
 using UnityEditor;
 
 namespace AssetManager
@@ -1220,7 +1217,7 @@ namespace AssetManager
             result = modifiableFile;
             return true;
         }
-        static System.Collections.IEnumerator GetOrCreateFile(string basePath, string filename, System.Action<bool, IModifiableFile> callback)
+        static System.Collections.IEnumerator GetOrCreateFile(string basePath, string filename, Action<bool, IModifiableFile> callback)
         {
             string path = Path.Combine(basePath, filename);
 
@@ -1273,7 +1270,7 @@ namespace AssetManager
             file.Bytes = data;
             return true;
         }
-        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, byte[] data, System.Action<bool> callback)
+        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, byte[] data, Action<bool> callback)
         {
             bool success = false;
             IModifiableFile file = null;
@@ -1307,7 +1304,7 @@ namespace AssetManager
             file.Text = data;
             return true;
         }
-        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, string data, System.Action<bool> callback)
+        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, string data, Action<bool> callback)
         {
             bool success = false;
             IModifiableFile file = null;
@@ -1334,16 +1331,16 @@ namespace AssetManager
         #endregion
 
         #region Save ISerializable
-        public static bool Save<T>(string basePath, string filename, DataUtilities.Serializer.ISerializable<T> data) where T : DataUtilities.Serializer.ISerializable<T>
+        public static bool Save<T>(string basePath, string filename, ISerializable<T> data) where T : ISerializable<T>
         {
             if (!GetOrCreateFile(basePath, filename, out IModifiableFile file)) return false;
 
-            DataUtilities.Serializer.Serializer serializer = new();
+            Serializer serializer = new();
             serializer.Serialize<T>(data);
             file.Bytes = serializer.Result;
             return true;
         }
-        public static System.Collections.IEnumerator SaveAsync<T>(string basePath, string filename, DataUtilities.Serializer.ISerializable<T> data, System.Action<bool> callback) where T : DataUtilities.Serializer.ISerializable<T>
+        public static System.Collections.IEnumerator SaveAsync<T>(string basePath, string filename, ISerializable<T> data, Action<bool> callback) where T : ISerializable<T>
         {
             bool success = false;
             IModifiableFile file = null;
@@ -1359,7 +1356,7 @@ namespace AssetManager
                 yield break;
             }
 
-            DataUtilities.Serializer.Serializer serializer = new();
+            Serializer serializer = new();
             serializer.Serialize<T>(data);
             file.Bytes = serializer.Result;
 
@@ -1372,14 +1369,14 @@ namespace AssetManager
         #endregion
 
         #region Save ISerializableText
-        public static bool Save(string basePath, string filename, DataUtilities.ReadableFileFormat.ISerializableText data, bool minimal = false)
+        public static bool Save(string basePath, string filename, ISerializableText data, bool minimal = false)
         {
             if (!GetOrCreateFile(basePath, filename, out IModifiableFile file)) return false;
 
             file.Text = data.SerializeText().ToSDF(minimal);
             return true;
         }
-        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, DataUtilities.ReadableFileFormat.ISerializableText data, System.Action<bool> callback, bool minimal = false)
+        public static System.Collections.IEnumerator SaveAsync(string basePath, string filename, ISerializableText data, Action<bool> callback, bool minimal = false)
         {
             bool success = false;
             IModifiableFile file = null;
@@ -1413,7 +1410,7 @@ namespace AssetManager
             IFile file = loader.GetAbsoluteFile(path);
             return file;
         }
-        public static System.Collections.IEnumerator LoadAsync(string basePath, string filename, System.Action<IFile> callback)
+        public static System.Collections.IEnumerator LoadAsync(string basePath, string filename, Action<IFile> callback)
         {
             string path = Path.Combine(basePath, filename);
 
@@ -1435,7 +1432,7 @@ namespace AssetManager
             byte[] result = file.Bytes;
             return result;
         }
-        public static System.Collections.IEnumerator LoadBinaryAsync(string basePath, string filename, System.Action<byte[]> callback)
+        public static System.Collections.IEnumerator LoadBinaryAsync(string basePath, string filename, Action<byte[]> callback)
         {
             IFile file = null;
             yield return LoadAsync(basePath, filename, (_file) =>
@@ -1457,14 +1454,14 @@ namespace AssetManager
             yield break;
         }
 
-        public static T LoadBinary<T>(string basePath, string filename) where T : DataUtilities.Serializer.ISerializable<T>
+        public static T LoadBinary<T>(string basePath, string filename) where T : ISerializable<T>
         {
             byte[] data = LoadBinary(basePath, filename);
-            DataUtilities.Serializer.Deserializer deserializer = new(data);
+            Deserializer deserializer = new(data);
             T result = deserializer.DeserializeObject<T>();
             return result;
         }
-        public static System.Collections.IEnumerator LoadBinaryAsync<T>(string basePath, string filename, System.Action<T> callback) where T : DataUtilities.Serializer.ISerializable<T>
+        public static System.Collections.IEnumerator LoadBinaryAsync<T>(string basePath, string filename, Action<T> callback) where T : ISerializable<T>
         {
             byte[] data = null;
             yield return LoadBinaryAsync(basePath, filename, (_data) =>
@@ -1472,7 +1469,7 @@ namespace AssetManager
                 data = _data;
             });
 
-            DataUtilities.Serializer.Deserializer deserializer = new(data);
+            Deserializer deserializer = new(data);
             T result = deserializer.DeserializeObject<T>();
             callback?.Invoke(result);
             yield break;
@@ -1484,7 +1481,7 @@ namespace AssetManager
             string result = file.Text;
             return result;
         }
-        public static System.Collections.IEnumerator LoadTextAsync(string basePath, string filename, System.Action<string> callback)
+        public static System.Collections.IEnumerator LoadTextAsync(string basePath, string filename, Action<string> callback)
         {
             IFile file = null;
             yield return LoadAsync(basePath, filename, (_file) =>
@@ -1506,15 +1503,15 @@ namespace AssetManager
             yield break;
         }
 
-        public static T LoadSDF<T>(string basePath, string filename) where T : DataUtilities.ReadableFileFormat.IDeserializableText
+        public static T LoadSDF<T>(string basePath, string filename) where T : IDeserializableText
         {
             IFile file = Load(basePath, filename);
             string data = file.Text;
-            DataUtilities.ReadableFileFormat.Value parsed = DataUtilities.ReadableFileFormat.Parser.Parse(data);
-            T result = parsed.Deserialize<T>();
+            Value parsed = Parser.Parse(data);
+            T result = parsed.Object<T>();
             return result;
         }
-        public static System.Collections.IEnumerator LoadSDFAsync<T>(string basePath, string filename, System.Action<T> callback) where T : DataUtilities.ReadableFileFormat.IDeserializableText
+        public static System.Collections.IEnumerator LoadSDFAsync<T>(string basePath, string filename, Action<T> callback) where T : IDeserializableText
         {
             string data = null;
             yield return LoadTextAsync(basePath, filename, (_data) =>
@@ -1522,14 +1519,14 @@ namespace AssetManager
                 data = _data;
             });
 
-            DataUtilities.ReadableFileFormat.Value parsed = DataUtilities.ReadableFileFormat.Parser.Parse(data);
-            T result = parsed.Deserialize<T>();
+            Value parsed = Parser.Parse(data);
+            T result = parsed.Object<T>();
             callback?.Invoke(result);
             yield break;
         }
 
         public static bool IsExists(string basePath, string filename) => Load(basePath, filename) != null;
-        public static System.Collections.IEnumerator IsExistsAsync(string basePath, string filename, System.Action<bool> callback)
+        public static System.Collections.IEnumerator IsExistsAsync(string basePath, string filename, Action<bool> callback)
         {
             IFile file = null;
             yield return LoadAsync(basePath, filename, (_file) =>
@@ -1540,7 +1537,7 @@ namespace AssetManager
             callback?.Invoke(file != null);
             yield break;
         }
-        public static System.Collections.IEnumerator IsExistsAsync(string basePath, string filename, System.Action callback)
+        public static System.Collections.IEnumerator IsExistsAsync(string basePath, string filename, Action callback)
         {
             IFile file = null;
             yield return LoadAsync(basePath, filename, (_file) =>

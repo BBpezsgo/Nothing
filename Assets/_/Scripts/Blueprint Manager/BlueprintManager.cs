@@ -685,9 +685,9 @@ namespace Game.Blueprints
             PartType partType = Enum.Parse<PartType>(data["Type"], true);
             BlueprintPart result = partType switch
             {
-                PartType.Body => data.Deserialize(new PartBody()),
-                PartType.Turret => data.Deserialize(new PartTurret()),
-                PartType.Controller => data.Deserialize(new PartController()),
+                PartType.Body => data.Object(new PartBody()),
+                PartType.Turret => data.Object(new PartTurret()),
+                PartType.Controller => data.Object(new PartController()),
                 _ => null,
             };
 
