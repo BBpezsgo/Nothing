@@ -1,12 +1,8 @@
-using AssetManager;
-
 using System;
 using System.Collections.Generic;
-
+using AssetManager;
 using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
@@ -596,6 +592,16 @@ namespace Game.Components
                 t = Mathf.Min(t, projectile.Lifetime);
                 return t;
             }
+        }
+        internal bool TryGetTrajectory(out Ballistics.Trajectory trajectory)
+        {
+            trajectory = default;
+
+            if (!IsBallisticProjectile)
+            { return false; }
+
+            trajectory = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
+            return true;
         }
 
         void RotateTurretInstant(float to)

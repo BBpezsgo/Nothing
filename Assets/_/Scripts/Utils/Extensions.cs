@@ -790,11 +790,15 @@ internal static class ListEx
 
     internal static void Enqueue<T>(this NetworkList<T> v, T element) where T : unmanaged, IEquatable<T>
     {
+        if (v is null) throw new ArgumentNullException(nameof(v));
+
         v.Add(element);
     }
 
     internal static T[] ToArray<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
     {
+        if (v is null) throw new ArgumentNullException(nameof(v));
+
         T[] result = new T[v.Count];
         for (int i = 0; i < result.Length; i++)
         { result[i] = v[i]; }
@@ -803,6 +807,8 @@ internal static class ListEx
 
     internal static T Dequeue<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
     {
+        if (v is null) throw new ArgumentNullException(nameof(v));
+
         T element = v[0];
         v.RemoveAt(0);
         return element;
@@ -918,7 +924,7 @@ internal static class ListEx
         { if (v[i] == null) v.RemoveAt(i); }
     }
 
-    internal static void RemoveLast(this System.Collections.IList v)
+    internal static void RemoveLast(this IList v)
     { if (v.Count > 0) v.RemoveAt(v.Count - 1); }
     internal static T Pop<T>(this IList<T> v) where T : class
     {
@@ -992,6 +998,9 @@ internal static class GameObjectEx
 
     internal static bool HasComponent<T>(this GameObject obj) => obj.TryGetComponent<T>(out _);
     internal static bool HasComponent(this GameObject obj, Type type) => obj.TryGetComponent(type, out _);
+
+    internal static bool HasComponentInChildren<T>(this GameObject obj) => obj.TryGetComponentInChildren<T>(out _);
+    internal static bool HasComponentInParent<T>(this GameObject obj) => obj.TryGetComponentInParent<T>(out _);
 
     internal static bool TryGetComponentInChildren<T>(this GameObject obj, out T component)
     {

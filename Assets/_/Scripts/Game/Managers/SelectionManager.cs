@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Game.Managers
 {
-    public class SelectionManager : SingleInstance<SelectionManager>, ICanChangeCursorImage
+    public class SelectionManager : SingleInstance<SelectionManager>, ICanChangeCursor
     {
         internal delegate void SelectionChangedEvent();
 
@@ -56,7 +56,7 @@ namespace Game.Managers
             MouseRightButton = new AdvancedMouse(MouseButton.Right, 10, MouseCondition);
             MouseRightButton.OnClick += OnRightClicked;
 
-            CursorImageManager.Instance.Register(this);
+            CursorManager.Instance.Register(this);
         }
 
         void OnRightClicked(AdvancedMouse sender)
@@ -401,13 +401,18 @@ namespace Game.Managers
             };
         }
 
-        public bool YouCanChangeCursor()
+        public bool HandleCursorLock(out CursorLockMode locked)
+        {
+            locked = CursorLockMode.None;
+            return false;
+        }
+        public bool HandleCursor()
         {
             if (!MouseCondition()) return false;
 
             if (MouseLeftButton.IsDragging)
             {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                CursorManager.SetCursor();
                 return true;
             }
 
@@ -425,7 +430,7 @@ namespace Game.Managers
                 if (hits[i].collider.isTrigger) continue;
                 if (hits[i].transform.gameObject.HasComponent<Selectable>())
                 {
-                    CursorSelect.SetCursor();
+                    CursorSelect.Set();
                     return true;
                 }
             }
@@ -437,7 +442,7 @@ namespace Game.Managers
 
                     if (Selected[i].HasComponent<VehicleEngine>())
                     {
-                        CursorGoTo.SetCursor();
+                        CursorGoTo.Set();
                         return true;
                     }
                 }

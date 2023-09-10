@@ -2150,9 +2150,8 @@ namespace Game
     {
         public Texture2D Texture;
         public Vector2 Hotspot;
-        public CursorMode Mode;
 
-        public readonly void SetCursor() => Cursor.SetCursor(Texture, Hotspot, Mode);
+        public readonly void Set() => CursorManager.SetCursor(Texture, Hotspot);
     }
 
     internal static class ObjectGroups
@@ -3418,7 +3417,6 @@ internal static class UnityCopiables
     }
 }
 
-
 internal static class CopiableExtensions
 {
     internal static bool CopyTo<T>(this ICopiable<T> source, object destination)
@@ -3742,4 +3740,61 @@ internal static class Intervals
             }
         }
     }
+}
+
+internal struct MetricUtils
+{
+    const float Multiplier = 0.001f;
+
+    public static float GetMeters(float value) => value * Multiplier;
+    public static Vector2 GetMeters(Vector2 value) => value * Multiplier;
+    public static Vector3 GetMeters(Vector3 value) => value * Multiplier;
+}
+
+internal class WindowsAPI
+{
+#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
+    public static readonly bool IsSupported = true;
+#else
+    public static readonly bool IsSupported = false;
+#endif
+
+    public enum Cursor
+    {
+        StandardArrowAndSmallHourglass = 32650,
+        StandardArrow = 32512,
+        Crosshair = 32515,
+        Hand = 32649,
+        ArrowAndQuestionMark = 32651,
+        IBeam = 32513,
+        [Obsolete("Obsolete for applications marked version 4.0 or later.")]
+        Icon = 32641,
+        SlashedCircle = 32648,
+        [Obsolete(" Obsolete for applications marked version 4.0 or later. Use FourPointedArrowPointingNorthSouthEastAndWest")]
+        Size = 32640,
+        FourPointedArrowPointingNorthSouthEastAndWest = 32646,
+        DoublePointedArrowPointingNortheastAndSouthwest = 32643,
+        DoublePointedArrowPointingNorthAndSouth = 32645,
+        DoublePointedArrowPointingNorthwestAndSoutheast = 32642,
+        DoublePointedArrowPointingWestAndEast = 32644,
+        VerticalArrow = 32516,
+        Hourglass = 32514
+    }
+
+    public static void SetCursor(Cursor cursor)
+    {
+#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
+        SetCursor(LoadCursor(IntPtr.Zero, (int)cursor));
+#else
+        throw new NotSupportedException();
+#endif
+    }
+
+#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "SetCursor")]
+    public static extern IntPtr SetCursor(IntPtr hCursor);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "LoadCursor")]
+    public static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
+#endif
 }

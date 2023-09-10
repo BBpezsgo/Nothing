@@ -13,7 +13,7 @@ using Utilities.Drawers;
 
 namespace Game.Managers
 {
-    public class TakeControlManager : NetworkBehaviour, ICanChangeCursorImage
+    public class TakeControlManager : NetworkBehaviour, ICanChangeCursor
     {
         public enum ReloadIndicatorStyle
         {
@@ -51,6 +51,7 @@ namespace Game.Managers
 
         [SerializeField, ReadOnly] float EnableMouseCooldown = 0f;
         [SerializeField, ReadOnly] internal bool IsScoping;
+        [SerializeField, ReadOnly] internal CameraLockable Scope;
 
         [SerializeField, ReadOnly] float TimeToNextUnitCollecting = .5f;
 
@@ -62,6 +63,7 @@ namespace Game.Managers
         [SerializeField] Projectiles Projectiles;
         [SerializeField, ReadOnly] UIDocument UI;
         [SerializeField] VisualTreeAsset ProjectileButton;
+        [SerializeField] GUISkin GUISkin;
 
         [Header("UI - Crosshair")]
         [SerializeField] Color CrosshairColor = Color.white;
@@ -137,7 +139,7 @@ namespace Game.Managers
             LeftMouse = new AdvancedMouse(MouseButton.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
 
-            CursorImageManager.Instance.Register(this);
+            CursorManager.Instance.Register(this);
 
             KeyEsc = new PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
             KeyEsc.OnDown += OnKeyEsc;
@@ -242,12 +244,23 @@ namespace Game.Managers
                     { ControllingObject.DoInput(); }
                 }
                 else
-                { IsScoping = false; }
+                {
+                    IsScoping = false;
+                }
             }
             else
             {
                 EnableMouseCooldown -= Time.fixedUnscaledDeltaTime;
                 IsScoping = false;
+            }
+
+            if (IsScoping)
+            {
+
+            }
+            else
+            {
+                Scope = null;
             }
 
             if (IsControlling)
@@ -310,15 +323,66 @@ namespace Game.Managers
 
         void OnCameraModeChanged(CameraMode mode)
         {
-            SetWindowCursor();
+            CursorManager.Instance.ForceUpdate();
         }
 
-        void SetWindowCursor()
+        void UpdateUI()
         {
-            if (CameraController.cameraMode == CameraMode.Normal)
-            { UnityEngine.Cursor.lockState = CursorLockMode.Locked; }
-            else
-            { UnityEngine.Cursor.lockState = CursorLockMode.None; }
+            Turret turret = ControllingObject.Object().GetComponentInChildren<Turret>();
+
+            if (turret != null)
+            {
+                if (turret.projectile != null)
+                {
+                    GameObject projectile = turret.projectile;
+
+                    TemplateContainer newButton = ProjectileButton.Instantiate();
+
+                    if (TryGetProjectile(projectile, out var projectileInfo))
+                    {
+                        newButton.Q<Label>("label-name").text = projectileInfo.Name;
+                        newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
+                    }
+                    else
+                    {
+                        newButton.Q<Label>("label-name").text = projectile.name;
+                    }
+
+                    if (!newButton.ClassListContains("ammo-selected"))
+                    { newButton.AddToClassList("ammo-selected"); }
+
+                    newButton.name = $"ammo-{0}";
+
+                    UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
+                }
+                else
+                {
+                    for (int i = 0; i < turret.Projectiles.Length; i++)
+                    {
+                        GameObject projectile = turret.Projectiles[i];
+
+                        TemplateContainer newButton = ProjectileButton.Instantiate();
+
+                        if (TryGetProjectile(projectile, out var projectileInfo))
+                        {
+                            newButton.Q<Label>("label-name").text = projectileInfo.Name;
+                            newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
+                        }
+                        else
+                        {
+                            newButton.Q<Label>("label-name").text = projectile.name;
+                        }
+
+                        if (turret.SelectedProjectile == i &&
+                            !newButton.ClassListContains("ammo-selected"))
+                        { newButton.AddToClassList("ammo-selected"); }
+
+                        newButton.name = $"ammo-{i}";
+
+                        UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
+                    }
+                }
+            }
         }
 
         void TakeControl(ICanTakeControl unit)
@@ -354,7 +418,6 @@ namespace Game.Managers
 
             if ((Object)ControllingObject == (Object)unit) return;
             LoseControl();
-            SetWindowCursor();
 
             if (unit is ICanTakeControlAndHasTurret hasTurret2)
             {
@@ -390,62 +453,9 @@ namespace Game.Managers
             UI.rootVisualElement.Q<VisualElement>(null, "unity-progress-bar__progress").style.backgroundColor = new StyleColor(Color.green);
             UI.rootVisualElement.Q<VisualElement>("container-ammo").Clear();
 
-            {
-                Turret turret = ((Component)unit).GetComponentInChildren<Turret>();
-                if (turret != null)
-                {
-                    if (turret.projectile != null)
-                    {
-                        GameObject projectile = turret.projectile;
+            CursorManager.Instance.ForceUpdate();
 
-                        TemplateContainer newButton = ProjectileButton.Instantiate();
-
-                        if (TryGetProjectile(projectile, out var projectileInfo))
-                        {
-                            newButton.Q<Label>("label-name").text = projectileInfo.Name;
-                            newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
-                        }
-                        else
-                        {
-                            newButton.Q<Label>("label-name").text = projectile.name;
-                        }
-
-                        if (!newButton.ClassListContains("ammo-selected"))
-                        { newButton.AddToClassList("ammo-selected"); }
-
-                        newButton.name = $"ammo-{0}";
-
-                        UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < turret.Projectiles.Length; i++)
-                        {
-                            GameObject projectile = turret.Projectiles[i];
-
-                            TemplateContainer newButton = ProjectileButton.Instantiate();
-
-                            if (TryGetProjectile(projectile, out var projectileInfo))
-                            {
-                                newButton.Q<Label>("label-name").text = projectileInfo.Name;
-                                newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
-                            }
-                            else
-                            {
-                                newButton.Q<Label>("label-name").text = projectile.name;
-                            }
-
-                            if (turret.SelectedProjectile == i &&
-                                !newButton.ClassListContains("ammo-selected"))
-                            { newButton.AddToClassList("ammo-selected"); }
-
-                            newButton.name = $"ammo-{i}";
-
-                            UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
-                        }
-                    }
-                }
-            }
+            UpdateUI();
         }
 
         void TakeControlClient(ICanTakeControl unit)
@@ -472,7 +482,6 @@ namespace Game.Managers
 
             if ((Object)ControllingObject == (Object)unit) return;
             LoseControl();
-            SetWindowCursor();
 
             if (unit is ICanTakeControlAndHasTurret hasTurret2)
             {
@@ -494,62 +503,9 @@ namespace Game.Managers
             UI.rootVisualElement.Q<VisualElement>(null, "unity-progress-bar__progress").style.backgroundColor = new StyleColor(Color.green);
             UI.rootVisualElement.Q<VisualElement>("container-ammo").Clear();
 
-            {
-                Turret turret = ((Component)unit).GetComponentInChildren<Turret>();
-                if (turret != null)
-                {
-                    if (turret.projectile != null)
-                    {
-                        GameObject projectile = turret.projectile;
+            CursorManager.Instance.ForceUpdate();
 
-                        TemplateContainer newButton = ProjectileButton.Instantiate();
-
-                        if (TryGetProjectile(projectile, out var projectileInfo))
-                        {
-                            newButton.Q<Label>("label-name").text = projectileInfo.Name;
-                            newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
-                        }
-                        else
-                        {
-                            newButton.Q<Label>("label-name").text = projectile.name;
-                        }
-
-                        if (!newButton.ClassListContains("ammo-selected"))
-                        { newButton.AddToClassList("ammo-selected"); }
-
-                        newButton.name = $"ammo-{0}";
-
-                        UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < turret.Projectiles.Length; i++)
-                        {
-                            GameObject projectile = turret.Projectiles[i];
-
-                            TemplateContainer newButton = ProjectileButton.Instantiate();
-
-                            if (TryGetProjectile(projectile, out var projectileInfo))
-                            {
-                                newButton.Q<Label>("label-name").text = projectileInfo.Name;
-                                newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
-                            }
-                            else
-                            {
-                                newButton.Q<Label>("label-name").text = projectile.name;
-                            }
-
-                            if (turret.SelectedProjectile == i &&
-                                !newButton.ClassListContains("ammo-selected"))
-                            { newButton.AddToClassList("ammo-selected"); }
-
-                            newButton.name = $"ammo-{i}";
-
-                            UI.rootVisualElement.Q<VisualElement>("container-ammo").Add(newButton);
-                        }
-                    }
-                }
-            }
+            UpdateUI();
         }
 
         internal void UpdateSelectedProjectile(int selected)
@@ -618,7 +574,6 @@ namespace Game.Managers
             EnableMouseCooldown = 1f;
             FindObjectOfType<SelectionManager>().ClearSelection();
 
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
             if ((Object)ControllingObject == null) return;
 
             if (((Component)ControllingObject).TryGetComponent(out HoveringLabel label))
@@ -632,6 +587,8 @@ namespace Game.Managers
 
             CameraController.FollowObject = null;
             ControllingObject = null;
+
+            CursorManager.Instance.ForceUpdate();
         }
 
         void LoseControlClient()
@@ -644,11 +601,12 @@ namespace Game.Managers
             CurrentCrossStyle = CrossStyle.None;
             CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
 
-            UnityEngine.Cursor.lockState = CursorLockMode.None;
             if ((Object)ControllingObject == null) return;
 
             CameraController.FollowObject = null;
             ControllingObject = null;
+
+            CursorManager.Instance.ForceUpdate();
         }
 
         internal void ControllableDestroyed()
@@ -657,7 +615,22 @@ namespace Game.Managers
             LoseControl();
         }
 
-        public bool YouCanChangeCursor()
+        public bool HandleCursorLock(out CursorLockMode locked)
+        {
+            locked = CursorLockMode.None;
+
+            if (!InputCondition()) return false;
+            if (IsControlling)
+            {
+                if (CameraController.cameraMode == CameraMode.Normal)
+                { locked = CursorLockMode.Locked; }
+                else
+                { locked = CursorLockMode.None; }
+                return true;
+            }
+            return false;
+        }
+        public bool HandleCursor()
         {
             if (!InputCondition()) return false;
             if (IsControlling) return false;
@@ -669,7 +642,7 @@ namespace Game.Managers
 
             if ((Object)controllable == null) return false;
 
-            CursorConfig.SetCursor();
+            CursorConfig.Set();
             return true;
         }
 
@@ -778,6 +751,8 @@ namespace Game.Managers
 
         void OnGUI()
         {
+            if (Event.current.type != EventType.Repaint) return;
+
             if (!IsControlling)
             { return; }
 
@@ -795,9 +770,42 @@ namespace Game.Managers
 
             bool showReload = false;
 
+            Transform targetObject = null;
+
+            Vector3[] trajectoryPath = null;
+
             if (ControllingObject is ICanTakeControlAndHasTurret hasTurret &&
                 hasTurret.Turret != null)
             {
+                using (ProfilerMarkers.TrajectoryMath.Auto())
+                {
+                    if (hasTurret.Turret.TryGetTrajectory(out Ballistics.Trajectory trajectory))
+                    {
+                        const int iterations = 5;
+                        const float step = .2f;
+
+                        trajectoryPath = new Vector3[iterations];
+
+                        float t = 0f;
+                        for (int i = 0; i < iterations; i++)
+                        {
+                            Vector3 point = trajectory.Position(t);
+                            t += step;
+
+                            Vector3 screenPoint = MainCamera.Camera.WorldToScreenPoint(point);
+                            if (screenPoint.z <= 0f)
+                            {
+                                trajectoryPath = null;
+                                break;
+                            }
+
+                            trajectoryPath[i] = GUIUtils.TransformPoint(screenPoint);
+                        }
+                    }
+                }
+
+                targetObject = hasTurret.Turret.TargetTransform;
+
                 showReload = hasTurret.Turret.reloadTime >= .5f;
 
                 Vector3 _targetPosition = hasTurret.Turret.TargetPosition;
@@ -827,8 +835,8 @@ namespace Game.Managers
 
                 isAccurate = hasTurret.Turret.IsAccurateShoot;
 
-                if (hasTurret.Turret.TargetTransform != null &&
-                    hasTurret.Turret.TargetTransform.TryGetComponent(out Hitbox hitbox))
+                if (targetObject != null &&
+                    targetObject.TryGetComponent(out Hitbox hitbox))
                 {
                     Bounds bounds = hitbox.ColliderBounds;
 
@@ -886,13 +894,28 @@ namespace Game.Managers
 
             Vector2 reloadIndicatorCenter = mousePosition;
 
+            const float MeltDistance = 5f;
+
+            GUISkin savedSkin = GUI.skin;
+            GUI.skin = GUISkin;
             GL.PushMatrix();
             if (GLUtils.SolidMaterial.SetPass(0))
             {
-                if (targetPosition != Vector2.zero)
+                if (trajectoryPath != null)
                 {
-                    DrawCross((predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction);
+                    GL.Begin(GL.LINE_STRIP);
+                    for (int i = 0; i < trajectoryPath.Length; i++)
+                    {
+                        GL.Color(new Color(1f, 1f, 1f, 1f - ((float)(i + 1) / (float)trajectoryPath.Length)));
+                        GL.Vertex(trajectoryPath[i]);
+                    }
+                    GL.End();
                 }
+
+                Vector2 _targetPosition = (predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition;
+
+                if (_targetPosition != Vector2.zero && (_targetPosition - mousePosition).sqrMagnitude > MeltDistance)
+                { DrawCross(_targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction); }
 
                 if (mousePosition != Vector2.zero)
                 {
@@ -901,6 +924,11 @@ namespace Game.Managers
                     {
                         DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor);
                         reloadIndicatorCenter = Vector2.Lerp(mousePosition, this.targetRect.center, animation);
+
+                        if (targetObject != null)
+                        {
+                            GUI.Label(new Rect(new Vector2(this.targetRect.xMax, this.targetRect.yMin - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize)), $"{Mathf.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m");
+                        }
                     }
                     else
                     {
@@ -908,7 +936,7 @@ namespace Game.Managers
                     }
                 }
 
-                if (predictedHitPosition != Vector2.zero)
+                if (predictedHitPosition != Vector2.zero && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
                 {
                     DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
                 }
@@ -917,6 +945,7 @@ namespace Game.Managers
                 { DrawReloadIndicator(reloadPercent, reloadIndicatorCenter, ShadowColor); }
             }
             GL.PopMatrix();
+            GUI.skin = savedSkin;
         }
 
         void DrawReloadIndicator(float value, Vector2 center, Color shadowColor)

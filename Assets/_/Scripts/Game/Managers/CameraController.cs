@@ -1,9 +1,6 @@
 using Game.Components;
-using Game.Managers;
 using InputUtils;
 using UnityEngine;
-
-using Utilities;
 
 namespace Game.Managers
 {
@@ -418,101 +415,5 @@ namespace Game.Managers
                 lastCameraMode = cameraMode;
             }
         }
-
-        /*
-        void FixedUpdate()
-        {
-            if (IsScoping)
-            {
-                if (!ScopeTotallyLocked)
-                {
-                    float lockSpeed = 50f;
-                    {
-                        Vector3 displacement = CurrentScope.position - transform.position;
-                        displacement *= .9f;
-                        displacement = Vector3.ClampMagnitude(displacement, lockSpeed * Time.fixedUnscaledDeltaTime);
-                        transform.Translate(displacement, Space.World);
-
-                        transform.rotation = Quaternion.Lerp(transform.rotation, CurrentScope.rotation, rotationSpeed * Time.fixedUnscaledDeltaTime);
-                    }
-
-                    {
-                        Vector3 displacement = theCamera.transform.localPosition * -0.9f;
-                        displacement = Vector3.ClampMagnitude(displacement, lockSpeed * Time.fixedUnscaledDeltaTime);
-                        theCamera.transform.Translate(displacement, Space.Self);
-                    }
-
-                    if ((theCamera.transform.position - CurrentScope.position).sqrMagnitude < .1f)
-                    { ScopeTotallyLocked = true; }
-                }
-
-                cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.identity, AngleSpeed * Time.fixedUnscaledDeltaTime);
-
-                rotation = CurrentScope.rotation.eulerAngles.y;
-                targetRotation = rotation;
-
-                return;
-            }
-            else
-            {
-                theCamera.transform.localRotation = Quaternion.identity;
-                ScopeTotallyLocked = false;
-            }
-
-            if (cameraMode != lastCameraMode)
-            {
-                OnCameraModeChanged?.Invoke(cameraMode);
-                lastCameraMode = cameraMode;
-            }
-
-            if (IsFollowing)
-            {
-                if ((transform.position - FollowObject.position).sqrMagnitude > 10f)
-                { ActualFollowSpeed = Mathf.Sqrt((transform.position - FollowObject.position).sqrMagnitude) * 3f; }
-                else if (FollowObject.gameObject.TryGetComponent<VehicleEngine>(out var vehicle))
-                { ActualFollowSpeed = vehicle.Speed + 5f; }
-
-                Vector3 displacement = FollowObject.position - (transform.position + new Vector3(0f, Mathf.Clamp(ZoomValue * -0.1f, -FollowHeightDisplacement.y, -FollowHeightDisplacement.x), 0f));
-                displacement *= .9f;
-                displacement = Vector3.ClampMagnitude(displacement, ActualFollowSpeed * Time.fixedUnscaledDeltaTime);
-
-                float verticalDisplacement = ((FollowObject.position.y + Mathf.Clamp(ZoomValue, FollowHeightDisplacement.x, FollowHeightDisplacement.y)) - transform.position.y) * Time.fixedUnscaledDeltaTime;
-                displacement.y = verticalDisplacement;
-
-                transform.Translate(displacement, Space.World);
-            }
-            else
-            {
-                if (float.IsNaN(velocity.x) || float.IsNaN(velocity.y))
-                { velocity = Vector2.zero; }
-
-                velocity = Vector2.Lerp(velocity, targetVelocity, Time.fixedUnscaledDeltaTime * acceleration);
-                Vector2 currentVelocity = velocity * Mathf.Clamp(-theCamera.transform.localPosition.z * 0.05f, minVelocity, maxVelocity);
-                Vector3 forwardVelocity = transform.forward * currentVelocity.x;
-                Vector3 rightVelocity = transform.right * currentVelocity.y;
-
-                float verticalDisplacement = (1f - transform.position.y) * Time.fixedUnscaledDeltaTime;
-
-                Vector3 transition = forwardVelocity + rightVelocity + new Vector3(0f, verticalDisplacement, 0f);
-                if (!float.IsNaN(transition.x) && !float.IsNaN(transition.y) && !float.IsNaN(transition.z))
-                { transform.Translate(transition, Space.World); }
-            }
-
-            {
-                rotation = Mathf.LerpAngle(rotation, targetRotation, Time.fixedUnscaledDeltaTime * rotationSpeed);
-                transform.rotation = Quaternion.Euler(0f, rotation, 0f);
-            }
-
-            {
-                float currentZoomSpeed = zoomSpeed * Mathf.Clamp(-theCamera.transform.localPosition.z * 0.05f, minZoomSpeed, maxZoomSpeed);
-                zoom = Mathf.Lerp(zoom, targetZoom, Time.fixedUnscaledDeltaTime * currentZoomSpeed);
-                zoom = Mathf.Max(zoom, 0f);
-
-                theCamera.transform.Translate(new Vector3(0f, 0f, (-zoom) - theCamera.transform.localPosition.z), Space.Self);
-            }
-
-            cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.Euler(targetAngle, 0f, 0f), AngleSpeed * Time.fixedUnscaledDeltaTime);
-        }
-        */
     }
 }

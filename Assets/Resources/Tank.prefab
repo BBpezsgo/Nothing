@@ -10135,20 +10135,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1f54e6a934da4daaffacad5f2a064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 80
+  MaxHP: 0
   Team: 
   TeamHash: -1
   teamRenderers:
   - {fileID: 87338080659416804}
   - {fileID: 87338082177340332}
   - {fileID: 87338082549523861}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 2619412345505571578}
   turret: {fileID: 2619412344863678371}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 80
   <CrossStyle>k__BackingField: 1
   <ReloadIndicatorStyle>k__BackingField: 2
   buttonDestroy: 
@@ -10179,7 +10178,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 50
@@ -10486,6 +10484,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6063154753538146735}
+  - component: {fileID: 1017282598370557398}
   m_Layer: 0
   m_Name: Scope
   m_TagString: Untagged
@@ -10508,6 +10507,21 @@ Transform:
   m_Father: {fileID: 2776137622048779255}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1017282598370557398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9014093887257582577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c96fe74f1436884d872011d4df6a1af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  FreeMode: 0
+  Zoomable: 1
 --- !u!1001 &1674865958028431571
 PrefabInstance:
   m_ObjectHideFlags: 0

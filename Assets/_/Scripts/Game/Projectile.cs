@@ -270,6 +270,7 @@ namespace Game.Components
         void OnTriggerEnter(Collider other)
         {
             if (destroyed) return;
+            if (Lifetime <= 0f) return;
 
             if (!other.gameObject.HasComponent<Projectile>())
             {

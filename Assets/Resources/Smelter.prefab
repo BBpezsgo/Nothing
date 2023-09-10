@@ -95,16 +95,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 650f59c3e69bb884f96703464debf13f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 40
+  MaxHP: 0
   Team: 
   TeamHash: -1
   teamRenderers:
   - {fileID: 4468492274419348520}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 40
   GroundOrigin: {x: 0, y: 0, z: 0}
+  buttonDestroy: 
   rawItemID: scrap
-  processingSpeed: 1
+  processingSpeed: 0.01
   CurrentRawMaterials: 0
   CurrentProcessedMaterials: 0
   ParticleSystems:
