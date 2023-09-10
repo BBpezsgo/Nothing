@@ -733,15 +733,7 @@ namespace AssetManager
                 }
                 return Utils.LoadSprite(file, pixelsPerUnit, filterMode);
             }
-            internal static Vector2 Vector2(this Value self) => new(self["x"].Float ?? self["X"].Float ?? 0f, self["y"].Float ?? self["Y"].Float ?? 0f);
-            internal static TEnum? Enum<TEnum>(this Value self) where TEnum : struct
-            {
-                if (self.String == null) return null;
-                if (string.IsNullOrWhiteSpace(self.String)) return null;
-                if (!System.Enum.TryParse(self.String ?? "", true, out TEnum result)) return null;
-                return result;
-            }
-            internal static TEnum Enum<TEnum>(this Value self, TEnum @default) where TEnum : struct => self.Enum<TEnum>() ?? @default;
+            internal static Vector2 Vector2(this Value self) => new(self["x", "X"].Float ?? 0f, self["y", "Y"].Float ?? 0f);
         }
     }
 }
