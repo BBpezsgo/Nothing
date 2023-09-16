@@ -15,6 +15,7 @@ namespace MogulTech.Utilities
             public List<IEnumerator> history = new();
             public bool waitForGUI = false;
             public Action Repaint;
+            public bool IsDone;
 
             public void OnGUI() => waitForGUI = false;
         }
@@ -53,6 +54,7 @@ namespace MogulTech.Utilities
                     {
                         if (coroutine.history.Count == 0)
                         {
+                            coroutine.IsDone = true;
                             coroutines.RemoveAt(i);
                             i--;
                         }
@@ -84,6 +86,7 @@ namespace MogulTech.Utilities
                 catch (System.Exception error)
                 {
                     UnityEngine.Debug.LogException(error);
+                    coroutine.IsDone = true;
                     coroutines.RemoveAt(i);
                     i--;
                 }

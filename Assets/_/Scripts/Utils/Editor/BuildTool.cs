@@ -215,7 +215,7 @@ namespace Utilities.Editor
             yield return null;
         }
 
-        const string BaseOutputPath = "C:/Users/bazsi/Nothing 3D/Build/";
+        internal const string BaseOutputPath = "C:/Users/bazsi/Nothing 3D/Build/";
 
         BuildReport BuildIndividualTarget(BuildTarget target, bool developmentBuild)
         {
