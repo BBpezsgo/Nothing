@@ -69,10 +69,12 @@ namespace InGameComputer
         {
             Hardware = computer;
 
+            /*
             Programs.Add(ProgramData.Create((p0, p1) => new ProgramWebBrowser(p0, p1)
             {
                 Rect = new(0, 0, ScreenSize.x, ScreenSize.y),
             }, "web"));
+            */
             Programs.Add(ProgramData.Create((p0, p1) => new ProgramTerminal(p0, p1)
             {
                 Rect = new(0, 0, ScreenSize.x, ScreenSize.y),
