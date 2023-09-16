@@ -76,7 +76,7 @@ namespace Game.Managers
 
         void FrequentUpdate()
         {
-            if (!MenuManager.AnyMenuVisible)
+            if (!MenuManager.AnyMenuVisible && MouseManager.MouseOnWindow)
             {
                 for (int i = 0; i < CursorManagers.Count; i++)
                 {
@@ -149,6 +149,8 @@ namespace Game.Managers
 
         public static void SetCursor()
         {
+            Cursor.visible = true;
+
             if (instance.CurrentCursor == null) return;
 
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);

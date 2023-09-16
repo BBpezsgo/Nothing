@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6633352966255038993}
   - component: {fileID: 5074971692722232777}
   - component: {fileID: 1352584524639922918}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4826,7 +4826,7 @@ GameObject:
   - component: {fileID: 7794286996213101090}
   - component: {fileID: 7794286996213101091}
   - component: {fileID: 2068784519687251800}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Spit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4941,6 +4941,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Register: 0
+  AudioSource: {fileID: 0}
   Acceleration: 0
   ImpactForce: 0
   ImpactDamage: 1
@@ -4952,6 +4953,7 @@ MonoBehaviour:
   ExplodeOnImpact: 0
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
+  ImpactSound: {fileID: 0}
   impactEffect: {fileID: 2661302671473292696, guid: 2fdc239c56917a541b810c9f9313a91a,
     type: 3}
   ImpactEffects: []
@@ -4962,6 +4964,9 @@ MonoBehaviour:
   rotationSpeedZ: 0
   RandomRotation: 0
   RotateThis: {fileID: 0}
+  HitLayerMask:
+    serializedVersion: 2
+    m_Bits: 65
   DieInWater: 0
   DestroyInExploisons: 0
   ignoreCollision: []

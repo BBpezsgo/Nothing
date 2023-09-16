@@ -191,6 +191,17 @@ namespace Game.Managers
                 TargetVelocity = Vector2.zero;
             }
 
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                cameraMode = cameraMode switch
+                {
+                    CameraMode.Normal => CameraMode.TopDown,
+                    CameraMode.TopDown => CameraMode.ZoomBased,
+                    CameraMode.ZoomBased => CameraMode.Normal,
+                    _ => CameraMode.Normal,
+                };
+            }
+
             HandleRotationInput();
 
             if (IsFollowing)
@@ -266,7 +277,7 @@ namespace Game.Managers
                     }
                 case CameraMode.ZoomBased:
                     {
-                        if (!MenuManager.AnyMenuVisible && ((IsFollowing && !JustFollow) || Input.GetMouseButton(MouseButton.Middle)))
+                        if (!MenuManager.AnyMenuVisible && (/*(IsFollowing && !JustFollow) || */Input.GetMouseButton(MouseButton.Middle)))
                         { TargetRotation += MouseDelta.x * inputAngleMultiplier; }
                         TargetAngle = Mathf.Clamp(Zoom * .5f, 10f, 80f);
                         break;

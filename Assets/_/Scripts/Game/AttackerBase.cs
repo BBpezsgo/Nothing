@@ -148,6 +148,9 @@ namespace Game.Components
                                 if (unit == null)
                                 { continue; }
 
+                                if (unit == BaseObject)
+                                { continue; }
+
                                 if (TeamManager.Instance.GetFuckYou(TeamHash, unit.TeamHash) < 0f)
                                 { continue; }
 

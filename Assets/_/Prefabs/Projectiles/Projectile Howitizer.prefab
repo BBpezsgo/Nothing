@@ -90,7 +90,7 @@ MonoBehaviour:
   BounceAngle: 0
   ExploisonForce: 30
   ExploisonRadius: 50
-  ExploisonDamage: 60
+  ExploisonDamage: 130
   ExplodeOnImpact: 1
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
@@ -99,13 +99,13 @@ MonoBehaviour:
     type: 3}
   ImpactEffects:
   - MaterialID: Dirt
-    Sound: {fileID: 0}
+    Sounds: []
     Particles: {fileID: 9033517131993547254, guid: e9257a0eae21d4e46be9e5e874e261c0,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 5117192577485989853, guid: 3a1db7ce8d51853408d58d3d91ef391b, type: 3}
   - MaterialID: Water
-    Sound: {fileID: 0}
+    Sounds: []
     Particles: {fileID: 3714180705142066515, guid: 3653051462f469d45b7215e286b62f26,
       type: 3}
     UseNormal: 0

@@ -5,8 +5,19 @@ using Game.Components;
 using Unity.Netcode;
 using UnityEngine;
 
-internal static class UnclassifiedExtensions
+public static class UnclassifiedExtensions
 {
+    public static float GetProgress(this System.Threading.Tasks.Task task) => task?.Status switch
+    {
+        System.Threading.Tasks.TaskStatus.Created => 0f,
+        System.Threading.Tasks.TaskStatus.WaitingForActivation => .1f,
+        System.Threading.Tasks.TaskStatus.WaitingToRun => .2f,
+        System.Threading.Tasks.TaskStatus.Running => .5f,
+        System.Threading.Tasks.TaskStatus.WaitingForChildrenToComplete => .75f,
+        System.Threading.Tasks.TaskStatus.Faulted or System.Threading.Tasks.TaskStatus.Canceled or System.Threading.Tasks.TaskStatus.RanToCompletion => 1f,
+        _ => 0f,
+    };
+
     public static T? PeekOrNull<T>(this Stack<T> stack) where T : struct
         => stack.TryPeek(out T result) ? result : null;
 
@@ -774,28 +785,28 @@ public static class DataChunk
     }
 }
 
-internal static class ListEx
+public static class ListEx
 {
-    internal static void Enqueue<T>(this ICollection<T> v, T element)
+    public static void Enqueue<T>(this ICollection<T> v, T element)
     {
         v.Add(element);
     }
 
-    internal static T Dequeue<T>(this IList<T> v)
+    public static T Dequeue<T>(this IList<T> v)
     {
         T element = v[0];
         v.RemoveAt(0);
         return element;
     }
 
-    internal static void Enqueue<T>(this NetworkList<T> v, T element) where T : unmanaged, IEquatable<T>
+    public static void Enqueue<T>(this NetworkList<T> v, T element) where T : unmanaged, IEquatable<T>
     {
         if (v is null) throw new ArgumentNullException(nameof(v));
 
         v.Add(element);
     }
 
-    internal static T[] ToArray<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
+    public static T[] ToArray<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
     {
         if (v is null) throw new ArgumentNullException(nameof(v));
 
@@ -805,7 +816,7 @@ internal static class ListEx
         return result;
     }
 
-    internal static T Dequeue<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
+    public static T Dequeue<T>(this NetworkList<T> v) where T : unmanaged, IEquatable<T>
     {
         if (v is null) throw new ArgumentNullException(nameof(v));
 
@@ -814,7 +825,7 @@ internal static class ListEx
         return element;
     }
 
-    internal static bool TryGetValue<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key, out TValue value)
+    public static bool TryGetValue<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key, out TValue value)
         where TKey : IEquatable<TKey>
     {
         foreach (var pair in v)
@@ -829,7 +840,7 @@ internal static class ListEx
         return false;
     }
 
-    internal static TValue Get<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key)
+    public static TValue Get<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> v, TKey key)
         where TKey : IEquatable<TKey>
     {
         foreach (var pair in v)
@@ -842,7 +853,7 @@ internal static class ListEx
         return default(TValue);
     }
 
-    internal static bool TryGetValue<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TKey key, out TValue value)
+    public static bool TryGetValue<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TKey key, out TValue value)
         where TKey : IEquatable<TKey>
     {
         foreach (var pair in v)
@@ -857,7 +868,7 @@ internal static class ListEx
         return false;
     }
 
-    internal static bool ContainsValue<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TValue value)
+    public static bool ContainsValue<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TValue value)
         where TValue : IEquatable<TValue>
     {
         foreach (var pair in v)
@@ -870,7 +881,7 @@ internal static class ListEx
         return false;
     }
 
-    internal static TValue Get<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TKey key)
+    public static TValue Get<TKey, TValue>(this IEnumerable<Pair<TKey, TValue>> v, TKey key)
         where TKey : IEquatable<TKey>
     {
         foreach (var pair in v)
@@ -883,7 +894,7 @@ internal static class ListEx
         return default(TValue);
     }
 
-    internal static void AddOrModify<TKey, TValue>(this Dictionary<TKey, TValue> v, TKey key, TValue value)
+    public static void AddOrModify<TKey, TValue>(this Dictionary<TKey, TValue> v, TKey key, TValue value)
     {
         if (v.ContainsKey(key))
         {
@@ -893,6 +904,20 @@ internal static class ListEx
         {
             v.Add(key, value);
         }
+    }
+
+    public static void Set<TKey, TValue>(this List<KeyValuePair<TKey, TValue>> v, TKey key, TValue value)
+            where TKey : IEquatable<TKey>
+    {
+        for (int i = 0; i < v.Count; i++)
+        {
+            KeyValuePair<TKey, TValue> pair = v[i];
+            if ((IEquatable<TKey>)pair.Key == (IEquatable<TKey>)key)
+            {
+                v[i] = new KeyValuePair<TKey, TValue>(key, value);
+            }
+        }
+        v.Add(new KeyValuePair<TKey, TValue>(key, value));
     }
 
     internal static T[] PurgeObjects<T>(this T[] v) where T : UnityEngine.Object
@@ -912,21 +937,21 @@ internal static class ListEx
         { if (v[i] == null) v.RemoveAt(i); }
     }
 
-    internal static T[] Purge<T>(this T[] v) where T : class
+    public static T[] Purge<T>(this T[] v) where T : class
     {
         List<T> result = new(v);
         result.Purge();
         return result.ToArray();
     }
-    internal static void Purge<T>(this IList<T> v) where T : class
+    public static void Purge<T>(this IList<T> v) where T : class
     {
         for (int i = v.Count - 1; i >= 0; i--)
         { if (v[i] == null) v.RemoveAt(i); }
     }
 
-    internal static void RemoveLast(this IList v)
+    public static void RemoveLast(this IList v)
     { if (v.Count > 0) v.RemoveAt(v.Count - 1); }
-    internal static T Pop<T>(this IList<T> v) where T : class
+    public static T Pop<T>(this IList<T> v) where T : class
     {
         if (v.Count > 0)
         {
@@ -936,7 +961,7 @@ internal static class ListEx
         }
         return null;
     }
-    internal static bool Pop<T>(this IList<T> v, out T popped)
+    public static bool Pop<T>(this IList<T> v, out T popped)
     {
         if (v.Count > 0)
         {
@@ -1083,7 +1108,7 @@ internal static class ObjectEx
     internal static void Destroy(this UnityEngine.Object obj, float t) => UnityEngine.Object.Destroy(obj, t);
 }
 
-internal static class RectEx
+public static class RectEx
 {
     public static Rect Padding(this Rect rect, float padding)
     {
@@ -1102,6 +1127,13 @@ internal static class RectEx
 
     public static (Vector2 TopLeft, Vector2 TopRight, Vector2 BottomLeft, Vector2 BottomRight) Corners(this Rect rect) =>
         (rect.TopLeft(), rect.TopRight(), rect.BottomLeft(), rect.BottomRight());
+
+    public static Rect CutLeft(this Rect rect, float width, out Rect cutted)
+    {
+        cutted = new Rect(rect.xMin, rect.yMin, width, rect.height);
+        rect.xMin += width;
+        return rect;
+    }
 }
 
 internal static class RectIntEx

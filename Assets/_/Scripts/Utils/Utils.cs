@@ -24,10 +24,10 @@ using UnityEditor;
 #endif
 
 [Serializable]
-internal struct Pair<TKey, TValue>
+public struct Pair<TKey, TValue>
 {
-    [SerializeField] internal TKey Key;
-    [SerializeField] internal TValue Value;
+    [SerializeField] public TKey Key;
+    [SerializeField] public TValue Value;
 
     public Pair(TKey key, TValue value)
     {
@@ -347,12 +347,12 @@ internal static class GLUtils
 
 }
 
-internal readonly struct GUIUtils
+public readonly struct GUIUtils
 {
-    internal static Vector2 TransformPoint(Vector2 screenPosition)
+    public static Vector2 TransformPoint(Vector2 screenPosition)
         => new(screenPosition.x, Screen.height - screenPosition.y);
 
-    internal static Texture2D GenerateCircleFilled(Vector2Int size)
+    public static Texture2D GenerateCircleFilled(Vector2Int size)
     {
         var result = new Texture2D(size.x, size.y);
         Vector2 center = Vector2.one * .5f;
@@ -376,7 +376,7 @@ internal readonly struct GUIUtils
         return result;
     }
 
-    internal static Texture2D GenerateCircle(Vector2Int size, float thickness = .25f)
+    public static Texture2D GenerateCircle(Vector2Int size, float thickness = .25f)
     {
         thickness = Mathf.Clamp(thickness, 0f, .5f);
         var result = new Texture2D(size.x, size.y);
@@ -401,6 +401,43 @@ internal readonly struct GUIUtils
         return result;
     }
 
+    public static GuiSkinUsage Skin(GUISkin skin) => new(skin);
+    public static GuiEnabled Enabled(bool enabled) => new(enabled);
+
+    public static GuiEnabled Enabled() => new(true);
+    public static GuiEnabled Disabled() => new(false);
+}
+
+public readonly struct GuiSkinUsage : IDisposable
+{
+    readonly GUISkin savedSkin;
+
+    public GuiSkinUsage(GUISkin skin)
+    {
+        savedSkin = GUI.skin;
+        GUI.skin = skin;
+    }
+
+    public void Dispose()
+    {
+        GUI.skin = savedSkin;
+    }
+}
+
+public readonly struct GuiEnabled : IDisposable
+{
+    readonly bool savedEnabled;
+
+    public GuiEnabled(bool enabled)
+    {
+        savedEnabled = GUI.enabled;
+        GUI.enabled = enabled;
+    }
+
+    public void Dispose()
+    {
+        GUI.enabled = savedEnabled;
+    }
 }
 
 namespace Utilities
@@ -3579,6 +3616,194 @@ internal static class ListUtils
             { builder.Append(", "); }
 
             builder.Append(element.ToString());
+
+            notFirst = true;
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+
+    internal static string ToReadableString<T1, T2>(this NetworkList<T1> self, Func<T1, T2> converter) where T1 : unmanaged, IEquatable<T1>
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            T2 converted = converter.Invoke(element);
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this T1[] self, Func<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Length; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            T2 converted = converter.Invoke(element);
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this IReadOnlyList<T1> self, Func<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            T2 converted = converter.Invoke(element);
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this IEnumerable<T1> self, Func<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        bool notFirst = false;
+        foreach (T1 element in self)
+        {
+            if (notFirst)
+            { builder.Append(", "); }
+
+            T2 converted = converter.Invoke(element);
+            builder.Append(converted.ToString());
+
+            notFirst = true;
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+
+    internal static string ToReadableString<T1, T2>(this NetworkList<T1> self, IReadOnlyDictionary<T1, T2> converter) where T1 : unmanaged, IEquatable<T1>
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            if (!converter.TryGetValue(element, out T2 converted))
+            { converted = default; }
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this T1[] self, IReadOnlyDictionary<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Length; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            if (!converter.TryGetValue(element, out T2 converted))
+            { converted = default; }
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this IReadOnlyList<T1> self, IReadOnlyDictionary<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        for (int i = 0; i < self.Count; i++)
+        {
+            if (i > 0)
+            { builder.Append(", "); }
+            T1 element = self[i];
+            if (!converter.TryGetValue(element, out T2 converted))
+            { converted = default; }
+            builder.Append(converted.ToString());
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
+    }
+    internal static string ToReadableString<T1, T2>(this IEnumerable<T1> self, IReadOnlyDictionary<T1, T2> converter)
+    {
+        if (self == null)
+        { return "null"; }
+
+        StringBuilder builder = new();
+
+        builder.Append("{ ");
+
+        bool notFirst = false;
+        foreach (T1 element in self)
+        {
+            if (notFirst)
+            { builder.Append(", "); }
+
+            if (!converter.TryGetValue(element, out T2 converted))
+            { converted = default; }
+            builder.Append(converted.ToString());
 
             notFirst = true;
         }

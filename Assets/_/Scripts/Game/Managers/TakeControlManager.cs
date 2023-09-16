@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Authentication;
 using Game.Components;
@@ -58,6 +59,8 @@ namespace Game.Managers
         [SerializeField] CursorConfig CursorConfig;
 
         NetworkList<ulong> ControllingObjects;
+
+        readonly List<ClientObject> ShouldAlwaysControllObjects = new();
 
         [Header("UI")]
         [SerializeField] Projectiles Projectiles;
@@ -149,6 +152,60 @@ namespace Game.Managers
             ControllingObjects.Initialize(this);
         }
 
+        public void ShouldAlwaysControll(ulong clientId, ulong objectId, bool should)
+        {
+            if (NetcodeUtils.IsClient)
+            {
+                Debug.LogError($"[{nameof(TakeControlManager)}]: This should be not called on clients");
+                return;
+            }
+
+            for (int i = ShouldAlwaysControllObjects.Count - 1; i >= 0; i--)
+            {
+                if (ShouldAlwaysControllObjects[i].ClientId != clientId) continue;
+
+                if (!should)
+                { ShouldAlwaysControllObjects.RemoveAt(i); }
+                return;
+            }
+            ShouldAlwaysControllObjects.Add(new ClientObject(clientId, objectId));
+
+            if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject obj))
+            {
+                Debug.LogError($"[{nameof(TakeControlManager)}]: Network object {objectId} not found", this);
+                return;
+            }
+
+            if (!obj.gameObject.TryGetComponent(out ICanTakeControl controllableObj))
+            {
+                Debug.LogError($"[{nameof(TakeControlManager)}]: Object {obj} does not have a component {nameof(ICanTakeControl)}", obj);
+                return;
+            }
+
+            ControllingObjects.Set((int)clientId, objectId, ulong.MaxValue);
+
+            if (clientId == NetworkManager.ServerClientId)
+            {
+                if (IsControlling)
+                { LoseControl(); }
+                TakeControl(controllableObj);
+            }
+        }
+
+        public bool ShouldIAlwaysControll(ulong clientId, out ulong objectId)
+        {
+            for (int i = ShouldAlwaysControllObjects.Count - 1; i >= 0; i--)
+            {
+                if (ShouldAlwaysControllObjects[i].ClientId != clientId) continue;
+
+                objectId = ShouldAlwaysControllObjects[i].ObjectId;
+                return true;
+            }
+
+            objectId = default;
+            return false;
+        }
+
         void ControllingObjectsChanged(NetworkListEvent<ulong> changeEvent)
         {
             if (!NetcodeUtils.IsClient)
@@ -156,7 +213,7 @@ namespace Game.Managers
 
             Debug.Log($"[{nameof(TakeControlManager)}]: Server sent a RefreshControlling command, so ...", this);
 
-            Debug.Log($"[{nameof(TakeControlManager)}]: {nameof(ControllingObjects)} = {ControllingObjects.ToReadableString()}");
+            Debug.Log($"[{nameof(TakeControlManager)}]: {nameof(ControllingObjects)}: {ControllingObjects.ToReadableString(NetworkManager.SpawnManager.SpawnedObjects)}");
 
             ulong controllingThis = ControllingObjects.Get((int)NetworkManager.LocalClientId, ulong.MaxValue);
             if (controllingThis == ulong.MaxValue)
@@ -236,9 +293,7 @@ namespace Game.Managers
                 if (IsControlling &&
                     !MouseManager.IsPointerOverUI())
                 {
-                    IsScoping =
-                        Input.GetKey(KeyCode.LeftShift) &&
-                        CameraController.cameraMode == CameraMode.Normal;
+                    IsScoping = Input.GetKey(KeyCode.LeftShift);
 
                     if (MouseManager.MouseOnWindow)
                     { ControllingObject.DoInput(); }
@@ -626,6 +681,10 @@ namespace Game.Managers
                 { locked = CursorLockMode.Locked; }
                 else
                 { locked = CursorLockMode.None; }
+
+                if (IsScoping)
+                { locked = CursorLockMode.Locked; }
+
                 return true;
             }
             return false;
@@ -633,7 +692,18 @@ namespace Game.Managers
         public bool HandleCursor()
         {
             if (!InputCondition()) return false;
-            if (IsControlling) return false;
+            if (IsControlling)
+            {
+                if (CurrentCrossStyle == CrossStyle.None)
+                {
+                    return false;
+                }
+                else
+                {
+                    UnityEngine.Cursor.visible = false;
+                    return true;
+                }
+            }
             if (!Input.GetKey(KeyCode.LeftControl)) return false;
 
             Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition, CursorHitLayer);
@@ -738,9 +808,11 @@ namespace Game.Managers
             catch (System.NullReferenceException)
             { return false; }
 
+            ulong objectId = @this.GetNetworkIDForce();
+
             for (int i = 0; i < ControllingObjects.Count; i++)
             {
-                if (ControllingObjects[i] == NetworkObjectId)
+                if (ControllingObjects[i] == objectId)
                 {
                     clientID = (ulong)i;
                     return true;
@@ -1109,10 +1181,17 @@ public static class ICanTakeControlExtensions
         return TakeControlManager.Instance.AnybodyControlling(self);
     }
 
-    public static string ControlledBy(this ICanTakeControl self)
+    public static string ControlledByName(this ICanTakeControl self)
     {
         if (TakeControlManager.Instance == null)
         { return "nobody"; }
         return TakeControlManager.Instance.AnybodyControlling(self, out ulong controllingBy) ? $"client {controllingBy}" : "nobody";
+    }
+
+    public static ulong ControlledBy(this ICanTakeControl self)
+    {
+        if (TakeControlManager.Instance == null)
+        { return ulong.MaxValue; }
+        return TakeControlManager.Instance.AnybodyControlling(self, out ulong controllingBy) ? controllingBy : ulong.MaxValue;
     }
 }
