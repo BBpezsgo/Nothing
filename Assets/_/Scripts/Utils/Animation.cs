@@ -5,7 +5,7 @@ namespace Utilities
     internal readonly struct AnimationFunctions
     {
         internal static float Square(float v) => v * v;
-        internal static float Squareroot(float v) => Mathf.Sqrt(v);
+        internal static float Squareroot(float v) => Maths.Sqrt(v);
     }
 
     internal delegate float AnimationFunction(float v);
@@ -19,7 +19,7 @@ namespace Utilities
 
         internal abstract float Elapsed { get; }
 
-        protected virtual float RawPercent => Mathf.Clamp01(Elapsed * Speed);
+        protected virtual float RawPercent => Maths.Clamp01(Elapsed * Speed);
 
         internal float Percent
         {
@@ -51,7 +51,7 @@ namespace Utilities
         internal bool IsStarted => startedAt > 0f;
         internal bool IsFinished => RawPercent >= 1f;
 
-        internal override float Elapsed => Mathf.Max(Now - startedAt, 0f);
+        internal override float Elapsed => Maths.Max(Now - startedAt, 0f);
 
         internal SimpleAnimation(float speed) : this(speed, null) { }
         internal SimpleAnimation(float speed, AnimationFunction function) : base(speed, function)
@@ -173,7 +173,7 @@ namespace Utilities
     {
         readonly AnimationDependency Dependency;
 
-        internal override float Elapsed => Mathf.Max(Now - Dependency.Invoke(), 0f);
+        internal override float Elapsed => Maths.Max(Now - Dependency.Invoke(), 0f);
 
         internal DependentAnimation(float speed, AnimationDependency dependency) : this(speed, dependency, null) { }
 

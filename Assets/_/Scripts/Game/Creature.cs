@@ -261,7 +261,7 @@ namespace Game.Components
 
             Vector3 localTarget = transform.InverseTransformPoint(destination);
 
-            float deltaAngle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+            float deltaAngle = Maths.Atan2(localTarget.x, localTarget.z) * Maths.Rad2Deg;
 
             Vector3 deltaPosition = Speed * Time.deltaTime * transform.forward;
 

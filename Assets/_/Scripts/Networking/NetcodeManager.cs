@@ -72,7 +72,7 @@ namespace Networking.Managers
 
             Window = IMGUIManager.Instance.CreateWindow(new Rect(5f, 5f, 250f, 150f));
             Window.Title = "Netcode Scenes";
-            Window.Visible = false;
+            Window.Visible = true;
             Window.DrawContent = OnWindowGUI;
         }
 
@@ -109,7 +109,7 @@ namespace Networking.Managers
                     GUI.Box(progressBarRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-bg"));
 
                     Rect progressBarFgRect = progressBarRect;
-                    progressBarFgRect.width *= Mathf.Clamp01(info.Value.AsyncOperation.progress);
+                    progressBarFgRect.width *= Maths.Clamp01(info.Value.AsyncOperation.progress);
                     GUI.Box(progressBarFgRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-fg"));
 
                     GUI.Label(progressBarRect, $"Loading \"{info.Value.SceneName}\" {info.Value.AsyncOperation.progress:P}");
@@ -149,7 +149,7 @@ namespace Networking.Managers
                     GUI.Box(progressBarRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-bg"));
 
                     Rect progressBarFgRect = progressBarRect;
-                    progressBarFgRect.width *= Mathf.Clamp01(info.Value.AsyncOperation.progress);
+                    progressBarFgRect.width *= Maths.Clamp01(info.Value.AsyncOperation.progress);
                     GUI.Box(progressBarFgRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-fg"));
 
                     GUI.Label(progressBarRect, $"Unloading \"{info.Value.SceneName}\" {info.Value.AsyncOperation.progress:P}");

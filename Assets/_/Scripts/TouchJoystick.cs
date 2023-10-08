@@ -72,7 +72,7 @@ namespace Game.Managers
 
         void Refresh()
         {
-            Size = Vector2Int.one * (Mathf.Min(Screen.width, Screen.height) / 4);
+            Size = Vector2Int.one * (Maths.Min(Screen.width, Screen.height) / 4);
 
             Pivot = new(0, Screen.height - Size.y);
             Origin = Pivot + new Vector2Int(Size.x / 2, Size.y / 2);

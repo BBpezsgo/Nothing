@@ -55,12 +55,12 @@ namespace InGameComputer
 
         public bool IsPointerOnRect(RectInt rect)
         {
-            if (Mouse.IsButtonDown(MouseButton.Left))
+            if (Mouse.IsButtonDown(global::Mouse.Left))
             { return rect.Contains(TransformedMousePosition); }
-            else if (Mouse.IsButtonHold(MouseButton.Left))
-            { return rect.Contains(TransformPoint(Mouse.PressedAt(MouseButton.Left))); }
-            else if (Mouse.IsButtonUp(MouseButton.Left))
-            { return rect.Contains(TransformPoint(Mouse.PressedAt(MouseButton.Left))); }
+            else if (Mouse.IsButtonHold(global::Mouse.Left))
+            { return rect.Contains(TransformPoint(Mouse.PressedAt(global::Mouse.Left))); }
+            else if (Mouse.IsButtonUp(global::Mouse.Left))
+            { return rect.Contains(TransformPoint(Mouse.PressedAt(global::Mouse.Left))); }
             else
             { return rect.Contains(TransformedMousePosition); }
         }

@@ -345,7 +345,7 @@ namespace Game.Components
             else if (CanBounce && (!hasMaterial || material.Hardness > float.Epsilon))
             {
                 float normalAngle = Vector3.Angle(rb.velocity, -normal);
-                float impactAngle = 90f - Mathf.Clamp(normalAngle, 0f, 90f);
+                float impactAngle = 90f - Maths.Clamp(normalAngle, 0f, 90f);
 
                 float modifiedImpactAngle = impactAngle;
                 if (hasMaterial)
@@ -353,7 +353,7 @@ namespace Game.Components
 
                 if (modifiedImpactAngle < BounceAngle && rb != null)
                 {
-                    float impactEnergy = Mathf.Sin(impactAngle * Mathf.Deg2Rad);
+                    float impactEnergy = Maths.Sin(impactAngle * Maths.Deg2Rad);
                     float remaingEnergy = 1f - impactEnergy;
 
                     if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
@@ -547,7 +547,7 @@ namespace Game.Components
 
                     GameObject @object = objectCollider.gameObject;
 
-                    float distanceSqr = Mathf.Max(1f, (@object.transform.position - origin).sqrMagnitude);
+                    float distanceSqr = Maths.Max(1f, (@object.transform.position - origin).sqrMagnitude);
 
                     if (@object.TryGetComponent(out IDetailedDamagable detailedDamagable))
                     {

@@ -723,12 +723,12 @@ namespace AssetManager
 
         /// <exception cref="NotImplementedException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public System.Collections.IEnumerator LoadAsnyc(string basePath)
-        { yield return LoadAsnyc(basePath, () => { }); }
+        public System.Collections.IEnumerator LoadAsync(string basePath)
+        { yield return LoadAsync(basePath, () => { }); }
 
         /// <exception cref="NotImplementedException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        internal System.Collections.IEnumerator LoadAsnyc(string basePath, Action onDone, Action<ChunkCollector> progress = null)
+        internal System.Collections.IEnumerator LoadAsync(string basePath, Action onDone, Action<ChunkCollector> progress = null)
         {
             if (string.IsNullOrWhiteSpace(basePath))
             { throw new ArgumentException($"'{nameof(basePath)}' cannot be null or whitespace.", nameof(basePath)); }
@@ -848,7 +848,7 @@ namespace AssetManager
                 while (!task.isDone)
                 {
                     System.Threading.Thread.Sleep(50);
-                    if (FolderLoader.EnableNetworkLogging) UnityEngine.Debug.Log($"[{nameof(FolderLoader)}]: Downloading {UnityEngine.Mathf.Round(task.progress * 100f)}% ...");
+                    if (FolderLoader.EnableNetworkLogging) UnityEngine.Debug.Log($"[{nameof(FolderLoader)}]: Downloading {Maths.Round(task.progress * 100f)}% ...");
                 }
 
                 if (req.result != UnityEngine.Networking.UnityWebRequest.Result.Success)
@@ -1222,7 +1222,7 @@ namespace AssetManager
             string path = Path.Combine(basePath, filename);
 
             FolderLoader loader = new();
-            yield return loader.LoadAsnyc(basePath);
+            yield return loader.LoadAsync(basePath);
 
             if (loader.Root is HttpFolder httpFolder)
             { yield return httpFolder.Preload(); }
@@ -1415,7 +1415,7 @@ namespace AssetManager
             string path = Path.Combine(basePath, filename);
 
             FolderLoader loader = new();
-            yield return loader.LoadAsnyc(basePath);
+            yield return loader.LoadAsync(basePath);
 
             if (loader.Root is HttpFolder httpFolder1)
             { yield return httpFolder1.Preload(); }

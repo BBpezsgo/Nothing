@@ -1,20 +1,18 @@
 using System.IO;
 
-using UnityEngine;
-
+#if UNITY_EDITOR
 namespace AssetManager
 {
-    public class AssetBundleManager : MonoBehaviour
+    public static class AssetBundleManager
     {
-#if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Build AssetBundles")]
-        static void BuildAllAssetBundles()
+        public static void BuildAllAssetBundles()
         {
             string assetBundleDirectory = "Assets/StreamingAssets";
             if (!Directory.Exists(assetBundleDirectory))
             { Directory.CreateDirectory(assetBundleDirectory); }
             UnityEditor.BuildPipeline.BuildAssetBundles(assetBundleDirectory, UnityEditor.BuildAssetBundleOptions.None, UnityEditor.BuildTarget.StandaloneWindows);
         }
-#endif
     }
 }
+#endif

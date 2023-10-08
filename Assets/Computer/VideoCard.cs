@@ -178,7 +178,7 @@ namespace InGameComputer
                 position.x += characterSize.x;
 
                 width += characterSize.x;
-                height = Mathf.Max(characterSize.y);
+                height = Maths.Max(characterSize.y);
             }
 
             DrawTextDecorations(new RectInt(rect.xMin, rect.yMin, width, height), color, decorations);

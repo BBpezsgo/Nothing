@@ -77,7 +77,7 @@ namespace Game.Components
 
         internal bool Repair(float v)
         {
-            HP = Mathf.Min(MaxHP, HP + v);
+            HP = Maths.Min(MaxHP, HP + v);
             return HP >= MaxHP;
         }
     }

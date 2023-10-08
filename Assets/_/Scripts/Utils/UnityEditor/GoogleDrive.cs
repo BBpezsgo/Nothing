@@ -216,6 +216,8 @@ namespace Utilities.Editor
         bool ShouldFullyRefreshCloudFiles = false;
         readonly List<string> ShouldGetCloudFiles = new();
 
+        string LastError = null;
+
         [MenuItem("Tools/Google Drive")]
         public static void OnShow()
         {
@@ -433,6 +435,7 @@ namespace Utilities.Editor
 
                 if (EditorGUI.LinkButton(new Rect(r1_.xMax - r2_.x, r1_.y, r2_.x, r1_.height), "Refresh"))
                 {
+                    LastError = null;
                     if (Directory.Exists(BuildTool.BaseOutputPath))
                     {
                         RefreshLocalFiles();
@@ -489,6 +492,7 @@ namespace Utilities.Editor
 
                             if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                             {
+                                LastError = null;
                                 if (cloudFile != null)
                                 {
                                     File newCloudFile = new()
@@ -524,6 +528,7 @@ namespace Utilities.Editor
 
                             if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                             {
+                                LastError = null;
                                 DeleteLocalFile(file.FullName);
                                 EditorUtility.SetDirty(this);
                             }
@@ -535,6 +540,7 @@ namespace Utilities.Editor
 
                                 if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                                 {
+                                    LastError = null;
                                     var task = GetCloudFileByName(file.Name);
                                     LocalFileTasks.Add((file.Name, new Task("Get File", TaskVisibility.VisibleInContext, task)));
                                 }
@@ -550,6 +556,7 @@ namespace Utilities.Editor
 
                             if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading)
                             {
+                                LastError = null;
                                 System.Threading.Tasks.Task task = System.Threading.Tasks.Task.Run(() =>
                                 {
                                     string dest = Path.Combine(directoryInfo.Parent.FullName, directoryInfo.Name + ".zip");
@@ -582,7 +589,10 @@ namespace Utilities.Editor
                 using (GUIUtils.Enabled(!IsLoading))
                 {
                     if (EditorGUI.LinkButton(new Rect(r1_.xMax - r2_.x, r1_.y, r2_.x, r1_.height), "Refresh") && !IsLoading)
-                    { ShouldFullyRefreshCloudFiles = true; }
+                    {
+                        LastError = null;
+                        ShouldFullyRefreshCloudFiles = true;
+                    }
                 }
 
                 for (int i = 0; i < CloudFiles.Count; i++)
@@ -620,6 +630,7 @@ namespace Utilities.Editor
                     {
                         if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                         {
+                            LastError = null;
                             GetCloudFile(file.Id);
                             EditorUtility.SetDirty(this);
                         }
@@ -632,6 +643,7 @@ namespace Utilities.Editor
                     {
                         if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                         {
+                            LastError = null;
                             DeleteCloudFile(file.Id);
                             EditorUtility.SetDirty(this);
                         }
@@ -653,6 +665,11 @@ namespace Utilities.Editor
                 }
             }
             EditorGUILayout.EndVertical();
+
+            if (!string.IsNullOrWhiteSpace(LastError))
+            {
+                EditorGUILayout.HelpBox(LastError, MessageType.Error, true);
+            }
 
             {
                 bool verticalBegan = false;
@@ -768,6 +785,9 @@ namespace Utilities.Editor
 
         void OnDriveList(Task<List<File>> task)
         {
+            if (task.IsFaulted)
+            { LastError = task.Exception.Message; }
+
             if (task.Result == null) return;
 
             CloudFiles.Clear();
@@ -784,6 +804,9 @@ namespace Utilities.Editor
 
         void OnDriveListSimple(Task<List<File>> task)
         {
+            if (task.IsFaulted)
+            { LastError = task.Exception.Message; }
+
             if (task.Result == null) return;
 
             CloudFiles.Clear();

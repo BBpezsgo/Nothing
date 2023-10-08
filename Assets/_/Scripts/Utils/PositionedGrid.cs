@@ -20,11 +20,11 @@ namespace Grid
             => new Vector3(x, 0f, y) * this.CellSize + this.origin;
         internal override ValueTuple<int, int> GetGridPosition(Vector3 worldPosition)
         {
-            int x = Mathf.FloorToInt((worldPosition.x - origin.x) / CellSize);
-            int y = Mathf.FloorToInt((worldPosition.z - origin.z) / CellSize);
+            int x = Maths.FloorToInt((worldPosition.x - origin.x) / CellSize);
+            int y = Maths.FloorToInt((worldPosition.z - origin.z) / CellSize);
 
-            x = Mathf.Clamp(x, 0, width);
-            y = Mathf.Clamp(y, 0, height);
+            x = Maths.Clamp(x, 0, width);
+            y = Maths.Clamp(y, 0, height);
 
             return (x, y);
         }

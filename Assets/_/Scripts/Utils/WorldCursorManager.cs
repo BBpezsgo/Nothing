@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Managers
 {
-    internal class WorldCursorManager : SingleInstance<WorldCursorManager>, ICanChangeCursor
+    public class WorldCursorManager : SingleInstance<WorldCursorManager>, ICanChangeCursor
     {
         readonly List<INeedWorldCursor> NeedWorldCursor = new();
         readonly List<INeedDirectWorldCursor> NeedDirectWorldCursor = new();
@@ -27,7 +27,7 @@ namespace Game.Managers
 
         void Start()
         {
-            LeftMouseButton = new AdvancedMouse(MouseButton.Left, 9, MouseCondition);
+            LeftMouseButton = new AdvancedMouse(Mouse.Left, 9, MouseCondition);
             LeftMouseButton.OnClick += OnLeftMouseButtonClick;
 
             CursorManager.Instance.Register(this);
@@ -165,7 +165,7 @@ namespace Game.Managers
 
 namespace Game
 {
-    internal class CursorPriorityComparer : IComparer<INeedWorldCursor>, IComparer<INeedDirectWorldCursor>
+    public class CursorPriorityComparer : IComparer<INeedWorldCursor>, IComparer<INeedDirectWorldCursor>
     {
         public int Compare(INeedWorldCursor a, INeedWorldCursor b)
             => System.Collections.Comparer.Default.Compare(b.CursorPriority, a.CursorPriority);
@@ -174,13 +174,13 @@ namespace Game
             => System.Collections.Comparer.Default.Compare(b.CursorPriority, a.CursorPriority);
     }
 
-    internal interface INeedWorldCursor
+    public interface INeedWorldCursor
     {
         public int CursorPriority { get; }
         public bool OnWorldCursor(Vector3 worldPosition);
     }
 
-    internal interface INeedDirectWorldCursor : IComponent
+    public interface INeedDirectWorldCursor : IComponent
     {
         public GameObject gameObject { get; }
         public int CursorPriority { get; }

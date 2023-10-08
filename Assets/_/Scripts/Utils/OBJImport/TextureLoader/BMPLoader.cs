@@ -90,8 +90,8 @@ namespace B83.Image.BMP
         public uint nPaletteColors;
         public uint nImportantColors;
 
-        public int absWidth { get { return Mathf.Abs(width); } }
-        public int absHeight { get { return Mathf.Abs(height); } }
+        public int absWidth { get { return Maths.Abs(width); } }
+        public int absHeight { get { return Maths.Abs(height); } }
 
     }
 
@@ -213,8 +213,8 @@ namespace B83.Image.BMP
 
         private static void Read32BitImage(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             Color32[] data = bmp.imageData = new Color32[w * h];
             if (aReader.BaseStream.Position + w * h * 4 > aReader.BaseStream.Length)
             {
@@ -241,8 +241,8 @@ namespace B83.Image.BMP
 
         private static void Read24BitImage(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             int rowLength = ((24 * w + 31) / 32) * 4;
             int count = rowLength * h;
             int pad = rowLength - w * 3;
@@ -272,8 +272,8 @@ namespace B83.Image.BMP
 
         private static void Read16BitImage(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             int rowLength = ((16 * w + 31) / 32) * 4;
             int count = rowLength * h;
             int pad = rowLength - w * 2;
@@ -307,8 +307,8 @@ namespace B83.Image.BMP
 
         private static void ReadIndexedImage(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             int bitCount = bmp.info.nBitsPerPixel;
             int rowLength = ((bitCount * w + 31) / 32) * 4;
             int count = rowLength * h;
@@ -339,8 +339,8 @@ namespace B83.Image.BMP
         }
         private static void ReadIndexedImageRLE4(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             Color32[] data = bmp.imageData = new Color32[w * h];
             int x = 0;
             int y = 0;
@@ -401,8 +401,8 @@ namespace B83.Image.BMP
         }
         private static void ReadIndexedImageRLE8(BinaryReader aReader, BMPImage bmp)
         {
-            int w = Mathf.Abs(bmp.info.width);
-            int h = Mathf.Abs(bmp.info.height);
+            int w = Maths.Abs(bmp.info.width);
+            int h = Maths.Abs(bmp.info.height);
             Color32[] data = bmp.imageData = new Color32[w * h];
             int x = 0;
             int y = 0;

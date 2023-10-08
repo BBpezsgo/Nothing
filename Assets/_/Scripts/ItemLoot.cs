@@ -21,7 +21,7 @@ namespace Game.Components
                 if (Ammount.x == Ammount.y)
                 { return Ammount.x; }
 
-                int evaulatedAmmount = Random.Range(Mathf.Min(Ammount.x, Ammount.y), Mathf.Max(Ammount.x, Ammount.y));
+                int evaulatedAmmount = Random.Range(Maths.Min(Ammount.x, Ammount.y), Maths.Max(Ammount.x, Ammount.y));
 
                 return evaulatedAmmount;
             }

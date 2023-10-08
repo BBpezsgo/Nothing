@@ -162,7 +162,7 @@ namespace Networking.Components
         void INetworkObservable.OnRPC(RpcHeader header)
         { }
 
-        static byte AngleToByte(float angle) => (byte)Mathf.Clamp(((angle + 360f) % 360f) / ByteRotationMagicNumber, 0f, 255f);
+        static byte AngleToByte(float angle) => (byte)Maths.Clamp(((angle + 360f) % 360f) / ByteRotationMagicNumber, 0f, 255f);
 
         void INetworkObservable.OnSerializeView(Deserializer deserializer, Serializer serializer, NetcodeMessageInfo messageInfo)
         {

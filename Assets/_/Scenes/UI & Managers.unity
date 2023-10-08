@@ -1045,7 +1045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   theCamera: {fileID: 330585545}
   cameraRotation: {fileID: 42618974}
-  cameraMode: 0
+  cameraMode: 3
   Height: 1
   FollowObject: {fileID: 0}
   JustFollow: 0
@@ -2775,7 +2775,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1146926335
 Transform:
   m_ObjectHideFlags: 0

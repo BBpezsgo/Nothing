@@ -125,7 +125,7 @@ namespace Game.Managers
             worldPosition.y = TheTerrain.Height(worldPosition);
 
             if (Input.GetKey(KeyCode.LeftControl))
-            { worldPosition = new Vector3(Mathf.Round(worldPosition.x), worldPosition.y, Mathf.Round(worldPosition.z)); }
+            { worldPosition = new Vector3(Maths.Round(worldPosition.x), worldPosition.y, Maths.Round(worldPosition.z)); }
 
             PlaceBuilding(worldPosition - SelectedBuilding.GroundOrigin, SelectedBuilding);
         }
@@ -216,7 +216,7 @@ namespace Game.Managers
                 }
             }
 
-            if (Input.GetMouseButtonDown(MouseButton.Right) && (IsBuilding || BuildingUI.gameObject.activeSelf))
+            if (Input.GetMouseButtonDown(Mouse.Right) && (IsBuilding || BuildingUI.gameObject.activeSelf))
             {
                 Hide();
             }
@@ -250,7 +250,7 @@ namespace Game.Managers
                     position.y = TheTerrain.Height(position);
 
                     if (Input.GetKey(KeyCode.LeftControl))
-                    { position = new Vector3(Mathf.Round(position.x), position.y, Mathf.Round(position.z)); }
+                    { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
 
                     BuildingHologram.transform.position = position - SelectedBuilding.GroundOrigin;
                 }
@@ -276,7 +276,7 @@ namespace Game.Managers
                     position.y = TheTerrain.Height(position);
 
                     if (Input.GetKey(KeyCode.LeftControl))
-                    { position = new Vector3(Mathf.Round(position.x), position.y, Mathf.Round(position.z)); }
+                    { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
 
                     Vector3 checkPosition = position - SelectedBuilding.GroundOrigin;
 

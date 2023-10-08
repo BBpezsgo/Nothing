@@ -192,7 +192,7 @@ namespace Game.Components
                 }
             }
 
-            if (Input.GetMouseButton(MouseButton.Left) && !MenuManager.AnyMenuVisible)
+            if (Mouse.IsDown(Mouse.Left) && !MenuManager.AnyMenuVisible)
             {
                 turret.PrepareShooting = true;
                 if (turret.IsAccurateShoot)
@@ -224,18 +224,16 @@ namespace Game.Components
 
             if (TakeControlManager.Instance.IsScoping && turret.ScopeHolder != null && !MenuManager.AnyMenuVisible)
             {
-                Vector2 mouseDelta = CameraController.MouseDelta;
+                float scopeSensitivity = ScopeSensitivity * Maths.Clamp((40f - CameraController.Instance.ScopeZoom) / 40f, .5f, 1f);
 
-                float scopeSensitivity = ScopeSensitivity * Mathf.Clamp((40f - CameraController.Instance.ScopeZoom) / 40f, .5f, 1f);
+                Vector3 newRotation = turret.ScopeHolder.localRotation.eulerAngles + new Vector3(Mouse.DeltaY * (-scopeSensitivity), Mouse.DeltaX * scopeSensitivity, 0f);
 
-                Vector3 newRotation = turret.ScopeHolder.localRotation.eulerAngles + new Vector3(mouseDelta.y * (-scopeSensitivity), mouseDelta.x * scopeSensitivity, 0f);
+                newRotation.x = GeneralUtils.NormalizeAngle(newRotation.x);
 
-                newRotation.x = Utilities.Utils.NormalizeAngle(newRotation.x);
+                float minAngle = -Maths.Abs(turret.cannonHighestAngle);
+                float maxAngle = Maths.Abs(turret.cannonLowestAngle);
 
-                float minAngle = -Mathf.Abs(turret.cannonHighestAngle);
-                float maxAngle = Mathf.Abs(turret.cannonLowestAngle);
-
-                newRotation.x = Mathf.Clamp(newRotation.x, minAngle, maxAngle);
+                newRotation.x = Maths.Clamp(newRotation.x, minAngle, maxAngle);
 
                 turret.ScopeHolder.localRotation = Quaternion.Euler(newRotation);
             }

@@ -60,7 +60,7 @@ namespace Game.Managers
 
         NetworkList<ulong> ControllingObjects;
 
-        readonly List<ClientObject> ShouldAlwaysControllObjects = new();
+        readonly List<ClientObject> ShouldAlwaysControlObjects = new();
 
         [Header("UI")]
         [SerializeField] Projectiles Projectiles;
@@ -139,7 +139,7 @@ namespace Game.Managers
                 { Debug.LogError($"[{nameof(TakeControlManager)}]: UI does not have an UIDocument", takeControlUiObject); }
             }
 
-            LeftMouse = new AdvancedMouse(MouseButton.Left, 11, InputCondition);
+            LeftMouse = new AdvancedMouse(Mouse.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
 
             CursorManager.Instance.Register(this);
@@ -152,7 +152,7 @@ namespace Game.Managers
             ControllingObjects.Initialize(this);
         }
 
-        public void ShouldAlwaysControll(ulong clientId, ulong objectId, bool should)
+        public void ShouldAlwaysControl(ulong clientId, ulong objectId, bool should)
         {
             if (NetcodeUtils.IsClient)
             {
@@ -160,15 +160,15 @@ namespace Game.Managers
                 return;
             }
 
-            for (int i = ShouldAlwaysControllObjects.Count - 1; i >= 0; i--)
+            for (int i = ShouldAlwaysControlObjects.Count - 1; i >= 0; i--)
             {
-                if (ShouldAlwaysControllObjects[i].ClientId != clientId) continue;
+                if (ShouldAlwaysControlObjects[i].ClientId != clientId) continue;
 
                 if (!should)
-                { ShouldAlwaysControllObjects.RemoveAt(i); }
+                { ShouldAlwaysControlObjects.RemoveAt(i); }
                 return;
             }
-            ShouldAlwaysControllObjects.Add(new ClientObject(clientId, objectId));
+            ShouldAlwaysControlObjects.Add(new ClientObject(clientId, objectId));
 
             if (!NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject obj))
             {
@@ -192,13 +192,13 @@ namespace Game.Managers
             }
         }
 
-        public bool ShouldIAlwaysControll(ulong clientId, out ulong objectId)
+        public bool ShouldIAlwaysControl(ulong clientId, out ulong objectId)
         {
-            for (int i = ShouldAlwaysControllObjects.Count - 1; i >= 0; i--)
+            for (int i = ShouldAlwaysControlObjects.Count - 1; i >= 0; i--)
             {
-                if (ShouldAlwaysControllObjects[i].ClientId != clientId) continue;
+                if (ShouldAlwaysControlObjects[i].ClientId != clientId) continue;
 
-                objectId = ShouldAlwaysControllObjects[i].ObjectId;
+                objectId = ShouldAlwaysControlObjects[i].ObjectId;
                 return true;
             }
 
@@ -737,25 +737,34 @@ namespace Game.Managers
                 return;
             }
 
-            if (NetcodeUtils.FindGameObject(objectID, out GameObject unitObject) &&
-                unitObject.TryGetComponent(out ICanTakeControl unit) &&
-                AnybodyControlling(unit, out ulong controlledBy) &&
-                controlledBy == serverRpcParams.Receive.SenderClientId)
+            if (!NetcodeUtils.FindGameObject(objectID, out GameObject unitObject))
             {
-                Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID} is now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
-
-                if (unitObject.TryGetComponent(out HoveringLabel label) &&
-                    AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
-                {
-                    label.Show(remoteAccounts.Get(serverRpcParams.Receive.SenderClientId)?.DisplayName);
-                }
-
-                ControllingObjects.Set((int)serverRpcParams.Receive.SenderClientId, objectID, ulong.MaxValue);
-
+                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Network object {objectID} not found", this);
                 return;
             }
 
-            Debug.LogWarning($"[{nameof(TakeControlManager)}]: Bruh case", this);
+            if (!unitObject.TryGetComponent(out ICanTakeControl unit))
+            {
+                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object {unitObject} does not have an {nameof(ICanTakeControl)} component", this);
+                return;
+            }
+
+            if (AnybodyControlling(unit, out ulong controlledBy) &&
+                controlledBy != serverRpcParams.Receive.SenderClientId)
+            {
+                Debug.LogWarning($"[{nameof(TakeControlManager)}]: Object {unit} already controlled by client {controlledBy}", this);
+                return;
+            }
+
+            Debug.Log($"[{nameof(TakeControlManager)}]: Object {objectID} is now controlled by {(int)serverRpcParams.Receive.SenderClientId}");
+
+            {
+                if (unitObject.TryGetComponent(out HoveringLabel label) &&
+                AuthManager.RemoteAccountProvider is IRemoteAccountProviderWithCustomID<ulong> remoteAccounts)
+                { label.Show(remoteAccounts.Get(serverRpcParams.Receive.SenderClientId)?.DisplayName); }
+            }
+
+            ControllingObjects.Set((int)serverRpcParams.Receive.SenderClientId, objectID, ulong.MaxValue);
         }
 
         [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
@@ -849,7 +858,7 @@ namespace Game.Managers
             if (ControllingObject is ICanTakeControlAndHasTurret hasTurret &&
                 hasTurret.Turret != null)
             {
-                using (ProfilerMarkers.TrajectoryMath.Auto())
+                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
                 {
                     if (hasTurret.Turret.TryGetTrajectory(out Ballistics.Trajectory trajectory))
                     {
@@ -903,7 +912,7 @@ namespace Game.Managers
                 { ReloadIndicatorFadeoutAnimation.Start(); }
 
                 if (hasTurret.Turret.reloadTime > 0.01f)
-                { reloadPercent = 1f - Mathf.Clamp01(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime); }
+                { reloadPercent = 1f - Maths.Clamp01(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime); }
 
                 isAccurate = hasTurret.Turret.IsAccurateShoot;
 
@@ -918,7 +927,7 @@ namespace Game.Managers
                     }
                     else
                     {
-                        hasTargetRect = Utils.GetScreenCorners(bounds, out var corners);
+                        hasTargetRect = UnityUtils.GetScreenCorners(MainCamera.Camera, bounds, out var corners);
 
                         if (hasTargetRect)
                         {
@@ -949,10 +958,10 @@ namespace Game.Managers
                 }
                 else
                 {
-                    this.targetRect.x = Mathf.MoveTowards(this.targetRect.x, targetRect.x, 1f);
-                    this.targetRect.y = Mathf.MoveTowards(this.targetRect.y, targetRect.y, 1f);
-                    this.targetRect.width = Mathf.MoveTowards(this.targetRect.width, targetRect.width, 1f);
-                    this.targetRect.height = Mathf.MoveTowards(this.targetRect.height, targetRect.height, 1f);
+                    this.targetRect.x = Maths.MoveTowards(this.targetRect.x, targetRect.x, 1f);
+                    this.targetRect.y = Maths.MoveTowards(this.targetRect.y, targetRect.y, 1f);
+                    this.targetRect.width = Maths.MoveTowards(this.targetRect.width, targetRect.width, 1f);
+                    this.targetRect.height = Maths.MoveTowards(this.targetRect.height, targetRect.height, 1f);
                 }
             }
 
@@ -973,16 +982,7 @@ namespace Game.Managers
             GL.PushMatrix();
             if (GLUtils.SolidMaterial.SetPass(0))
             {
-                if (trajectoryPath != null)
-                {
-                    GL.Begin(GL.LINE_STRIP);
-                    for (int i = 0; i < trajectoryPath.Length; i++)
-                    {
-                        GL.Color(new Color(1f, 1f, 1f, 1f - ((float)(i + 1) / (float)trajectoryPath.Length)));
-                        GL.Vertex(trajectoryPath[i]);
-                    }
-                    GL.End();
-                }
+                // if (trajectoryPath != null) DrawTrajectory(trajectoryPath);
 
                 Vector2 _targetPosition = (predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition;
 
@@ -999,7 +999,7 @@ namespace Game.Managers
 
                         if (targetObject != null)
                         {
-                            GUI.Label(new Rect(new Vector2(this.targetRect.xMax, this.targetRect.yMin - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize)), $"{Mathf.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m");
+                            GUI.Label(new Rect(new Vector2(this.targetRect.xMax, this.targetRect.yMin - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize)), $"{Maths.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m");
                         }
                     }
                     else
@@ -1018,6 +1018,17 @@ namespace Game.Managers
             }
             GL.PopMatrix();
             GUI.skin = savedSkin;
+        }
+
+        void DrawTrajectory(Vector3[] trajectoryPath)
+        {
+            GL.Begin(GL.LINE_STRIP);
+            for (int i = 0; i < trajectoryPath.Length; i++)
+            {
+                GL.Color(new Color(1f, 1f, 1f, 1f - ((float)(i + 1) / (float)trajectoryPath.Length)));
+                GL.Vertex(trajectoryPath[i]);
+            }
+            GL.End();
         }
 
         void DrawReloadIndicator(float value, Vector2 center, Color shadowColor)
@@ -1039,10 +1050,10 @@ namespace Game.Managers
                     {
                         float normalizedIndex = (float)i / (float)ReloadDots;
 
-                        float rad = 2 * Mathf.PI * normalizedIndex;
-                        Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+                        float rad = 2 * Maths.PI * normalizedIndex;
+                        Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
 
-                        float multiplier = Mathf.Clamp01((value - normalizedIndex) / step);
+                        float multiplier = Maths.Clamp01((value - normalizedIndex) / step);
 
                         if (multiplier <= .01f)
                         { continue; }
@@ -1070,8 +1081,8 @@ namespace Game.Managers
                         {
                             float normalizedIndex = (float)i / (float)ReloadDots;
 
-                            float rad = 2 * Mathf.PI * normalizedIndex;
-                            Vector2 direction = new(Mathf.Cos(rad), Mathf.Sin(rad));
+                            float rad = 2 * Maths.PI * normalizedIndex;
+                            Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
 
                             float size = ReloadDotsSize;
 

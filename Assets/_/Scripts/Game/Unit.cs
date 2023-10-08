@@ -83,7 +83,7 @@ namespace Game.Components
                 }
             }
 
-            if (Input.GetMouseButton(MouseButton.Left))
+            if (Input.GetMouseButton(Mouse.Left))
             {
                 turret.PrepareShooting = true;
 

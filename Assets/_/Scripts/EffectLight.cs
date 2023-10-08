@@ -13,7 +13,7 @@ public class EffectLight : MonoBehaviour
 
     [SerializeField, ReadOnly] float Lifetime;
 
-    float LifetimePercent => Mathf.Clamp01(Lifetime / MaxAge);
+    float LifetimePercent => Maths.Clamp01(Lifetime / MaxAge);
 
     [SerializeField, ReadOnly] float OriginalIntensity;
 

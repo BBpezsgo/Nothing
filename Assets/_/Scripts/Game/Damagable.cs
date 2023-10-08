@@ -1,11 +1,11 @@
 ﻿namespace Game.Components
 {
-    internal interface IDamagable
+    public interface IDamagable
     {
         public void Damage(float ammount);
     }
 
-    internal interface IDetailedDamagable
+    public interface IDetailedDamagable
     {
         public void Damage(float ammount, Projectile source);
     }

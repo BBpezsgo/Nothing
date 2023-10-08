@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Game.Components
@@ -47,7 +48,7 @@ namespace Game.Components
             {
                 float processed = CurrentRawMaterials;
 
-                CurrentRawMaterials = Mathf.Max(CurrentRawMaterials - (Time.fixedDeltaTime * processingSpeed), 0f);
+                CurrentRawMaterials = Math.Max(CurrentRawMaterials - (Time.fixedDeltaTime * processingSpeed), 0f);
                 processed -= CurrentRawMaterials;
 
                 CurrentProcessedMaterials += processed;

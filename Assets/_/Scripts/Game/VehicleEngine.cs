@@ -147,8 +147,8 @@ namespace Game.Components
             {
                 if (value.x == float.NegativeInfinity || value.x == float.PositiveInfinity || value.x == float.NaN) return;
                 if (value.y == float.NegativeInfinity || value.y == float.PositiveInfinity || value.y == float.NaN) return;
-                SteeringInput = Mathf.Clamp(value.x, -1f, 1f);
-                TorqueInput = Mathf.Clamp(value.y, -1f, 1f);
+                SteeringInput = Maths.Clamp(value.x, -1f, 1f);
+                TorqueInput = Maths.Clamp(value.y, -1f, 1f);
                 input = new Vector2(SteeringInput, TorqueInput);
             }
             get => new(SteeringInput, TorqueInput);
@@ -223,7 +223,7 @@ namespace Game.Components
         /// <summary>
         /// <b>Check if it's really handbrakeing!!!</b> <see cref="IsHandbraking"/>
         /// </summary>
-        public float HandbrakeValue => handbrake * (1 - Mathf.Abs(Mathf.Min(1, LaterialVelocity)));
+        public float HandbrakeValue => handbrake * (1 - Maths.Abs(Maths.Min(1, LaterialVelocity)));
 
         bool IsFlippedOver => FlippedOverValue < .5f;
 
@@ -289,13 +289,13 @@ namespace Game.Components
 
             if (HasDustParticles)
             {
-                DustEmissionRate = Mathf.Lerp(DustEmissionRate, 0, Time.deltaTime * 5);
+                DustEmissionRate = Maths.Lerp(DustEmissionRate, 0, Time.deltaTime * 5);
                 dustParticlesEmission.rateOverTime = InWater ? 0f : DustEmissionRate;
             }
 
             if (HasWaterParticles)
             {
-                WaterEmissionRate = Mathf.Lerp(WaterEmissionRate, 0, Time.deltaTime * 5);
+                WaterEmissionRate = Maths.Lerp(WaterEmissionRate, 0, Time.deltaTime * 5);
                 waterParticlesEmission.rateOverTime = InWater ? WaterEmissionRate : 0f;
             }
 
@@ -343,7 +343,7 @@ namespace Game.Components
             if (EnableWheels && Wheels.Length > 0)
             { return; }
 
-            SmoothSteeringInput = Mathf.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);
+            SmoothSteeringInput = Maths.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);
 
             DoBasicPhysics();
         }
@@ -372,7 +372,7 @@ namespace Game.Components
                     float springOffset = wheel.Radius - distanceFromGround;
 
                     if (wheel.HasSubtransform)
-                    { wheel.Subtransform.localPosition = new Vector3(0f, Mathf.Clamp(springOffset, 0f, wheel.Radius), 0f); }
+                    { wheel.Subtransform.localPosition = new Vector3(0f, Maths.Clamp(springOffset, 0f, wheel.Radius), 0f); }
 
                     if (distanceFromGround > wheel.Radius) continue;
 
@@ -448,7 +448,7 @@ namespace Game.Components
                             _forward = forward.Value;
                         }
 
-                        float normalizedSpeed = Mathf.Clamp(Speed / moveSpeedMax, -1, 1);
+                        float normalizedSpeed = Maths.Clamp(Speed / moveSpeedMax, -1, 1);
                         float avaliableTorque = (1f - normalizedSpeed) * EngineForce;
 
                         force += avaliableTorque * TorqueInput * _forward;
@@ -482,12 +482,12 @@ namespace Game.Components
                 if (isHandbraking)
                 { DustEmissionRate = DUST_HANDBRAKING; }
                 else if (LaterialVelocity > DUST_MIN_LATERIAL_VELOCITY)
-                { DustEmissionRate = Mathf.Abs(LaterialVelocity) * DUST_LATERIAL_VELOCITY_MULTIPLIER; }
+                { DustEmissionRate = Maths.Abs(LaterialVelocity) * DUST_LATERIAL_VELOCITY_MULTIPLIER; }
             }
 
             if (isHaveTracks && HasDustParticles)
             {
-                DustEmissionRate = Mathf.Max(DustEmissionRate, Speed * 10f);
+                DustEmissionRate = Maths.Max(DustEmissionRate, Speed * 10f);
             }
 
             if (HasWaterParticles)
@@ -537,7 +537,7 @@ namespace Game.Components
             // Pressing the gas pedal
             else
             {
-                float engineForce = Mathf.Clamp01(FlippedOverValue) * TorqueInput * moveAccelerationFactor * Mathf.Max(0f, 1 - (Speed / moveSpeedMax));
+                float engineForce = Maths.Clamp01(FlippedOverValue) * TorqueInput * moveAccelerationFactor * Maths.Max(0f, 1 - (Speed / moveSpeedMax));
                 Vector3 engineForceVector = transform.forward * engineForce;
                 Vector3 engineForcePosition = transform.position - (.2f * Collider.bounds.extents.y * transform.up);
                 rb.AddForceAtPosition(engineForceVector, engineForcePosition, ForceMode.Force);
@@ -562,7 +562,7 @@ namespace Game.Components
 
         void ApplySteering()
         {
-            Steering = Mathf.Clamp01(FlippedOverValue) * SmoothSteeringInput * turnFactor;
+            Steering = Maths.Clamp01(FlippedOverValue) * SmoothSteeringInput * turnFactor;
 
             float rotateAngle = 0f;
             if (isHaveTracks)
@@ -571,7 +571,7 @@ namespace Game.Components
             }
             else
             {
-                float minSpeedBeforeAllowTurningFactor = Mathf.Clamp01(Velocity.magnitude / speedAndSteer);
+                float minSpeedBeforeAllowTurningFactor = Maths.Clamp01(Velocity.magnitude / speedAndSteer);
                 if (IsReverse)
                 {
                     rotateAngle -= Steering * minSpeedBeforeAllowTurningFactor;
@@ -616,7 +616,7 @@ namespace Game.Components
             rb.velocity = new Vector3(finalVelocity.x, velocity.y, finalVelocity.z);
         }
 
-        bool IsTireScreeching => isHandbraking || Mathf.Abs(LaterialVelocity) > 15f;
+        bool IsTireScreeching => isHandbraking || Maths.Abs(LaterialVelocity) > 15f;
 
         #endregion
 
@@ -640,7 +640,7 @@ namespace Game.Components
         {
             float speed = this.Speed;
 
-            if (Mathf.Abs(speed) <= 1f)
+            if (Maths.Abs(speed) <= 1f)
             { return 0f; }
 
             float brake = this.Braking;
@@ -650,7 +650,7 @@ namespace Game.Components
 
             if (brake == 0f) brake = this.engineBrake;
 
-            float brakingDistance = Mathf.Abs(Utilities.Acceleration.DistanceToReachVelocity(speed, 0f, brake * -20f));
+            float brakingDistance = Maths.Abs(Utilities.Acceleration.DistanceToReachVelocity(speed, 0f, brake * -20f));
             if (this.IsReverse) brakingDistance = -brakingDistance;
             return brakingDistance;
         }

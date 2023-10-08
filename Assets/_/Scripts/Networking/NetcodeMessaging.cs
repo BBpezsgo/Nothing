@@ -736,7 +736,7 @@ namespace Networking.Network
             {
                 if (Data == null) return 0f;
                 if (ExpectedSize == 0f) return 0f;
-                return Mathf.Clamp01((float)TotalReceivedBytes / (float)ExpectedSize);
+                return Maths.Clamp01((float)TotalReceivedBytes / (float)ExpectedSize);
             }
         }
         internal bool ReceivedEverything => TotalReceivedBytes >= ExpectedSize;

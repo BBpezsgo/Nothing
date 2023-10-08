@@ -182,7 +182,7 @@ public class MTLLoader {
             if (splitLine[0] == "d")
             {
                 float visibility = OBJLoaderHelper.FastFloatParse(splitLine[1]);
-                if(visibility < (1f - Mathf.Epsilon))
+                if(visibility < (1f - Maths.Epsilon))
                 {
                     Color temp = currentMaterial.color;
 

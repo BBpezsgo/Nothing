@@ -37,7 +37,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     {
         RegenerateTextures();
 
-        LeftMouse = new AdvancedMouse(MouseButton.Left, 14, MouseCondition, HOLD_TIME_REQUIREMENT);
+        LeftMouse = new AdvancedMouse(Mouse.Left, 14, MouseCondition, HOLD_TIME_REQUIREMENT);
         LeftMouse.OnClick += LeftMouse_OnClick;
     }
 
@@ -61,14 +61,14 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             LeftMouse.Reset();
         }
 
-        if (IsShown && Input.GetMouseButtonUp(MouseButton.Left))
+        if (IsShown && Input.GetMouseButtonUp(Mouse.Left))
         {
             OnPicked();
             IsShown = false;
         }
 
         if (IsShown && (
-            Input.GetMouseButtonDown(MouseButton.Right) ||
+            Input.GetMouseButtonDown(Mouse.Right) ||
             Input.GetKeyDown(KeyCode.Escape)
             ))
         {
@@ -103,7 +103,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         if (!IsShown) return;
 
         float showTime = Time.unscaledTime - ShownAt;
-        float animationTime = Mathf.Clamp(showTime * ShowSpeed, 0f, 1f);
+        float animationTime = Maths.Clamp(showTime * ShowSpeed, 0f, 1f);
 
         Vector2 center = Origin;
         center.y = Screen.height - center.y;
@@ -132,9 +132,9 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             float smallestDot = float.MaxValue;
             for (int i = 0; i < commands.Length; i++)
             {
-                float rad = 2f * Mathf.PI * (((float)i) / ((float)commands.Length));
-                float x = Mathf.Cos(rad);
-                float y = Mathf.Sin(rad);
+                float rad = 2f * Maths.PI * (((float)i) / ((float)commands.Length));
+                float x = Maths.Cos(rad);
+                float y = Maths.Sin(rad);
                 Vector2 direction = new(x, y);
                 float dot = Vector2.Dot(direction, mouseDirection);
                 if (dot < smallestDot)
@@ -148,11 +148,11 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         for (int i = 0; i < commands.Length; i++)
         {
             float normalizedIndex = (float)i / (float)commands.Length;
-            float localAnimationTime = Mathf.Clamp(((showTime - (normalizedIndex / ShowSpeed)) * ShowSpeed) - .3f, 0f, 1f);
+            float localAnimationTime = Maths.Clamp(((showTime - (normalizedIndex / ShowSpeed)) * ShowSpeed) - .3f, 0f, 1f);
 
-            float rad = 2 * Mathf.PI * normalizedIndex;
-            float x = Mathf.Cos(rad);
-            float y = Mathf.Sin(rad);
+            float rad = 2 * Maths.PI * normalizedIndex;
+            float x = Maths.Cos(rad);
+            float y = Maths.Sin(rad);
             Vector2 direction = new(x, y);
             Vector2 point = MiddleRadius * localAnimationTime * direction;
 
@@ -228,7 +228,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             Vector2 diff = (Vector2)projectedWorldPosition - center;
             float diffD = diff.sqrMagnitude;
 
-            if (diffD > Mathf.Pow(OuterRadius, 2))
+            if (diffD > Maths.Pow(OuterRadius, 2))
             {
                 Vector2 startP = center + (diff.normalized * OuterRadius);
 

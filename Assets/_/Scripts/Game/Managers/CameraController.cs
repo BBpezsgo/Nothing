@@ -9,13 +9,14 @@ namespace Game.Managers
         Normal,
         TopDown,
         ZoomBased,
+        OrthographicTopDown,
     }
 
     internal delegate void OnCameraModeChanged(CameraMode mode);
 
     public class CameraController : MonoBehaviour
     {
-        internal static CameraController Instance;
+        public static CameraController Instance;
 
         [SerializeField] Camera theCamera;
         [SerializeField] Transform cameraRotation;
@@ -27,7 +28,7 @@ namespace Game.Managers
         [Header("Following")]
         [SerializeField] internal Transform FollowObject;
         internal bool IsFollowing => FollowObject != null;
-        [SerializeField, Tooltip("Use the default movement behaviour when following an object")] internal bool JustFollow;
+        [SerializeField, Tooltip("Use the default movement behavior when following an object")] internal bool JustFollow;
         [SerializeField, ReadOnly] float ActualFollowSpeed = 1f;
         [SerializeField, MinMax(0f, 10f)] Vector2 FollowHeightDisplacement = Vector2.one;
 
@@ -62,10 +63,10 @@ namespace Game.Managers
         [SerializeField, ReadOnly] float Zoom;
 
         [Header("Scoping")]
-        [SerializeField] internal CameraLockable LockOn;
-        internal bool IsLocked => LockOn != null;
+        [SerializeField] public CameraLockable LockOn;
+        public bool IsLocked => LockOn != null;
 
-        internal bool TryOverrideLock(CameraLockable @lock, int lockPriority)
+        public bool TryOverrideLock(CameraLockable @lock, int lockPriority)
         {
             if (LockOn != null && LockOn.Priority > lockPriority) return false;
 
@@ -81,11 +82,9 @@ namespace Game.Managers
         [SerializeField, ReadOnly] bool IsTotallyLocked = false;
 
         // [Header("Other")]
-        internal float ZoomValue => Mathf.Max(0f, -theCamera.transform.localPosition.z);
+        internal float ZoomValue => Maths.Max(0f, -theCamera.transform.localPosition.z);
         internal Vector3 CameraPosition => theCamera.transform.position;
         internal event OnCameraModeChanged OnCameraModeChanged;
-
-        internal static Vector2 MouseDelta => new(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
         TouchZoom TouchZoom;
 
@@ -106,7 +105,7 @@ namespace Game.Managers
             TargetZoom = -theCamera.transform.localPosition.z;
             Zoom = -theCamera.transform.localPosition.z;
 
-            TargetAngle = Mathf.Clamp(cameraRotation.transform.localRotation.eulerAngles.x, 10f, 80f);
+            TargetAngle = Maths.Clamp(cameraRotation.transform.localRotation.eulerAngles.x, 10f, 80f);
 
             TargetRotation = transform.rotation.eulerAngles.y;
             Rotation = transform.rotation.eulerAngles.y;
@@ -132,7 +131,7 @@ namespace Game.Managers
                 case CameraMode.Normal:
                     {
                         TargetRotation += delta.x * inputAngleMultiplier;
-                        TargetAngle = Mathf.Clamp(TargetAngle - (delta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                        TargetAngle = Maths.Clamp(TargetAngle - (delta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
                         break;
                     }
                 case CameraMode.TopDown:
@@ -144,7 +143,13 @@ namespace Game.Managers
                 case CameraMode.ZoomBased:
                     {
                         TargetRotation += delta.x * inputAngleMultiplier;
-                        TargetAngle = Mathf.Clamp(Zoom * .5f, 10f, 80f);
+                        TargetAngle = Maths.Clamp(Zoom * .5f, 10f, 80f);
+                        break;
+                    }
+                case CameraMode.OrthographicTopDown:
+                    {
+                        TargetRotation = 45f;
+                        TargetAngle = 45f;
                         break;
                     }
             }
@@ -153,16 +158,16 @@ namespace Game.Managers
         void OnTouchZoom(TouchZoom sender, float delta)
         {
             float zoomInput = delta * 30f;
-            zoomInput *= Mathf.Max(Mathf.Log(ZoomValue), 1f);
+            zoomInput *= Maths.Max(Maths.Log(ZoomValue), 1f);
 
-            TargetZoom = Mathf.Max(TargetZoom + zoomInput, 0f);
+            TargetZoom = Maths.Max(TargetZoom + zoomInput, 0f);
 
-            Zoom = Mathf.Max(TargetZoom, 0f);
+            Zoom = Maths.Max(TargetZoom, 0f);
         }
 
         void Update()
         {
-            currentZoomSpeed = Mathf.MoveTowards(currentZoomSpeed, targetZoomSpeed, 5 * Time.unscaledDeltaTime);
+            currentZoomSpeed = Maths.MoveTowards(currentZoomSpeed, targetZoomSpeed, 5 * Time.unscaledDeltaTime);
 
             if (IsLocked)
             {
@@ -192,17 +197,11 @@ namespace Game.Managers
             }
 
             if (Input.GetKeyDown(KeyCode.F5))
-            {
-                cameraMode = cameraMode switch
-                {
-                    CameraMode.Normal => CameraMode.TopDown,
-                    CameraMode.TopDown => CameraMode.ZoomBased,
-                    CameraMode.ZoomBased => CameraMode.Normal,
-                    _ => CameraMode.Normal,
-                };
-            }
+            { cameraMode = (CameraMode)(((int)cameraMode + 1) % 4); }
 
             HandleRotationInput();
+
+            HandleZooming();
 
             if (IsFollowing)
             { DoFollowing(Time.unscaledDeltaTime); }
@@ -214,20 +213,27 @@ namespace Game.Managers
             DoZooming(Time.unscaledDeltaTime);
 
             DoAngle(Time.unscaledDeltaTime);
+        }
 
-            if (!MenuManager.AnyMenuVisible &&
-                MouseManager.MouseOnWindow &&
-                !MouseManager.IsPointerOverUI())
-            {
-                float zoomInput = -Input.mouseScrollDelta.y * zoomInputMultiplier;
+        void HandleZooming()
+        {
+            if (MenuManager.AnyMenuVisible ||
+                !MouseManager.MouseOnWindow ||
+                MouseManager.IsPointerOverUI())
+            { return; }
 
-                if (Input.GetKey(KeyCode.LeftShift))
-                { zoomInput *= ZoomBonusOnShift; }
+            float zoomInput;
+            if (MouseAlt.HasScrollDelta)
+            { zoomInput = MouseAlt.ScrollDelta * .2f; }
+            else
+            { zoomInput = -Mouse.ScrollDelta * zoomInputMultiplier; }
 
-                zoomInput *= Mathf.Max(Mathf.Log(ZoomValue), 1f);
+            if (Input.GetKey(KeyCode.LeftShift))
+            { zoomInput *= ZoomBonusOnShift; }
 
-                TargetZoom = Mathf.Max(TargetZoom + zoomInput, 0f);
-            }
+            zoomInput *= Maths.Max(Maths.Log(ZoomValue), 1f);
+
+            TargetZoom = Maths.Max(TargetZoom + zoomInput, 0f);
         }
 
         void HandleMovementInput()
@@ -261,25 +267,53 @@ namespace Game.Managers
             {
                 case CameraMode.Normal:
                     {
-                        if (!MenuManager.AnyMenuVisible && ((IsFollowing && !JustFollow) || Input.GetMouseButton(MouseButton.Middle)))
+                        if (!MenuManager.AnyMenuVisible)
                         {
-                            TargetRotation += MouseDelta.x * inputAngleMultiplier;
-                            TargetAngle = Mathf.Clamp(TargetAngle - (MouseDelta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                            if (MouseAlt.HasDelta)
+                            {
+                                TargetRotation += MouseAlt.DeltaX;
+                                TargetAngle = Maths.Clamp(TargetAngle - (MouseAlt.DeltaY), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                            }
+                            else if ((IsFollowing && !JustFollow) || Input.GetMouseButton(Mouse.Middle))
+                            {
+                                TargetRotation += Mouse.DeltaX * inputAngleMultiplier;
+                                TargetAngle = Maths.Clamp(TargetAngle - (Mouse.DeltaY * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                            }
                         }
+
                         break;
                     }
                 case CameraMode.TopDown:
                     {
-                        if (!MenuManager.AnyMenuVisible && Input.GetMouseButton(MouseButton.Middle))
-                        { TargetRotation += MouseDelta.x * inputAngleMultiplier; }
+                        if (!MenuManager.AnyMenuVisible)
+                        {
+                            if (MouseAlt.HasDelta)
+                            { TargetRotation += Mouse.DeltaX; }
+                            else if (Input.GetMouseButton(Mouse.Middle))
+                            { TargetRotation += Mouse.DeltaX * inputAngleMultiplier; }
+                        }
+
                         TargetAngle = 80f;
                         break;
                     }
                 case CameraMode.ZoomBased:
                     {
-                        if (!MenuManager.AnyMenuVisible && (/*(IsFollowing && !JustFollow) || */Input.GetMouseButton(MouseButton.Middle)))
-                        { TargetRotation += MouseDelta.x * inputAngleMultiplier; }
-                        TargetAngle = Mathf.Clamp(Zoom * .5f, 10f, 80f);
+                        if (!MenuManager.AnyMenuVisible)
+                        {
+                            if (MouseAlt.HasDelta)
+                            { TargetRotation += MouseAlt.DeltaX; }
+                            else if (Input.GetMouseButton(Mouse.Middle))
+                            { TargetRotation += Mouse.DeltaX * inputAngleMultiplier; }
+                        }
+
+                        TargetAngle = Maths.Clamp(Zoom * .5f, 10f, 80f);
+                        break;
+                    }
+
+                case CameraMode.OrthographicTopDown:
+                    {
+                        TargetRotation = 45f;
+                        TargetAngle = 45f;
                         break;
                     }
             }
@@ -296,7 +330,7 @@ namespace Game.Managers
             {
                 float lockSpeed = 50f;
 
-                lockSpeed *= Mathf.Clamp(Mathf.Sqrt(LockedValue) / 3, .001f, 10f);
+                lockSpeed *= Maths.Clamp(Maths.Sqrt(LockedValue) / 3, .001f, 10f);
 
                 {
                     Vector3 displacement = LockOn.position - transform.position;
@@ -326,22 +360,22 @@ namespace Game.Managers
                 !MenuManager.AnyMenuVisible &&
                 MouseManager.MouseOnWindow)
             {
-                theCamera.fieldOfView = Mathf.Clamp(theCamera.fieldOfView - (Input.mouseScrollDelta.y * 2f), 20f, 60f);
+                theCamera.fieldOfView = Maths.Clamp(theCamera.fieldOfView - (Input.mouseScrollDelta.y * 2f), 20f, 60f);
             }
         }
 
         void DoFollowing(float deltaTime)
         {
             if ((transform.position - FollowObject.position).sqrMagnitude > 10f)
-            { ActualFollowSpeed = Mathf.Sqrt((transform.position - FollowObject.position).sqrMagnitude) * 3f; }
+            { ActualFollowSpeed = Maths.Sqrt((transform.position - FollowObject.position).sqrMagnitude) * 3f; }
             else if (FollowObject.gameObject.TryGetComponent<VehicleEngine>(out var vehicle))
             { ActualFollowSpeed = vehicle.Speed + 5f; }
 
-            Vector3 displacement = FollowObject.position - (transform.position + new Vector3(0f, Mathf.Clamp(ZoomValue * -0.1f, -FollowHeightDisplacement.y, -FollowHeightDisplacement.x), 0f));
+            Vector3 displacement = FollowObject.position - (transform.position + new Vector3(0f, Maths.Clamp(ZoomValue * -0.1f, -FollowHeightDisplacement.y, -FollowHeightDisplacement.x), 0f));
             displacement *= .9f;
             displacement = Vector3.ClampMagnitude(displacement, ActualFollowSpeed * deltaTime);
 
-            float verticalDisplacement = ((FollowObject.position.y + Mathf.Clamp(ZoomValue, FollowHeightDisplacement.x, FollowHeightDisplacement.y)) - transform.position.y) * deltaTime;
+            float verticalDisplacement = ((FollowObject.position.y + Maths.Clamp(ZoomValue, FollowHeightDisplacement.x, FollowHeightDisplacement.y)) - transform.position.y) * deltaTime;
             displacement.y = verticalDisplacement;
 
             transform.Translate(displacement, Space.World);
@@ -358,8 +392,8 @@ namespace Game.Managers
 
             if (Velocity != Vector2.zero || verticalVelocity != 0f)
             {
-                // float heightMultiplier = Mathf.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
-                float heightMultiplier = Mathf.Max(.2f, Mathf.Log(ZoomValue));
+                // float heightMultiplier = Maths.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
+                float heightMultiplier = Maths.Max(.2f, Maths.Log(ZoomValue));
 
                 Vector2 scaledVelocity = Velocity * heightMultiplier;
 
@@ -381,25 +415,49 @@ namespace Game.Managers
         {
             if (Rotation == TargetRotation) return;
 
-            Rotation = Mathf.LerpAngle(Rotation, TargetRotation, 1f - Mathf.Pow(.5f, rotationSpeed * deltaTime));
+            Rotation = Maths.LerpAngle(Rotation, TargetRotation, 1f - Maths.Pow(.5f, rotationSpeed * deltaTime));
             transform.rotation = Quaternion.Euler(0f, Rotation, 0f);
         }
 
         void DoZooming(float deltaTime)
         {
-            Zoom = Mathf.Lerp(Zoom, TargetZoom, 1f - Mathf.Pow(.5f, currentZoomSpeed * deltaTime));
-            Zoom = Mathf.Max(Zoom, 0f);
+            if (cameraMode == CameraMode.OrthographicTopDown)
+            {
+                Zoom = Maths.Lerp(Zoom, TargetZoom, 1f - Maths.Pow(.5f, currentZoomSpeed * deltaTime));
+                Zoom = Maths.Max(Zoom, 0f);
 
-            float zoomTransition = Zoom - ZoomValue;
+                float zoomTransition = Zoom - ZoomValue;
+                if (zoomTransition != 0)
+                { theCamera.transform.Translate(new Vector3(0f, 0f, -zoomTransition), Space.Self); }
 
-            if (zoomTransition == 0) return;
+                if (!theCamera.orthographic)
+                {
+                    theCamera.orthographic = true;
+                    theCamera.ResetProjectionMatrix();
+                }
 
-            theCamera.transform.Translate(new Vector3(0f, 0f, -zoomTransition), Space.Self);
+                theCamera.orthographicSize = Maths.Max(Zoom * .4f, 1f);
+            }
+            else
+            {
+                Zoom = Maths.Lerp(Zoom, TargetZoom, 1f - Maths.Pow(.5f, currentZoomSpeed * deltaTime));
+                Zoom = Maths.Max(Zoom, 0f);
+
+                float zoomTransition = Zoom - ZoomValue;
+                if (zoomTransition != 0)
+                { theCamera.transform.Translate(new Vector3(0f, 0f, -zoomTransition), Space.Self); }
+
+                if (theCamera.orthographic)
+                {
+                    theCamera.orthographic = false;
+                    theCamera.ResetProjectionMatrix();
+                }
+            }
         }
 
         void DoAngle(float deltaTime)
         {
-            cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.Euler(TargetAngle, 0f, 0f), 1f - Mathf.Pow(.5f, AngleSpeed * deltaTime));
+            cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.Euler(TargetAngle, 0f, 0f), 1f - Maths.Pow(.5f, AngleSpeed * deltaTime));
         }
 
         void FixedUpdate()

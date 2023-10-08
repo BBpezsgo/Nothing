@@ -49,11 +49,11 @@ namespace Game.Managers
             if (CommandManager == null)
             { Debug.LogWarning($"[{nameof(SelectionManager)}]: {nameof(CommandManager)} is null"); }
 
-            MouseLeftButton = new AdvancedMouse(MouseButton.Left, 10, MouseCondition);
+            MouseLeftButton = new AdvancedMouse(Mouse.Left, 10, MouseCondition);
             MouseLeftButton.OnDragged += OnLeftDragged;
             MouseLeftButton.OnClick += OnLeftClicked;
 
-            MouseRightButton = new AdvancedMouse(MouseButton.Right, 10, MouseCondition);
+            MouseRightButton = new AdvancedMouse(Mouse.Right, 10, MouseCondition);
             MouseRightButton.OnClick += OnRightClicked;
 
             CursorManager.Instance.Register(this);
@@ -299,9 +299,9 @@ namespace Game.Managers
             if (!MouseLeftButton.IsDragging || !MouseLeftButton.IsActive)
             { return; }
 
-            Rect rect = Utilities.Utils.GetScreenRect(MouseLeftButton.DragStart, Input.mousePosition);
-            Utilities.Utils.DrawScreenRect(rect, SelectionBoxColor);
-            Utilities.Utils.DrawScreenRectBorder(rect, SelectionBoxBorderWidth, SelectionBoxBorderColor);
+            Rect rect = Utilities.UnityUtils.GetScreenRect(MouseLeftButton.DragStart, Input.mousePosition);
+            Utilities.UnityUtils.DrawScreenRect(rect, SelectionBoxColor);
+            Utilities.UnityUtils.DrawScreenRectBorder(rect, SelectionBoxBorderWidth, SelectionBoxBorderColor);
         }
 
         /// <summary>

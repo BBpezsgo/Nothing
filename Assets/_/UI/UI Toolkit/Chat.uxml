@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:VisualElement name="container" style="background-color: rgba(0, 0, 0, 0.3); position: absolute; left: 0; bottom: 0; max-width: 260px; flex-grow: 1;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="messages-container" horizontal-scroller-visibility="Hidden" style="flex-grow: 1;">
+            <ui:VisualElement name="message" style="flex-direction: column; flex-wrap: wrap; flex-grow: 0; white-space: normal;">
+                <ui:VisualElement name="icon" style="flex-shrink: 0; width: 20px; height: 20px; background-image: url(&apos;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2346436936791262179&amp;guid=888d889282661a243bd8c5c6ae0df9db&amp;type=3#console.infoicon&apos;);" />
+                <ui:Label text="Labelfdsfsdfsdfsdfsdfsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsdsd" display-tooltip-when-elided="true" name="label-content" style="flex-wrap: wrap; white-space: normal;" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="input-container" style="flex-direction: row; background-color: rgba(56, 56, 56, 255); border-left-color: rgb(89, 89, 89); border-right-color: rgb(89, 89, 89); border-top-color: rgb(89, 89, 89); border-bottom-color: rgb(89, 89, 89); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; flex-shrink: 0;">
+            <ui:TextField picking-mode="Ignore" name="input" max-length="40" style="flex-basis: 200px;" />
+            <ui:Button text="Send" display-tooltip-when-elided="true" name="button-send" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

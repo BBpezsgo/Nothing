@@ -78,7 +78,7 @@ namespace Game.Components
             { return true; }
 
             if (Particles != null)
-            { Particles.Emit(Mathf.RoundToInt(ParticlesAmmount * progress)); }
+            { Particles.Emit(Maths.RoundToInt(ParticlesAmmount * progress)); }
 
             BuildingProcess += progress;
 

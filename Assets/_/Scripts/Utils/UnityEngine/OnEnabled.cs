@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    internal delegate void OnEnableEvent();
+    public delegate void OnEnableEvent();
 
     public class OnEnabled : MonoBehaviour
     {
-        internal event OnEnableEvent onEnable;
+        public event OnEnableEvent onEnable;
         void OnEnable() => onEnable?.Invoke();
     }
 

@@ -64,7 +64,7 @@ namespace Game.UI
             {
                 GUIStyle style = Skin.GetStyle("label-stats");
 
-                string label = $"FPS: {Mathf.CeilToInt(LastFramerate)}";
+                string label = $"FPS: {Maths.CeilToInt(LastFramerate)}";
                 Vector2 size = style.CalcSize(new GUIContent(label));
                 Vector2 position = new Vector2(Screen.width - size.x, 0) + new Vector2(-4, 4);
                 GUI.Label(new Rect(position, size), label, style);
@@ -74,7 +74,7 @@ namespace Game.UI
         /*
         void OnDrawWindow()
         {
-            GUILayout.Label($"FPS: {Mathf.RoundToInt(LastFramerate)}");
+            GUILayout.Label($"FPS: {Maths.RoundToInt(LastFramerate)}");
 
             Rect graphRect = GUILayoutUtility.GetRect(80f, 100f);
             if (Event.current.type == EventType.Repaint)
@@ -112,8 +112,8 @@ namespace Game.UI
                 float value1 = drawValues[i - 1];
                 float value2 = drawValues[i];
 
-                value1 = Mathf.Clamp(value1, 0f, maxValue);
-                value2 = Mathf.Clamp(value2, 0f, maxValue);
+                value1 = Maths.Clamp(value1, 0f, maxValue);
+                value2 = Maths.Clamp(value2, 0f, maxValue);
 
                 float x1 = (i - 1) * widthScale;
                 float x2 = (i) * widthScale;

@@ -103,7 +103,7 @@ public class GameManager : SingleNetworkInstance<GameManager>
 
         ClientObjects.Add(new ClientObject(clientId, objectId));
 
-        TakeControlManager.Instance.ShouldAlwaysControll(clientId, objectId, true);
+        TakeControlManager.Instance.ShouldAlwaysControl(clientId, objectId, true);
     }
 
     GameObject InstantiatePlayerObject(GameObject prefab, ulong ownerId)

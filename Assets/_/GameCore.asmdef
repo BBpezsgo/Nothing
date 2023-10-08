@@ -1,0 +1,30 @@
+{
+    "name": "GameCore",
+    "rootNamespace": "",
+    "references": [
+        "GUID:96424ca1d1e0bc649bce10279a53ff07",
+        "GUID:089ae5d1c530d8546854b5fb4e93afb2",
+        "GUID:3b8ed52f1b5c64994af4c4e0aa4b6c4b",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:2aa43b0c797e0d444a7e82e75d4f2082",
+        "GUID:297305f147831cf40986760fb65c251e",
+        "GUID:72616ce32f01317409ff1c9b4202aa29",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9",
+        "GUID:fe25561d224ed4743af4c60938a59d0b",
+        "GUID:1104de264d522446f8274872ebf70b3d",
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:2c360f3794ebc41388fc11424ddbfdd0",
+        "GUID:088b28bd4e32e6f4b812ed0814121a32",
+        "GUID:5e0b455853cd340e0813387221dfd501"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

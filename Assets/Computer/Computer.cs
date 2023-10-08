@@ -88,9 +88,9 @@ namespace InGameComputer
             return true;
         }
 
-        public void Damage(float ammount)
+        public void Damage(float amount)
         {
-            HP -= ammount;
+            HP -= amount;
             if (HP <= 0)
             { Explode(); }
         }
@@ -237,8 +237,8 @@ namespace InGameComputer
         public MouseEventSystem(Monitor computerScreen)
         {
             ComputerScreen = computerScreen;
-            LeftMouse = new ComputerMouseEventSubsystem(MouseButton.Left, computerScreen);
-            RightMouse = new ComputerMouseEventSubsystem(MouseButton.Right, computerScreen);
+            LeftMouse = new ComputerMouseEventSubsystem(Mouse.Left, computerScreen);
+            RightMouse = new ComputerMouseEventSubsystem(Mouse.Right, computerScreen);
         }
 
         public void Tick()
@@ -305,29 +305,29 @@ namespace InGameComputer
 
         public bool IsButtonDown(int button) => button switch
         {
-            MouseButton.Left => LeftMouse.IsDown,
-            MouseButton.Right => RightMouse.IsDown,
+            Mouse.Left => LeftMouse.IsDown,
+            Mouse.Right => RightMouse.IsDown,
             _ => throw new System.Exception($"Unknown button {button}"),
         };
 
         public bool IsButtonHold(int button) => button switch
         {
-            MouseButton.Left => LeftMouse.IsHold,
-            MouseButton.Right => RightMouse.IsHold,
+            Mouse.Left => LeftMouse.IsHold,
+            Mouse.Right => RightMouse.IsHold,
             _ => throw new System.Exception($"Unknown button {button}"),
         };
 
         public bool IsButtonUp(int button) => button switch
         {
-            MouseButton.Left => LeftMouse.IsUp,
-            MouseButton.Right => RightMouse.IsUp,
+            Mouse.Left => LeftMouse.IsUp,
+            Mouse.Right => RightMouse.IsUp,
             _ => throw new System.Exception($"Unknown button {button}"),
         };
 
         public Vector2 PressedAt(int button) => button switch
         {
-            MouseButton.Left => LeftMouse.PressedAt,
-            MouseButton.Right => RightMouse.PressedAt,
+            Mouse.Left => LeftMouse.PressedAt,
+            Mouse.Right => RightMouse.PressedAt,
             _ => throw new System.Exception($"Unknown button {button}"),
         };
     }
@@ -774,7 +774,7 @@ namespace InGameComputer
         }
 
         void MoveCursor(int offset)
-        { CursorPosition = Mathf.Clamp(CursorPosition + offset, 0, Buffer.Length); }
+        { CursorPosition = Maths.Clamp(CursorPosition + offset, 0, Buffer.Length); }
 
         public void Clear()
         {
@@ -783,7 +783,7 @@ namespace InGameComputer
         }
 
         internal void SetCursor(int clickedCharacter)
-        { CursorPosition = Mathf.Clamp(clickedCharacter, 0, Buffer.Length); }
+        { CursorPosition = Maths.Clamp(clickedCharacter, 0, Buffer.Length); }
     }
 
     [Serializable]
@@ -862,9 +862,9 @@ namespace InGameComputer
 
             int characterWidth = Computer.Hardware.VideoCard.SelectedFont.CharacterSize(FontSize).x;
 
-            int avaliableLines = Rect.height / FontSize - 1;
+            int availableLines = Rect.height / FontSize - 1;
 
-            int startLineIndex = Mathf.Max(0, Lines.Count - avaliableLines);
+            int startLineIndex = Maths.Max(0, Lines.Count - availableLines);
 
             int visibleLines = Lines.Count - startLineIndex;
             int linesHeight = visibleLines * FontSize * LineSpacing;
@@ -929,11 +929,11 @@ namespace InGameComputer
 
         public override void Draw()
         {
-            int avaliableLines = Rect.height / FontSize - 1;
+            int availableLines = Rect.height / FontSize - 1;
 
             int characterWidth = Computer.Hardware.VideoCard.SelectedFont.CharacterSize(FontSize).x;
 
-            int startLineIndex = Mathf.Max(0, Lines.Count - avaliableLines);
+            int startLineIndex = Maths.Max(0, Lines.Count - availableLines);
 
             int visibleLines = Lines.Count - startLineIndex;
             int linesHeight = visibleLines * FontSize * LineSpacing;
@@ -1494,7 +1494,7 @@ namespace InGameComputer
                         if (string.IsNullOrWhiteSpace(label)) continue;
                         values.Add((value, label));
 
-                        longest = Mathf.Max(longest, MeasureText.Invoke(label, 8).x);
+                        longest = Maths.Max(longest, MeasureText.Invoke(label, 8).x);
                     }
 
                     contentRect = new RectInt(CurrentPosition, new Vector2Int(longest, 10));
@@ -1576,7 +1576,7 @@ namespace InGameComputer
         {
             if (color.grayscale >= .5f) return color;
             Color.RGBToHSV(color, out float h, out float s, out float v);
-            v = Mathf.Clamp(v, .5f, 1f);
+            v = Maths.Clamp(v, .5f, 1f);
             return Color.HSVToRGB(h, s, v);
         }
 
@@ -1630,7 +1630,7 @@ namespace InGameComputer
             if (CurrentPosition.x + element.PaddingRect.width > PageArea.width)
             {
                 FinishLine();
-                OverflowX = Mathf.Max(OverflowX, element.PaddingRect.width);
+                OverflowX = Maths.Max(OverflowX, element.PaddingRect.width);
             }
 
             element.ContentPosition = CurrentPosition;
@@ -1642,7 +1642,7 @@ namespace InGameComputer
 
             element.RecalculateRectangles();
 
-            CurrentLine.LineHeight = Mathf.Max(CurrentLine.LineHeight, element.PaddingRect.height);
+            CurrentLine.LineHeight = Maths.Max(CurrentLine.LineHeight, element.PaddingRect.height);
             CurrentLine.Elements.Add(element);
 
             element.RecalculateRectangles();

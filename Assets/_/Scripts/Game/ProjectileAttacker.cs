@@ -66,7 +66,7 @@ namespace Game.Components
             }
 
             var predictedAim = Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition, projectile.Shot);
-            
+
             /*
             float? angle_;
             float? t;
@@ -79,7 +79,7 @@ namespace Game.Components
 
                 float lifetime = projectile.Lifetime + Time.fixedDeltaTime;
 
-                var projectileTOF = Ballistics.CalculateTime(shot.Velocity, shot.ShootAngle * Mathf.Deg2Rad, shot.ShootPosition.y);
+                var projectileTOF = Ballistics.CalculateTime(shot.Velocity, shot.ShootAngle * Maths.Deg2Rad, shot.ShootPosition.y);
 
                 if (projectileTOF.HasValue && (projectileTOF - lifetime) < .5f)
                 {
@@ -117,11 +117,11 @@ namespace Game.Components
             {
                 // Debug3D.DrawSphere(predictedAim.Value.PredictedPosition, 2f, Color.red, predictedAim.Value.TimeToReach);
 
-                // Vector3 predictedTargetPos = turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Mathf.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f;
+                // Vector3 predictedTargetPos = turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f;
 
                 // Debug.DrawLine(turret.ShootPosition, predictedTargetPos, Color.white, Time.fixedDeltaTime, false);
 
-                // turret.Input = new Vector2(0f, angle_.Value * Mathf.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Mathf.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
+                // turret.Input = new Vector2(0f, angle_.Value * Maths.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
                 turret.RequiedProjectileLifetime = predictedAim.Value.TimeToReach - Time.fixedDeltaTime;
                 turret.SetTarget(predictedAim.Value.PredictedPosition);
             }

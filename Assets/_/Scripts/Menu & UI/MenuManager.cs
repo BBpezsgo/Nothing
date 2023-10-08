@@ -106,7 +106,7 @@ namespace Game.Managers
                         SetActive(true);
                         SetUI();
                     }
-                    // this.alpha = Mathf.Lerp(this.alpha, 1f, deltaTime * lerpAmmount);
+                    // this.alpha = Maths.Lerp(this.alpha, 1f, deltaTime * lerpAmmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
                 else
@@ -116,7 +116,7 @@ namespace Game.Managers
                         SetActive(false);
                         SetUI();
                     }
-                    // this.alpha = Mathf.Lerp(this.alpha, 0f, deltaTime * lerpAmmount);
+                    // this.alpha = Maths.Lerp(this.alpha, 0f, deltaTime * lerpAmmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
             }

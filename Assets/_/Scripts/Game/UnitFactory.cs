@@ -38,7 +38,7 @@ namespace Game.Components
             {
                 if (Queue.Count == 0) return 0f;
                 QueuedUnit producing = Queue[0];
-                return Mathf.Clamp01(producing.Progress / producing.RequiedProgress);
+                return Maths.Clamp01(producing.Progress / producing.RequiedProgress);
             }
         }
 

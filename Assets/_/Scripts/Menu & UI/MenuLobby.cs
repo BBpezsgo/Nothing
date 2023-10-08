@@ -42,7 +42,8 @@ namespace Game.UI
             UI.rootVisualElement.Q<Button>("button-discovery-toggle").clicked += ButtonDiscoveryToggle;
             UI.rootVisualElement.Q<Button>("button-discovery-refresh").clicked += ButtonDiscoveryRefresh;
 
-            NetworkDiscovery.Instance.OnDiscoveredSomething += OnDiscoveredSomething;
+            if (NetworkDiscovery.Instance != null)
+            { NetworkDiscovery.Instance.OnDiscoveredSomething += OnDiscoveredSomething; }
 
             if (string.IsNullOrWhiteSpace(InputSocket.value))
             {
@@ -164,6 +165,9 @@ namespace Game.UI
 
         void ButtonDiscoveryRefresh()
         {
+            NetworkDiscovery.Instance.OnDiscoveredSomething -= OnDiscoveredSomething;
+            NetworkDiscovery.Instance.OnDiscoveredSomething += OnDiscoveredSomething;
+
             if (!NetworkManager.Singleton.IsListening &&
                 NetworkDiscovery.Instance.IsRunning &&
                 NetworkDiscovery.IsSupported)

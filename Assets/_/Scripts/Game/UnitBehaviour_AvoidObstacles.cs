@@ -53,7 +53,7 @@ namespace Game.Components
                 }
                 else
                 {
-                    TimeToCheck = Mathf.Clamp((DetectionRange * DetectionRange) / MovementEngine.Velocity.sqrMagnitude, .1f, MaxDetectionCooldown);
+                    TimeToCheck = Maths.Clamp((DetectionRange * DetectionRange) / MovementEngine.Velocity.sqrMagnitude, .1f, MaxDetectionCooldown);
                 }
             }
 
@@ -134,7 +134,7 @@ namespace Game.Components
 
             float lr = Vector2.SignedAngle(transform.forward, offset) / 180;
 
-            float steering = 1f - Mathf.Abs(lr);
+            float steering = 1f - Maths.Abs(lr);
             if (lr < 0) steering = -steering;
 
             steering *= 1f - dot;

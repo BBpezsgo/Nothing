@@ -711,7 +711,7 @@ namespace Game.Blueprints
         {
             Debug.Log($"[{nameof(BlueprintManager)}]: Loading parts ...");
             AssetManager.AssetManager.Instance.LoadIfNot();
-            Value[] partsData = AssetManager.AssetManager.Instance.LoadFilesWithInheritacne($"Parts");
+            Value[] partsData = AssetManager.AssetManager.Instance.LoadFilesWithInheritance($"Parts");
 
             List<BlueprintPart> parts = new();
 

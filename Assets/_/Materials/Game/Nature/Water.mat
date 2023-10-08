@@ -57,7 +57,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientOcclusion: 1
-    - _Depth: 0
+    - _Depth: 0.09
     - _Displacement: 0.5
     - _Displacement_Scroll_Speed: 0.005
     - _QueueControl: 0
@@ -65,7 +65,7 @@ Material:
     - _Shorline_Density: 10
     - _Shorline_Speed: -0.1
     - _Smoothness: 1
-    - _Strength: 2
+    - _Strength: 1
     - _Wave_Speed_Main: 0.01
     - _Wave_Speed_Secondary: -0.01
     m_Colors:

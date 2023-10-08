@@ -112,7 +112,7 @@ namespace Game.Components
             if (!theta_.HasValue)
             { angle = 45f; }
             else
-            { angle = theta_.Value * Mathf.Rad2Deg; }
+            { angle = theta_.Value * Maths.Rad2Deg; }
 
             float rotation = Quaternion.LookRotation(targetPosition - transform.position).eulerAngles.y;
 
@@ -156,7 +156,7 @@ namespace Game.Components
 
             Vector3 localTarget = transform.InverseTransformPoint(destination);
 
-            float deltaAngle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+            float deltaAngle = Maths.Atan2(localTarget.x, localTarget.z) * Maths.Rad2Deg;
 
             if (InWater)
             {

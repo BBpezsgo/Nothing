@@ -8,17 +8,17 @@ static class CookiesLib
 {
 #if UNITY_WEBGL
     [DllImport("__Internal")]
-    internal static extern void SetCookies(string cookies);
+    public static extern void SetCookies(string cookies);
 
     [DllImport("__Internal")]
-    internal static extern string GetCookies();
+    public static extern string GetCookies();
 #else
-    internal static void SetCookies(string cookies)
+    public static void SetCookies(string cookies)
     {
 
     }
 
-    internal static string GetCookies()
+    public static string GetCookies()
     {
         return "";
     }
@@ -78,7 +78,7 @@ public static class Cookies
             SameSite = SameSite.Undefined;
         }
 
-        internal Cookie(string key, string value, CookieParser.CookieClass cookieClass)
+        public Cookie(string key, string value, CookieParser.CookieClass cookieClass)
         {
             Key = key ?? "";
             Value = value ?? "";
@@ -171,9 +171,9 @@ public static class Cookies
         return result;
     }
 
-    internal class CookieParser
+    public class CookieParser
     {
-        internal class CookieClass
+        public class CookieClass
         {
             public string Key;
             public string Value;

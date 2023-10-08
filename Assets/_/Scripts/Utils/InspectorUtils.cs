@@ -736,8 +736,8 @@ namespace InspectorDrawers
 
             Rect topPosition = new(foldoutPosition.xMax, position.y, position.width - foldoutPosition.width, EditorGUIUtility.singleLineHeight);
             var v = property.vector2Value;
-            float minValue = Mathf.Clamp(Mathf.Min(v.x, v.y), attribute.Minimum, attribute.Maximum);
-            float maxValue = Mathf.Clamp(Mathf.Max(v.x, v.y), attribute.Minimum, attribute.Maximum);
+            float minValue = Maths.Clamp(Maths.Min(v.x, v.y), attribute.Minimum, attribute.Maximum);
+            float maxValue = Maths.Clamp(Maths.Max(v.x, v.y), attribute.Minimum, attribute.Maximum);
             EditorGUI.MinMaxSlider(topPosition, ref minValue, ref maxValue, attribute.Minimum, attribute.Maximum);
             property.vector2Value = new Vector2(minValue, maxValue);
 

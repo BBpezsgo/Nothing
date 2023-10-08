@@ -33,7 +33,7 @@ namespace InGameComputer
         {
             float aspectRatio = (float)originalSize.x / (float)originalSize.y;
             originalSize = new Vector2Int(fontSize, fontSize);
-            originalSize.x = Mathf.RoundToInt(aspectRatio * originalSize.y);
+            originalSize.x = Maths.RoundToInt(aspectRatio * originalSize.y);
             return originalSize;
         }
     }

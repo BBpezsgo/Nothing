@@ -144,9 +144,9 @@ namespace AssetManager
             => Files.LoadFile(Assets.GetAbsoluteFile(path));
         public Value[] LoadFiles(string folder)
             => Files.LoadFiles(Assets.GetAbsoluteFolder(folder));
-        public Value[] LoadFilesWithInheritacne(string folder)
+        public Value[] LoadFilesWithInheritance(string folder)
             => Files.LoadFilesWithInheritacne(Assets.GetAbsoluteFolder(folder), Assets.GetFile, MaxInheritanceDepth);
-        public Value LoadFileWithInheritacne(string path)
+        public Value LoadFileWithInheritance(string path)
             => Files.LoadFileWithInheritacne(Assets.GetAbsoluteFile(path), Assets.GetFile, MaxInheritanceDepth);
 
         #endregion
@@ -459,10 +459,10 @@ namespace AssetManager
             return null;
 
             /*
-            if (Instance.HasGeneratedPrefab(prefabName, out GameObject exsistingPrefab))
+            if (Instance.HasGeneratedPrefab(prefabName, out GameObject existingPrefab))
             {
                 if (EnableDebugLogging) Debug.Log($"[{nameof(AssetManager)}]: Prefab \"{prefabName}\" already generated, cloning ...");
-                return InstantiatePrefab(exsistingPrefab, spawnOverNetwork, false, position, rotation);
+                return InstantiatePrefab(existingPrefab, spawnOverNetwork, false, position, rotation);
             }
 
             var filesSDF = Instance.Assets.GetAllFilesEnumerable("*.obj.sdf");
@@ -1108,7 +1108,7 @@ namespace AssetManager
             if (Unity.Netcode.NetworkManager.Singleton != null &&
                 Unity.Netcode.NetworkManager.Singleton.IsConnectedClient)
             { path = "netcode"; }
-            StartCoroutine(Assets.LoadAsnyc(path, OnAssetsLoaded, OnAssetDownloadProgress));
+            StartCoroutine(Assets.LoadAsync(path, OnAssetsLoaded, OnAssetDownloadProgress));
         }
 
         void OnAssetsLoaded()
@@ -1146,7 +1146,7 @@ namespace AssetManager
             Assets = new FolderLoader();
             testObject = settings.test_object;
             // testScene = settings.test_scene;
-            StartCoroutine(Assets.LoadAsnyc(Unity.Netcode.NetworkManager.Singleton.IsConnectedClient ? "netcode" : settings.assets_path, () => { }, OnAssetDownloadProgress));
+            StartCoroutine(Assets.LoadAsync(Unity.Netcode.NetworkManager.Singleton.IsConnectedClient ? "netcode" : settings.assets_path, () => { }, OnAssetDownloadProgress));
         }));
 
         void OnAssetDownloadProgress(Networking.Network.ChunkCollector chunkCollector)
@@ -1192,12 +1192,12 @@ namespace AssetManager
 
             GUILayout.BeginVertical(GUI.skin.box);
 
-            GUILayout.Label($"Download Progress: {Mathf.Round(AssetsDownloadProgress.Progress * 1000f) * 0.1f}%");
+            GUILayout.Label($"Download Progress: {Maths.Round(AssetsDownloadProgress.Progress * 1000f) * 0.1f}%");
             GUILayout.Label($"Download Speed: {Utils.ReadableSize(AssetsDownloadProgress.Speed)} b/s");
             if (AssetsDownloadProgress.RemaingTime == TimeSpan.MaxValue)
-            { GUILayout.Label($"Download Remaing Time: --:--:--"); }
+            { GUILayout.Label($"Download Remaining Time: --:--:--"); }
             else
-            { GUILayout.Label($"Download Remaing Time: {AssetsDownloadProgress.RemaingTime:hh\\:mm\\:ss}"); }
+            { GUILayout.Label($"Download Remaining Time: {AssetsDownloadProgress.RemaingTime:hh\\:mm\\:ss}"); }
 
             GUILayout.EndVertical();
 

@@ -92,7 +92,7 @@ namespace Game.Blueprints
             return (byte)Random.Range(byte.MinValue, byte.MaxValue);
         }
 
-        int UniqueGUIDCapacity => Mathf.Abs(byte.MinValue) + Mathf.Abs(byte.MaxValue) + 1;
+        int UniqueGUIDCapacity => byte.MaxValue + 1;
 
         void GenerateGUIDs()
         {
@@ -114,7 +114,7 @@ namespace Game.Blueprints
                 {
                     if (maxIterations-- < 0)
                     {
-                        Debug.LogError($"Failed to generate GUID: max iterations exeed", this);
+                        Debug.LogError($"Failed to generate GUID: max iterations exceeded", this);
                         break;
                     }
 

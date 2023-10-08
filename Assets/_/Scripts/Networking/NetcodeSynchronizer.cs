@@ -141,7 +141,7 @@ namespace Networking
                 if (SentRequests[i].Progress > float.Epsilon)
                 {
                     Rect progressBarFgRect = progressBarRect;
-                    progressBarFgRect.width *= Mathf.Clamp01(SentRequests[i].Progress);
+                    progressBarFgRect.width *= Maths.Clamp01(SentRequests[i].Progress);
                     GUI.Box(progressBarFgRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-fg"));
                 }
 

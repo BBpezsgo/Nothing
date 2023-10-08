@@ -155,7 +155,7 @@ TextField > Label {
     border-bottom-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background-color: rgb(53, 53, 53);
+    background-color: rgb(41, 41, 41);
 }
 
 .unity-scroller--vertical > #unity-high-button {
@@ -169,7 +169,7 @@ TextField > Label {
     border-bottom-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background-color: rgb(53, 53, 53);
+    background-color: rgb(41, 41, 41);
 }
 
 .unity-scroller--vertical > #unity-slider {
@@ -254,19 +254,13 @@ TextField > Label {
 }
 
 Scroller #unity-tracker {
-    background-color: rgb(53, 53, 53);
+    background-color: rgb(41, 41, 41);
 }
 
 Scroller {
-    border-left-color: rgb(48, 48, 48);
-    border-right-color: rgb(48, 48, 48);
-    border-top-color: rgb(48, 48, 48);
-    border-bottom-color: rgb(48, 48, 48);
     border-left-width: 1px;
-    border-right-width: 1px;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
-    background-color: rgb(53, 53, 53);
+    background-color: rgb(41, 41, 41);
+    border-left-color: rgba(22, 22, 22, 255);
 }
 
 .scrollview {
@@ -286,15 +280,15 @@ Scroller {
 }
 
 .progressbar > #unity-progress-bar > .unity-progress-bar__background {
-    background-color: rgba(48, 48, 48, 255);
+    background-color: rgb(48, 48, 48);
     border-left-width: 0.5px;
     border-right-width: 0.5px;
     border-top-width: 0.5px;
     border-bottom-width: 0.5px;
-    border-left-color: rgba(37, 37, 37, 255);
-    border-right-color: rgba(37, 37, 37, 255);
-    border-top-color: rgba(37, 37, 37, 255);
-    border-bottom-color: rgba(37, 37, 37, 255);
+    border-left-color: rgb(37, 37, 37);
+    border-right-color: rgb(37, 37, 37);
+    border-top-color: rgb(37, 37, 37);
+    border-bottom-color: rgb(37, 37, 37);
     border-top-left-radius: 1px;
     border-bottom-left-radius: 1px;
     border-top-right-radius: 1px;
