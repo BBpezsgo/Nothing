@@ -1,17 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MogulTech.Utilities;
-using Unity.EditorCoroutines.Editor;
 using UnityEditor;
-using UnityEditor.TextCore.Text;
 using UnityEngine;
 using UnityGoogleDrive;
-using UnityGoogleDrive.Data;
 using File = UnityGoogleDrive.Data.File;
 
 namespace Utilities.Editor

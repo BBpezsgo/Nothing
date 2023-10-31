@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 using Unity.EditorCoroutines.Editor;
@@ -10,12 +13,18 @@ using UnityEditor.Build.Reporting;
 
 using UnityEngine;
 
+using Debug = UnityEngine.Debug;
+
 namespace Utilities.Editor
 {
     public class BuildTool : EditorWindow
     {
         readonly Dictionary<BuildTarget, TargetSettings> TargetsToBuild = new();
         readonly List<BuildTarget> AvailableTargets = new();
+
+        public const string BaseOutputPath = "C:/Users/bazsi/Nothing 3D/Build/";
+
+        bool IsCompressing;
 
         class TargetSettings
         {
@@ -46,7 +55,7 @@ namespace Utilities.Editor
             {
                 BuildTarget buildTarget = (BuildTarget)buildTargetValue;
 
-                if (!BuildPipeline.IsBuildTargetSupported(GetTargetGroup(buildTarget), buildTarget)) continue;
+                if (!BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(buildTarget), buildTarget)) continue;
                 if (!TargetsToBuild.ContainsKey(buildTarget))
                 { TargetsToBuild.Add(buildTarget, new TargetSettings()); }
 
@@ -66,27 +75,6 @@ namespace Utilities.Editor
                 { TargetsToBuild.Remove(target); }
             }
         }
-
-        static BuildTargetGroup GetTargetGroup(BuildTarget buildTarget) => BuildPipeline.GetBuildTargetGroup(buildTarget);  /*buildTarget switch
-    {
-        BuildTarget.StandaloneOSX => BuildTargetGroup.Standalone,
-        BuildTarget.StandaloneWindows => BuildTargetGroup.Standalone,
-        BuildTarget.iOS => BuildTargetGroup.iOS,
-        BuildTarget.Android => BuildTargetGroup.Android,
-        BuildTarget.StandaloneWindows64 => BuildTargetGroup.Standalone,
-        BuildTarget.WebGL => BuildTargetGroup.WebGL,
-        BuildTarget.WSAPlayer => BuildTargetGroup.WSA,
-        BuildTarget.StandaloneLinux64 => BuildTargetGroup.Standalone,
-        BuildTarget.XboxOne => BuildTargetGroup.XboxOne,
-        BuildTarget.tvOS => BuildTargetGroup.tvOS,
-        BuildTarget.Switch => BuildTargetGroup.Switch,
-        BuildTarget.Lumin => BuildTargetGroup.Lumin,
-        BuildTarget.Stadia => BuildTargetGroup.Stadia,
-        BuildTarget.GameCoreXboxOne => BuildTargetGroup.GameCoreXboxOne,
-        BuildTarget.PS5 => BuildTargetGroup.PS5,
-        BuildTarget.EmbeddedLinux => BuildTargetGroup.EmbeddedLinux,
-        _ => BuildTargetGroup.Unknown,
-    };*/
 
         void OnGUI()
         {
@@ -108,13 +96,13 @@ namespace Utilities.Editor
                 GUILayout.EndVertical();
             }
 
-            GUI.enabled = numEnabled > 0;
-            if (GUILayout.Button($"Build Selected {numEnabled} Platforms"))
+            GUI.enabled = numEnabled > 0 && !IsCompressing;
+            if (GUILayout.Button($"Build Selected Platforms ({numEnabled})"))
             {
                 List<BuildTarget> selectedPlatforms = new();
                 foreach (var target in TargetsToBuild.Keys)
                 {
-                    if (!BuildPipeline.IsBuildTargetSupported(GetTargetGroup(target), target)) continue;
+                    if (!BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(target), target)) continue;
                     if (!TargetsToBuild[target].IsAnySelected) continue;
                     selectedPlatforms.Add(target);
                 }
@@ -122,6 +110,70 @@ namespace Utilities.Editor
                 EditorCoroutineUtility.StartCoroutine(PerformBuild(selectedPlatforms.ToArray()), this);
             }
             GUI.enabled = true;
+
+            if (GUILayout.Button($"Open Folder"))
+            {
+                Process.Start("explorer.exe", BaseOutputPath.Replace('/', '\\'));
+            }
+
+            GUI.enabled = !IsCompressing;
+            if (GUILayout.Button($"Compress All"))
+            {
+                List<string> folders = new();
+
+                foreach (BuildTarget target in AvailableTargets)
+                {
+                    if (target == BuildTarget.Android) continue;
+
+                    folders.Add($"{BaseOutputPath}{target}/");
+                    folders.Add($"{BaseOutputPath}{target}-dev/");
+                }
+
+                EditorCoroutineUtility.StartCoroutine(PerformCompress(folders.ToArray()), this);
+            }
+            GUI.enabled = true;
+        }
+
+        static void Compress(ValueTuple<string, string> p)
+        {
+            if (!Directory.Exists(p.Item1)) return;
+            if (File.Exists(p.Item2))
+            { File.Delete(p.Item2); }
+            ZipFile.CreateFromDirectory(p.Item1, p.Item2, System.IO.Compression.CompressionLevel.Optimal, false);
+        }
+
+        IEnumerator PerformCompress(string[] folders)
+        {
+            IsCompressing = true;
+
+            int progressId = Progress.Start("Compress", $"Compressing all build output folders", Progress.Options.Sticky);
+            Progress.ShowDetails();
+            Progress.SetTimeDisplayMode(progressId, Progress.TimeDisplayMode.NoTimeShown);
+            yield return null;
+
+            bool isFailed = false;
+
+            for (int i = 0; i < folders.Length; i++)
+            {
+                string path = folders[i];
+
+                path = path.TrimEnd('/', '\\');
+                string fileName = Path.GetFileName(path);
+
+                yield return null;
+                if (!Directory.Exists(path)) continue;
+
+                IEnumerator task = CoroutineUtils.Task(ThreadTask.Start(Compress, (path, $"{BaseOutputPath}/{fileName}.zip")));
+                while (task.MoveNext()) yield return null;
+
+                Progress.Report(progressId, i + 1, folders.Length, $"{fileName}.zip");
+                yield return null;
+            }
+
+            Progress.Finish(progressId, isFailed ? Progress.Status.Failed : Progress.Status.Succeeded);
+
+            IsCompressing = false;
+            yield return null;
         }
 
         IEnumerator PerformBuild(BuildTarget[] targets)
@@ -208,14 +260,12 @@ namespace Utilities.Editor
                 Progress.Report(buildAllProgressID, currentStep, totalSteps);
             }
 
-            EditorUserBuildSettings.SwitchActiveBuildTargetAsync(GetTargetGroup(originalTarget), originalTarget);
+            EditorUserBuildSettings.SwitchActiveBuildTargetAsync(BuildPipeline.GetBuildTargetGroup(originalTarget), originalTarget);
 
             Progress.Finish(buildAllProgressID, anyBuildFailed ? Progress.Status.Failed : Progress.Status.Succeeded);
 
             yield return null;
         }
-
-        internal const string BaseOutputPath = "C:/Users/bazsi/Nothing 3D/Build/";
 
         BuildReport BuildIndividualTarget(BuildTarget target, bool developmentBuild)
         {
@@ -227,7 +277,7 @@ namespace Utilities.Editor
             options.scenes = scenes.ToArray();
 
             options.target = target;
-            options.targetGroup = GetTargetGroup(target);
+            options.targetGroup = BuildPipeline.GetBuildTargetGroup(target);
 
             string path = BaseOutputPath + target.ToString() + (developmentBuild ? "-dev" : "") + "/";
 

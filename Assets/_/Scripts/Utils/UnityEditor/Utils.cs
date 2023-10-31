@@ -1,103 +1,74 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Threading;
 
-using UnityEditor;
-
-namespace MogulTech.Utilities
+namespace Utilities.Editor
 {
-    public static class EditorCoroutines
+    public static class CoroutineUtils
     {
-        public class Coroutine
+        public static IEnumerator Task(Func<bool> isDone)
         {
-            public IEnumerator enumerator;
-            public System.Action<bool> OnUpdate;
-            public List<IEnumerator> history = new();
-            public bool waitForGUI = false;
-            public Action Repaint;
-            public bool IsDone;
-
-            public void OnGUI() => waitForGUI = false;
+            while (!isDone.Invoke())
+            { yield return null; }
         }
 
-        public class WaitForGUI
+        public static IEnumerator Task(ITask task)
         {
-
+            while (task != null && !task.IsDone)
+            { yield return null; }
         }
+    }
 
-        static readonly List<Coroutine> coroutines = new();
+    public interface ITask
+    {
+        public bool IsDone { get; }
+    }
 
-        public static Coroutine Execute(IEnumerator enumerator, System.Action<bool> OnUpdate = null)
+    public delegate void ParameterizedThreadStartSafe<T>(T obj);
+
+    public class ThreadTask : ITask
+    {
+        readonly Thread Thread;
+        public bool IsDone
         {
-            if (coroutines.Count == 0)
+            get
             {
-                EditorApplication.update += Update;
+                if (Thread.IsAlive) return false;
+                return true;
             }
-            var coroutine = new Coroutine { enumerator = enumerator, OnUpdate = OnUpdate };
-            coroutines.Add(coroutine);
-            return coroutine;
         }
 
-        static void Update()
+        public ThreadTask(Thread thread)
         {
-            for (int i = 0; i < coroutines.Count; i++)
-            {
-                Coroutine coroutine = coroutines[i];
-                if (coroutine.waitForGUI)
-                {
-                    coroutine.Repaint?.Invoke();
-                }
-                try
-                {
-                    bool done = !coroutine.enumerator.MoveNext();
-                    if (done)
-                    {
-                        if (coroutine.history.Count == 0)
-                        {
-                            coroutine.IsDone = true;
-                            coroutines.RemoveAt(i);
-                            i--;
-                        }
-                        else
-                        {
-                            done = false;
-                            coroutine.enumerator = coroutine.history[^1];
-                            coroutine.history.RemoveAt(coroutine.history.Count - 1);
-                        }
-                    }
-                    else
-                    {
-                        if (coroutine.enumerator.Current is null)
-                        {
-
-                        }
-                        else if (coroutine.enumerator.Current is IEnumerator enumerator)
-                        {
-                            coroutine.history.Add(coroutine.enumerator);
-                            coroutine.enumerator = enumerator;
-                        }
-                        else if (coroutine.enumerator.Current is WaitForGUI)
-                        {
-                            coroutine.waitForGUI = true;
-                        }
-                    }
-                    coroutine.OnUpdate?.Invoke(done);
-                }
-                catch (System.Exception error)
-                {
-                    UnityEngine.Debug.LogException(error);
-                    coroutine.IsDone = true;
-                    coroutines.RemoveAt(i);
-                    i--;
-                }
-            }
-            if (coroutines.Count == 0) EditorApplication.update -= Update;
+            Thread = thread;
         }
 
-        internal static void StopAll()
+        public static ThreadTask Start(ThreadStart task)
         {
-            coroutines.Clear();
-            EditorApplication.update -= Update;
+            Thread thread = new(task);
+            thread.Start();
+            return new ThreadTask(thread);
+        }
+
+        public static ThreadTask Start<T>(ParameterizedThreadStartSafe<T> task, T parameter)
+        {
+            Thread thread = new(new ParameterizedThreadStart((param) => task.Invoke((T)param)));
+            thread.Start(parameter);
+            return new ThreadTask(thread);
+        }
+
+        public static ThreadTask Start(ThreadStart task, string name)
+        {
+            Thread thread = new(task) { Name = name };
+            thread.Start();
+            return new ThreadTask(thread);
+        }
+
+        public static ThreadTask Start<T>(ParameterizedThreadStartSafe<T> task, T parameter, string name)
+        {
+            Thread thread = new(new ParameterizedThreadStart((param) => task.Invoke((T)param))) { Name = name };
+            thread.Start(parameter);
+            return new ThreadTask(thread);
         }
     }
 }
