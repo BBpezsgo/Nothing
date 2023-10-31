@@ -1,3 +1,4 @@
+/** @returns {import("./unity").PreprocessorVariables} */
 function UnityPreprocessorVariables() {
 	const COMPANY_NAME = {{{ JSON.stringify(COMPANY_NAME) }}}
 	const PRODUCT_NAME = {{{ JSON.stringify(PRODUCT_NAME) }}}

@@ -143,6 +143,7 @@ export interface UnityInstance {
 }
 
 export interface UnityModule {
+    // #region Internal
     AL(): unknown
     AsciiToString(): unknown
     Browser(): unknown
@@ -248,7 +249,7 @@ export interface UnityModule {
         hasWasm: boolean
         hasWasmThreads: false
         hasWebGL: number
-        language: navigator.userLanguage | navigator.language
+        language: string
         os: 'Windows' | 'Android' | 'iPhoneOS' | 'iPadOS' | 'FreeBSD' | 'OpenBSD' | 'Linux' | 'MacOS' | 'Search Bot' | 'Unknown OS'
         osVersion: string | 'Unknown OS Version'
     }
@@ -301,7 +302,7 @@ export interface UnityModule {
     currentFullscreenStrategy(): unknown
     cwrap(ident, returnType, argTypes, opts): unknown
     dataUrl: string
-    deinitializers: unknown[]
+    deinitializers: ((() => void) | unknown)[]
     demangle(): unknown
     demangleAll(): unknown
     disableAccessToMediaDevices(): unknown
@@ -537,18 +538,6 @@ export interface UnityModule {
     _setNetworkCallback(): unknown
     _setThrew(): unknown
     _strlen(): unknown
-    ALLOC_NORMAL: unknown
-    ALLOC_STACK: unknown
-    INITIAL_MEMORY: unknown
-    arguments: unknown
-    noExitRuntime: unknown
-    quit: unknown
-    read: unknown
-    readAsync: unknown
-    readBinary: unknown
-    setWindowTitle: unknown
-    thisProgram: unknown
-    wasmBinary: unknown
     get ALLOC_NORMAL(): unknown
     get ALLOC_STACK(): unknown
     get INITIAL_MEMORY(): unknown
@@ -565,9 +554,15 @@ export interface UnityModule {
     readonly shouldQuit: boolean
     onQuit?: () => void
 
-    Quit(): unknown
-    SendMessage(): unknown
-    SetFullscreen(): unknown
+    // #endregion
+
+    // #region User
+
+    Quit(): void
+    SendMessage(): void
+    SetFullscreen(): void
+
+    // #endregion
 }
 
 /**

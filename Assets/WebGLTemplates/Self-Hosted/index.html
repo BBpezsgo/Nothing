@@ -3,46 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>{{{ PRODUCT_NAME }}} WebGL Player</title>
+    <title>{{{ PRODUCT_NAME }}}</title>
     <link rel="shortcut icon" href="app/favicon.ico">
     <link rel="stylesheet" href="app/css/style.css">
   </head>
   <body>
-      <button id="details-show" style="margin:10px" class="btn" onclick="document.getElementById('details').style.display='block';document.getElementById('details-show').style.display='none'">
-          Show Details
-      </button>
-      <div id="details" class="panel" style="display:none;position:absolute;z-index:1">
-          <div class="panel-title"><span>Details</span><div id="details-close" onclick="document.getElementById('details').style.display='none';document.getElementById('details-show').style.display='block'">X</div></div>
-          <ul class="no-list">
-              <li>
-                  <b>UNITY_VERSION:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>DEVELOPMENT_PLAYER:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>DECOMPRESSION_FALLBACK:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>INITIAL_MEMORY:</b> <span>null</span> Mb
-              </li>
-              <li>
-                  <b>USE_WASM:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>USE_THREADS:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>USE_WEBGL_1_0:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>USE_WEBGL_2_0:</b> <span>null</span>
-              </li>
-              <li>
-                  <b>USE_DATA_CACHING:</b> <span>null</span>
-              </li>
-          </ul>
-      </div>
       <div id="unity-container" class="unity-desktop">
           <canvas id="unity-canvas" width="{{{ WIDTH }}}" height="{{{ HEIGHT }}}"></canvas>
           <div id="unity-loading-bar">
