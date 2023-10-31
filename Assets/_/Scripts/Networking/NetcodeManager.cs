@@ -163,6 +163,8 @@ namespace Networking.Managers
 
         void FixedUpdate()
         {
+            Window.Visible = sceneLoadings.Count != 0 && sceneUnloadings.Count != 0;
+
             if (!BaseEventsRegistered && NetworkManager.Singleton != null)
             {
                 BaseEventsRegistered = true;
@@ -261,8 +263,6 @@ namespace Networking.Managers
 
         void OnSceneLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
         {
-            Debug.Log($"[{nameof(NetcodeManager)}]: Scene \"{sceneName}\" loaded (loadSceneMode: {loadSceneMode}, clientsCompleted: {{ {string.Join(", ", clientsCompleted)} }}, clientsTimedOut: {{ {string.Join(", ", clientsTimedOut)} }})", this);
-
             for (int i = 0; i < clientsCompleted.Count; i++)
             {
                 sceneLoadings[clientsCompleted[i]] = new SceneLoadInfo(sceneName, loadSceneMode)
@@ -279,6 +279,8 @@ namespace Networking.Managers
                     IsTimedOut = true,
                 };
             }
+
+            Debug.Log($"[{nameof(NetcodeManager)}]: Scene \"{sceneName}\" loaded (loadSceneMode: {loadSceneMode}, clientsCompleted: {{ {string.Join(", ", clientsCompleted)} }}, clientsTimedOut: {{ {string.Join(", ", clientsTimedOut)} }})", this);
         }
 
         void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
@@ -311,6 +313,7 @@ namespace Networking.Managers
             {
                 Debug.Log($"[{nameof(NetcodeManager)}]: Server stopped", this);
             }
+            SceneManager.UnloadAllScenes();
         }
 
         void Singleton_OnServerStarted()
@@ -335,6 +338,7 @@ namespace Networking.Managers
                     Debug.Log($"[{nameof(NetcodeManager)}]: Client stopped, reason: \"{NetworkManager.Singleton.DisconnectReason}\"", this);
                 }
             }
+            SceneManager.UnloadAllScenes();
         }
 
         void Singleton_OnClientStarted()

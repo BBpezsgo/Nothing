@@ -48,6 +48,8 @@ namespace Game.Managers
 
         AdvancedMouse LeftMouse;
 
+        public AdvancedTouch Touch;
+
         ICanTakeControl[] units = new ICanTakeControl[0];
 
         [SerializeField, ReadOnly] float EnableMouseCooldown = 0f;
@@ -141,6 +143,8 @@ namespace Game.Managers
 
             LeftMouse = new AdvancedMouse(Mouse.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
+
+            Touch = new AdvancedTouch(2, () => InputCondition() && IsControlling);
 
             CursorManager.Instance.Register(this);
 

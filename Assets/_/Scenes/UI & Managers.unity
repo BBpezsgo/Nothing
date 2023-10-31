@@ -700,7 +700,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35d41cad0b062894e9e6a600528596dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BackgroundFillColor: {r: 0.21176472, g: 0.21176472, b: 0.21176472, a: 1}
+  ForegroundFillColor: {r: 0.34509805, g: 0.34509805, b: 0.34509805, a: 1}
+  ForegroundOutlineColor: {r: 0.18823531, g: 0.18823531, b: 0.18823531, a: 1}
+  ForegroundFillColorActive: {r: 0.27450982, g: 0.3764706, b: 0.4862745, a: 1}
+  ForegroundOutlineColorActive: {r: 0.14117648, g: 0.14117648, b: 0.14117648, a: 1}
   NormalizedInput: {x: 0, y: 0}
+  NormalizedInput2: {x: 0, y: 0}
 --- !u!1 &310034299
 GameObject:
   m_ObjectHideFlags: 0
@@ -3028,6 +3034,10 @@ MonoBehaviour:
   CursorHitLayer:
     serializedVersion: 2
     m_Bits: 65
+  Touch:
+    FingerID: 0
+    ClickedOnUI: 0
+    IsCaptured: 0
   EnableMouseCooldown: 0
   IsScoping: 0
   Scope: {fileID: 0}
@@ -3523,8 +3533,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58e82f17a7b2c7c4dba9ce04b5f00f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartOffline: 0
-  LoadScene: 
+  StartOffline: 1
+  LoadScene: Testing
 --- !u!114 &1376606815
 MonoBehaviour:
   m_ObjectHideFlags: 0

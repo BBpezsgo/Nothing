@@ -972,10 +972,24 @@ namespace InputUtils
 
             GLUtils.DrawCircle(guiPosition / 4.3f, radius, 2, color, 16);
 
-            GUIStyle style = new(IMGUIManager.Instance.Skin.label)
+            GUIStyle style = new(GUI.skin.label)
             {
                 fontSize = 48,
                 fontStyle = FontStyle.Bold,
+                normal = new GUIStyleState()
+                {
+                    textColor = Color.white,
+                },
+            };
+
+            GUIStyle styleOutline = new(GUI.skin.label)
+            {
+                fontSize = 48,
+                fontStyle = FontStyle.Bold,
+                normal = new GUIStyleState()
+                {
+                    textColor = Color.black,
+                },
             };
 
             Vector2 textOffset = new(radius, -radius);
@@ -985,8 +999,11 @@ namespace InputUtils
 
             void Label(string text)
             {
+                Vector2 position = guiPosition + textOffset + new Vector2(0, style.fontSize * -line);
+                Vector2 size = new(Screen.width, style.fontSize);
                 GUI.enabled = false;
-                GUI.Label(new Rect(guiPosition + textOffset + new Vector2(0, style.fontSize * -line), new Vector2(Screen.width, style.fontSize)), text, style);
+                GUI.Label(new Rect(position + (Vector2.one * 3), size), text, styleOutline);
+                GUI.Label(new Rect(position, size), text, style);
                 GUI.enabled = true;
                 line++;
             }

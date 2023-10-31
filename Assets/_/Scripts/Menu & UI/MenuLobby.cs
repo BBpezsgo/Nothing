@@ -105,13 +105,15 @@ namespace Game.UI
             ushort port = ushort.Parse(socket.Split(':')[^1]);
             string address = socket[..(socket.Length - socket.Split(':')[^1].Length - 1)];
 
-            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is UnityTransport unityTransport)
+            if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is not UnityTransport unityTransport)
             {
-                unityTransport.SetConnectionData(address, port, address);
-                Debug.Log($"[{nameof(MenuLobby)}]: Start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port} ...", this);
+                unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+                NetworkManager.Singleton.NetworkConfig.NetworkTransport = unityTransport;
+                // throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}");
             }
-            else
-            { throw new NotImplementedException($"Unknown netcode transport {NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType()}"); }
+
+            unityTransport.SetConnectionData(address, port, address);
+            Debug.Log($"[{nameof(MenuLobby)}]: Start client on {unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port} ...", this);
 
             bool success = NetworkManager.Singleton.StartClient();
             if (success)
@@ -124,13 +126,13 @@ namespace Game.UI
 
         void RefreshDiscoveryUI()
         {
-            if (NetworkManager.Singleton.IsListening)
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
                 UI.rootVisualElement.Q<Button>("button-discovery-toggle").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
 
                 UI.rootVisualElement.Q<Button>("button-discovery-refresh").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
             }
-            else if (NetworkDiscovery.Instance.IsRunning)
+            else if (NetworkDiscovery.Instance != null && NetworkDiscovery.Instance.IsRunning)
             {
                 UI.rootVisualElement.Q<Button>("button-discovery-toggle").text = "Stop Discovery";
                 UI.rootVisualElement.Q<Button>("button-discovery-toggle").style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);

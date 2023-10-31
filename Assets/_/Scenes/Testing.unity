@@ -1219,7 +1219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &951541515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1484,7 +1484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   things: []
-  EnableAutoSpawn: 0
+  EnableAutoSpawn: 1
   Thing: {fileID: 5278498343419542869, guid: 8c3c45102458da94bb5eb8919a4bc1eb, type: 3}
   MinThings: 1
   NextSpawn: 1
@@ -1536,7 +1536,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   things: []
-  EnableAutoSpawn: 0
+  EnableAutoSpawn: 1
   Thing: {fileID: 8289170899940005791, guid: 2ca74966a54ce0c498ff772f51441b54, type: 3}
   MinThings: 1
   NextSpawn: 1
@@ -1588,7 +1588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Terrain: {fileID: 0}
   things: []
-  EnableAutoSpawn: 0
+  EnableAutoSpawn: 1
   Thing: {fileID: 1172948685928354089, guid: 20f75c7101b340e418db274a7386f601, type: 3}
   MinThings: 1
   NextSpawn: 1
@@ -1714,7 +1714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1e19cb2f8713546879df3531ec7958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ClientObjectPrefab: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd,
+  ClientObjectPrefab: {fileID: 4032902050812513782, guid: 022c6e1d6a988e84f87efaa86e82792c,
     type: 3}
   ClientObjectInstances: []
 --- !u!4 &2031779240

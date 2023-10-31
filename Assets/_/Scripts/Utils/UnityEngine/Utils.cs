@@ -383,6 +383,30 @@ public readonly struct GUIUtils
 
     public static GuiEnabled Enabled() => new(true);
     public static GuiEnabled Disabled() => new(false);
+
+    public static bool Active()
+    {
+        UnityEngine.UIElements.UIDocument[] uiDocuments = GameObject.FindObjectsOfType< UnityEngine.UIElements.UIDocument>(false);
+
+        if (GUIUtility.hotControl != 0)
+        {
+            return true;
+        }
+
+        for (int i = 0; i < uiDocuments.Length; i++)
+        {
+            if (uiDocuments[i] == null) continue;
+            if (!uiDocuments[i].gameObject.activeSelf) continue;
+            if (!uiDocuments[i].isActiveAndEnabled) continue;
+            if (uiDocuments[i].rootVisualElement == null) continue;
+
+            if (uiDocuments[i].rootVisualElement.focusController.focusedElement == null) continue;
+
+            return true;
+        }
+
+        return false;
+    }
 }
 
 public readonly struct GuiSkinUsage : IDisposable

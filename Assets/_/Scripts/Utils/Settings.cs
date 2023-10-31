@@ -2,13 +2,11 @@
 #define DOWNLOAD_ASSETS
 #endif
 
-using DataUtilities.ReadableFileFormat;
-using DataUtilities.Serializer;
-
 using System;
 using System.IO;
 using System.Runtime.Serialization;
-
+using DataUtilities.ReadableFileFormat;
+using DataUtilities.Serializer;
 using UnityEngine;
 
 public static class Settings
@@ -245,11 +243,16 @@ public static class GameConfigManager
     public static void SetDefaults()
     {
 #if !PLATFORM_WEBGL
-        if (!Directory.Exists(Application.streamingAssetsPath))
-        { Directory.CreateDirectory(Application.streamingAssetsPath); }
-        var DefaultData = GameConfig.Default;
-        var Json = JsonUtility.ToJson(DefaultData);
-        File.WriteAllText(Path, Json);
+        try
+        {
+            if (!Directory.Exists(Application.streamingAssetsPath))
+            { Directory.CreateDirectory(Application.streamingAssetsPath); }
+            GameConfig defaultData = GameConfig.Default;
+            string json = JsonUtility.ToJson(defaultData);
+            File.WriteAllText(Path, json);
+        }
+        catch (Exception)
+        { }
 #endif
     }
 

@@ -110,7 +110,10 @@ namespace Game.UI
             for (int i = 0; i < Hotkeys.Length; i++)
             {
                 if (Input.GetKeyDown(Hotkeys[i].Key))
-                { Hotkeys[i].Toggle(); }
+                {
+                    if (GUIUtils.Active()) return;
+                    Hotkeys[i].Toggle();
+                }
             }
 
             /*

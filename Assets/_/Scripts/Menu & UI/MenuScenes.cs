@@ -57,6 +57,10 @@ namespace Game.UI
             if (MenuManager.Instance.CurrentIntermediateMenu != MenuManager.IntermediateMenuType.Scenes)
             { return; }
 
+            if (Unity.Netcode.NetworkManager.Singleton != null &&
+                Unity.Netcode.NetworkManager.Singleton.IsListening)
+            { Unity.Netcode.NetworkManager.Singleton.Shutdown(); }
+
             MenuManager.Instance.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.None;
         }
 

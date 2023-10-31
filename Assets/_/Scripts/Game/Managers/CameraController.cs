@@ -102,13 +102,13 @@ namespace Game.Managers
 
         void Start()
         {
-            TargetZoom = -theCamera.transform.localPosition.z;
             Zoom = -theCamera.transform.localPosition.z;
+            TargetZoom = Zoom;
 
             TargetAngle = Maths.Clamp(cameraRotation.transform.localRotation.eulerAngles.x, 10f, 80f);
 
-            TargetRotation = transform.rotation.eulerAngles.y;
             Rotation = transform.rotation.eulerAngles.y;
+            TargetRotation = Rotation;
 
             lastCameraMode = cameraMode;
 
@@ -116,8 +116,14 @@ namespace Game.Managers
             TouchZoom.OnZoom += OnTouchZoom;
             TouchZoom.OnMove += OnTouchMove;
 
-            targetZoomSpeed = zoomSpeed;
             currentZoomSpeed = zoomSpeed;
+            targetZoomSpeed = currentZoomSpeed;
+
+            if (cameraMode == CameraMode.OrthographicTopDown)
+            {
+                Zoom = 60;
+                TargetZoom = Zoom;
+            }
         }
 
         void OnTouchMove(AdvancedTouch sender)

@@ -251,20 +251,25 @@ namespace Game.Components
             targetTransform = null;
             if (ShootEffects != null)
             {
-                ShootEffectInstances = new BurstParticles[ShootEffects.Length];
+                List<BurstParticles> burstParticles = new(ShootEffects.Length);
                 for (int i = 0; i < ShootEffects.Length; i++)
                 {
-                    ParticleSystem newParticleSystem = GameObject.Instantiate(ShootEffects[i], shootPosition.position, shootPosition.rotation, (cannon == null) ? transform : cannon).GetComponent<ParticleSystem>();
-                    ShootEffectInstances[i] = new BurstParticles(newParticleSystem);
+                    GameObject newParticleSystem = GameObject.Instantiate(ShootEffects[i], shootPosition.position, shootPosition.rotation, (cannon == null) ? transform : cannon);
+                    // burstParticles.Add(new BurstParticles(newParticleSystem));
+                    var all = newParticleSystem.GetComponentsInChildren<ParticleSystem>(false);
+                    for (int j = 0; j < all.Length; j++)
+                    {
+                         burstParticles.Add(new BurstParticles(all[j]));
+                    }
                 }
+                ShootEffectInstances = burstParticles.ToArray();
             }
             else
             {
                 ShootEffectInstances = new BurstParticles[0];
             }
 
-            if (CurrentProjectile.TryGetComponent(out Rigidbody projectileRigidbody))
-            { IsBallisticProjectile = projectileRigidbody.useGravity; }
+            IsBallisticProjectile = CurrentProjectile != null && CurrentProjectile.TryGetComponent(out Rigidbody projectileRigidbody) && projectileRigidbody.useGravity;
 
             Range = GetRange();
 
@@ -310,7 +315,7 @@ namespace Game.Components
                 }
             }
 
-            if (CannonKnockback != 0f)
+            if (CannonKnockback != 0f && KnockbackTransform != null)
             {
                 switch (CannonKnockbackState)
                 {
@@ -640,16 +645,16 @@ namespace Game.Components
 
         internal bool Shoot()
             => Shoot(null, 0f);
-        internal bool Shoot(RequiredShoots requiedShoots)
+        internal bool Shoot(RequiredShoots requiredShoots)
         {
             float? t = ImpactTime();
             if (!t.HasValue)
             { return Shoot(); }
-            return Shoot(requiedShoots, t.Value);
+            return Shoot(requiredShoots, t.Value);
         }
-        internal bool Shoot(RequiredShoots requiedShoots, float impactTime)
-            => ShootInternal(requiedShoots, impactTime, UnityEngine.Random.Range(BulletCount.x, BulletCount.y));
-        bool ShootInternal(RequiredShoots requiedShoots, float impactTime, int bulletCount)
+        internal bool Shoot(RequiredShoots requiredShoots, float impactTime)
+            => ShootInternal(requiredShoots, impactTime, UnityEngine.Random.Range(BulletCount.x, BulletCount.y));
+        bool ShootInternal(RequiredShoots requiredShoots, float impactTime, int bulletCount)
         {
             if (reload > 0f)
             { return false; }
@@ -664,7 +669,7 @@ namespace Game.Components
             bool instantiatedAnyProjectile = false;
             for (int i = 0; i < bulletCount; i++)
             {
-                GameObject newProjectile = CurrentProjectile.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
+                GameObject newProjectile = CurrentProjectile?.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
 
                 if (newProjectile == null)
                 { continue; }
@@ -705,10 +710,10 @@ namespace Game.Components
 
                     if (IsAccurateShoot)
                     {
-                        if (requiedShoots != null)
+                        if (requiredShoots != null)
                         {
                             float predictedDamage = 0f;
-                            if (requiedShoots.HasComponent<Projectile>())
+                            if (requiredShoots.HasComponent<Projectile>())
                             {
                                 predictedDamage = 1f;
                             }
@@ -717,10 +722,11 @@ namespace Game.Components
                                 predictedDamage += _projectile.ImpactDamage;
                                 predictedDamage += _projectile.ExploisonDamage * .2f;
                             }
-                            requiedShoots.Shoot(impactTime, predictedDamage);
+                            requiredShoots.Shoot(impactTime, predictedDamage);
                         }
                         else if (targetTransform != null &&
-                            targetTransform.gameObject.TryGetComponent(out requiedShoots))
+                            targetTransform.gameObject.TryGetComponent(out requiredShoots) &&
+                            requiredShoots != null)
                         {
                             if ((predictedImpactPosition - TargetPosition).sqrMagnitude < 1f)
                             {
@@ -730,7 +736,7 @@ namespace Game.Components
                                     float predictedImpactTime = predictedImpactTime_.Value;
                                     float predictedDamage = _projectile.ImpactDamage;
                                     predictedDamage += _projectile.ExploisonDamage * .2f;
-                                    requiedShoots.Shoot(predictedImpactTime, predictedDamage);
+                                    requiredShoots.Shoot(predictedImpactTime, predictedDamage);
                                 }
                             }
                         }

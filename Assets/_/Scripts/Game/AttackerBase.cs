@@ -66,6 +66,18 @@ namespace Game.Components
 
         public void DoInput()
         {
+            bool anyTouchCaptured = false;
+            for (int i = Input.touchCount - 1; i >= 0; i--)
+            {
+                Touch touch = Input.touches[i];
+                if (MouseManager.IsTouchCaptured(touch.fingerId))
+                { anyTouchCaptured = true; }
+                else
+                { anyTouchCaptured = false; }
+            }
+
+            if (anyTouchCaptured) return;
+
             if (TakeControlManager.Instance.IsScoping && turret.ScopeHolder != null)
             {
                 Vector3 lockFix = Vector3.zero;
@@ -192,7 +204,7 @@ namespace Game.Components
                 }
             }
 
-            if (Mouse.IsDown(Mouse.Left) && !MenuManager.AnyMenuVisible)
+            if (Mouse.IsHold(Mouse.Left) && !MenuManager.AnyMenuVisible)
             {
                 turret.PrepareShooting = true;
                 if (turret.IsAccurateShoot)

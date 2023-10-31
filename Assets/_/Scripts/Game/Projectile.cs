@@ -1,3 +1,4 @@
+using System.Collections;
 using Game.Managers;
 
 using UnityEngine;
@@ -38,6 +39,7 @@ namespace Game.Components
 
         [SerializeField] bool Register;
         [SerializeField, ReadOnly] AudioSource AudioSource;
+        [SerializeField] bool Instant;
 
         [Header("Movement")]
         [SerializeField] internal float Acceleration = 0f;
@@ -48,7 +50,7 @@ namespace Game.Components
         [SerializeField] bool CanBounce = true;
         [SerializeField, Range(0f, 90f)] float BounceAngle = 50f;
 
-        [Header("Exploison")]
+        [Header("Explosion")]
         [SerializeField] float ExploisonForce = 0f;
         [SerializeField] float ExploisonRadius = 0f;
         [SerializeField] internal float ExploisonDamage = 0f;
@@ -93,7 +95,7 @@ namespace Game.Components
 
         internal Rigidbody Rigidbody => rb;
 
-        internal Vector3 Position => rb.position + (rb.velocity * Time.fixedDeltaTime);
+        internal Vector3 Position => rb == null ? transform.position : rb.position + (rb.velocity * Time.fixedDeltaTime);
 
         internal Ballistics.Trajectory Shot;
 
@@ -112,14 +114,7 @@ namespace Game.Components
 
             destroyed = false;
             AttachTrail();
-        }
-        void OnDisable()
-        {
-            if (Register) RegisteredObjects.Projectiles.Remove(this);
-        }
 
-        void Start()
-        {
             if (RandomRotation)
             {
                 Quaternion randomRotation = Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
@@ -129,6 +124,16 @@ namespace Game.Components
                 { transform.rotation = randomRotation; }
             }
 
+            if (Instant)
+            { StartCoroutine(InstantHit()); }
+        }
+        void OnDisable()
+        {
+            if (Register) RegisteredObjects.Projectiles.Remove(this);
+        }
+
+        void Start()
+        {
             rb = GetComponent<Rigidbody>();
             AudioSource = GetComponentInChildren<AudioSource>();
 
@@ -139,6 +144,81 @@ namespace Game.Components
                     Parent = trail.transform.parent,
                     LocalPosition = trail.transform.localPosition,
                 };
+            }
+        }
+
+        IEnumerator InstantHit()
+        {
+            yield return new WaitForFixedUpdate();
+
+            Vector3 startPosition = transform.position;
+            int hitCount = Physics.RaycastNonAlloc(startPosition, transform.forward, hits, 500f, HitLayerMask);
+
+            int closestI = -1;
+            float closestD = float.MaxValue;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                if (!hits[i].collider.gameObject.HasComponent<Projectile>())
+                {
+                    if (hits[i].collider.isTrigger &&
+                        (hits[i].collider.gameObject.name != "Water" || !DieInWater))
+                    { continue; }
+                }
+                else if (PropabilityOfProjectileIntersection <= 0f)
+                { continue; }
+
+                if (hits[i].transform == transform)
+                { continue; }
+
+                if (ignoreCollision.Contains(hits[i].transform))
+                { continue; }
+
+                if (closestI == -1)
+                {
+                    closestI = i;
+                }
+                else
+                {
+                    float d = (lastPosition - hits[i].point).sqrMagnitude;
+                    if (d < closestD)
+                    {
+                        closestD = d;
+                        closestI = i;
+                    }
+                }
+            }
+
+            Vector3 point;
+            if (closestI != -1)
+            {
+                point = hits[closestI].point;
+            }
+            else
+            {
+                point = transform.position + transform.forward * 500f;
+            }
+            transform.position = point;
+
+            if (trail != null)
+            {
+                if (trail.TryGetComponent(out TrailRenderer trailRenderer))
+                {
+                    trailRenderer.SetPositions(new Vector3[] { startPosition, point });
+                }
+
+                if (trail.TryGetComponent(out LineRenderer lineRenderer))
+                {
+                    lineRenderer.SetPositions(new Vector3[] { startPosition, point });
+                }
+            }
+
+            if (closestI != -1)
+            {
+                if (Impact(hits[closestI].point, hits[closestI].normal, hits[closestI].collider))
+                {
+
+                }
             }
         }
 
@@ -354,12 +434,12 @@ namespace Game.Components
                 if (modifiedImpactAngle < BounceAngle && rb != null)
                 {
                     float impactEnergy = Maths.Sin(impactAngle * Maths.Deg2Rad);
-                    float remaingEnergy = 1f - impactEnergy;
+                    float remainingEnergy = 1f - impactEnergy;
 
                     if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
                     { obj.attachedRigidbody.AddForceAtPosition(ImpactForce * impactEnergy * transform.forward, at, ForceMode.Impulse); }
 
-                    var newVelocity = Vector3.Reflect(rb.velocity * remaingEnergy, normal);
+                    var newVelocity = Vector3.Reflect(rb.velocity * remainingEnergy, normal);
                     rb.velocity = newVelocity;
 
                     if (RicochetEffect != null)
@@ -416,10 +496,17 @@ namespace Game.Components
             if (trailData.Parent == null) return;
             ticksUntilTrailClear = 1;
 
+            trail.SetActive(true);
+
             if (trail.TryGetComponent(out TrailRenderer trailRenderer))
             {
                 trailRenderer.emitting = false;
                 trailRenderer.Clear();
+            }
+
+            if (trail.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.SetPositions(new Vector3[0]);
             }
 
             if (trail.transform.parent.gameObject != trailData.Parent.gameObject)
@@ -445,15 +532,15 @@ namespace Game.Components
             if (ImpactDamage <= 0f)
             { return; }
 
-            if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamagable))
+            if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamageable))
             {
-                detailedDamagable.Damage(ImpactDamage, this);
+                detailedDamageable.Damage(ImpactDamage, this);
                 return;
             }
 
-            if (other.gameObject.TryGetComponentInParent(out IDamagable damagable))
+            if (other.gameObject.TryGetComponentInParent(out IDamagable damageable))
             {
-                damagable.Damage(ImpactDamage);
+                damageable.Damage(ImpactDamage);
                 return;
             }
         }
@@ -533,7 +620,7 @@ namespace Game.Components
                     if (objectCollider.isTrigger)
                     {
                         if (objectCollider.gameObject.TryGetComponent(out Projectile otherProjectile))
-                        { otherProjectile.OnOtherExploison(this); }
+                        { otherProjectile.OnOtherExplosion(this); }
                         else
                         { continue; }
                     }
@@ -549,13 +636,13 @@ namespace Game.Components
 
                     float distanceSqr = Maths.Max(1f, (@object.transform.position - origin).sqrMagnitude);
 
-                    if (@object.TryGetComponent(out IDetailedDamagable detailedDamagable))
+                    if (@object.TryGetComponent(out IDetailedDamagable detailedDamageable))
                     {
-                        detailedDamagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr, this);
+                        detailedDamageable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr, this);
                     }
-                    else if (@object.TryGetComponent<IDamagable>(out var damagable))
+                    else if (@object.TryGetComponent<IDamagable>(out var damageable))
                     {
-                        damagable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr);
+                        damageable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr);
                     }
                 }
             }
@@ -569,7 +656,7 @@ namespace Game.Components
             return false;
         }
 
-        private void OnOtherExploison(Projectile exploisonSource)
+        private void OnOtherExplosion(Projectile explosionSource)
         {
             if (!DestroyInExploisons) return;
             if (destroyed) return;

@@ -668,6 +668,14 @@ namespace Game.Components
 
             input.x = Input.GetAxis("Horizontal");
             input.y = Input.GetAxis("Vertical");
+
+            if (TouchJoystick.Instance != null && TouchJoystick.Instance.IsActiveAndCaptured)
+            {
+                input = TouchJoystick.Instance.NormalizedInput2;
+                input.Rotate(-45f);
+                input = transform.InverseTransformDirection(input.To3D()).To2D();
+            }
+
             bool handbrake = Input.GetKey(KeyCode.Space);
 
             if (NetcodeUtils.IsOfflineOrServer)

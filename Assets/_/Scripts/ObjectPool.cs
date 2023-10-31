@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class PooledObject
@@ -67,7 +66,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
             {
                 if (Instances[i] == null)
                 {
-                    Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Pooled instance is destroyed  (pool: \"{Prefab.name}\")", ObjectPool.instance);
+                    Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Pooled instance is destroyed  (pool: {(Prefab == null ? "null" : $"\"{Prefab.name}\"")})", ObjectPool.instance);
                     Instances.RemoveAt(i);
                     continue;
                 }
@@ -82,11 +81,13 @@ public class ObjectPool : SingleInstance<ObjectPool>
             if (Instances.Count >= MaxSize)
             {
                 if (ObjectPool.Instance.SizeExceedWarnings)
-                { Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exeeded (pool: \"{Prefab.name}\" count: {Instances.Count})", ObjectPool.instance); }
+                { Debug.LogWarning($"[{nameof(ObjectPool)}.{nameof(Pool)}]: Size exceeded (pool: {(Prefab == null ? "null" : $"\"{Prefab.name}\"")} count: {Instances.Count})", ObjectPool.instance); }
                 return null;
             }
 
             GameObject newInstance = GameObject.Instantiate(Prefab);
+            if (newInstance == null) return null;
+
             Instances.Add(newInstance);
             return newInstance;
         }
@@ -97,6 +98,7 @@ public class ObjectPool : SingleInstance<ObjectPool>
 
     public PooledObject GeneratePool(GameObject prefab)
     {
+        if (prefab == null) return null;
         for (int i = 0; i < Pools.Count; i++)
         {
             if (Pools[i].Prefab == prefab)
@@ -107,5 +109,5 @@ public class ObjectPool : SingleInstance<ObjectPool>
     }
 
     public GameObject Generate(int i)
-        => Pools[i].Generate();
+        => (i < 0 || i >= Pools.Count) ? null : Pools[i].Generate();
 }

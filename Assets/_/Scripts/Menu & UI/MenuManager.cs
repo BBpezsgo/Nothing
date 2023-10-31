@@ -101,7 +101,7 @@ namespace Game.Managers
 
                 if (Enabled)
                 {
-                    if (!Active)
+                    if (!gameObject.activeSelf)
                     {
                         SetActive(true);
                         SetUI();
@@ -111,7 +111,7 @@ namespace Game.Managers
                 }
                 else
                 {
-                    if (Active)
+                    if (gameObject.activeSelf)
                     {
                         SetActive(false);
                         SetUI();
@@ -217,6 +217,9 @@ namespace Game.Managers
 
                 if (CurrentStatus != StatusType.None) return IntermediateMenuType.None;
                 if (CurrentPanel != PanelType.None) return IntermediateMenuType.None;
+
+                if (SceneManager.LoadedScene == null && NetcodeUtils.IsActiveOfflineOrServer)
+                { return IntermediateMenuType.Scenes; }
 
                 return currentIntermediateMenu;
             }
