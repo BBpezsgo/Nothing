@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-
-using UnityEngine;
 using System.Runtime.CompilerServices;
 
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
+#nullable enable
 
 public struct Triangle
 {
@@ -119,7 +115,7 @@ public readonly struct RectUtils
 
 public static class GLUtils
 {
-    static Material _solidMaterial;
+    static Material? _solidMaterial;
     public static Material SolidMaterial
     {
         get
@@ -230,9 +226,9 @@ public static class GLUtils
         }
         GL.End();
     }
-    public static void DrawCircle(Vector2 center, float radius, float thickness, Color color, float fillAmmount, int segmentCount = CircleSegmentCount)
+    public static void DrawCircle(Vector2 center, float radius, float thickness, Color color, float fillAmount, int segmentCount = CircleSegmentCount)
     {
-        if (fillAmmount >= .99f)
+        if (fillAmount >= .99f)
         {
             DrawCircle(center, radius, thickness, color, segmentCount);
             return;
@@ -244,7 +240,7 @@ public static class GLUtils
             return;
         }
 
-        int segments = Maths.FloorToInt(fillAmmount * segmentCount);
+        int segments = Maths.FloorToInt(fillAmount * segmentCount);
         float step = 1f / (float)segmentCount;
 
         GL.Begin(GL.TRIANGLE_STRIP);
@@ -261,7 +257,7 @@ public static class GLUtils
             }
 
             {
-                float next = 1 + Maths.Clamp((fillAmmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
+                float next = 1 + Maths.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
 
                 float rad = 2 * Maths.PI * ((float)(i + next) / (float)segmentCount);
                 Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
@@ -287,15 +283,15 @@ public static class GLUtils
         }
         GL.End();
     }
-    public static void DrawCircle(Vector2 center, float radius, Color color, float fillAmmount, int segmentCount = CircleSegmentCount)
+    public static void DrawCircle(Vector2 center, float radius, Color color, float fillAmount, int segmentCount = CircleSegmentCount)
     {
-        if (fillAmmount >= .99f)
+        if (fillAmount >= .99f)
         {
             DrawCircle(center, radius, color, segmentCount);
             return;
         }
 
-        int segments = Maths.FloorToInt(fillAmmount * segmentCount);
+        int segments = Maths.FloorToInt(fillAmount * segmentCount);
         float step = 1f / (float)segmentCount;
 
         GL.Begin(GL.LINE_STRIP);
@@ -311,7 +307,7 @@ public static class GLUtils
             }
 
             {
-                float next = 1 + Maths.Clamp((fillAmmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
+                float next = 1 + Maths.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
 
                 float rad = 2 * Maths.PI * ((float)(i + next) / (float)segmentCount);
                 Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
@@ -533,14 +529,14 @@ namespace Utilities
             return (topLeft, bottomRight);
         }
 
-        public static float ModularClamp(float val, float min, float max, float rangemin = -180f, float rangemax = 180f)
+        public static float ModularClamp(float val, float min, float max, float rangeMin = -180f, float rangeMax = 180f)
         {
-            var modulus = Maths.Abs(rangemax - rangemin);
+            var modulus = Maths.Abs(rangeMax - rangeMin);
             if ((val %= modulus) < 0f) val += modulus;
-            return System.Math.Clamp(val + Maths.Min(rangemin, rangemax), min, max);
+            return System.Math.Clamp(val + Maths.Min(rangeMin, rangeMax), min, max);
         }
 
-        static Texture2D _whiteTexture;
+        static Texture2D? _whiteTexture;
         /// <summary>
         /// <see href="https://github.com/pickles976/RTS_selection/blob/master/Utils.cs"/>
         /// </summary>
@@ -647,7 +643,7 @@ namespace Utilities
 
     public static class Ballistics
     {
-        public struct ProfilerMarkers
+        public readonly struct ProfilerMarkers
         {
             public static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");
         }
@@ -963,9 +959,11 @@ namespace Utilities
             return (shallow, steep);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Radius(float v, float angleRad)
             => ((v * v) / G) * Maths.Sin(angleRad * 2f);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float MaxRadius(float v)
             => (v * v) / G;
 
@@ -996,6 +994,7 @@ namespace Utilities
         /// <param name="angleRad">Launch angle</param>
         /// <param name="v">Initial velocity</param>
         /// <param name="t">Time</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DisplacementX(float angleRad, float v, float t)
             => v * t * Maths.Cos(angleRad);
 
@@ -1066,6 +1065,7 @@ namespace Utilities
         /// </summary>
         /// <param name="v">Initial velocity</param>
         /// <param name="angleRad">Launch angle</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float TimeOfFlight(float v, float angleRad)
             => (2f * v * Maths.Sin(angleRad)) / G;
 
@@ -1077,9 +1077,11 @@ namespace Utilities
             return d / a;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float MaxHeight2(float d, float angleRad)
             => (d * Maths.Tan(angleRad)) / 4;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 GetPosition(Vector2 v, float t)
             => (v * t) + ((t * t * GVector) / 2);
 
@@ -1149,7 +1151,7 @@ namespace Utilities
                 }
             }
 
-            return (targetPosition, t.Value);
+            return (targetPosition, t!.Value);
         }
 
         public static Vector2? CalculateInterceptCourse(Vector2 projectilePosition, float projectileVelocity, Vector2 targetPosition, Vector2 targetVelocity)
@@ -1241,375 +1243,22 @@ namespace Utilities
 
         public static bool IsBetween(Vector2 a, Vector2 b, Vector2 c)
         {
-            var crossproduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
+            float crossProduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
 
-            //  compare versus epsilon for floating point values, or != 0 if using integers
-            if (Maths.Abs(crossproduct) > 0.0001f)
+            // compare versus epsilon for floating point values, or != 0 if using integers
+            if (Maths.Abs(crossProduct) > 0.0001f)
             { return false; }
 
-            var dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
-            if (dotproduct < 0)
+            float dotProduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
+            if (dotProduct < 0)
             { return false; }
 
-            var squaredlengthba = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
-            if (dotproduct > squaredlengthba)
+            float squaredLengthBA = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+            if (dotProduct > squaredLengthBA)
             { return false; }
 
             return true;
 
-        }
-    }
-
-    /// <summary>
-    /// A collection of generic math functions.
-    /// </summary>
-    public struct Math
-    {
-        public static float QuadraticEquation(float a, float b, float c, float sign)
-        {
-            float discriminant = (b * b) - (4 * a * c);
-            return (-b + sign * Maths.Sqrt(discriminant)) / (2 * a);
-        }
-        public static (float, float) QuadraticEquation(float a, float b, float c)
-        {
-            float discriminant = (b * b) - (4 * a * c);
-            float dqrt = Maths.Sqrt(discriminant);
-            float x1 = (-b + dqrt) / (2 * a);
-            float x2 = (-b - dqrt) / (2 * a);
-
-            return (x1, x2);
-        }
-        public static float Sum(params float[] values)
-        {
-            var sum = 0f;
-            for (int i = 0; i < values.Length; i++)
-            {
-                sum += values[i];
-            }
-            return sum;
-        }
-        public static float Sum(float a)
-        {
-            return a;
-        }
-        public static float Sum(float a, float b)
-        {
-            return a + b;
-        }
-
-        public static float Average(params float[] values)
-        {
-            return Sum(values) / values.Length;
-        }
-        public static float Average(float a, float b)
-        {
-            return (a + b) / 2;
-        }
-        public static float Average(float a)
-        {
-            return a;
-        }
-
-        public static float Difference(float a, float b)
-        {
-            return Maths.Abs(a - b);
-        }
-        public static Vector2 Difference(Vector2 a, Vector2 b)
-        {
-            return new Vector2(
-                    Difference(a.x, b.x),
-                    Difference(a.y, b.y)
-                );
-        }
-        public static Vector3 Difference(Vector3 a, Vector3 b)
-        {
-            return new Vector3(
-                    Difference(a.x, b.x),
-                    Difference(a.y, b.y),
-                    Difference(a.z, b.z)
-                );
-        }
-
-        public static Vector3 Mult(Vector3 a, Vector3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
-
-        public struct Circle
-        {
-            public Vector2 center;
-            public float radius;
-
-            public Circle(Vector2 center, float radius)
-            {
-                this.center = center;
-                this.radius = radius;
-            }
-
-            public readonly void DebugPrint()
-            {
-                Debug.Log("Circle { center: { x: " + center.x.ToString() + ", y: " + center.y.ToString() + "}, radius: " + radius.ToString() + "}");
-            }
-
-            /// <param name="angle">Angle in radians</param>
-            public readonly Vector2 GetPoint(float angle)
-            {
-                float x = this.radius * Maths.Cos(angle) + this.center.x;
-                float y = this.radius * Maths.Sin(angle) + this.center.y;
-                return new Vector2(x, y);
-            }
-
-            /// <param name="angleOffset">Angle in radians</param>
-            public readonly Vector2 GetPointAfterTime(float speed, float time, float angleOffset)
-                => GetPoint(GetAngle(speed, time) + (angleOffset));
-
-            public readonly float GetAngle(Vector2 pointOnCircle)
-                => Maths.Atan2(pointOnCircle.y - this.center.y, pointOnCircle.x - this.center.y);
-
-            public readonly float GetAngle(float speed, float time)
-                => GetAngle(speed * time);
-
-            public readonly float GetAngle(float distance)
-                => distance / this.radius;
-
-            public static float Circumference(float radius)
-                => Maths.PI * 2 * radius;
-
-            public readonly float Circumference()
-                => Maths.PI * 2 * radius;
-
-            public static Vector2[] GenerateEquadistancePoints(int n, float radius)
-            {
-                List<Vector2> points = new();
-
-                for (int i = 0; i < n; i++)
-                {
-                    var k = i + .5f;
-                    var r = Maths.Sqrt((k) / n);
-                    var theta = Maths.PI * (1 + Maths.Sqrt(5)) * k;
-                    var x = r * Maths.Cos(theta) * radius;
-                    var y = r * Maths.Sin(theta) * radius;
-                    points.Add(new Vector2(x, y));
-                }
-
-                return points.ToArray();
-            }
-        }
-
-        public static float IsStraightLine(Vector2 positionA, Vector2 positionB, Vector2 positionC)
-            => (positionA.x * (positionB.y - positionC.y) + positionB.x * (positionC.y - positionA.y) + positionC.x * (positionA.y - positionB.y)) / 2;
-
-        public static Circle FincCircle(Vector2 positionA, Vector2 positionB, Vector2 positionC)
-            => FindCircle(positionA.x, positionA.y, positionB.x, positionB.y, positionC.x, positionC.y);
-        public static Circle FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
-        {
-            float x12 = x1 - x2;
-            float x13 = x1 - x3;
-
-            float y12 = y1 - y2;
-            float y13 = y1 - y3;
-
-            float y31 = y3 - y1;
-            float y21 = y2 - y1;
-
-            float x31 = x3 - x1;
-            float x21 = x2 - x1;
-
-            float sx13 = Maths.Pow(x1, 2) - Maths.Pow(x3, 2);
-            float sy13 = Maths.Pow(y1, 2) - Maths.Pow(y3, 2);
-            float sx21 = Maths.Pow(x2, 2) - Maths.Pow(x1, 2);
-            float sy21 = Maths.Pow(y2, 2) - Maths.Pow(y1, 2);
-
-            float f = ((sx13) * (x12)
-                    + (sy13) * (x12)
-                    + (sx21) * (x13)
-                    + (sy21) * (x13))
-                    / (2 * ((y31) * (x12) - (y21) * (x13)));
-            float g = ((sx13) * (y12)
-                    + (sy13) * (y12)
-                    + (sx21) * (y13)
-                    + (sy21) * (y13))
-                    / (2 * ((x31) * (y12) - (x21) * (y13)));
-
-            float c = -Maths.Pow(x1, 2) - Maths.Pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
-            float h = g * -1;
-            float k = f * -1;
-            float sqr_of_r = h * h + k * k - c;
-
-            float r = (sqr_of_r < 0) ? 0f : Maths.Sqrt(sqr_of_r);
-
-            return new Circle(new Vector2(h, k), r);
-        }
-
-        /// <returns>In degrees</returns>
-        public static float GetAngleFromVectorFloat(Vector3 dir)
-        {
-            dir = dir.normalized;
-            float n = Maths.Atan2(dir.y, dir.x) * Maths.Rad2Deg;
-            if (n < 0) n += 360;
-
-            return n;
-        }
-
-        /// <returns>In degrees</returns>
-        public static float GetAngleFromVectorFloat(Vector2 dir)
-        {
-            dir = dir.normalized;
-            float n = Maths.Atan2(dir.y, dir.x) * Maths.Rad2Deg;
-            if (n < 0) n += 360;
-
-            return n;
-        }
-
-        public static Vector2 RadianToVector2(float radian)
-        { return new Vector2(Maths.Cos(radian), Maths.Sin(radian)); }
-        public static Vector2 DegreeToVector2(float degree)
-        { return RadianToVector2(degree * Maths.Deg2Rad); }
-
-        public static float NormalizeDegree(float degree)
-        { return (degree + 360) % 360; }
-
-        public static Vector3 LengthDir(Vector3 center, float angle, float distance)
-        {
-            float x = distance * Maths.Cos((90 + angle) * Maths.Deg2Rad);
-            float y = distance * Maths.Sin((90 + angle) * Maths.Deg2Rad);
-            Vector3 newPosition = center;
-            newPosition.x += x;
-            newPosition.y += y;
-            return newPosition;
-        }
-
-        public static int BoolToInt(bool val)
-        { return val ? 1 : 0; }
-        public static bool IntToBool(int val)
-        {
-            if (val == 0)
-            {
-                return false;
-            }
-            if (val == 1)
-            {
-                return true;
-            }
-
-            throw new System.Exception("Unable to convert int " + val.ToString() + " to bool");
-        }
-
-        class PointGroup
-        {
-            public int GroupID { get; set; }
-            public Vector2 Point1 { get; set; }
-            public bool IsGrouped { get; set; }
-        }
-
-        static PointGroup[] GeneratePointGroups(Vector2[] points)
-        {
-            List<PointGroup> groups = new();
-            for (int i = 0; i < points.Length; i++)
-            {
-                groups.Add(new PointGroup() { GroupID = i, IsGrouped = false, Point1 = points[i] });
-            }
-            return groups.ToArray();
-        }
-
-        static Vector2[][] GetGroupsFromGroups(PointGroup[] pointGroups)
-        {
-            List<List<Vector2>> vector2s = new();
-            Dictionary<int, int> groupIdToIndex = new();
-            for (int i = 0; i < pointGroups.Length; i++)
-            {
-                if (groupIdToIndex.TryGetValue(pointGroups[i].GroupID, out int groupIndex))
-                {
-                    vector2s[groupIndex].Add(pointGroups[i].Point1);
-                }
-                else
-                {
-                    vector2s.Add(new List<Vector2>());
-                    groupIdToIndex.Add(pointGroups[i].GroupID, vector2s.Count - 1);
-                }
-            }
-            List<Vector2[]> vector2s1 = new();
-            foreach (var item in vector2s)
-            {
-                vector2s1.Add(item.ToArray());
-            }
-            return vector2s1.ToArray();
-        }
-
-        public static Vector2[][] GroupPoints(Vector2[] points, float tolerance)
-        {
-            PointGroup[] colls = GeneratePointGroups(points);
-            for (int i = 0; i < colls.Length; i++)
-            {
-                PointGroup pg1 = colls[i];
-                if (!pg1.IsGrouped)
-                {
-                    for (int j = 0; j < colls.Length; j++)
-                    {
-                        PointGroup pg2 = colls[j];
-                        if (pg1.Point1.AreEquals(pg2.Point1, tolerance) && pg2.IsGrouped == false)
-                        {
-                            if (pg2.GroupID == j)
-                            {
-                                pg2.GroupID = pg1.GroupID;
-                                pg2.IsGrouped = true;
-                            }
-                        }
-                    }
-
-                    pg1.IsGrouped = true;
-                }
-            }
-            return GetGroupsFromGroups(colls);
-        }
-
-        /// <returns>(lowerLeft, upperRight)</returns>
-        public static (Vector2, Vector2) GetRect(Vector2 a, Vector2 b)
-        {
-            Vector2 lowerLeft = new(Maths.Min(a.x, b.x), Maths.Min(a.y, b.y));
-            Vector2 upperRight = new(Maths.Max(a.x, b.x), Maths.Max(a.y, b.y));
-            return (lowerLeft, upperRight);
-        }
-
-        /// <returns>(lowerLeft, upperRight)</returns>
-        public static (Vector2, Vector2) GetRect(Transform a, Transform b)
-        {
-            return GetRect(a.position, b.position);
-        }
-
-        /// <param name="p1">Angle peak</param>
-        public static float CalculateAngle(Vector2 p1, Vector2 p2, Vector2 p3)
-        {
-            float numerator = p2.y * (p1.x - p3.x) + p1.y * (p3.x - p2.x) + p3.y * (p2.x - p1.x);
-            float denominator = (p2.x - p1.x) * (p1.x - p3.x) + (p2.y - p1.y) * (p1.y - p3.y);
-            float ratio = numerator / denominator;
-
-            float angleRad = Maths.Atan(ratio);
-            float angleDeg = (angleRad * 180) / Maths.PI;
-
-            if (angleDeg < 0)
-            {
-                angleDeg = 180 + angleDeg;
-            }
-
-            return angleDeg;
-        }
-
-        public static float MapToRange(float outputStart, float outputEnd, float percent)
-        {
-            /* Note, "slope" below is a constant for given numbers, so if you are calculating
-               a lot of output values, it makes sense to calculate it once.  It also makes
-               understanding the Code easier */
-            var slope = outputEnd - outputStart;
-            var output = outputStart + slope * percent;
-            return output;
-        }
-
-        public static float MapToRange(float outputStart, float outputEnd, float inputStart, float inputEnd, float input)
-        {
-            /* Note, "slope" below is a constant for given numbers, so if you are calculating
-               a lot of output values, it makes sense to calculate it once.  It also makes
-               understanding the Code easier */
-            var slope = (outputEnd - outputStart) / (inputEnd - inputStart);
-            var output = outputStart + slope * (input - inputStart);
-            return output;
         }
     }
 
@@ -1618,18 +1267,18 @@ namespace Utilities
         public const float LargeNumber = 69420f;
 
         /// <summary>
-        /// If <paramref name="time"/> is 0 it returns <see cref="LargeNumber"/> to avoid divison by zero
+        /// If <paramref name="time"/> is 0 it returns <see cref="LargeNumber"/> to avoid division by zero
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateAcceleration(float initialVelocity, float topVelocity, float time)
         {
             if (time == 0f) return LargeNumber;
             return (topVelocity - initialVelocity) / time;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float SpeedAfterTime(float velocity, float acceleration, float time)
-        {
-            return velocity + (acceleration * time);
-        }
+            => velocity + (acceleration * time);
 
         public static float SpeedAfterDistance(float velocity, float acceleration, float distance)
         {
@@ -1649,17 +1298,16 @@ namespace Utilities
         /// a: <paramref name="acceleration"/> <br/>
         /// t: <paramref name="time"/> <br/>
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DistanceAfterTime(float velocity, float acceleration, float time)
-        {
-            return (velocity * time) + ((acceleration / 2) * (time * time));
-        }
+            => (velocity * time) + ((acceleration / 2) * (time * time));
 
         /// <summary>
         /// <b>Δv / a</b> <br/>
         /// or <br/>
         /// <b>(v - vₒ) / a</b> <br/><br/>
         /// 
-        /// If <paramref name="targetVelocity"/> can't be reached, it returns <see cref="LargeNumber"/> to avoid divison by zero. <br/><br/>
+        /// If <paramref name="targetVelocity"/> can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero. <br/><br/>
         /// 
         /// v: <paramref name="targetVelocity"/> <br/>
         /// vₒ: <paramref name="initialVelocity"/> <br/>
@@ -1677,7 +1325,7 @@ namespace Utilities
         /// <summary>
         /// <b>-vₒ / a</b> <br/><br/>
         /// 
-        /// If 0 velocity can't be reached, it returns <see cref="LargeNumber"/> to avoid divison by zero. <br/><br/>
+        /// If 0 velocity can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero. <br/><br/>
         /// 
         /// vₒ: <paramref name="initialVelocity"/> <br/>
         /// a: <paramref name="acceleration"/> <br/>
@@ -1731,10 +1379,9 @@ namespace Utilities
         /// vₒ: <paramref name="topVelocity"/> <br/>
         /// t: <paramref name="time"/> <br/>
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateDistanceFromSpeed(float initialVelocity, float topVelocity, float time)
-        {
-            return Math.Average(initialVelocity, topVelocity) * time;
-        }
+            => Maths.Average(initialVelocity, topVelocity) * time;
 
         public static float CalculateTime(float initialVelocity, float topVelocity, float timeToSpeedUp, float distance, float acceleration)
         {
@@ -1800,27 +1447,20 @@ namespace Utilities
 
     public static class Velocity
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateTime(Vector2 pointA, Vector2 pointB, float speed)
-        {
-            return CalculateTime(Vector2.Distance(pointA, pointB), speed);
-        }
+            => CalculateTime(Vector2.Distance(pointA, pointB), speed);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateSpeed(float distance, float time)
-        {
-            if (time == 0f) return 0f;
-            return (distance / time);
-        }
+            => time == 0f ? 0f : distance / time;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateDistance(float velocity, float time)
-        {
-            return velocity * time;
-        }
+            => velocity * time;
 
         public static float CalculateTime(float distance, float velocity)
-        {
-            if (velocity == 0f) return 0f;
-            return distance / velocity;
-        }
+            => velocity == 0f ? 0f : distance / velocity;
 
         /// <returns>Aim offset</returns>
         public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity)
@@ -1838,7 +1478,7 @@ namespace Utilities
             return targetVelocity * time;
         }
         /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, Math.Circle circle)
+        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, Maths.Circle circle)
         {
             float p = 1 / projectileVelocity;
 
@@ -1878,13 +1518,11 @@ namespace Utilities
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Label(float x, float y, float z, string content)
-        {
-#if UNITY_EDITOR
-            Label(new Vector3(x, y, z), content);
-#endif
-        }
+            => Label(new Vector3(x, y, z), content);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Label(Vector3 position, string content)
         {
 #if UNITY_EDITOR
@@ -2076,7 +1714,7 @@ namespace Utilities
 public class SearcherCoroutine<T>
 {
     int i;
-    T[] gotList = null;
+    T[]? gotList = null;
     bool isRunning;
 
     readonly Func<T[]> list;
@@ -2140,7 +1778,7 @@ public readonly struct EditorUtils
     public static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
 }
 
-public static class UnityCopiables
+public static class UnityCopyables
 {
     public static void CopyTo(Rigidbody source, Rigidbody destination)
     {
@@ -2163,13 +1801,13 @@ public static class UnityCopiables
     }
 }
 
-public static class CopiableExtensions
+public static class CopyableExtensions
 {
-    public static bool CopyTo<T>(this ICopiable<T> source, object destination)
+    public static bool CopyTo<T>(this ICopyable<T> source, object destination)
     {
         if (destination is not T _destination)
         {
-            Debug.LogError($"[{nameof(CopiableExtensions)}]: Invalid destination type");
+            Debug.LogError($"[{nameof(CopyableExtensions)}]: Invalid destination type");
             return false;
         }
         source.CopyTo(_destination);
@@ -2184,34 +1822,33 @@ public interface IComponent { }
 
 public static class IObjectExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool HasComponent<T>(this IComponent self)
-        => (self as Component).HasComponent<T>();
+        => ((Component)self).HasComponent<T>();
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Component Object(this IComponent self)
-        => self as Component;
+        => (Component)self;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static GameObject GetGameObject(this IComponent self)
-        => (self as Component).gameObject;
+        => ((Component)self).gameObject;
 
-    public static T GetComponent<T>(this IComponent self)
-    {
-        if (!(self as Component).TryGetComponent(out T component))
-        { return default; }
-        return component;
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? GetComponent<T>(this IComponent self)
+        => !((Component)self).TryGetComponent(out T component) ? default : component;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryGetComponent<T>(this IComponent self, out T component)
-        => (self as Component).TryGetComponent(out component);
+        => ((Component)self).TryGetComponent(out component);
 
-    public static T GetComponentInChildren<T>(this IComponent self)
-    {
-        if (!(self as Component).TryGetComponentInChildren(out T component))
-        { return default; }
-        return component;
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? GetComponentInChildren<T>(this IComponent self)
+        => !((Component)self).TryGetComponentInChildren(out T component) ? default : component;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryGetComponentInChildren<T>(this IComponent self, out T component)
-        => (self as Component).TryGetComponentInChildren(out component);
+        => ((Component)self).TryGetComponentInChildren(out component);
 }
 
 public static class Intervals
@@ -2220,7 +1857,7 @@ public static class Intervals
 
     static bool AlwaysTrue() => true;
 
-    public static void Timeout(this MonoBehaviour context, Action action, float timeout, Condition condition = null)
+    public static void Timeout(this MonoBehaviour context, Action action, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
         context.StartCoroutine(Intervals.TimeoutCoroutine(action, timeout, condition ?? AlwaysTrue));
@@ -2234,7 +1871,7 @@ public static class Intervals
         action.Invoke();
     }
 
-    public static void Timeout<T0>(this MonoBehaviour context, Action<T0> action, T0 parameter0, float timeout, Condition condition = null)
+    public static void Timeout<T0>(this MonoBehaviour context, Action<T0> action, T0 parameter0, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
         context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, timeout, condition ?? AlwaysTrue));
@@ -2248,7 +1885,7 @@ public static class Intervals
         action.Invoke(parameter0);
     }
 
-    public static void Timeout<T0, T1>(this MonoBehaviour context, Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition condition = null)
+    public static void Timeout<T0, T1>(this MonoBehaviour context, Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
         context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, timeout, condition ?? AlwaysTrue));
@@ -2262,7 +1899,7 @@ public static class Intervals
         action.Invoke(parameter0, parameter1);
     }
 
-    public static void Timeout<T0, T1, T2>(this MonoBehaviour context, Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition condition = null)
+    public static void Timeout<T0, T1, T2>(this MonoBehaviour context, Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
         context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, parameter2, timeout, condition ?? AlwaysTrue));
@@ -2276,7 +1913,7 @@ public static class Intervals
         action.Invoke(parameter0, parameter1, parameter2);
     }
 
-    public static UnityIntervalDynamicCondition Interval(this MonoBehaviour context, Action action, float interval, Condition condition = null)
+    public static UnityIntervalDynamicCondition Interval(this MonoBehaviour context, Action action, float interval, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
         UnityIntervalDynamicCondition unityInterval = new(context, action, interval, condition ?? AlwaysTrue);
@@ -2294,7 +1931,7 @@ public static class Intervals
 
     public abstract class UnityBaseInterval
     {
-        protected Coroutine Coroutine;
+        protected Coroutine? Coroutine;
 
         protected readonly MonoBehaviour Context;
         protected readonly Action Action;

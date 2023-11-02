@@ -755,7 +755,7 @@ namespace InputUtils
         bool DownInvoked;
         bool UpInvoked;
 
-        public bool IsCaptured;
+        [ReadOnly] public bool IsCaptured;
 
         public bool IsHolding { get; private set; }
 

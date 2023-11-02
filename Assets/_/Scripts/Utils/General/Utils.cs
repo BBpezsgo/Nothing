@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#nullable enable
+
 [Serializable]
 public struct Pair<TKey, TValue>
 {
@@ -32,7 +34,7 @@ namespace Utilities
         }
 
         /// <summary>
-        /// Normalizes the angle <paramref name="a"/> between 0 .. 360
+        /// Normalizes the angle <paramref name="a"/> between <c>[0,360[</c>
         /// </summary>
         public static float NormalizeAngle360(float a)
         {
@@ -73,16 +75,16 @@ public static partial class ReflectionUtility
     /// <param name="type">The type to query</param>
     /// <returns>The element type of the collection or null if the type was not a collection
     /// </returns>
-    public static Type GetCollectionElementType(Type type)
+    public static Type? GetCollectionElementType(Type type)
     {
         if (null == type)
             throw new ArgumentNullException("type");
 
         // first try the generic way
         // this is easy, just query the IEnumerable<T> interface for its generic parameter
-        var etype = typeof(IEnumerable<>);
+        var eType = typeof(IEnumerable<>);
         foreach (var bt in type.GetInterfaces())
-            if (bt.IsGenericType && bt.GetGenericTypeDefinition() == etype)
+            if (bt.IsGenericType && bt.GetGenericTypeDefinition() == eType)
                 return bt.GetGenericArguments()[0];
 
         // now try the non-generic way
@@ -154,12 +156,12 @@ public static partial class ReflectionUtility
     }
 }
 
-public interface ICopiable<T> : ICopiable
+public interface ICopyable<T> : ICopyable
 {
     public void CopyTo(T destination);
 }
 
-public interface ICopiable
+public interface ICopyable
 {
     public void CopyTo(object destination);
 }
@@ -180,7 +182,7 @@ public static partial class ListUtils
             if (i > 0)
             { builder.Append(", "); }
             T element = self[i];
-            builder.Append(element.ToString());
+            builder.Append(element?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -201,7 +203,7 @@ public static partial class ListUtils
             if (i > 0)
             { builder.Append(", "); }
             T element = self[i];
-            builder.Append(element.ToString());
+            builder.Append(element?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -223,7 +225,7 @@ public static partial class ListUtils
             if (notFirst)
             { builder.Append(", "); }
 
-            builder.Append(element.ToString());
+            builder.Append(element?.ToString() ?? "null");
 
             notFirst = true;
         }
@@ -248,7 +250,7 @@ public static partial class ListUtils
             { builder.Append(", "); }
             T1 element = self[i];
             T2 converted = converter.Invoke(element);
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -270,7 +272,7 @@ public static partial class ListUtils
             { builder.Append(", "); }
             T1 element = self[i];
             T2 converted = converter.Invoke(element);
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -293,7 +295,7 @@ public static partial class ListUtils
             { builder.Append(", "); }
 
             T2 converted = converter.Invoke(element);
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
 
             notFirst = true;
         }
@@ -317,9 +319,9 @@ public static partial class ListUtils
             if (i > 0)
             { builder.Append(", "); }
             T1 element = self[i];
-            if (!converter.TryGetValue(element, out T2 converted))
+            if (!converter.TryGetValue(element, out T2? converted))
             { converted = default; }
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -340,9 +342,9 @@ public static partial class ListUtils
             if (i > 0)
             { builder.Append(", "); }
             T1 element = self[i];
-            if (!converter.TryGetValue(element, out T2 converted))
+            if (!converter.TryGetValue(element, out T2? converted))
             { converted = default; }
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
         }
 
         builder.Append(" }");
@@ -364,9 +366,9 @@ public static partial class ListUtils
             if (notFirst)
             { builder.Append(", "); }
 
-            if (!converter.TryGetValue(element, out T2 converted))
+            if (!converter.TryGetValue(element, out T2? converted))
             { converted = default; }
-            builder.Append(converted.ToString());
+            builder.Append(converted?.ToString() ?? "null");
 
             notFirst = true;
         }
@@ -379,13 +381,7 @@ public static partial class ListUtils
 
 public class WindowsAPI
 {
-#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
-    public static readonly bool IsSupported = true;
-#else
-    public static readonly bool IsSupported = false;
-#endif
-
-    public enum Cursor
+    public enum Cursor : int
     {
         StandardArrowAndSmallHourglass = 32650,
         StandardArrow = 32512,
@@ -407,20 +403,28 @@ public class WindowsAPI
         Hourglass = 32514
     }
 
-    public static void SetCursor(Cursor cursor)
-    {
-#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
-        SetCursor(LoadCursor(IntPtr.Zero, (int)cursor));
-#else
-        throw new NotSupportedException();
-#endif
-    }
+#if (PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN)
 
-#if PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN
+    public static readonly bool IsSupported = true;
+
     [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "SetCursor")]
-    public static extern IntPtr SetCursor(IntPtr hCursor);
+    static extern IntPtr SetCursor(
+        [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Optional] IntPtr cursorHandle);
 
-    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "LoadCursor")]
-    public static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
+    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "LoadCursorW")]
+    static extern IntPtr LoadCursor(
+        [System.Runtime.InteropServices.In, System.Runtime.InteropServices.Optional] IntPtr instanceHandle,
+        [System.Runtime.InteropServices.In] IntPtr cursorName);
+
+    /// <exception cref="PlatformNotSupportedException"/>
+    public static void SetCursor(Cursor cursor) => SetCursor(LoadCursor(IntPtr.Zero, (IntPtr)cursor));
+
+#else
+
+    public static readonly bool IsSupported = false;
+
+    /// <exception cref="PlatformNotSupportedException"/>
+    public static void SetCursor(Cursor cursor) => throw new PlatformNotSupportedException($"Win32 APIs not supported on the current platform");
+
 #endif
 }

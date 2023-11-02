@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields, ICopiable<UnitBehaviour_Seek>
+    public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields, ICopyable<UnitBehaviour_Seek>
     {
         internal const float DISTANCE_TO_STOP = 4f;
         internal const float BRAKING_DISTANCE_ERROR = .5f;

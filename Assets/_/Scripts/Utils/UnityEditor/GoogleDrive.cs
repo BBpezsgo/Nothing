@@ -286,7 +286,7 @@ namespace Utilities.Editor
             if (!IsLoading &&
                 ShouldGetCloudFiles.Count > 0)
             {
-                string fileId = ShouldGetCloudFiles.Pop();
+                string fileId = ShouldGetCloudFiles.PopOrDefault();
                 GetCloudFile(fileId);
                 EditorUtility.SetDirty(this);
             }

@@ -5,10 +5,11 @@ using Game.Managers;
 using Unity.Netcode;
 using UnityEngine;
 
+[Serializable]
 public struct ClientObject : INetworkSerializable, IEquatable<ClientObject>
 {
-    public ulong ClientId;
-    public ulong ObjectId;
+    [ReadOnly] public ulong ClientId;
+    [ReadOnly] public ulong ObjectId;
 
     public ClientObject(ulong clientId, ulong objectId)
     {
@@ -115,6 +116,10 @@ public class GameManager : SingleNetworkInstance<GameManager>
         }
 
         GameObject instance = GameObject.Instantiate(prefab, ObjectGroups.Game);
+        if (instance.TryGetComponent(out Game.Components.Unit unit))
+        {
+
+        }
         instance.SpawnOverNetwork();
         SetClientObject(ownerId, instance.GetComponent<NetworkObject>().NetworkObjectId);
         return instance;

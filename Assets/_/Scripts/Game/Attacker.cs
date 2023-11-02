@@ -158,6 +158,7 @@ namespace Game.Components
 
         internal void SomeoneDamagedMe(BaseObject source)
         {
+            if (BaseObject == null) return;
             bool alreadyAdded = false;
             for (int i = priorityTargets.Count - 1; i >= 0; i--)
             {

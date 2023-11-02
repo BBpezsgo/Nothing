@@ -411,7 +411,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!108 &410087040
 Light:
@@ -1219,7 +1219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &951541515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1700,7 +1700,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!114 &2031779239
 MonoBehaviour:
@@ -1714,7 +1714,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1e19cb2f8713546879df3531ec7958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ClientObjectPrefab: {fileID: 4032902050812513782, guid: 022c6e1d6a988e84f87efaa86e82792c,
+  ClientObjectPrefab: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd,
     type: 3}
   ClientObjectInstances: []
 --- !u!4 &2031779240

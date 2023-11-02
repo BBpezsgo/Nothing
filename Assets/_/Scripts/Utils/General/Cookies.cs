@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+#if UNITY_WEBGL
 using System.Runtime.InteropServices;
+#endif
+
+#nullable enable
 
 static class CookiesLib
 {
@@ -13,15 +17,11 @@ static class CookiesLib
     [DllImport("__Internal")]
     public static extern string GetCookies();
 #else
-    public static void SetCookies(string cookies)
-    {
+#pragma warning disable IDE0060 // Remove unused parameter
+    public static void SetCookies(string cookies) { }
+#pragma warning restore IDE0060 // Remove unused parameter
 
-    }
-
-    public static string GetCookies()
-    {
-        return "";
-    }
+    public static string GetCookies() => string.Empty;
 #endif
 }
 
@@ -57,11 +57,11 @@ public static class Cookies
     {
         public readonly string Key;
         public string Value;
-        public string Domain;
-        public string Expires;
+        public string? Domain;
+        public string? Expires;
         public uint MaxAge;
         public bool Partitioned;
-        public string Path;
+        public string? Path;
         public bool Secure;
         public SameSite SameSite;
 
@@ -103,7 +103,7 @@ public static class Cookies
         public static implicit operator KeyValuePair<string, string>(Cookie v)
             => new(v.Key ?? "", v.Value ?? "");
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             string result = $"{Uri.EscapeUriString(Key)}={Uri.EscapeUriString(Value)};";
 
@@ -145,9 +145,9 @@ public static class Cookies
         SetCookies(convertedCookies);
     }
 
-    public static string GetCookie(string key)
+    public static string? GetCookie(string key)
     {
-        var cookies = GetCookies();
+        Cookie[] cookies = GetCookies();
         for (int i = 0; i < cookies.Length; i++)
         {
             if (cookies[i].Key == key)
@@ -156,7 +156,7 @@ public static class Cookies
         return null;
     }
 
-    public static bool TryGetCookie(string key, out string value)
+    public static bool TryGetCookie(string key, [NotNullWhen(true)] out string? value)
     {
         value = GetCookie(key);
         return value != null;
@@ -177,11 +177,11 @@ public static class Cookies
         {
             public string Key;
             public string Value;
-            public string Domain;
-            public string Expires;
+            public string? Domain;
+            public string? Expires;
             public uint MaxAge;
             public bool Partitioned;
-            public string Path;
+            public string? Path;
             public bool Secure;
             public SameSite SameSite;
 
@@ -208,7 +208,7 @@ public static class Cookies
         {
             string[] pairs = data.Split(';');
 
-            CookieClass currentCookie = null;
+            CookieClass? currentCookie = null;
             List<Cookie> result = new();
 
             for (int i = 0; i < pairs.Length; i++)
@@ -216,7 +216,7 @@ public static class Cookies
                 string pair = pairs[i];
 
                 string key;
-                string value = null;
+                string? value = null;
 
                 if (!pair.Contains('='))
                 {
@@ -333,7 +333,7 @@ public static class Cookies
                                 currentCookie = new CookieClass()
                                 {
                                     Key = key,
-                                    Value = value,
+                                    Value = value ?? string.Empty,
                                 };
                             }
                             else

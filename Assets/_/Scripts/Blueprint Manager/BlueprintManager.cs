@@ -640,7 +640,7 @@ namespace Game.Blueprints
 
         static void MoveComponents(GameObject source, GameObject destination)
         {
-            List<ICopiable> copiables = new();
+            List<ICopyable> copiables = new();
             source.GetComponents(copiables);
 
             int iterations = 4;
@@ -674,7 +674,7 @@ namespace Game.Blueprints
                 if (!destination.TryGetComponent(out Rigidbody componentClone))
                 { componentClone = destination.AddComponent<Rigidbody>(); }
 
-                UnityCopiables.CopyTo(rigidbody, componentClone);
+                UnityCopyables.CopyTo(rigidbody, componentClone);
 
                 Destroy(rigidbody);
             }

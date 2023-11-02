@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Debug : UnitBehaviour_Base, ICopiable<UnitBehaviour_Debug>
+    public class UnitBehaviour_Debug : UnitBehaviour_Base, ICopyable<UnitBehaviour_Debug>
     {
         [SerializeField] internal Vector2 Input;
 

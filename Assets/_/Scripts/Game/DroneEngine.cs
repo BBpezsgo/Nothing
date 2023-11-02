@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class DroneEngine : MovementEngine, ICopiable<DroneEngine>
+    public class DroneEngine : MovementEngine, ICopyable<DroneEngine>
     {
         [SerializeField, AssetField] float HoveringHeight = 5f;
         [SerializeField, AssetField] float SpringStrength = 10f;

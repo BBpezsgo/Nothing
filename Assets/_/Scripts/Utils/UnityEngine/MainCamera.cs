@@ -1,10 +1,12 @@
 using UnityEngine;
 
+#nullable enable
+
 namespace Game
 {
     public static class MainCamera
     {
-        static Camera camera;
+        static Camera? camera;
         public static Camera Camera
         {
             get

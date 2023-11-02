@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+#nullable enable
 
 public static partial class UnclassifiedExtensions
 {
@@ -105,7 +109,7 @@ public static partial class UnclassifiedExtensions
         return hits[closestI];
     }
 
-    public static Transform Closest(this Transform[] v, Vector3 origin)
+    public static Transform? Closest(this Transform[] v, Vector3 origin)
     {
         if (v.Length == 0) return null;
         float closest = float.MaxValue;
@@ -125,7 +129,7 @@ public static partial class UnclassifiedExtensions
         return v[closestI];
     }
 
-    public static ValueTuple<int, float> ClosestI(this Transform[] v, Vector3 origin)
+    public static (int Index, float Distance) ClosestI(this Transform[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -144,7 +148,7 @@ public static partial class UnclassifiedExtensions
 
         return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
     }
-    public static ValueTuple<int, float> ClosestI(this Component[] v, Vector3 origin)
+    public static (int Index, float Distance) ClosestI(this Component[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -163,7 +167,7 @@ public static partial class UnclassifiedExtensions
 
         return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
     }
-    public static ValueTuple<int, float> ClosestI(this IComponent[] v, Vector3 origin)
+    public static (int Index, float Distance) ClosestI(this IComponent[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -182,7 +186,7 @@ public static partial class UnclassifiedExtensions
 
         return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
     }
-    public static ValueTuple<int, float> ClosestI(this GameObject[] v, Vector3 origin)
+    public static (int Index, float Distance) ClosestI(this GameObject[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -191,7 +195,7 @@ public static partial class UnclassifiedExtensions
         for (int i = 1; i < v.Length; i++)
         {
             if (v[i] == null) continue;
-            float d = (origin - v[i].gameObject.transform.position).sqrMagnitude;
+            float d = (origin - v[i].transform.position).sqrMagnitude;
             if (closestI == -1 || closest > d)
             {
                 closest = d;
@@ -199,13 +203,13 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return new System.ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
     }
 
     public delegate void SearchCallback<T1>(T1 p0);
     public delegate void SearchCallback<T1, T2>(T1 p0, T2 p1);
 
-    public static IEnumerator ClosestIAsync(this Transform[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    public static IEnumerator ClosestIAsync(this Transform[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
         float closest = float.MaxValue;
@@ -228,7 +232,7 @@ public static partial class UnclassifiedExtensions
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this Component[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    public static IEnumerator ClosestIAsync(this Component[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
         float closest = float.MaxValue;
@@ -251,7 +255,7 @@ public static partial class UnclassifiedExtensions
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this IComponent[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    public static IEnumerator ClosestIAsync(this IComponent[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
         float closest = float.MaxValue;
@@ -274,7 +278,7 @@ public static partial class UnclassifiedExtensions
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this GameObject[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float> doneCallback = null)
+    public static IEnumerator ClosestIAsync(this GameObject[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
         float closest = float.MaxValue;
@@ -285,7 +289,7 @@ public static partial class UnclassifiedExtensions
             yield return new WaitForFixedUpdate();
 
             if (v[i] == null) continue;
-            float d = (origin - v[i].gameObject.transform.position).sqrMagnitude;
+            float d = (origin - v[i].transform.position).sqrMagnitude;
             if (closestI == -1 || closest > d)
             {
                 closest = d;
@@ -300,8 +304,10 @@ public static partial class UnclassifiedExtensions
 
     const float ScreenRayMaxDistance = 500f;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out Vector3 worldPosition)
         => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out worldPosition);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition)
         => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance);
     public static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out Vector3 worldPosition)
@@ -325,8 +331,10 @@ public static partial class UnclassifiedExtensions
         return ray.GetPoint(maxDistance);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask, out Vector3 worldPosition)
         => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask, out worldPosition);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, LayerMask layerMask)
         => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask);
     public static bool ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask, out Vector3 worldPosition)
@@ -350,6 +358,7 @@ public static partial class UnclassifiedExtensions
         return ray.GetPoint(maxDistance);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, out RaycastHit[] hits)
         => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, out hits);
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, out RaycastHit[] hits)
@@ -481,15 +490,15 @@ public static class MeshEx
 
     static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] verts, KDTree vertProx, int[] tri, VertTriList vt)
     {
-        //	First, find the nearest vertex (the nearest point must be on one of the triangles
-        //	that uses this vertex if the mesh is convex).
-        int nearest = vertProx.FindNearest(pt);
+        // First, find the nearest vertex (the nearest point must be on one of the triangles
+        // that uses this vertex if the mesh is convex).
+        (int nearest, _) = vertProx.FindNearest(pt);
 
-        //	Get the list of triangles in which the nearest vert "participates".
+        // Get the list of triangles in which the nearest vert "participates".
         int[] nearTris = vt[nearest];
 
         Vector3 nearestPt = Vector3.zero;
-        float nearestSqDist = 100000000f;
+        float nearestSqDist = float.MaxValue;
 
         for (int i = 0; i < nearTris.Length; i++)
         {
@@ -498,13 +507,13 @@ public static class MeshEx
             Vector3 b = verts[tri[triOff + 1]];
             Vector3 c = verts[tri[triOff + 2]];
 
-            Vector3 possNearestPt = Triangle.NearestPoint(pt, a, b, c);
-            float possNearestSqDist = (pt - possNearestPt).sqrMagnitude;
+            Vector3 posNearestPt = Triangle.NearestPoint(pt, a, b, c);
+            float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;
 
-            if (possNearestSqDist < nearestSqDist)
+            if (posNearestSqDist < nearestSqDist)
             {
-                nearestPt = possNearestPt;
-                nearestSqDist = possNearestSqDist;
+                nearestPt = posNearestPt;
+                nearestSqDist = posNearestSqDist;
             }
         }
 
@@ -542,13 +551,13 @@ public static class MeshEx
             Vector3 b = verts[tri[triOff + 1]];
             Vector3 c = verts[tri[triOff + 2]];
 
-            Vector3 possNearestPt = Triangle.NearestPoint(pt, a, b, c);
-            float possNearestSqDist = (pt - possNearestPt).sqrMagnitude;
+            Vector3 posNearestPt = Triangle.NearestPoint(pt, a, b, c);
+            float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;
 
-            if (possNearestSqDist < nearestSqDist)
+            if (posNearestSqDist < nearestSqDist)
             {
-                nearestPt = possNearestPt;
-                nearestSqDist = possNearestSqDist;
+                nearestPt = posNearestPt;
+                nearestSqDist = posNearestSqDist;
             }
         }
 
@@ -580,12 +589,10 @@ public static class VectorEx
     public static Vector3 To3D(this Vector2 v) => new(v.x, 0f, v.y);
     public static Vector3 To3D(this Vector2 v, float yRotation) => new(v.x * Maths.Sin(yRotation), v.y, v.x * Maths.Cos(yRotation));
 
-    public static Vector2 To2(this Vector3 vector3) => vector3;
-    public static Vector3 To3(this Vector2 vector3) => vector3;
-
     public static Vector2Int ToInt(this Vector2 vector2) => new(Maths.RoundToInt(vector2.x), Maths.RoundToInt(vector2.y));
     public static Vector2 ToFloat(this Vector2Int vector2) => new(vector2.x, vector2.y);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 Rotate(this Vector2 v, float degrees) => v.RotateRadians(degrees * Maths.Deg2Rad);
     public static Vector2 RotateRadians(this Vector2 v, float radians)
     {
@@ -594,6 +601,7 @@ public static class VectorEx
         return new Vector2(ca * v.x - sa * v.y, sa * v.x + ca * v.y);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Rotate(this Vector3 v, float degrees) => v.RotateRadians(degrees * Maths.Deg2Rad);
     public static Vector3 RotateRadians(this Vector3 v, float radians)
     {
@@ -602,67 +610,40 @@ public static class VectorEx
         return new Vector3(ca * v.x - sa * v.y, sa * v.x + ca * v.y);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Flatten(this Vector3 v) => new(v.x, 0f, v.z);
 
     public static bool AreEquals(this Vector3 vectorA, Vector3 vectorB, double tolerance)
     {
-        var absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        var absY = Maths.Pow(vectorB.y - vectorA.y, 2);
-        var absZ = Maths.Pow(vectorB.z - vectorA.z, 2);
+        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
+        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
+        float absZ = Maths.Pow(vectorB.z - vectorA.z, 2);
 
-        if (Maths.Abs(absX + absY + absZ) >= tolerance)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return Maths.Abs(absX + absY + absZ) < tolerance;
     }
 
     public static bool AreEquals(this Vector2 vectorA, Vector2 vectorB, double tolerance)
     {
-        var absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        var absY = Maths.Pow(vectorB.y - vectorA.y, 2);
+        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
+        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
 
-        if (Maths.Abs(absX + absY) >= tolerance)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return Maths.Abs(absX + absY) < tolerance;
     }
 
     public static bool AreEquals(this Vector3 vectorA, Vector2 vectorB, double tolerance)
     {
-        var absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        var absY = Maths.Pow(vectorB.y - vectorA.y, 2);
+        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
+        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
 
-        if (Maths.Abs(absX + absY) >= tolerance)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return Maths.Abs(absX + absY) < tolerance;
     }
 
     public static bool AreEquals(this Vector2 vectorA, Vector3 vectorB, double tolerance)
     {
-        var absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        var absY = Maths.Pow(vectorB.y - vectorA.y, 2);
+        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
+        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
 
-        if (Maths.Abs(absX + absY) >= tolerance)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return Maths.Abs(absX + absY) < tolerance;
     }
 
     public static bool IsUnitVector(this Vector2 vector) =>
@@ -778,7 +759,7 @@ public static class GameObjectEx
         return component != null;
     }
 
-    public static bool TryGetComponent(this GameObject obj, string componentName, out Component component)
+    public static bool TryGetComponent(this GameObject obj, string componentName, [NotNullWhen(true)] out Component? component)
     {
         var allComponent = obj.GetComponents<Component>();
         for (int i = 0; i < allComponent.Length; i++)
@@ -794,10 +775,10 @@ public static class GameObjectEx
         return false;
     }
 
-    public static bool TryGetComponentInParent<T>(this GameObject obj, out T component)
+    public static bool TryGetComponentInParent<T>(this GameObject obj, [NotNullWhen(true)] out T? component)
     {
         if (obj.TryGetComponent<T>(out component))
-        { return true; }
+        { return component != null; }
 
         if (obj.transform.parent == null)
         {
@@ -808,10 +789,10 @@ public static class GameObjectEx
         return TryGetComponentInParent(obj.transform.parent.gameObject, out component);
     }
 
-    public static bool TryGetComponentInParent<T>(this Component obj, out T component)
+    public static bool TryGetComponentInParent<T>(this Component obj, [NotNullWhen(true)] out T? component)
     {
         if (obj.TryGetComponent<T>(out component))
-        { return true; }
+        { return component != null; }
 
         if (obj.transform.parent == null)
         {
@@ -855,9 +836,9 @@ public static class RectEx
     public static (Vector2 TopLeft, Vector2 TopRight, Vector2 BottomLeft, Vector2 BottomRight) Corners(this Rect rect) =>
         (rect.TopLeft(), rect.TopRight(), rect.BottomLeft(), rect.BottomRight());
 
-    public static Rect CutLeft(this Rect rect, float width, out Rect cutted)
+    public static Rect CutLeft(this Rect rect, float width, out Rect cut)
     {
-        cutted = new Rect(rect.xMin, rect.yMin, width, rect.height);
+        cut = new Rect(rect.xMin, rect.yMin, width, rect.height);
         rect.xMin += width;
         return rect;
     }
@@ -877,6 +858,7 @@ public static class RectIntEx
 
     public static Rect ToFloat(this RectInt rect) => new(rect.x, rect.y, rect.width, rect.height);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2Int TopLeft(this RectInt rect) => rect.position;
     public static Vector2Int TopRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
     public static Vector2Int BottomLeft(this RectInt rect) => new(rect.position.x, rect.position.y + rect.height);

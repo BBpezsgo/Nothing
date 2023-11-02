@@ -23,6 +23,8 @@ namespace Game.Components
 
         void OnEnable()
         {
+            LineRenderer = GetComponent<LineRenderer>();
+
             originalStartColor = LineRenderer.startColor;
             originalEndColor = LineRenderer.endColor;
 

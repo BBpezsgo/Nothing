@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class TeamRenderer : MonoBehaviour, ICopiable<TeamRenderer>
+    public class TeamRenderer : MonoBehaviour, ICopyable<TeamRenderer>
     {
         public MeshRenderer[] Renderers = new MeshRenderer[0];
 

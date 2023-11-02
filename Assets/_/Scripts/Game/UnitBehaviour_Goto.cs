@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Goto : UnitBehaviour_Base, IHaveAssetFields, ICopiable<UnitBehaviour_Goto>
+    public class UnitBehaviour_Goto : UnitBehaviour_Base, IHaveAssetFields, ICopyable<UnitBehaviour_Goto>
     {
         internal const float DISTANCE_TO_STOP = 8f;
         internal const float DISTANCE_TO_STOP_BRUH = 4f;

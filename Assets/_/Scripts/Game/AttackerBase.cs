@@ -109,7 +109,7 @@ namespace Game.Components
                             if (screenPosition.z <= 0f)
                             { continue; }
 
-                            if ((screenCenter - screenPosition.To2()).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
+                            if ((screenCenter - (Vector2)screenPosition).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
                             { continue; }
 
                             turret.SetTarget(unit.transform);
@@ -171,7 +171,7 @@ namespace Game.Components
                                 if (screenPosition.z <= 0f)
                                 { continue; }
 
-                                if ((mousePosition - screenPosition.To2()).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
+                                if ((mousePosition - (Vector2)screenPosition).sqrMagnitude > TargetLockingThreshold * TargetLockingThreshold)
                                 { continue; }
 
                                 turret.SetTarget(unit.transform);

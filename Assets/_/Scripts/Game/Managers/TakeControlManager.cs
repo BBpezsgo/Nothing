@@ -62,7 +62,7 @@ namespace Game.Managers
 
         NetworkList<ulong> ControllingObjects;
 
-        readonly List<ClientObject> ShouldAlwaysControlObjects = new();
+        [SerializeField, ReadOnly] List<ClientObject> ShouldAlwaysControlObjects = new();
 
         [Header("UI")]
         [SerializeField] Projectiles Projectiles;

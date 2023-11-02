@@ -10,7 +10,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class VehicleEngine : MovementEngine, IHaveAssetFields, ICopiable<VehicleEngine>
+    public class VehicleEngine : MovementEngine, IHaveAssetFields, ICopyable<VehicleEngine>
     {
         [SerializeField, ReadOnly] Unit unit;
 

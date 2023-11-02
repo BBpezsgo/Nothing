@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Internal;
+
+#nullable enable
 
 public struct Maths
 {
@@ -462,16 +465,16 @@ public struct Maths
         return to * t + from * (1f - t);
     }
 
-    public static float Gamma(float value, float absmax, float gamma)
+    public static float Gamma(float value, float absMax, float gamma)
     {
         bool flag = value < 0f;
         float num = MathF.Abs(value);
-        if (num > absmax)
+        if (num > absMax)
         {
             return flag ? (0f - num) : num;
         }
 
-        float num2 = MathF.Pow(num / absmax, gamma) * absmax;
+        float num2 = MathF.Pow(num / absMax, gamma) * absMax;
         return flag ? (0f - num2) : num2;
     }
 
@@ -651,4 +654,306 @@ public struct Maths
         r.NextBytes(array);
         return (long)(BitConverter.ToUInt64(array, 0) & 0x7FFFFFFFFFFFFFFFL);
     }
+
+    #region Custom
+
+    public static float QuadraticEquation(float a, float b, float c, float sign)
+    {
+        float discriminant = (b * b) - (4 * a * c);
+        return (-b + sign * Maths.Sqrt(discriminant)) / (2 * a);
+    }
+    public static (float, float) QuadraticEquation(float a, float b, float c)
+    {
+        float discriminant = (b * b) - (4 * a * c);
+        float dSrt = Maths.Sqrt(discriminant);
+        float x1 = (-b + dSrt) / (2 * a);
+        float x2 = (-b - dSrt) / (2 * a);
+
+        return (x1, x2);
+    }
+    public static float Sum(params float[] values)
+    {
+        float sum = 0f;
+        for (int i = 0; i < values.Length; i++)
+        { sum += values[i]; }
+        return sum;
+    }
+
+    public static float Average(params float[] values) => Sum(values) / values.Length;
+    public static float Average(float a, float b) => (a + b) / 2;
+
+    public static float Difference(float a, float b) => Maths.Abs(a - b);
+    public static Vector2 Difference(Vector2 a, Vector2 b) => new(
+        Difference(a.x, b.x),
+        Difference(a.y, b.y)
+    );
+    public static Vector3 Difference(Vector3 a, Vector3 b) => new(
+        Difference(a.x, b.x),
+        Difference(a.y, b.y),
+        Difference(a.z, b.z)
+    );
+
+    public static Vector3 Mult(Vector3 a, Vector3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
+
+    public struct Circle
+    {
+        public Vector2 center;
+        public float radius;
+
+        public Circle(Vector2 center, float radius)
+        {
+            this.center = center;
+            this.radius = radius;
+        }
+
+        public override readonly string ToString()
+            => $"Circle{{ Center: ({center.x}, {center.y}) radius: {radius} }}";
+
+        /// <param name="angle">Angle in radians</param>
+        public readonly Vector2 GetPoint(float angle)
+        {
+            float x = this.radius * Maths.Cos(angle) + this.center.x;
+            float y = this.radius * Maths.Sin(angle) + this.center.y;
+            return new Vector2(x, y);
+        }
+
+        /// <param name="angleOffset">Angle in radians</param>
+        public readonly Vector2 GetPointAfterTime(float speed, float time, float angleOffset)
+            => GetPoint(GetAngle(speed, time) + (angleOffset));
+
+        public readonly float GetAngle(Vector2 pointOnCircle)
+            => Maths.Atan2(pointOnCircle.y - this.center.y, pointOnCircle.x - this.center.y);
+
+        public readonly float GetAngle(float speed, float time)
+            => GetAngle(speed * time);
+
+        public readonly float GetAngle(float distance)
+            => distance / this.radius;
+
+        public static float Circumference(float radius)
+            => Maths.PI * 2 * radius;
+
+        public readonly float Circumference()
+            => Maths.PI * 2 * radius;
+
+        public static Vector2[] GenerateEquadistancePoints(int n, float radius)
+        {
+            List<Vector2> points = new();
+
+            for (int i = 0; i < n; i++)
+            {
+                var k = i + .5f;
+                var r = Maths.Sqrt((k) / n);
+                var theta = Maths.PI * (1 + Maths.Sqrt(5)) * k;
+                var x = r * Maths.Cos(theta) * radius;
+                var y = r * Maths.Sin(theta) * radius;
+                points.Add(new Vector2(x, y));
+            }
+
+            return points.ToArray();
+        }
+    }
+
+    public static float IsStraightLine(Vector2 positionA, Vector2 positionB, Vector2 positionC)
+        => (positionA.x * (positionB.y - positionC.y) + positionB.x * (positionC.y - positionA.y) + positionC.x * (positionA.y - positionB.y)) / 2;
+
+    public static Circle FindCircle(Vector2 positionA, Vector2 positionB, Vector2 positionC)
+        => FindCircle(positionA.x, positionA.y, positionB.x, positionB.y, positionC.x, positionC.y);
+    public static Circle FindCircle(float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        float x12 = x1 - x2;
+        float x13 = x1 - x3;
+
+        float y12 = y1 - y2;
+        float y13 = y1 - y3;
+
+        float y31 = y3 - y1;
+        float y21 = y2 - y1;
+
+        float x31 = x3 - x1;
+        float x21 = x2 - x1;
+
+        float sx13 = Maths.Pow(x1, 2) - Maths.Pow(x3, 2);
+        float sy13 = Maths.Pow(y1, 2) - Maths.Pow(y3, 2);
+        float sx21 = Maths.Pow(x2, 2) - Maths.Pow(x1, 2);
+        float sy21 = Maths.Pow(y2, 2) - Maths.Pow(y1, 2);
+
+        float f = ((sx13) * (x12)
+                + (sy13) * (x12)
+                + (sx21) * (x13)
+                + (sy21) * (x13))
+                / (2 * ((y31) * (x12) - (y21) * (x13)));
+        float g = ((sx13) * (y12)
+                + (sy13) * (y12)
+                + (sx21) * (y13)
+                + (sy21) * (y13))
+                / (2 * ((x31) * (y12) - (x21) * (y13)));
+
+        float c = -Maths.Pow(x1, 2) - Maths.Pow(y1, 2) - 2 * g * x1 - 2 * f * y1;
+        float h = g * -1;
+        float k = f * -1;
+        float sqr_of_r = h * h + k * k - c;
+
+        float r = (sqr_of_r < 0) ? 0f : Maths.Sqrt(sqr_of_r);
+
+        return new Circle(new Vector2(h, k), r);
+    }
+
+    /// <returns>In degrees</returns>
+    public static float GetAngleFromVectorFloat(Vector3 dir)
+    {
+        dir = dir.normalized;
+        float n = Maths.Atan2(dir.y, dir.x) * Maths.Rad2Deg;
+        if (n < 0) n += 360;
+
+        return n;
+    }
+
+    /// <returns>In degrees</returns>
+    public static float GetAngleFromVectorFloat(Vector2 dir)
+    {
+        dir = dir.normalized;
+        float n = Maths.Atan2(dir.y, dir.x) * Maths.Rad2Deg;
+        if (n < 0) n += 360;
+
+        return n;
+    }
+
+    public static Vector2 RadianToVector2(float radian)
+    { return new Vector2(Maths.Cos(radian), Maths.Sin(radian)); }
+    public static Vector2 DegreeToVector2(float degree)
+    { return RadianToVector2(degree * Maths.Deg2Rad); }
+
+    public static float NormalizeDegree(float degree)
+    { return (degree + 360) % 360; }
+
+    public static Vector3 LengthDir(Vector3 center, float angle, float distance)
+    {
+        float x = distance * Maths.Cos((90 + angle) * Maths.Deg2Rad);
+        float y = distance * Maths.Sin((90 + angle) * Maths.Deg2Rad);
+        Vector3 newPosition = center;
+        newPosition.x += x;
+        newPosition.y += y;
+        return newPosition;
+    }
+
+    class PointGroup
+    {
+        public int GroupID { get; set; }
+        public Vector2 Point1 { get; set; }
+        public bool IsGrouped { get; set; }
+    }
+
+    static PointGroup[] GeneratePointGroups(Vector2[] points)
+    {
+        List<PointGroup> groups = new();
+        for (int i = 0; i < points.Length; i++)
+        {
+            groups.Add(new PointGroup() { GroupID = i, IsGrouped = false, Point1 = points[i] });
+        }
+        return groups.ToArray();
+    }
+
+    static Vector2[][] GetGroupsFromGroups(PointGroup[] pointGroups)
+    {
+        List<List<Vector2>> vector2s = new();
+        Dictionary<int, int> groupIdToIndex = new();
+        for (int i = 0; i < pointGroups.Length; i++)
+        {
+            if (groupIdToIndex.TryGetValue(pointGroups[i].GroupID, out int groupIndex))
+            {
+                vector2s[groupIndex].Add(pointGroups[i].Point1);
+            }
+            else
+            {
+                vector2s.Add(new List<Vector2>());
+                groupIdToIndex.Add(pointGroups[i].GroupID, vector2s.Count - 1);
+            }
+        }
+        List<Vector2[]> vector2s1 = new();
+        foreach (var item in vector2s)
+        {
+            vector2s1.Add(item.ToArray());
+        }
+        return vector2s1.ToArray();
+    }
+
+    public static Vector2[][] GroupPoints(Vector2[] points, float tolerance)
+    {
+        PointGroup[] colls = GeneratePointGroups(points);
+        for (int i = 0; i < colls.Length; i++)
+        {
+            PointGroup pg1 = colls[i];
+            if (!pg1.IsGrouped)
+            {
+                for (int j = 0; j < colls.Length; j++)
+                {
+                    PointGroup pg2 = colls[j];
+                    if (pg1.Point1.AreEquals(pg2.Point1, tolerance) && pg2.IsGrouped == false)
+                    {
+                        if (pg2.GroupID == j)
+                        {
+                            pg2.GroupID = pg1.GroupID;
+                            pg2.IsGrouped = true;
+                        }
+                    }
+                }
+
+                pg1.IsGrouped = true;
+            }
+        }
+        return GetGroupsFromGroups(colls);
+    }
+
+    public static (Vector2 BottomLeft, Vector2 TopRight) GetRect(Vector2 a, Vector2 b)
+    {
+        Vector2 lowerLeft = new(Maths.Min(a.x, b.x), Maths.Min(a.y, b.y));
+        Vector2 upperRight = new(Maths.Max(a.x, b.x), Maths.Max(a.y, b.y));
+        return (lowerLeft, upperRight);
+    }
+
+    public static (Vector2 BottomLeft, Vector2 TopRight) GetRect(Transform a, Transform b)
+    {
+        return GetRect(a.position, b.position);
+    }
+
+    /// <param name="p1">Angle peak</param>
+    public static float CalculateAngle(Vector2 p1, Vector2 p2, Vector2 p3)
+    {
+        float numerator = p2.y * (p1.x - p3.x) + p1.y * (p3.x - p2.x) + p3.y * (p2.x - p1.x);
+        float denominator = (p2.x - p1.x) * (p1.x - p3.x) + (p2.y - p1.y) * (p1.y - p3.y);
+        float ratio = numerator / denominator;
+
+        float angleRad = Maths.Atan(ratio);
+        float angleDeg = (angleRad * 180) / Maths.PI;
+
+        if (angleDeg < 0)
+        {
+            angleDeg = 180 + angleDeg;
+        }
+
+        return angleDeg;
+    }
+
+    public static float MapToRange(float outputStart, float outputEnd, float percent)
+    {
+        /* Note, "slope" below is a constant for given numbers, so if you are calculating
+           a lot of output values, it makes sense to calculate it once.  It also makes
+           understanding the Code easier */
+        var slope = outputEnd - outputStart;
+        var output = outputStart + slope * percent;
+        return output;
+    }
+
+    public static float MapToRange(float outputStart, float outputEnd, float inputStart, float inputEnd, float input)
+    {
+        /* Note, "slope" below is a constant for given numbers, so if you are calculating
+           a lot of output values, it makes sense to calculate it once.  It also makes
+           understanding the Code easier */
+        var slope = (outputEnd - outputStart) / (inputEnd - inputStart);
+        var output = outputStart + slope * (input - inputStart);
+        return output;
+    }
+
+    #endregion
 }
