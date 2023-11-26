@@ -4,7 +4,7 @@
         <ui:VisualElement name="window" class="panel" style="flex-direction: row; flex-wrap: nowrap; justify-content: space-between; padding-left: 2px; padding-right: 2px; width: 219px; min-height: 187px;">
             <ui:GroupBox text="Lobby" name="host-or-connect" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; flex-basis: 50%; padding-left: 0;">
                 <ui:VisualElement name="panel-host" style="flex-grow: 1;">
-                    <ui:TextField picking-mode="Ignore" name="input-socket" focusable="true" text="adasdasdasdasdasdasdasdasdasdasdasd" style="font-size: 11px;" />
+                    <ui:TextField picking-mode="Ignore" name="input-socket" focusable="true" style="font-size: 11px;" />
                     <ui:Label name="label-socket-error" enable-rich-text="false" style="margin-top: 0; padding-top: 0; color: rgb(255, 0, 0); font-size: 11px; -unity-font-style: bold; white-space: normal; flex-grow: 1; max-width: 110px;" />
                     <ui:Button text="Host" display-tooltip-when-elided="true" name="button-host" />
                     <ui:Button text="Connect" display-tooltip-when-elided="true" name="button-connect" />

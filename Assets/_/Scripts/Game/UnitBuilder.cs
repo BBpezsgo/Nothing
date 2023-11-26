@@ -12,8 +12,8 @@ namespace Game.Components
         [SerializeField, ReadOnly] int nearestToBeBuilt = -1;
         [SerializeField, ReadOnly] int nearestToBeRepair = -1;
 
-        [SerializeField, AssetField] float DistanceToBuild = 1f;
-        [SerializeField, AssetField] float ConstructionSpeed = 1f;
+        [SerializeField] float DistanceToBuild = 1f;
+        [SerializeField] float ConstructionSpeed = 1f;
 
         [SerializeField, ReadOnly] float TimeToNextTargetSearch = 1f;
 

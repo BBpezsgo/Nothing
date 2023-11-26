@@ -19,7 +19,6 @@ GameObject:
   - component: {fileID: 1172948685928354067}
   - component: {fileID: 1172948685928354066}
   - component: {fileID: 1172948685928354065}
-  - component: {fileID: 1172948685928354064}
   - component: {fileID: 1172948685928354071}
   - component: {fileID: 1172948685928354068}
   - component: {fileID: 1172948685928354091}
@@ -246,20 +245,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1f54e6a934da4daaffacad5f2a064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 40
+  MaxHP: 0
   Team: scav
   TeamHash: -1
   teamRenderers:
   - {fileID: 454651010285595176}
   - {fileID: 454651009191991652}
   - {fileID: 454651010493998490}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 1172948685928354072}
   turret: {fileID: 1172948686247123623}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 40
   <CrossStyle>k__BackingField: 0
   <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
@@ -290,7 +288,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -300,18 +297,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &1172948685928354064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1172948685928354089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1172948685928354071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +599,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 1
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 1172948686925989687}
   - {fileID: 1172948686247123616}
@@ -634,9 +619,13 @@ MonoBehaviour:
   ScopeHolder: {fileID: 0}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 0
   ShowRadius: 0
   currentError: 1

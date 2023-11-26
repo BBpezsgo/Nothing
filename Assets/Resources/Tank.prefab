@@ -9856,7 +9856,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 2
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 2619412345589989142}
   - {fileID: 2619412344863678372}
@@ -9878,9 +9878,13 @@ MonoBehaviour:
   ScopeHolder: {fileID: 2776137622048779255}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 9176.791
   ShowRadius: 0
   currentError: 1
@@ -9907,7 +9911,6 @@ GameObject:
   - component: {fileID: 1329310247871405436}
   - component: {fileID: 6449386879822076090}
   - component: {fileID: 1857563574725348185}
-  - component: {fileID: 5615466198774182121}
   - component: {fileID: 4420155354252969548}
   - component: {fileID: 1849051629192169190}
   - component: {fileID: 9074750142406875483}
@@ -10187,18 +10190,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &5615466198774182121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2619412345505571582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4420155354252969548
 MonoBehaviour:
   m_ObjectHideFlags: 0

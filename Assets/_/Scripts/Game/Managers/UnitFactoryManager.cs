@@ -110,17 +110,6 @@ namespace Game.Managers
                 }
             }
 
-            var blueprints = Blueprints.BlueprintManager.LoadBlueprints();
-
-            for (int i = 0; i < blueprints.Length; i++)
-            {
-                units.Add(new ProducableUnit()
-                {
-                    PrefabID = blueprints[i].Name,
-                    ProgressRequied = 2f,
-                });
-            }
-
             return units.ToArray();
         }
 

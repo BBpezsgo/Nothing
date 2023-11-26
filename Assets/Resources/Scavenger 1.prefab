@@ -134,7 +134,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 1
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 5278498343604609213}
   - {fileID: 5278498342211207183}
@@ -154,9 +154,13 @@ MonoBehaviour:
   ScopeHolder: {fileID: 0}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 0
   ShowRadius: 0
   currentError: 1
@@ -245,7 +249,6 @@ GameObject:
   - component: {fileID: 9180679375099183831}
   - component: {fileID: 3790386922350675729}
   - component: {fileID: 8421062637140710642}
-  - component: {fileID: 57011732122675121}
   - component: {fileID: 3824124278512204864}
   - component: {fileID: 2208870706455817139}
   - component: {fileID: 5466001084010902814}
@@ -473,20 +476,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1f54e6a934da4daaffacad5f2a064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 30
+  MaxHP: 0
   Team: scav
   TeamHash: -1
   teamRenderers:
   - {fileID: 6905454055292209906}
   - {fileID: 6905454053632996239}
   - {fileID: 6905454053874273522}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 5278498343419542865}
   turret: {fileID: 5278498342211207176}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 30
   <CrossStyle>k__BackingField: 0
   <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
@@ -517,7 +519,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -527,18 +528,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &57011732122675121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5278498343419542869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3824124278512204864
 MonoBehaviour:
   m_ObjectHideFlags: 0

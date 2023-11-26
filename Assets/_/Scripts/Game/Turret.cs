@@ -5,9 +5,62 @@ using Unity.Netcode;
 using UnityEngine;
 using Utilities;
 
+#if UNITY_EDITOR
+using UnityEditor;
+[CustomPropertyDrawer(typeof(Game.Components.TurretInput))]
+public class TurretInputDrawer : PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        EditorGUI.BeginProperty(position, label, property);
+
+        position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+
+        float turretAngle = Maths.Round(property.FindPropertyRelative("TurretAngle").floatValue);
+        float cannonAngle = Maths.Round(property.FindPropertyRelative("CannonAngle").floatValue);
+
+        EditorGUI.SelectableLabel(position, $"Turret: {turretAngle}° Cannon: {cannonAngle}°");
+
+        EditorGUI.EndProperty();
+    }
+}
+#endif
+
 namespace Game.Components
 {
-    public class Turret : NetworkBehaviour, IHaveAssetFields
+    [Serializable]
+    [System.Diagnostics.DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    public struct TurretInput : IEquatable<TurretInput>
+    {
+        [ReadOnly] public float TurretAngle;
+        [ReadOnly] public float CannonAngle;
+
+        public TurretInput(float turretAngle, float cannonAngle)
+        {
+            TurretAngle = turretAngle;
+            CannonAngle = cannonAngle;
+        }
+
+        public override readonly bool Equals(object obj) => obj is TurretInput input && Equals(input);
+
+        public readonly bool Equals(TurretInput other) =>
+            TurretAngle == other.TurretAngle &&
+            CannonAngle == other.CannonAngle;
+
+        public override readonly int GetHashCode() => HashCode.Combine(TurretAngle, CannonAngle);
+
+        public static bool operator ==(TurretInput left, TurretInput right) => left.Equals(right);
+        public static bool operator !=(TurretInput left, TurretInput right) => !(left == right);
+
+        public static implicit operator ValueTuple<float, float>(TurretInput v) => (v.TurretAngle, v.CannonAngle);
+        public static implicit operator Vector2(TurretInput v) => new(v.TurretAngle, v.CannonAngle);
+        public static implicit operator TurretInput(ValueTuple<float, float> v) => new(v.Item1, v.Item2);
+        public static implicit operator TurretInput(Vector2 v) => new(v.x, v.y);
+
+        public override readonly string ToString() => $"(Turret: {TurretAngle}° Cannon: {CannonAngle}°)";
+    }
+
+    public class Turret : NetworkBehaviour
     {
         readonly struct BurstParticles
         {
@@ -61,57 +114,57 @@ namespace Game.Components
         [SerializeField] AudioClip ShootSound;
 
         [Header("Barrel")]
-        [SerializeField, AssetField] internal Transform Barrel;
+        [SerializeField] public Transform Barrel;
         [SerializeField, ReadOnly] bool HasBarrel;
-        [SerializeField, AssetField] internal float RequiedBarrelRotationSpeed = 0f;
-        [SerializeField, AssetField] internal float BarrelRotationAcceleration = 0f;
+        [SerializeField] public float RequiedBarrelRotationSpeed = 0f;
+        [SerializeField] public float BarrelRotationAcceleration = 0f;
         [SerializeField, ReadOnly] float BarrelRotationSpeed = 0f;
-        [SerializeField, ReadOnly] internal bool PrepareShooting = false;
+        [SerializeField, ReadOnly] public bool PrepareShooting = false;
 
         [Header("Cannon")]
-        [SerializeField, AssetField] internal Transform cannon;
-        [SerializeField, AssetField] internal float cannonRotationSpeed = 1f;
-        [SerializeField, AssetField] internal float cannonLowestAngle;
-        [SerializeField, AssetField] internal float cannonHighestAngle;
+        [SerializeField] public Transform cannon;
+        [SerializeField] public float cannonRotationSpeed = 1f;
+        [SerializeField] public float cannonLowestAngle;
+        [SerializeField] public float cannonHighestAngle;
 
         [Header("Turret")]
-        [SerializeField, AssetField] internal float rotationSpeed = 5f;
+        [SerializeField] public float rotationSpeed = 5f;
 
         [Header("Reload")]
-        [SerializeField, AssetField] internal float reloadTime = 1f;
+        [SerializeField] public float reloadTime = 1f;
         [SerializeField, ReadOnly] float reload;
 
-        internal float CurrentReload => reload;
-        internal float ReloadPercent => (reloadTime <= 0f) ? 1f : (1f - Maths.Clamp01(reload / reloadTime));
+        public float CurrentReload => reload;
+        public float ReloadPercent => (reloadTime <= 0f) ? 1f : (1f - Maths.Clamp01(reload / reloadTime));
 
         [Header("Projectile")]
-        [SerializeField, AssetField] internal float projectileVelocity = 100f;
+        [SerializeField] public float projectileVelocity = 100f;
         [Tooltip("-1 means infinity")]
-        [SerializeField, AssetField] internal float ProjectileLifetime = -1f;
+        [SerializeField] public float ProjectileLifetime = -1f;
         [Tooltip("Used by timer projectiles that explode in mid-air")]
-        [SerializeField, ReadOnly] internal float RequiedProjectileLifetime = -1f;
-        [SerializeField, AssetField] internal List<Transform> projectileIgnoreCollision = new();
-        [SerializeField, AssetField] internal Transform shootPosition;
-        [SerializeField, AssetField] internal GameObject projectile;
+        [SerializeField, ReadOnly] public float RequiredProjectileLifetime = -1f;
+        [SerializeField] public List<Transform> projectileIgnoreCollision = new();
+        [SerializeField] public Transform shootPosition;
+        [SerializeField] public GameObject projectile;
         PooledObject PooledProjectile;
-        [SerializeField, AssetField] internal GameObject[] Projectiles;
+        [SerializeField] public GameObject[] Projectiles;
         PooledObject[] PooledProjectiles;
         [SerializeField] float Randomness = 0f;
         [SerializeField] Vector2Int BulletCount = Vector2Int.one;
 
         [SerializeField] ParticleSystem Shells;
 
-        internal float CurrentProjectileLifetime
+        public float CurrentProjectileLifetime
         {
             get
             {
-                if (RequiedProjectileLifetime == -1f) return ProjectileLifetime;
-                if (ProjectileLifetime == -1f) return RequiedProjectileLifetime;
-                return Maths.Min(ProjectileLifetime, RequiedProjectileLifetime);
+                if (RequiredProjectileLifetime == -1f) return ProjectileLifetime;
+                if (ProjectileLifetime == -1f) return RequiredProjectileLifetime;
+                return Maths.Min(ProjectileLifetime, RequiredProjectileLifetime);
             }
         }
 
-        internal PooledObject CurrentProjectile
+        public PooledObject CurrentProjectile
         {
             get
             {
@@ -121,42 +174,42 @@ namespace Game.Components
             }
         }
 
-        [SerializeField, ReadOnly] internal int SelectedProjectile = 0;
-        [SerializeField, AssetField] internal GameObject[] ShootEffects;
+        [SerializeField, ReadOnly] public int SelectedProjectile = 0;
+        [SerializeField] public GameObject[] ShootEffects;
         [SerializeField, ReadOnly] BurstParticles[] ShootEffectInstances;
         [SerializeField, ReadOnly] bool IsBallisticProjectile = true;
 
         [Header("Scope")]
-        [SerializeField] internal Transform Scope;
-        [SerializeField] internal Transform ScopeHolder;
+        [SerializeField] public Transform Scope;
+        [SerializeField] public Transform ScopeHolder;
 
         [Header("Other")]
         [SerializeField, ReadOnly] Vector3 target;
         readonly NetworkVariable<Vector3> netTarget = new();
         [SerializeField, ReadOnly] Transform targetTransform;
-        [SerializeField, ReadOnly] Vector2 overridedInput = Vector2.zero;
+        [SerializeField, ReadOnly] TurretInput overriddenInput = (0f, 0f);
 
-        [SerializeField, ReadOnly] internal BaseObject @base;
+        [SerializeField, ReadOnly] public BaseObject @base;
 
-        internal Transform TargetTransform => targetTransform;
+        public Transform TargetTransform => targetTransform;
 
-        internal Vector2 Input
+        public TurretInput Input
         {
             get => input;
-            set => overridedInput = value;
+            set => overriddenInput = value;
         }
 
-        [SerializeField, ReadOnly] Vector2 input = Vector2.zero;
+        [SerializeField, ReadOnly] TurretInput input = (0f, 0f);
 
-        [SerializeField, ReadOnly] internal float Range;
+        [SerializeField, ReadOnly] public float Range;
 
         readonly List<(Projectile, Vector3)> shots = new();
 
-        internal Vector3 ShootPosition => shootPosition.position;
+        public Vector3 ShootPosition => shootPosition.position;
 
         [SerializeField] bool ShowRadius;
 
-        internal Vector3 TargetPosition
+        public Vector3 TargetPosition
         {
             get
             {
@@ -172,7 +225,7 @@ namespace Game.Components
             }
         }
 
-        internal void SetTarget(Vector3 target)
+        public void SetTarget(Vector3 target)
         {
             targetTransform = null;
             this.target = target;
@@ -181,7 +234,7 @@ namespace Game.Components
             { netTarget.Value = target; }
         }
 
-        internal void SetTarget(Transform target)
+        public void SetTarget(Transform target)
         {
             targetTransform = target;
             this.target = target.position;
@@ -190,7 +243,7 @@ namespace Game.Components
             { netTarget.Value = target.position; }
         }
 
-        internal float TurretLocalRotation
+        public float TurretLocalRotation
         {
             get => transform.localEulerAngles.y;
             set
@@ -201,7 +254,7 @@ namespace Game.Components
                 { transform.localEulerAngles = new Vector3(0f, value, 0f); }
             }
         }
-        internal float CannonLocalRotation
+        public float CannonLocalRotation
         {
             get
             {
@@ -219,12 +272,12 @@ namespace Game.Components
             }
         }
 
-        internal float ShootHeight => shootPosition.position.y;
+        public float ShootHeight => shootPosition.position.y;
         public bool IsAccurateShoot => currentError <= 0.001f;
         [SerializeField, ReadOnly] float currentError = 1f;
 
         Vector3 predictedOffset;
-        internal Vector3 PredictedOffset => predictedOffset;
+        public Vector3 PredictedOffset => predictedOffset;
 
         float CannonRotationFix => -(90f - Vector3.SignedAngle(transform.forward, Vector3.up, transform.forward));
 
@@ -259,7 +312,7 @@ namespace Game.Components
                     var all = newParticleSystem.GetComponentsInChildren<ParticleSystem>(false);
                     for (int j = 0; j < all.Length; j++)
                     {
-                         burstParticles.Add(new BurstParticles(all[j]));
+                        burstParticles.Add(new BurstParticles(all[j]));
                     }
                 }
                 ShootEffectInstances = burstParticles.ToArray();
@@ -380,11 +433,11 @@ namespace Game.Components
             else
             {
                 IdleTime = 0f;
-                Vector2 input;
-                if (overridedInput != Vector2.zero)
+                TurretInput input;
+                if (overriddenInput != default)
                 {
                     predictedOffset = Vector3.zero;
-                    input = overridedInput;
+                    input = overriddenInput;
                     this.input = input;
                 }
                 else
@@ -397,25 +450,22 @@ namespace Game.Components
                         if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out MovementEngine movementEngine))
                         { targetAcceleration = movementEngine.Acceleration; }
                     }
-                    input = CalculateInputVector(targetPosition, targetVelocity, targetAcceleration);
+                    input = Aim(targetPosition, targetVelocity, targetAcceleration);
                     this.input = input;
                 }
 
                 currentError = CalculateError(input);
 
-                RotateTurret(input.x);
-                RotateCannon(input.y);
+                RotateTurret(input.TurretAngle);
+                RotateCannon(input.CannonAngle);
             }
 
             // Debug.DrawLine(ShootPosition, transform.position + transform.forward * 150f, Color.yellow, Time.fixedDeltaTime);
             // Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.fixedDeltaTime);
         }
 
-        Vector2 CalculateInputVector(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration)
+        TurretInput Aim(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration)
         {
-            float turretRotation;
-            float cannonAngle;
-
             Vector2 selfGround = transform.position.To2D();
             float cannonLength = Vector2.Distance(selfGround, shootPosition.position.To2D());
 
@@ -443,7 +493,40 @@ namespace Game.Components
                 { predictedOffset = Vector3.zero; }
 
                 // Debug.DrawLine(transform.position, targetPosition, Color.green, Time.fixedDeltaTime);
+            }
+            else
+            {
+                if (targetVelocity.To2D().sqrMagnitude > .1f)
+                {
+                    Vector2 offset = Acceleration.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity, projectile.GetComponent<Projectile>().Acceleration);
+                    predictedOffset = offset.To3D();
 
+                    targetPosition += offset.To3D();
+                }
+                else
+                { predictedOffset = Vector3.zero; }
+            }
+
+            return Aim(targetPosition);
+        }
+
+        TurretInput Aim(Vector3 targetPosition)
+        {
+            float turretRotation;
+            float cannonAngle;
+
+            // turretRotation = Maths.Vector3AngleOnPlane(targetPosition, transform.position, -transform.up, transform.forward);
+
+            // cannonAngle = Vector3.Angle(targetPosition, cannon.up);
+            // cannonAngle = -(90f - cannonAngle);
+
+            Vector2 selfGround = transform.position.To2D();
+            float cannonLength = Vector2.Distance(selfGround, shootPosition.position.To2D());
+
+            targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
+
+            if (IsBallisticProjectile)
+            {
                 float targetAngle;
 
                 float? theta_;
@@ -469,16 +552,6 @@ namespace Game.Components
             }
             else
             {
-                if (targetVelocity.To2D().sqrMagnitude > .1f)
-                {
-                    Vector2 offset = Acceleration.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity, projectile.GetComponent<Projectile>().Acceleration);
-                    predictedOffset = offset.To3D();
-
-                    targetPosition += offset.To3D();
-                }
-                else
-                { predictedOffset = Vector3.zero; }
-
                 Vector3 rotationToTarget = Quaternion.LookRotation(targetPosition - shootPosition.position).eulerAngles;
 
                 turretRotation = rotationToTarget.y;
@@ -488,7 +561,10 @@ namespace Game.Components
 
             }
 
-            return new Vector2(turretRotation, cannonAngle);
+            // transform.Rotate(new Vector3(0f, turretRotation, 0f), Space.Self);
+            // cannon.Rotate(new Vector3(cannonAngle, 0f, 0f), Space.Self);
+
+            return (turretRotation, cannonAngle);
         }
 
         float CalculateError(Vector2 input)
@@ -503,9 +579,9 @@ namespace Game.Components
             return error;
         }
 
-        internal Vector3? PredictImpact()
+        public Vector3? PredictImpact()
             => PredictImpact(out _);
-        internal Vector3? PredictImpact(out bool outOfRange)
+        public Vector3? PredictImpact(out bool outOfRange)
         {
             outOfRange = false;
             if (!IsBallisticProjectile)

@@ -386,53 +386,6 @@ public static partial class UnclassifiedExtensions
 
 public static class MeshEx
 {
-    /*
-    static Vector3 ClosestPoint(Vector3 p, (Vector3 a, Vector3 b, Vector3 c) triangle)
-        => ClosestPoint(p, triangle.a, triangle.b, triangle.c);
-
-    static Vector3 ClosestPoint(Vector3 p, Vector3 v0, Vector3 v1, Vector3 v2)
-    {
-        // Compute vectors of the triangle edges
-        var edge0 = v1 - v0;
-        var edge1 = v2 - v0;
-
-        
-        // Compute the normal vector of the triangle
-        // var normal = new Vector3(edge0[1] * edge1[2] - edge0[2] * edge1[1],
-        //                    edge0[2] * edge1[0] - edge0[0] * edge1[2],
-        //                    edge0[0] * edge1[1] - edge0[1] * edge1[0]);
-        
-
-        // Compute the vector from a triangle vertex to the point
-        var v0_p = new Vector3(p[0] - v0[0], p[1] - v0[1], p[2] - v0[2]);
-
-        // Compute the dot products
-        var dot00 = edge0[0] * edge0[0] + edge0[1] * edge0[1] + edge0[2] * edge0[2];
-        var dot01 = edge0[0] * edge1[0] + edge0[1] * edge1[1] + edge0[2] * edge1[2];
-        var dot0p = edge0[0] * v0_p[0] + edge0[1] * v0_p[1] + edge0[2] * v0_p[2];
-        var dot11 = edge1[0] * edge1[0] + edge1[1] * edge1[1] + edge1[2] * edge1[2];
-        var dot1p = edge1[0] * v0_p[0] + edge1[1] * v0_p[1] + edge1[2] * v0_p[2];
-
-        // Compute the barycentric coordinates
-        var inv_denom = 1 / (dot00 * dot11 - dot01 * dot01);
-        var u = (dot11 * dot0p - dot01 * dot1p) * inv_denom;
-        var v = (dot00 * dot1p - dot01 * dot0p) * inv_denom;
-
-        // Clamp the barycentric coordinates to the valid range
-        u = Maths.Max(0, Maths.Min(1, u));
-        v = Maths.Max(0, Maths.Min(1, v));
-        var w = 1 - u - v;
-
-        // Compute the closest point on the triangle
-        var closest_point = new Vector3(
-            v0[0] * u + v1[0] * v + v2[0] * w,
-            v0[1] * u + v1[1] * v + v2[1] * w,
-            v0[2] * u + v1[2] * v + v2[2] * w);
-
-        return closest_point;
-    }
-    */
-
     /// <summary>
     /// <see href="https://discussions.unity.com/t/closest-point-on-mesh-collider/178"/>
     /// </summary>
@@ -613,32 +566,7 @@ public static class VectorEx
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Flatten(this Vector3 v) => new(v.x, 0f, v.z);
 
-    public static bool AreEquals(this Vector3 vectorA, Vector3 vectorB, double tolerance)
-    {
-        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
-        float absZ = Maths.Pow(vectorB.z - vectorA.z, 2);
-
-        return Maths.Abs(absX + absY + absZ) < tolerance;
-    }
-
     public static bool AreEquals(this Vector2 vectorA, Vector2 vectorB, double tolerance)
-    {
-        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
-
-        return Maths.Abs(absX + absY) < tolerance;
-    }
-
-    public static bool AreEquals(this Vector3 vectorA, Vector2 vectorB, double tolerance)
-    {
-        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
-
-        return Maths.Abs(absX + absY) < tolerance;
-    }
-
-    public static bool AreEquals(this Vector2 vectorA, Vector3 vectorB, double tolerance)
     {
         float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
         float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
@@ -730,7 +658,6 @@ public static class GameObjectEx
     }
 
     public static bool HasComponent<T>(this GameObject obj) => obj.TryGetComponent<T>(out _);
-    public static bool HasComponent(this GameObject obj, Type type) => obj.TryGetComponent(type, out _);
 
     public static bool HasComponentInChildren<T>(this GameObject obj) => obj.TryGetComponentInChildren<T>(out _);
     public static bool HasComponentInParent<T>(this GameObject obj) => obj.TryGetComponentInParent<T>(out _);
@@ -757,22 +684,6 @@ public static class GameObjectEx
         component = obj.GetComponentInChildren<T>();
 
         return component != null;
-    }
-
-    public static bool TryGetComponent(this GameObject obj, string componentName, [NotNullWhen(true)] out Component? component)
-    {
-        var allComponent = obj.GetComponents<Component>();
-        for (int i = 0; i < allComponent.Length; i++)
-        {
-            var componentType = allComponent[i].GetType();
-            if (componentType.Name == componentName || componentType.FullName == componentName)
-            {
-                component = allComponent[i];
-                return true;
-            }
-        }
-        component = null;
-        return false;
     }
 
     public static bool TryGetComponentInParent<T>(this GameObject obj, [NotNullWhen(true)] out T? component)
@@ -807,7 +718,6 @@ public static class GameObjectEx
 public static class ComponentEx
 {
     public static bool HasComponent<T>(this Component obj) => obj.TryGetComponent<T>(out _);
-    public static bool HasComponent(this Component obj, Type type) => obj.TryGetComponent(type, out _);
 }
 
 public static class ObjectEx
@@ -863,12 +773,4 @@ public static class RectIntEx
     public static Vector2Int TopRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
     public static Vector2Int BottomLeft(this RectInt rect) => new(rect.position.x, rect.position.y + rect.height);
     public static Vector2Int BottomRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
-
-    public static (Vector2Int TopLeft, Vector2Int TopRight, Vector2Int BottomLeft, Vector2Int BottomRight) Corners(this RectInt rect) =>
-        (rect.TopLeft(), rect.TopRight(), rect.BottomLeft(), rect.BottomRight());
-
-    public static bool Contains(this RectInt rect, Vector2 point)
-    {
-        return point.x >= rect.xMin && point.x < rect.xMax && point.y >= rect.yMin && point.y < rect.yMax;
-    }
 }

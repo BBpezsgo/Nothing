@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using AssetManager;
 using Game.Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,7 +9,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class VehicleEngine : MovementEngine, IHaveAssetFields, ICopyable<VehicleEngine>
+    public class VehicleEngine : MovementEngine, ICopyable<VehicleEngine>
     {
         [SerializeField, ReadOnly] Unit unit;
 
@@ -77,28 +76,28 @@ namespace Game.Components
         [SerializeField, Range(0f, 1f)] float Handbrake = 1f;
 
         [Header("Engine")]
-        [AssetField] public float moveAccelerationFactor = 30.0f;
+        public float moveAccelerationFactor = 30.0f;
         /// <summary>
         /// <code>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</code>
         /// </summary>
         [SerializeField, ReadOnly] float TorqueInput = 0f;
-        [SerializeField, AssetField] internal float moveSpeedMax = 50f;
-        [SerializeField, AssetField] internal float engineBrake = 2.0f;
+        [SerializeField] internal float moveSpeedMax = 50f;
+        [SerializeField] internal float engineBrake = 2.0f;
         [SerializeField, ReadOnly] internal float Torque;
 
         [Header("Braking")]
-        [SerializeField, AssetField] internal float brake = 3.0f;
-        [SerializeField, AssetField] internal float handbrake = 2.5f;
+        [SerializeField] internal float brake = 3.0f;
+        [SerializeField] internal float handbrake = 2.5f;
         [SerializeField, ReadOnly] bool isHandbraking = false;
         [SerializeField, ReadOnly] bool isBraking = false;
 
         [Header("Steer")]
-        [SerializeField, AssetField, Range(0f, 1f)] internal float driftFactor = 0.95f;
-        [SerializeField, AssetField, Range(0f, 1f)] internal float driftFactorWithHandbrake = 0.98f;
-        [SerializeField, AssetField] internal bool isHaveTracks = false;
-        [SerializeField, AssetField] internal float speedAndSteer = 40f;
-        [SerializeField, AssetField] internal float turnFactor = 3.5f;
-        [SerializeField, Min(0f), AssetField] internal float steeringSpeed = 1f;
+        [SerializeField, Range(0f, 1f)] internal float driftFactor = 0.95f;
+        [SerializeField, Range(0f, 1f)] internal float driftFactorWithHandbrake = 0.98f;
+        [SerializeField] internal bool isHaveTracks = false;
+        [SerializeField] internal float speedAndSteer = 40f;
+        [SerializeField] internal float turnFactor = 3.5f;
+        [SerializeField, Min(0f)] internal float steeringSpeed = 1f;
         /// <summary>
         /// <code>-1f (Left) ... 0f (None) ... 1f (Right)</code>
         /// </summary>

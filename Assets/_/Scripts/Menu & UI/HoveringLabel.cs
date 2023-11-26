@@ -1,10 +1,10 @@
-using System;
-
 using UI;
 
 using Unity.Netcode;
 
 using UnityEngine;
+
+#nullable enable
 
 namespace Game.UI.Components
 {
@@ -33,10 +33,10 @@ namespace Game.UI.Components
                     GUIContent = (value == null) ? GUIContent.none : new GUIContent(value);
 
                     if (NetcodeUtils.IsServer)
-                    { NetworkedText.Value = value ?? ""; }
+                    { NetworkedText.Value = value ?? string.Empty; }
                 }
             }
-            get => GUIContent.text ?? null;
+            get => GUIContent.text;
         }
 
         bool _visible = false;
@@ -73,7 +73,7 @@ namespace Game.UI.Components
         public void Hide()
         {
             Visible = false;
-            Text = null;
+            Text = string.Empty;
         }
 
         void OnGUI()

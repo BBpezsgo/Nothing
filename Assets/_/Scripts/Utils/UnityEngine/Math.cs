@@ -77,6 +77,7 @@ public struct Maths
     /// <returns>
     /// Correlated Color Temperature as floating point RGB color.
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Color CorrelatedColorTemperatureToRGB(float kelvin) => Mathf.CorrelatedColorTemperatureToRGB(kelvin);
 
     /// <summary>
@@ -122,6 +123,7 @@ public struct Maths
     /// <returns>
     /// The return value between -1 and +1.
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sin(float f) => MathF.Sin(f);
 
     /// <summary>
@@ -133,47 +135,56 @@ public struct Maths
     /// <returns>
     /// The return value between -1 and 1.
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Cos(float f) => MathF.Cos(f);
 
     /// <summary>
     /// Returns the tangent of angle f in radians.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Tan(float f) => MathF.Tan(f);
 
     //
     /// <summary>
     /// Returns the arc-sine of f - the angle in radians whose sine is f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Asin(float f) => MathF.Asin(f);
 
     /// <summary>
     /// Returns the arc-cosine of f - the angle in radians whose cosine is f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Acos(float f) => MathF.Acos(f);
 
     /// <summary>
     /// Returns the arc-tangent of f - the angle in radians whose tangent is f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Atan(float f) => MathF.Atan(f);
 
     /// <summary>
     /// Returns the angle in radians whose Tan is y/x.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Atan2(float y, float x) => MathF.Atan2(y, x);
 
     /// <summary>
     /// Returns square root of f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sqrt(float f) => MathF.Sqrt(f);
 
     /// <summary>
     /// Returns the absolute value of f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Abs(float f) => MathF.Abs(f);
 
     /// <summary>
     /// Returns the absolute value of value.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Abs(int value) => Math.Abs(value);
 
     /// <summary>
@@ -279,56 +290,67 @@ public struct Maths
     /// <summary>
     /// Returns f raised to power p.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Pow(float f, float p) => MathF.Pow(f, p);
 
     /// <summary>
     /// Returns e raised to the specified power.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Exp(float power) => MathF.Exp(power);
 
     /// <summary>
     /// Returns the logarithm of a specified number in a specified base.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Log(float f, float p) => MathF.Log(f, p);
 
     /// <summary>
     /// Returns the natural (base e) logarithm of a specified number.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Log(float f) => MathF.Log(f);
 
     /// <summary>
     /// Returns the base 10 logarithm of a specified number.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Log10(float f) => MathF.Log10(f);
 
     /// <summary>
     /// Returns the smallest integer greater to or equal to f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Ceil(float f) => MathF.Ceiling(f);
 
     /// <summary>
     /// Returns the largest integer smaller than or equal to f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Floor(float f) => MathF.Floor(f);
 
     /// <summary>
     /// Returns f rounded to the nearest integer.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Round(float f) => MathF.Round(f);
 
     /// <summary>
     /// Returns the smallest integer greater to or equal to f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CeilToInt(float f) => (int)MathF.Ceiling(f);
 
     /// <summary>
     /// Returns the largest integer smaller to or equal to f.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int FloorToInt(float f) => (int)MathF.Floor(f);
 
     /// <summary>
     /// Returns f rounded to the nearest integer.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int RoundToInt(float f) => (int)MathF.Round(f);
 
     /// <summary>
@@ -590,10 +612,7 @@ public struct Maths
     {
         float num = Repeat(target - current, 360f);
         if (num > 180f)
-        {
-            num -= 360f;
-        }
-
+        { num -= 360f; }
         return num;
     }
 
@@ -680,8 +699,10 @@ public struct Maths
     }
 
     public static float Average(params float[] values) => Sum(values) / values.Length;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(float a, float b) => (a + b) / 2;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Difference(float a, float b) => Maths.Abs(a - b);
     public static Vector2 Difference(Vector2 a, Vector2 b) => new(
         Difference(a.x, b.x),
@@ -718,21 +739,26 @@ public struct Maths
         }
 
         /// <param name="angleOffset">Angle in radians</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly Vector2 GetPointAfterTime(float speed, float time, float angleOffset)
             => GetPoint(GetAngle(speed, time) + (angleOffset));
 
         public readonly float GetAngle(Vector2 pointOnCircle)
             => Maths.Atan2(pointOnCircle.y - this.center.y, pointOnCircle.x - this.center.y);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly float GetAngle(float speed, float time)
             => GetAngle(speed * time);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly float GetAngle(float distance)
             => distance / this.radius;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Circumference(float radius)
             => Maths.PI * 2 * radius;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly float Circumference()
             => Maths.PI * 2 * radius;
 
@@ -819,13 +845,12 @@ public struct Maths
         return n;
     }
 
-    public static Vector2 RadianToVector2(float radian)
-    { return new Vector2(Maths.Cos(radian), Maths.Sin(radian)); }
-    public static Vector2 DegreeToVector2(float degree)
-    { return RadianToVector2(degree * Maths.Deg2Rad); }
+    public static Vector2 RadianToVector2(float radian) => new(Maths.Cos(radian), Maths.Sin(radian));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector2 DegreeToVector2(float degree) => RadianToVector2(degree * Maths.Deg2Rad);
 
-    public static float NormalizeDegree(float degree)
-    { return (degree + 360) % 360; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float NormalizeDegree(float degree) => (degree + 360) % 360;
 
     public static Vector3 LengthDir(Vector3 center, float angle, float distance)
     {
@@ -837,21 +862,21 @@ public struct Maths
         return newPosition;
     }
 
-    class PointGroup
+    struct PointGroup
     {
-        public int GroupID { get; set; }
-        public Vector2 Point1 { get; set; }
-        public bool IsGrouped { get; set; }
+        public int GroupID;
+        public Vector2 Point1;
+        public bool IsGrouped;
     }
 
     static PointGroup[] GeneratePointGroups(Vector2[] points)
     {
-        List<PointGroup> groups = new();
+        PointGroup[] groups = new PointGroup[points.Length];
         for (int i = 0; i < points.Length; i++)
         {
-            groups.Add(new PointGroup() { GroupID = i, IsGrouped = false, Point1 = points[i] });
+            groups[i] = new PointGroup() { GroupID = i, IsGrouped = false, Point1 = points[i] };
         }
-        return groups.ToArray();
+        return groups;
     }
 
     static Vector2[][] GetGroupsFromGroups(PointGroup[] pointGroups)
@@ -871,7 +896,7 @@ public struct Maths
             }
         }
         List<Vector2[]> vector2s1 = new();
-        foreach (var item in vector2s)
+        foreach (List<Vector2> item in vector2s)
         {
             vector2s1.Add(item.ToArray());
         }
@@ -883,12 +908,12 @@ public struct Maths
         PointGroup[] colls = GeneratePointGroups(points);
         for (int i = 0; i < colls.Length; i++)
         {
-            PointGroup pg1 = colls[i];
+            ref PointGroup pg1 = ref colls[i];
             if (!pg1.IsGrouped)
             {
                 for (int j = 0; j < colls.Length; j++)
                 {
-                    PointGroup pg2 = colls[j];
+                    ref PointGroup pg2 = ref colls[j];
                     if (pg1.Point1.AreEquals(pg2.Point1, tolerance) && pg2.IsGrouped == false)
                     {
                         if (pg2.GroupID == j)
@@ -912,10 +937,9 @@ public struct Maths
         return (lowerLeft, upperRight);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (Vector2 BottomLeft, Vector2 TopRight) GetRect(Transform a, Transform b)
-    {
-        return GetRect(a.position, b.position);
-    }
+        => GetRect(a.position, b.position);
 
     /// <param name="p1">Angle peak</param>
     public static float CalculateAngle(Vector2 p1, Vector2 p2, Vector2 p3)
@@ -953,6 +977,34 @@ public struct Maths
         var slope = (outputEnd - outputStart) / (inputEnd - inputStart);
         var output = outputStart + slope * (input - inputStart);
         return output;
+    }
+
+    /// <summary>
+    /// Source: <see href="https://www.youtube.com/watch?v=bCz7awDbl58"/>
+    /// </summary>
+    /// <param name="from">
+    /// Target position
+    /// </param>
+    /// <param name="to">
+    /// Us
+    /// </param>
+    /// <param name="toZeroAngle">
+    /// Orientation
+    /// </param>
+    public static float Vector3AngleOnPlane(Vector3 from, Vector3 to, Vector3 planeNormal, Vector3 toZeroAngle)
+        => Maths.Vector3AngleOnPlane(from - to, planeNormal, toZeroAngle);
+
+    /// <summary>
+    /// Source: <see href="https://www.youtube.com/watch?v=bCz7awDbl58"/>
+    /// </summary>
+    /// <param name="toZeroAngle">
+    /// Orientation
+    /// </param>
+    public static float Vector3AngleOnPlane(Vector3 relativePosition, Vector3 planeNormal, Vector3 toZeroAngle)
+    {
+        Vector3 projectedVector = Vector3.ProjectOnPlane(relativePosition, planeNormal);
+        float projectedVectorAngle = Vector3.SignedAngle(projectedVector, toZeroAngle, planeNormal);
+        return projectedVectorAngle;
     }
 
     #endregion

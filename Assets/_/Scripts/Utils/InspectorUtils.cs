@@ -246,9 +246,9 @@ namespace InspectorDrawers
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (property.type != "float")
+            if (property.propertyType != SerializedPropertyType.Float)
             {
-                EditorGUI.HelpBox(position, "[TimeSpanAttribute] is only valid on float fields!", MessageType.Error);
+                EditorGUI.HelpBox(position, $"[{nameof(TimeSpanAttribute)}] is only valid on float fields!", MessageType.Error);
                 return;
             }
 
@@ -258,13 +258,18 @@ namespace InspectorDrawers
 
             if (secs == 0)
             {
-                EditorGUI.LabelField(content, "00:00:00", new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.gray } });
+                EditorGUI.LabelField(content, "00:00:00.0", new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.gray } });
                 return;
             }
 
             TimeSpan time = TimeSpan.FromSeconds(secs);
 
-            EditorGUI.LabelField(content, $"{time.Hours.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}:{time.Minutes.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}:{time.Seconds.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0')}.{time.Milliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture)}", new GUIStyle(GUI.skin.label));
+            string hours = time.Hours.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0');
+            string minutes = time.Minutes.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0');
+            string seconds = time.Seconds.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2, '0');
+            string milliseconds = time.Milliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+            EditorGUI.LabelField(content, $"{hours}:{minutes}:{seconds}.{milliseconds}", new GUIStyle(GUI.skin.label));
         }
     }
 

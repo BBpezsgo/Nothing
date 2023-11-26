@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class BaseObject : NetworkBehaviour, IHaveAssetFields
+    public class BaseObject : NetworkBehaviour
     {
         [Header("Health")]
-        [SerializeField, AssetField] internal float HP;
+        [SerializeField] internal float HP;
         [SerializeField, ReadOnly] float MaxHP;
 
         internal float NormalizedHP => HP / MaxHP;
@@ -20,7 +20,7 @@ namespace Game.Components
         [Header("Team")]
         [SerializeField] internal string Team;
         [SerializeField, ReadOnly] internal int TeamHash = -1;
-        [SerializeField, AssetField] protected Renderer[] teamRenderers = new Renderer[0];
+        [SerializeField] protected Renderer[] teamRenderers = new Renderer[0];
 
         protected virtual void Awake()
         {

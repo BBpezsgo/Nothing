@@ -5074,7 +5074,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 300
   ProjectileLifetime: 0.1
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 8289170899011404161}
   - {fileID: 8289170899688348694}
@@ -5096,9 +5096,13 @@ MonoBehaviour:
   ScopeHolder: {fileID: 0}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 0
   ShowRadius: 0
   currentError: 1
@@ -5156,7 +5160,6 @@ GameObject:
   - component: {fileID: 8289170899940005797}
   - component: {fileID: 8289170899940005796}
   - component: {fileID: 8289170899940005799}
-  - component: {fileID: 8289170899940005798}
   - component: {fileID: 8289170899940005793}
   - component: {fileID: 8289170899940005794}
   - component: {fileID: 8289170899940005789}
@@ -5383,20 +5386,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1f54e6a934da4daaffacad5f2a064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 40
+  MaxHP: 0
   Team: scav
   TeamHash: -1
   teamRenderers:
   - {fileID: 7278121773628976286}
   - {fileID: 0}
   - {fileID: 0}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 8289170899940005806}
   turret: {fileID: 8289170899688348689}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 40
   <CrossStyle>k__BackingField: 0
   <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
@@ -5427,7 +5429,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -5437,18 +5438,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &8289170899940005798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8289170899940005791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8289170899940005793
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,11 +13,6 @@ public class VertTriList
 
     public int[] this[int index] => list![index];
 
-    public VertTriList(int[] tri, int numVerts)
-    {
-        Init(tri, numVerts);
-    }
-
     public VertTriList(Mesh mesh)
     {
         Init(mesh.triangles, mesh.vertexCount);
@@ -27,7 +22,7 @@ public class VertTriList
     /// You don't usually need to call this - it's just to assist the implementation
     /// of the constructors.
     /// </summary>
-    public void Init(int[] tri, int numVerts)
+    void Init(int[] tri, int numVerts)
     {
         // First, go through the triangles, keeping a count of how many times
         // each vert is used.

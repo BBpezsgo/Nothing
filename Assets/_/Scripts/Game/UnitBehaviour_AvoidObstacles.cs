@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_AvoidObstacles : UnitBehaviour_Base, IHaveAssetFields, ICopyable<UnitBehaviour_AvoidObstacles>
+    public class UnitBehaviour_AvoidObstacles : UnitBehaviour_Base, ICopyable<UnitBehaviour_AvoidObstacles>
     {
         [SerializeField, ReadOnly] internal Transform IgnoreCollision;
         [SerializeField, ReadOnly] RaycastHitCache raycastHitCache;

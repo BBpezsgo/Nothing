@@ -1,4 +1,3 @@
-using AssetManager;
 using Game.Managers;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -14,7 +13,7 @@ namespace Game.Components
             Selected = 2,
         }
 
-        [SerializeField, AssetField] internal GameObject UiSelected;
+        [SerializeField] internal GameObject UiSelected;
 
         [SerializeField, ReadOnly] State selectableState = State.None;
         public State SelectableState

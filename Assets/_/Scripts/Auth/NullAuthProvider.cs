@@ -1,22 +1,22 @@
+using System;
 using Game.Components;
 using Game.Managers;
-
-using System;
-
 using UnityEngine;
 using UnityEngine.UIElements;
+
+#nullable enable
 
 namespace Authentication.Providers
 {
     public class NullAuthProvider : MonoBehaviour, IAccountMenuProvider, IAuthProvider
     {
-        [SerializeField] UIDocument loginMenu;
-        [SerializeField] MenuManager menuManager;
-        [SerializeField, ReadOnly] string id;
+        [SerializeField] UIDocument loginMenu = null!;
+        [SerializeField] MenuManager menuManager = null!;
+        [SerializeField, ReadOnly] string? id;
 
-        public string DisplayName => AuthManager.USERNAME_NULL;
-        public string AvatarUrl => null;
-        public string ID => id;
+        public string? DisplayName => null;
+        public string? AvatarUrl => null;
+        public string ID => id ?? string.Empty;
         public bool IsAuthorized => false;
 
         void Start()
@@ -26,7 +26,7 @@ namespace Authentication.Providers
 #if UNITY_EDITOR
                 loginMenu.rootVisualElement.Q<Button>("button-quit").clicked += () => UnityEditor.EditorApplication.isPlaying = false;
 #else
-            loginMenu.rootVisualElement.Q<Button>("button-quit").clicked += Application.Quit;
+                loginMenu.rootVisualElement.Q<Button>("button-quit").clicked += Application.Quit;
 #endif
             };
             id = Guid.NewGuid().ToString();

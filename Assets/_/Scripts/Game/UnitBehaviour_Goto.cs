@@ -1,12 +1,9 @@
-using AssetManager;
-
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Goto : UnitBehaviour_Base, IHaveAssetFields, ICopyable<UnitBehaviour_Goto>
+    public class UnitBehaviour_Goto : UnitBehaviour_Base, ICopyable<UnitBehaviour_Goto>
     {
         internal const float DISTANCE_TO_STOP = 8f;
         internal const float DISTANCE_TO_STOP_BRUH = 4f;
@@ -36,8 +33,8 @@ namespace Game.Components
         readonly NetworkVariable<Vector3> NetTarget = new();
 
         [Header("Movement")]
-        [SerializeField, AssetField] float maxDistanceToReverse = 32f;
-        [SerializeField, AssetField] internal bool useBrakingCalculations;
+        [SerializeField] float maxDistanceToReverse = 32f;
+        [SerializeField] internal bool useBrakingCalculations;
 
         [SerializeField, ReadOnly] internal bool currentlyStopping;
         [SerializeField, ReadOnly] float BrakingDistance;

@@ -197,7 +197,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 50
   ProjectileLifetime: 10
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 4273319253527134403}
   shootPosition: {fileID: 4273319252432233776}
@@ -216,12 +216,19 @@ MonoBehaviour:
   ScopeHolder: {fileID: 4273319252398771123}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 141.42136
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 0
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &4273319253527134430
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,7 +241,6 @@ GameObject:
   - component: {fileID: 4273319253527134402}
   - component: {fileID: 8554003262345555702}
   - component: {fileID: 4273319253527134401}
-  - component: {fileID: 7534748102374203335}
   - component: {fileID: 4967378241857771815}
   - component: {fileID: 1041381626135451567}
   - component: {fileID: 8401276797070513005}
@@ -278,6 +284,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fb3607c80aa8cb4b867317d3b6719d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 30
+  MaxHP: 0
   Team: a
   TeamHash: -1
   teamRenderers:
@@ -286,11 +294,8 @@ MonoBehaviour:
   - {fileID: 9210987647440865383}
   DestroyEffect: {fileID: 346126464746661311, guid: 9345da9ce82822f4bbf006b6a6c42688,
     type: 3}
-  HP: 30
   GroundOrigin: {x: 0, y: -1.18, z: 0}
   buttonDestroy: 
-  controllingByUser: 0
-  UiSelected: {fileID: 9132971557407977805}
   Attacker: {fileID: 0}
   <CrossStyle>k__BackingField: 2
   <ReloadIndicatorStyle>k__BackingField: 2
@@ -306,7 +311,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -315,15 +319,7 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &4273319253527134401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,18 +334,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   incomingBullets: []
   estimatedHP: 0
---- !u!114 &7534748102374203335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4273319253527134430}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4967378241857771815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -744,12 +728,6 @@ PrefabInstance:
 --- !u!4 &2579892866051630204 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1765551639380614811, guid: e07be840856b001449c6d4a40d13eae5,
-    type: 3}
-  m_PrefabInstance: {fileID: 4273319252455439079}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &9132971557407977805 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5040429609296710570, guid: e07be840856b001449c6d4a40d13eae5,
     type: 3}
   m_PrefabInstance: {fileID: 4273319252455439079}
   m_PrefabAsset: {fileID: 0}

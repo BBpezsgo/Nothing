@@ -24,7 +24,7 @@ namespace Game.Components
         [SerializeField] float TargetLockingThreshold = 10f;
 
         [Header("Turret")]
-        [SerializeField, AssetField] protected Turret turret;
+        [SerializeField] protected Turret turret;
         public Turret Turret
         {
             get => turret;
@@ -32,8 +32,8 @@ namespace Game.Components
         }
 
         [Header("Scope")]
-        [SerializeField, AssetField] float ScopeSensitivity = 1f;
-        [SerializeField, AssetField] bool HullRotationStabilizer = false;
+        [SerializeField] float ScopeSensitivity = 1f;
+        [SerializeField] bool HullRotationStabilizer = false;
 
         [SerializeField, ReadOnly] float lastRotation;
         [SerializeField, ReadOnly] float rotationDelta;

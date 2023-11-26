@@ -1,24 +1,22 @@
-using AssetManager;
-
 using Game.Managers;
 
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Seek : UnitBehaviour_Base, IHaveAssetFields, ICopyable<UnitBehaviour_Seek>
+    public class UnitBehaviour_Seek : UnitBehaviour_Base, ICopyable<UnitBehaviour_Seek>
     {
         internal const float DISTANCE_TO_STOP = 4f;
         internal const float BRAKING_DISTANCE_ERROR = .5f;
         internal const float DISTANCE_TO_STOP_BRUH = 4f;
 
-        [SerializeField, AssetField] bool FollowCursor;
+        [SerializeField] bool FollowCursor;
 
         [SerializeField, ReadOnly] internal Vector3 Target;
 
         [Header("Movement")]
-        [SerializeField, AssetField] float maxDistanceToReverse = 32f;
-        [SerializeField, AssetField] internal bool useBrakingCalculations;
+        [SerializeField] float maxDistanceToReverse = 32f;
+        [SerializeField] internal bool useBrakingCalculations;
 
         [SerializeField, ReadOnly] internal bool currentlyStopping;
         [SerializeField, ReadOnly] float BrakingDistance;

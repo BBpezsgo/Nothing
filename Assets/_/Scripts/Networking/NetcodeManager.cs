@@ -355,7 +355,7 @@ namespace Networking.Managers
 
         void Singleton_OnClientConnectedCallback(ulong clientId)
         {
-            Debug.Log($"[{nameof(NetcodeManager)}]: Client {clientId} connected", this);
+            Debug.Log($"[{nameof(NetcodeManager)}]: Client #{clientId} connected", this);
             var v = FindObjectOfType<Game.UI.MenuRoom>();
             if (v != null) v.RefreshPlayerList();
         }

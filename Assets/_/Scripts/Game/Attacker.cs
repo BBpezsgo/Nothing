@@ -1,16 +1,15 @@
 using System.Collections.Generic;
-using AssetManager;
 using Game.Managers;
 using UnityEngine;
 
 namespace Game.Components
 {
-    internal class Attacker : AttackerBase, IHaveAssetFields
+    internal class Attacker : AttackerBase
     {
         [Header("Targeting")]
         BaseObject[] targets = new BaseObject[5];
         List<BaseObject> priorityTargets = new();
-        [SerializeField, AssetField, Min(0f)] float DetectionRadius = 300f;
+        [SerializeField, Min(0f)] float DetectionRadius = 300f;
 
         bool NeedNewTargets
         {

@@ -1,98 +1,15 @@
-using Authentication;
-
-using Networking;
-using Networking.Messages;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using Authentication;
+using Networking;
+using Networking.Messages;
 using Unity.Netcode;
-
 using UnityEngine;
 using UnityEngine.Networking;
+using Utilities;
 
-#if UNITY_EDITOR && false
-using UnityEditor;
-[CustomPropertyDrawer(typeof(NetcodeServices.ClientList))]
-public class IngredientDrawerUIE : PropertyDrawer
-{
-    bool foldout;
-    readonly float padding = 6;
-
-    public override VisualElement CreatePropertyGUI(SerializedProperty property)
-    {
-        var container = new VisualElement();
-
-        return container;
-    }
-
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-    {
-        float listHeight = 0f;
-        if (foldout)
-        {
-            var targetObject = property.serializedObject.targetObject;
-            var targetObjectClassType = targetObject.GetType();
-            var field = targetObjectClassType.GetField(property.propertyPath);
-            if (field != null)
-            {
-                var value = field.GetValue(targetObject) as NetcodeServices.ClientList;
-                listHeight = (EditorGUIUtility.singleLineHeight * value.Count) + (padding * 2f);
-            }
-        }
-        return EditorGUIUtility.singleLineHeight + listHeight;
-    }
-
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-    {
-        var targetObject = property.serializedObject.targetObject;
-        var targetObjectClassType = targetObject.GetType();
-        var field = targetObjectClassType.GetField(property.propertyPath);
-        NetcodeServices.ClientList value = null;
-        if (field != null)
-        { value = field.GetValue(targetObject) as NetcodeServices.ClientList; }
-
-        EditorGUI.BeginProperty(position, label, property);
-
-        var indent = EditorGUI.indentLevel;
-        EditorGUI.indentLevel = 0;
-
-        foldout = EditorGUI.BeginFoldoutHeaderGroup(position, foldout, label);
-
-        EditorGUI.BeginDisabledGroup(true);
-        EditorGUI.IntField(new Rect(position.x + position.width - 45, position.y, 45, EditorGUIUtility.singleLineHeight), value.Count);
-        EditorGUI.EndDisabledGroup();
-
-        if (foldout)
-        {
-            if (field != null)
-            {
-                float y = EditorGUIUtility.singleLineHeight;
-
-                GUI.Box(new Rect(position.x, position.y + y, position.width, (y * value.Count) + (padding * 2)), GUIContent.none);
-
-                y += padding;
-
-                for (int i = 0; i < value.Count; i++)
-                {
-                    var item = value.ElementAt(i);
-                    var rect = EditorGUI.PrefixLabel(new Rect(position.x + padding, position.y + y, position.width - (padding * 2f), EditorGUIUtility.singleLineHeight), new GUIContent(item.Key.ToString()));
-                    EditorGUI.LabelField(rect, item.Value.ToString());
-
-                    y += EditorGUIUtility.singleLineHeight;
-                }
-            }
-        }
-
-        EditorGUI.EndFoldoutHeaderGroup();
-
-        EditorGUI.indentLevel = indent;
-
-        EditorGUI.EndProperty();
-    }
-}
-#endif
+#nullable enable
 
 namespace Networking
 {
@@ -101,7 +18,7 @@ namespace Networking
         [Serializable]
         struct UserData
         {
-            [SerializeField, ReadOnly] internal string DisplayName;
+            [SerializeField, ReadOnly] internal string? DisplayName;
             [SerializeField, ReadOnly] internal string ID;
             [SerializeField, ReadOnly] internal ulong NetworkID;
         }
@@ -114,7 +31,7 @@ namespace Networking
         [Serializable]
         public class Client
         {
-            public IRemoteAccountProvider.RemoteAccount Profile;
+            public IRemoteAccountProvider.RemoteAccount? Profile;
             public TimeSpan LastHeartbeat;
             public ulong NetworkID;
 
@@ -147,12 +64,14 @@ namespace Networking
 #endif
 
         public delegate void OnClientsUpdatedEventHandler();
-        public event OnClientsUpdatedEventHandler OnClientsUpdated;
-        string publicAddress;
+        public event OnClientsUpdatedEventHandler? OnClientsUpdated;
+        string? publicAddress;
 
-        public string PublicAddress => publicAddress;
+        public string? PublicAddress => publicAddress;
 
         public bool NeedAuthorization => false;
+
+        public bool CanRequestRemoteAccount => true;
 
         void Start()
         {
@@ -243,11 +162,11 @@ namespace Networking
                         ResetServerInfo();
 
                         ProcessClient(NetworkManager.Singleton.LocalClientId, AuthManager.AuthProvider.ID);
-                        OnClientInfoRecivedClientRpc(NetworkManager.Singleton.LocalClientId, AuthManager.AuthProvider.ID);
+                        OnClientInfoReceivedClientRpc(NetworkManager.Singleton.LocalClientId, AuthManager.AuthProvider.ID);
                     }
                     else
                     {
-                        OnClientInfoRecivedServerRpc(NetworkManager.Singleton.LocalClientId, AuthManager.AuthProvider.ID);
+                        OnClientInfoReceivedServerRpc(NetworkManager.Singleton.LocalClientId, AuthManager.AuthProvider!.ID);
                     }
                 }
             }
@@ -258,14 +177,14 @@ namespace Networking
         }
 
         [ServerRpc(RequireOwnership = false)]
-        void OnClientInfoRecivedServerRpc(ulong clientID, string ID)
+        void OnClientInfoReceivedServerRpc(ulong clientID, string ID)
         {
             ProcessClient(clientID, ID);
-            OnClientInfoRecivedClientRpc(clientID, ID);
+            OnClientInfoReceivedClientRpc(clientID, ID);
         }
 
         [ClientRpc]
-        void OnClientInfoRecivedClientRpc(ulong clientID, string ID)
+        void OnClientInfoReceivedClientRpc(ulong clientID, string ID)
         {
             ProcessClient(clientID, ID);
         }
@@ -286,9 +205,9 @@ namespace Networking
                 return;
             }
             if (AuthManager.RemoteAccountProvider == null) return;
-            StartCoroutine(AuthManager.RemoteAccountProvider.GetAsync(ID, (result, error) =>
+            StartCoroutine(AuthManager.RemoteAccountProvider.GetAsync(ID, result =>
             {
-                if (error != null) return;
+                if (result.IsFailed) return;
 
                 if (Clients.ContainsKey(clientID))
                 {
@@ -311,7 +230,7 @@ namespace Networking
                     UserData userData = UserDatas[i];
 
                     userData.DisplayName = message.UserName;
-                    userData.ID = message.ID;
+                    userData.ID = message.ID!;
 
                     UserDatas[i] = userData;
                     return;
@@ -321,27 +240,29 @@ namespace Networking
             UserDatas.Add(new UserData()
             {
                 DisplayName = message.UserName,
-                ID = message.ID,
+                ID = message.ID!,
                 NetworkID = message.Sender,
             });
         }
 
-        public IRemoteAccountProvider.RemoteAccount Get(string userId)
+        public IRemoteAccountProvider.RemoteAccount? Get(string userId)
         {
             for (int i = 0; i < UserDatas.Count; i++)
             {
-                if (UserDatas[i].ID != userId) continue;
-                return new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName);
+                UserData userData = UserDatas[i];
+                if (userData.ID != userId) continue;
+                return new IRemoteAccountProvider.RemoteAccount(userData.DisplayName);
             }
             return null;
         }
 
-        public IEnumerator GetAsync(string userId, Action<IRemoteAccountProvider.RemoteAccount, object> callback)
+        public IEnumerator GetAsync(string userId, Action<TaskResult<IRemoteAccountProvider.RemoteAccount, string>> callback)
         {
             for (int i = 0; i < UserDatas.Count; i++)
             {
-                if (UserDatas[i].ID != userId) continue;
-                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName), null);
+                UserData userData = UserDatas[i];
+                if (userData.ID != userId) continue;
+                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount(userData.DisplayName));
                 yield break;
             }
 
@@ -365,26 +286,30 @@ namespace Networking
             TimeSpan started = DateTime.UtcNow.TimeOfDay;
             while ((DateTime.UtcNow.TimeOfDay - started).TotalSeconds < 5)
             {
-                IRemoteAccountProvider.RemoteAccount possiblyFoundRemoteAccount = Get(userId);
+                IRemoteAccountProvider.RemoteAccount? possiblyFoundRemoteAccount = Get(userId);
                 if (possiblyFoundRemoteAccount != null)
                 {
-                    callback?.Invoke(possiblyFoundRemoteAccount, null);
+                    callback?.Invoke(possiblyFoundRemoteAccount);
                     yield break;
                 }
 
                 yield return new WaitForSecondsRealtime(1f);
             }
 
-            callback?.Invoke(null, "Timed out");
+            callback?.Invoke("Timed out");
             yield break;
         }
 
-        public IRemoteAccountProvider.RemoteAccount Get(ulong userId)
+        public IRemoteAccountProvider.RemoteAccount? Get(ulong userId)
         {
             for (int i = 0; i < UserDatas.Count; i++)
             {
-                if (UserDatas[i].NetworkID != userId) continue;
-                return new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName);
+                UserData userData = UserDatas[i];
+                if (userData.NetworkID != userId) continue;
+                if (string.IsNullOrWhiteSpace(userData.DisplayName))
+                { break; }
+                else
+                { return new IRemoteAccountProvider.RemoteAccount(userData.DisplayName); }
             }
 
             if (NetworkManager.ServerClientId == userId)
@@ -393,23 +318,29 @@ namespace Networking
             { return new IRemoteAccountProvider.RemoteAccount($"Client #{userId}"); }
         }
 
-        public IEnumerator GetAsync(ulong userId, Action<IRemoteAccountProvider.RemoteAccount, object> callback)
+        public IEnumerator GetAsync(ulong userId, Action<TaskResult<IRemoteAccountProvider.RemoteAccount, string>> callback)
         {
             for (int i = 0; i < UserDatas.Count; i++)
             {
-                if (UserDatas[i].NetworkID != userId) continue;
-                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount(UserDatas[i].DisplayName), null);
-                yield break;
+                UserData userData = UserDatas[i];
+                if (userData.NetworkID != userId) continue;
+                if (string.IsNullOrWhiteSpace(userData.DisplayName))
+                { break; }
+                else
+                {
+                    callback?.Invoke(new IRemoteAccountProvider.RemoteAccount(userData.DisplayName));
+                    yield break;
+                }
             }
 
             if (NetworkManager.ServerClientId == userId)
             {
-                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Server"), null);
+                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Server"));
                 yield break;
             }
             else
             {
-                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Client #{userId}"), null);
+                callback?.Invoke(new IRemoteAccountProvider.RemoteAccount($"Client #{userId}"));
                 yield break;
             }
         }
@@ -420,32 +351,12 @@ namespace Unity.Netcode
 {
     public static class Services
     {
-        static NetcodeServices instance;
+        static NetcodeServices? instance;
 
-        public static NetcodeServices Singleton
+        public static NetcodeServices? Singleton
         {
-            get
-            {
-                return instance;
-            }
-            set
-            {
-                instance = value;
-            }
-        }
-    }
-
-    public struct Client : INetworkSerializable
-    {
-        public Collections.FixedString32Bytes Name;
-        public int Id;
-        public bool IsHost;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Name);
-            serializer.SerializeValue(ref Id);
-            serializer.SerializeValue(ref IsHost);
+            get => instance;
+            set => instance = value;
         }
     }
 }

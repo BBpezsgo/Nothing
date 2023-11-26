@@ -10,6 +10,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+#nullable enable
+
 namespace Authentication.Providers
 {
     public class AnonymousManager : SingleInstance<AnonymousManager>, IModifiableAuthProvider, IFriendsProvider, IAccountMenuProvider
@@ -17,44 +19,37 @@ namespace Authentication.Providers
         const string fileName = "anonymous";
 
         public bool IsAuthorized { get; private set; } = false;
-        public Sprite Avatar => null;
-        public string DisplayName
+        public Sprite? Avatar => null;
+        public string? DisplayName
         {
-            get => AccountData.DisplayName;
-            set => AccountData.DisplayName = value;
+            get => AccountData?.DisplayName;
+            set => AccountData!.DisplayName = value;
         }
-        public string AvatarUrl
+        public string? AvatarUrl
         {
             get => null;
             set { }
         }
-        public string ID => AccountData.ID;
+        public string ID => AccountData!.ID;
 
-        [SerializeField, ReadOnly] string dataFilePath;
-        string DataFilePath
-        {
-            get
-            {
-                dataFilePath = $"{AssetManager.Storage.Path}/users/{fileName}.bin";
-                return dataFilePath;
-            }
-        }
+        [SerializeField, ReadOnly] string? dataFilePath;
+        string DataFilePath => throw new NotImplementedException();
 
-        [SerializeField, ReadOnly] AnonymousUser AccountData;
+        [SerializeField, ReadOnly] AnonymousUser? AccountData;
 
         [SerializeField] bool AutoAuthorize = false;
 
         [Header("UI")]
-        [SerializeField] UIDocument loginMenu;
-        [SerializeField] UIDocument accountMenu;
+        [SerializeField] UIDocument? loginMenu;
+        [SerializeField] UIDocument? accountMenu;
 
         void Start()
         {
             ResetHaveAccount();
 
-            loginMenu.OnEnabled().onEnable += () =>
+            loginMenu.OnEnabled()!.onEnable += () =>
             {
-                loginMenu.rootVisualElement.Q<Button>("button-anonymous").clicked += Login;
+                loginMenu!.rootVisualElement.Q<Button>("button-anonymous").clicked += Login;
                 ResetHaveAccount();
             };
 
@@ -84,7 +79,7 @@ namespace Authentication.Providers
 
         public void OnButtonUpdateAccount()
         {
-            DisplayName = accountMenu.rootVisualElement.Q<TextField>("inp-name").value;
+            DisplayName = accountMenu?.rootVisualElement.Q<TextField>("inp-name").value;
         }
 
         public void OnButtonLogout() { }
@@ -109,7 +104,7 @@ namespace Authentication.Providers
 
         void Save()
         {
-            AssetManager.Storage.Write(AccountData, DataFilePath);
+            throw new NotImplementedException();
         }
 
         public void Logout()
@@ -119,40 +114,34 @@ namespace Authentication.Providers
 
         #endregion
 
-        public string[] GetFriends() => AccountData.Friends.ToArray();
-        public void AddFriend(string newFriendID)
-        {
-            throw new NotImplementedException();
-        }
-        public void RemoveFriend(string userId)
-        {
-            throw new NotImplementedException();
-        }
+        public string[] GetFriends() => AccountData?.Friends.ToArray() ?? new string[0];
+        public void AddFriend(string newFriendID) => throw new NotImplementedException();
+        public void RemoveFriend(string userId) => throw new NotImplementedException();
 
         public void Show()
         {
-            if (accountMenu.rootVisualElement != null)
-            { accountMenu.rootVisualElement.Q<TextField>("inp-name").value = AccountData.DisplayName ?? AuthManager.USERNAME_NULL; }
+            if (accountMenu?.rootVisualElement != null)
+            { accountMenu.rootVisualElement.Q<TextField>("inp-name").value = AccountData?.DisplayName ?? string.Empty; }
         }
 
         [Serializable]
         class AnonymousUser : ISerializable<AnonymousUser>, ISerializableText, IDeserializableText
         {
             [ReadOnly] public string ID;
-            [ReadOnly] public string DisplayName;
+            [ReadOnly] public string? DisplayName;
             [ReadOnly, NonReorderable] public List<string> Friends;
 
             public AnonymousUser()
             {
-                ID = "";
-                DisplayName = AuthManager.USERNAME_NULL;
+                ID = string.Empty;
+                DisplayName = null;
                 Friends = new List<string>();
             }
 
             public void Deserialize(Deserializer deserializer)
             {
-                ID = deserializer.DeserializeString();
-                DisplayName = deserializer.DeserializeString();
+                ID = deserializer.DeserializeString() ?? string.Empty;
+                DisplayName = deserializer.DeserializeString()!;
                 Friends = deserializer.DeserializeArray<string>().ToList();
             }
 
@@ -160,7 +149,7 @@ namespace Authentication.Providers
             {
                 ID = data["ID"].String ?? throw new System.Exception($"Field ID not found");
                 DisplayName = data["DisplayName"].String ?? string.Empty;
-                Friends = data["Friends"].Array.ConvertPrimitive<string>().ToList();
+                Friends = data["Friends"].Array!.ConvertPrimitive<string>().ToList();
             }
 
             public void Serialize(Serializer serializer)

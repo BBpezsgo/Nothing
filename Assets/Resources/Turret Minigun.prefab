@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 1726614090810903903}
   - component: {fileID: 6489167832348549995}
   - component: {fileID: 1726614090810903900}
-  - component: {fileID: 4912026536958579290}
   - component: {fileID: 7517747301856220346}
   - component: {fileID: 2506376836180171314}
   - component: {fileID: 8489667657845955715}
@@ -88,6 +87,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fb3607c80aa8cb4b867317d3b6719d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 30
+  MaxHP: 0
   Team: a
   TeamHash: -1
   teamRenderers:
@@ -96,11 +97,8 @@ MonoBehaviour:
   - {fileID: 6012247300215918302}
   DestroyEffect: {fileID: 346126464746661311, guid: 9345da9ce82822f4bbf006b6a6c42688,
     type: 3}
-  HP: 30
   GroundOrigin: {x: 0, y: -1.17, z: 0}
   buttonDestroy: 
-  controllingByUser: 0
-  UiSelected: {fileID: 5910163450971634896}
   Attacker: {fileID: 0}
   <CrossStyle>k__BackingField: 1
   <ReloadIndicatorStyle>k__BackingField: 2
@@ -116,7 +114,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -125,15 +122,7 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  PriorityTargetCount: 0
-  priorityTargets: []
-  NewTargetCooldown: 1
+  DetectionRadius: 300
 --- !u!114 &1726614090810903900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,18 +137,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   incomingBullets: []
   estimatedHP: 0
---- !u!114 &4912026536958579290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1726614090810903875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7517747301856220346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,7 +479,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 500
   ProjectileLifetime: 0.7
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision: []
   shootPosition: {fileID: 1726614091862829229}
   projectile: {fileID: 4399164710629436118, guid: 5174b65d87d2d414d80f578f8d874857,
@@ -520,12 +497,19 @@ MonoBehaviour:
   ScopeHolder: {fileID: 1726614091964106286}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 141.42136
   ShowRadius: 0
   currentError: 1
+  ResetAfterTime: 0
+  TimeToReset: 1
+  IdleTime: 0
 --- !u!1 &5001198054609984692
 GameObject:
   m_ObjectHideFlags: 0
@@ -5584,12 +5568,6 @@ PrefabInstance:
 --- !u!4 &1114171977930058209 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1765551639380614811, guid: e07be840856b001449c6d4a40d13eae5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1726614091882362746}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5910163450971634896 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5040429609296710570, guid: e07be840856b001449c6d4a40d13eae5,
     type: 3}
   m_PrefabInstance: {fileID: 1726614091882362746}
   m_PrefabAsset: {fileID: 0}

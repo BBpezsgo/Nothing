@@ -9,9 +9,9 @@ using UnityEngine;
 namespace Game.Components
 {
     [RequireComponent(typeof(UnitBehaviour))]
-    public class UnitBehaviour_Base : NetworkBehaviour, IComparable<UnitBehaviour_Base>, IHaveAssetFields, ICopyable<UnitBehaviour_Base>
+    public class UnitBehaviour_Base : NetworkBehaviour, IComparable<UnitBehaviour_Base>, ICopyable<UnitBehaviour_Base>
     {
-        [SerializeField, AssetField] internal float Priority;
+        [SerializeField] internal float Priority;
         [SerializeField, ReadOnly] protected MovementEngine MovementEngine;
 
         protected virtual void Start()

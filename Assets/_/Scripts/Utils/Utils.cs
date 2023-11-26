@@ -1190,49 +1190,6 @@ namespace InputUtils
 
 public static partial class ListUtils
 {
-    public static string ToReadableString<T>(this NetworkList<T> self) where T : unmanaged, IEquatable<T>
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Count; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T element = self[i];
-            builder.Append(element.ToString());
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
-    public static string ToReadableString<T1, T2>(this NetworkList<T1> self, Func<T1, T2> converter) where T1 : unmanaged, IEquatable<T1>
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Count; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T1 element = self[i];
-            T2 converted = converter.Invoke(element);
-            builder.Append(converted.ToString());
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
     public static string ToReadableString<T1, T2>(this NetworkList<T1> self, IReadOnlyDictionary<T1, T2> converter) where T1 : unmanaged, IEquatable<T1>
     {
         if (self == null)

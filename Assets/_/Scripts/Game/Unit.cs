@@ -10,8 +10,8 @@ namespace Game.Components
 {
     internal class Unit : BaseObject, IDamagable, ICanTakeControlAndHasTurret
     {
-        [SerializeField, AssetField] MovementEngine vehicleEngine;
-        [SerializeField, AssetField] protected Turret turret;
+        [SerializeField] MovementEngine vehicleEngine;
+        [SerializeField] protected Turret turret;
 
         public Turret Turret
         {

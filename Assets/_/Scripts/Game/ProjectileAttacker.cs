@@ -1,5 +1,3 @@
-using AssetManager;
-
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -8,7 +6,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    internal class ProjectileAttacker : AttackerBase, IHaveAssetFields
+    internal class ProjectileAttacker : AttackerBase
     {
         protected override void FixedUpdate()
         {
@@ -17,7 +15,7 @@ namespace Game.Components
             if (turret != null)
             {
                 turret.LoseTarget();
-                turret.RequiedProjectileLifetime = -1f;
+                turret.RequiredProjectileLifetime = -1f;
             }
 
             if (BaseObject is ICanTakeControl canTakeControl && canTakeControl.AnybodyControllingThis())
@@ -122,12 +120,12 @@ namespace Game.Components
                 // Debug.DrawLine(turret.ShootPosition, predictedTargetPos, Color.white, Time.fixedDeltaTime, false);
 
                 // turret.Input = new Vector2(0f, angle_.Value * Maths.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
-                turret.RequiedProjectileLifetime = predictedAim.Value.TimeToReach - Time.fixedDeltaTime;
+                turret.RequiredProjectileLifetime = predictedAim.Value.TimeToReach - Time.fixedDeltaTime;
                 turret.SetTarget(predictedAim.Value.PredictedPosition);
             }
             else
             {
-                turret.Input = Vector3.zero;
+                turret.Input = default;
                 turret.SetTarget(Vector3.zero);
             }
 

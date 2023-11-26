@@ -41,9 +41,6 @@ namespace Game.UI
 
             for (int i = 0; i < SceneManager.Scenes.Count; i++)
             {
-                if (UnityEngine.SceneManagement.SceneManager.GetSceneByName(SceneManager.Scenes[i]).buildIndex < 0)
-                { continue; }
-
                 TemplateContainer newElement = SceneElement.Instantiate();
 
                 newElement.Q<Label>().text = SceneManager.Scenes[i];

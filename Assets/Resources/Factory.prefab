@@ -113,7 +113,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2759722349239998941}
   - component: {fileID: -3430128879076549079}
-  - component: {fileID: -1963496345961549120}
   - component: {fileID: 3190057481564433997}
   - component: {fileID: 6798426574847624917}
   m_Layer: 0
@@ -155,26 +154,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdfb8333d4a292e48bd7f4fe5dfe1c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 80
+  MaxHP: 0
   Team: 
   TeamHash: -1
   teamRenderers: []
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 80
   GroundOrigin: {x: 0, y: 0, z: 0}
+  buttonDestroy: 
   DepotSpawn: {fileID: 7657099949244250535}
---- !u!114 &-1963496345961549120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2759722349239998939}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df163fc0622f7cc42ba275f18df6ce73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3190057481564433997
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
 using System;
-using AssetManager;
 using Game.Managers;
 using Unity.Collections;
 using Unity.Netcode;
@@ -42,7 +41,7 @@ namespace Game.Components
             }
         }
 
-        [SerializeField, AssetField] Transform DepotSpawn;
+        [SerializeField] Transform DepotSpawn;
 
         void OnEnable()
         { WorldCursorManager.Instance.Register(this); }
@@ -86,26 +85,26 @@ namespace Game.Components
         {
             Vector3 spawnAt = DepotSpawn.position;
             spawnAt.y = TheTerrain.Height(spawnAt);
-            AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID.ToString(), true, spawnAt, DepotSpawn.rotation, instance =>
+
+            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID.ToString(), true, spawnAt, DepotSpawn.rotation);
+
+            instance.transform.SetParent(transform.parent);
+
+            if (instance.TryGetComponent(out Collider collider))
             {
-                instance.transform.SetParent(transform.parent);
+                instance.transform.position = new Vector3(
+                    instance.transform.position.x,
+                    instance.transform.position.y + collider.bounds.size.y,
+                    instance.transform.position.z);
+            }
 
-                if (instance.TryGetComponent(out Collider collider))
-                {
-                    instance.transform.position = new Vector3(
-                        instance.transform.position.x,
-                        instance.transform.position.y + collider.bounds.size.y,
-                        instance.transform.position.z);
-                }
+            BaseObject baseObject = instance.GetComponentInChildren<BaseObject>(false);
+            if (baseObject != null)
+            { baseObject.Team = Team; }
 
-                BaseObject baseObject = instance.GetComponentInChildren<BaseObject>(false);
-                if (baseObject != null)
-                { baseObject.Team = Team; }
+            instance.SetActive(true);
 
-                instance.SetActive(true);
-
-                instance.SpawnOverNetwork(true);
-            });
+            instance.SpawnOverNetwork(true);
         }
 
         public bool OnWorldCursor(Vector3 worldPosition)
