@@ -5,6 +5,8 @@ using Unity.Multiplayer.Tools.NetStatsMonitor;
 using Unity.Netcode;
 using UnityEngine;
 
+#nullable enable
+
 namespace Networking
 {
     [AddComponentMenu("Netcode/Synchronizer")]
@@ -71,9 +73,9 @@ namespace Networking
 
                             if (AuthManager.AuthProvider.IsAuthorized && AuthManager.AuthProvider.ID == message.ID)
                             {
-                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(MessageType.USER_DATA, NetworkManager.LocalClientId)
+                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
                                 {
-                                    UserName = AuthManager.AuthProvider.DisplayName,
+                                    UserName = AuthManager.AuthProvider.DisplayName ?? "null",
                                     ID = AuthManager.AuthProvider.ID,
                                 }, baseMessage.Sender);
                                 break;
@@ -84,9 +86,9 @@ namespace Networking
                                 var result = AuthManager.RemoteAccountProvider.Get(message.ID);
                                 if (result != null)
                                 {
-                                    NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(MessageType.USER_DATA, NetworkManager.LocalClientId)
+                                    NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
                                     {
-                                        UserName = result.DisplayName,
+                                        UserName = result.DisplayName ?? "null",
                                         ID = message.ID,
                                     }, baseMessage.Sender);
                                 }
@@ -98,7 +100,8 @@ namespace Networking
                     case MessageType.USER_DATA:
                         {
                             UserDataHeader message = (UserDataHeader)baseMessage;
-                            Services.Singleton.OnUserData(message);
+                            if (Services.Singleton != null)
+                            { Services.Singleton.OnUserData(message); }
                             break;
                         }
 
@@ -106,9 +109,9 @@ namespace Networking
                         {
                             if (AuthManager.AuthProvider.IsAuthorized)
                             {
-                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(MessageType.USER_DATA, NetworkManager.LocalClientId)
+                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
                                 {
-                                    UserName = AuthManager.AuthProvider.DisplayName,
+                                    UserName = AuthManager.AuthProvider.DisplayName ?? "null",
                                     ID = AuthManager.AuthProvider.ID,
                                 }, baseMessage.Sender);
                                 break;

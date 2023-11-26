@@ -13,28 +13,28 @@ namespace Networking
     public class NetcodeMessaging
     {
         static NetworkManager NetworkManager => NetworkManager.Singleton;
-        internal const int MessageSize = 1100;
-        internal const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
+        public const int MessageSize = 1100;
+        public const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
         static bool Logs => NetcodeSynchronizer.Instance.Logs;
 
-        internal static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
+        public static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
         {
-            BaseMessage baseMessage = new(MessageType.UNKNOWN, ulong.MaxValue);
-            if (!reader.TryBeginRead(BaseMessage.HeaderSize))
-            { throw new Exception($"Tried to read {BaseMessage.HeaderSize} bytes from buffer with size of {reader.Length} bytes from position {reader.Position}"); }
+            BaseMessage baseMessage = new(MessageHeader.Unknown);
+            if (!reader.TryBeginRead(MessageHeader.Size))
+            { throw new Exception($"Tried to read {MessageHeader.Size} bytes from buffer with size of {reader.Length} bytes from position {reader.Position}"); }
             baseMessage.Deserialize(reader);
             switch (baseMessage.Type)
             {
                 case MessageType.USER_DATA_REQUEST:
                     {
-                        UserDataRequestHeader header = new(baseMessage.Type, baseMessage.Sender);
+                        UserDataRequestHeader header = new(new MessageHeader(baseMessage.Type, baseMessage.Sender));
                         header.Deserialize(reader);
                         return header;
                     }
 
                 case MessageType.USER_DATA:
                     {
-                        UserDataHeader header = new(baseMessage.Type, clientId);
+                        UserDataHeader header = new(new MessageHeader(baseMessage.Type, clientId));
                         header.Deserialize(reader);
                         return header;
                     }
@@ -47,13 +47,13 @@ namespace Networking
             }
         }
 
-        internal static BaseMessage[] ReceiveUnnamedMessage(ulong clientId, FastBufferReader reader)
+        public static BaseMessage[] ReceiveUnnamedMessage(ulong clientId, FastBufferReader reader)
         {
             string senderName = ((clientId == NetworkManager.ServerClientId) ? $"server" : $"client {clientId}");
             if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Received {reader.Length} bytes from {senderName}");
             int endlessSafe = 5000;
             List<BaseMessage> result = new();
-            while (reader.TryBeginRead(BaseMessage.HeaderSize))
+            while (reader.TryBeginRead(MessageHeader.Size))
             {
                 if (endlessSafe-- <= 0) { Debug.LogError($"[{nameof(NetcodeMessaging)}]: Endless loop!"); break; }
 
@@ -68,7 +68,7 @@ namespace Networking
             return result.ToArray();
         }
 
-        internal static void BroadcastUnnamedMessage(INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        public static void BroadcastUnnamedMessage(INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             if (!NetworkManager.IsServer)
             {
@@ -80,7 +80,7 @@ namespace Networking
             BroadcastUnnamedMessage(writer, networkDelivery);
         }
 
-        internal static void SendUnnamedMessage(INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        public static void SendUnnamedMessage(INetworkSerializable data, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             using FastBufferWriter writer = new(MessageSize, Allocator.Temp);
             if (data is BaseMessage message)
@@ -99,7 +99,7 @@ namespace Networking
             SendUnnamedMessage(writer, destination, networkDelivery);
         }
 
-        internal static void BroadcastUnnamedMessage(FastBufferWriter writer, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        public static void BroadcastUnnamedMessage(FastBufferWriter writer, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             if (!NetworkManager.IsServer)
             {
@@ -110,7 +110,7 @@ namespace Networking
             if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Broadcasted {writer.Length} bytes");
         }
 
-        internal static void SendUnnamedMessage(FastBufferWriter writer, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
+        public static void SendUnnamedMessage(FastBufferWriter writer, ulong destination, NetworkDelivery networkDelivery = DefaultNetworkDelivery)
         {
             NetworkManager.CustomMessagingManager.SendUnnamedMessage(destination, writer, networkDelivery);
             if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Sent {writer.Length} bytes to client {destination}");
@@ -120,7 +120,7 @@ namespace Networking
 
 namespace Networking.Messages
 {
-    internal enum MessageType : byte
+    public enum MessageType : byte
     {
         UNKNOWN,
 
@@ -129,27 +129,65 @@ namespace Networking.Messages
         USER_DATA,
     }
 
-    internal class BaseMessage : INetworkSerializable, ISizeOf
+    public struct MessageHeader : INetworkSerializable
     {
-        internal MessageType Type => (MessageType)_type;
-        internal byte TypeRaw => _type;
-        internal uint Sender => _sender;
+        public MessageType Type;
+        public uint Sender;
+        public TimeSpan Sent;
 
-        byte _type;
-        uint _sender;
-        TimeSpan _sent;
-
-        public BaseMessage(MessageType type, ulong sender)
-        {
-            _type = (byte)type;
-            _sender = (uint)sender;
-            _sent = DateTime.UtcNow.TimeOfDay;
-        }
-
-        public const int HeaderSize =
+        public const int Size =
             sizeof(byte) +
             sizeof(uint) +
             sizeof(long);
+
+        public static MessageHeader Unknown => new(MessageType.UNKNOWN, uint.MaxValue, TimeSpan.Zero);
+
+        public MessageHeader(MessageType type, uint sender) : this(type, sender, DateTime.UtcNow.TimeOfDay)
+        { }
+
+        public MessageHeader(MessageType type, ulong sender) : this(type, (uint)sender, DateTime.UtcNow.TimeOfDay)
+        { }
+
+        public MessageHeader(MessageType type, ulong sender, TimeSpan sent) : this(type, (uint)sender, sent)
+        { }
+
+        public MessageHeader(MessageType type, uint sender, TimeSpan sent)
+        {
+            Type = type;
+            Sender = sender;
+            Sent = sent;
+        }
+
+        public void Deserialize(FastBufferReader deserializer)
+        {
+            deserializer.ReadValueSafe(out byte type);
+            Type = (MessageType)type;
+            deserializer.ReadValueSafe(out Sender);
+            deserializer.ReadValueSafe(out long ticks);
+            Sent = new TimeSpan(ticks);
+        }
+
+        public void Serialize(FastBufferWriter serializer)
+        {
+            serializer.WriteValueSafe((byte)Type);
+            serializer.WriteValueSafe(Sender);
+            serializer.WriteValueSafe(Sent.Ticks);
+        }
+    }
+
+    public class BaseMessage : INetworkSerializable, ISizeOf
+    {
+        public MessageType Type => Header.Type;
+        public byte TypeRaw => (byte)Header.Type;
+        public uint Sender => Header.Sender;
+
+        MessageHeader Header;
+
+        public BaseMessage(MessageHeader header)
+        {
+            header.Sent = DateTime.UtcNow.TimeOfDay;
+            Header = header;
+        }
 
         public virtual int Size()
         {
@@ -160,42 +198,41 @@ namespace Networking.Messages
 
         public virtual void Deserialize(FastBufferReader deserializer)
         {
-            deserializer.ReadValueSafe(out _type);
-            deserializer.ReadValueSafe(out _sender);
-            deserializer.ReadValueSafe(out long ticks);
-            _sent = new TimeSpan(ticks);
+            Header.Deserialize(deserializer);
         }
 
         public virtual void Serialize(FastBufferWriter serializer)
         {
-            serializer.WriteValueSafe(_type);
-            serializer.WriteValueSafe(_sender);
-            serializer.WriteValueSafe(_sent.Ticks);
+            Header.Serialize(serializer);
         }
 
         public override string ToString() =>
             $"ObjType: \"{GetType().Name}\"\n";
     }
 
-    internal class EmptyHeader : BaseMessage, INetworkSerializable, ISizeOf
+    public class EmptyHeader : BaseMessage, INetworkSerializable, ISizeOf
     {
-        public EmptyHeader(MessageType type, ulong sender) : base(type, sender) { }
+        public EmptyHeader(MessageHeader header) : base(header) { }
         public override void Deserialize(FastBufferReader deserializer) { }
         public override void Serialize(FastBufferWriter serializer) => base.Serialize(serializer);
     }
-    internal class UserDataHeader : BaseMessage, INetworkSerializable, ISizeOf
+    public class UserDataHeader : BaseMessage, INetworkSerializable, ISizeOf
     {
-        internal string? UserName;
-        internal string? ID;
+        public string UserName;
+        public string ID;
 
-        public UserDataHeader(MessageType type, ulong sender) : base(type, sender) { }
+        public UserDataHeader(MessageHeader header) : base(header)
+        {
+            UserName = string.Empty;
+            ID = string.Empty;
+        }
 
         public override int Size() =>
             base.Size() +
             sizeof(uint) +
-            System.Text.ASCIIEncoding.Unicode.GetByteCount(UserName ?? "") +
+            System.Text.Encoding.Unicode.GetByteCount(UserName) +
             sizeof(uint) +
-            System.Text.ASCIIEncoding.Unicode.GetByteCount(ID ?? "");
+            System.Text.Encoding.Unicode.GetByteCount(ID);
 
         public override void Deserialize(FastBufferReader deserializer)
         {
@@ -214,16 +251,19 @@ namespace Networking.Messages
             $"UserName: {UserName}\n" +
             $"ID: {ID}\n";
     }
-    internal class UserDataRequestHeader : BaseMessage, INetworkSerializable, ISizeOf
+    public class UserDataRequestHeader : BaseMessage, INetworkSerializable, ISizeOf
     {
-        internal string? ID;
+        public string ID;
 
-        public UserDataRequestHeader(MessageType type, ulong sender) : base(type, sender) { }
+        public UserDataRequestHeader(MessageHeader header) : base(header)
+        {
+            ID = string.Empty;
+        }
 
         public override int Size() =>
             base.Size() +
             sizeof(uint) +
-            System.Text.ASCIIEncoding.Unicode.GetByteCount(ID ?? "");
+            System.Text.Encoding.Unicode.GetByteCount(ID);
 
         public override void Deserialize(FastBufferReader deserializer)
         {
@@ -240,7 +280,7 @@ namespace Networking.Messages
             $"ID: {ID}\n";
     }
 
-    interface INetworkSerializable
+    public interface INetworkSerializable
     {
         void Deserialize(FastBufferReader reader);
         void Serialize(FastBufferWriter writer);
