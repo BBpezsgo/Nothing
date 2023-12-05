@@ -5,11 +5,9 @@ using Unity.Netcode;
 using UnityEngine;
 using Utilities;
 
-#pragma warning disable CS0162 // Unreachable code detected
-
 namespace Game.Components
 {
-    public class VehicleEngine : MovementEngine, ICopyable<VehicleEngine>
+    public class VehicleEngine : MovementEngine
     {
         [SerializeField, ReadOnly] Unit unit;
 
@@ -18,25 +16,20 @@ namespace Game.Components
         [Serializable]
         public class Wheel
         {
-            [SerializeField] internal Transform Transform;
-            [SerializeField, Range(0f, 90f)] internal float MaxSteerAngle;
-            [SerializeField, Min(0f)] internal float Radius;
+            [SerializeField] public Transform Transform;
+            [SerializeField, Range(0f, 90f)] public float MaxSteerAngle;
+            [SerializeField, Min(0f)] public float Radius;
 
             [SerializeField, ReadOnly] Transform _subtransform;
             [SerializeField, ReadOnly] bool _hasSubtransform;
 
-            internal Vector3 Position => Transform.position;
-            internal Vector3 Forward => Transform.forward;
-            internal Vector3 Up => Transform.up;
-            internal Vector3 Right => Transform.right;
-
-            internal float Rotation
+            public float Rotation
             {
                 get => Transform.localEulerAngles.y;
                 set => Transform.localEulerAngles = new Vector3(0f, value, 0f);
             }
 
-            internal float DistanceFromGround
+            public float DistanceFromGround
             {
                 get
                 {
@@ -45,17 +38,20 @@ namespace Game.Components
                 }
             }
 
-            internal Transform Subtransform => _subtransform;
-            internal bool HasSubtransform => _hasSubtransform;
+            public Transform Subtransform => _subtransform;
+            public bool HasSubtransform => _hasSubtransform;
 
-            internal void OnDrawGizmos()
+            public void OnDrawGizmos()
             {
                 if (Transform == null) return;
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawLine(Position, Position - new Vector3(0f, Radius, 0f));
+                Gizmos.DrawLine(Transform.position, Transform.position - new Vector3(0f, Radius, 0f));
+#if UNITY_EDITOR
+                UnityEditor.Handles.DrawWireDisc(Transform.position, Transform.right, Radius, 1f);
+#endif
             }
 
-            internal void Init()
+            public void Init()
             {
                 _subtransform = (Transform.childCount == 1) ? Transform.GetChild(0) : null;
                 _hasSubtransform = _subtransform != null;
@@ -64,7 +60,7 @@ namespace Game.Components
 
         [SerializeField] float CenterOfMass;
 
-        const bool EnableWheels = false;
+        const bool EnableWheels = true;
 
         [Header("Wheels")]
         [SerializeField] Wheel[] Wheels = new Wheel[0];
@@ -171,7 +167,7 @@ namespace Game.Components
             }
         }
 
-        public float LaterialVelocity => Vector3.Dot(transform.right, rb.velocity);
+        public float LateralVelocity => Vector3.Dot(transform.right, rb.velocity);
 
         public bool IsBraking
         {
@@ -215,14 +211,14 @@ namespace Game.Components
         public bool IsAutoHandbraking => TorqueInput == 0f;
 
         /// <summary>
-        /// <b>Check if it's really brakeing!!!</b> <see cref="IsBraking"/>
+        /// <b>Check if it's really braking!!!</b> <see cref="IsBraking"/>
         /// </summary>
         public float BrakeValue => brake;
 
         /// <summary>
-        /// <b>Check if it's really handbrakeing!!!</b> <see cref="IsHandbraking"/>
+        /// <b>Check if it's really handbraking!!!</b> <see cref="IsHandbraking"/>
         /// </summary>
-        public float HandbrakeValue => handbrake * (1 - Maths.Abs(Maths.Min(1, LaterialVelocity)));
+        public float HandbrakeValue => handbrake * (1 - Maths.Abs(Maths.Min(1, LateralVelocity)));
 
         bool IsFlippedOver => FlippedOverValue < .5f;
 
@@ -375,7 +371,7 @@ namespace Game.Components
 
                     if (distanceFromGround > wheel.Radius) continue;
 
-                    Vector3 wheelPosition = wheel.Position;
+                    Vector3 wheelPosition = wheel.Transform.position;
 
                     Vector3 tireWorldVelocity = rb.GetPointVelocity(wheelPosition);
 
@@ -402,7 +398,7 @@ namespace Game.Components
                         }
                         else
                         {
-                            right ??= wheel.Right;
+                            right ??= wheel.Transform.right;
                             steeringDirection = right.Value;
                         }
 
@@ -423,7 +419,7 @@ namespace Game.Components
                         }
                         else
                         {
-                            forward ??= wheel.Forward;
+                            forward ??= wheel.Transform.forward;
                             steeringDirection = forward.Value;
                         }
 
@@ -443,14 +439,14 @@ namespace Game.Components
                         }
                         else
                         {
-                            forward ??= wheel.Forward;
+                            forward ??= wheel.Transform.forward;
                             _forward = forward.Value;
                         }
 
                         float normalizedSpeed = Maths.Clamp(Speed / moveSpeedMax, -1, 1);
-                        float avaliableTorque = (1f - normalizedSpeed) * EngineForce;
+                        float availableTorque = (1f - normalizedSpeed) * EngineForce;
 
-                        force += avaliableTorque * TorqueInput * _forward;
+                        force += availableTorque * TorqueInput * _forward;
                     }
 
                     rb.AddForceAtPosition(force, wheelPosition);
@@ -480,8 +476,8 @@ namespace Game.Components
             {
                 if (isHandbraking)
                 { DustEmissionRate = DUST_HANDBRAKING; }
-                else if (LaterialVelocity > DUST_MIN_LATERIAL_VELOCITY)
-                { DustEmissionRate = Maths.Abs(LaterialVelocity) * DUST_LATERIAL_VELOCITY_MULTIPLIER; }
+                else if (LateralVelocity > DUST_MIN_LATERIAL_VELOCITY)
+                { DustEmissionRate = Maths.Abs(LateralVelocity) * DUST_LATERIAL_VELOCITY_MULTIPLIER; }
             }
 
             if (isHaveTracks && HasDustParticles)
@@ -615,7 +611,7 @@ namespace Game.Components
             rb.velocity = new Vector3(finalVelocity.x, velocity.y, finalVelocity.z);
         }
 
-        bool IsTireScreeching => isHandbraking || Maths.Abs(LaterialVelocity) > 15f;
+        bool IsTireScreeching => isHandbraking || Maths.Abs(LateralVelocity) > 15f;
 
         #endregion
 
@@ -689,55 +685,6 @@ namespace Game.Components
                 InputRequest_ServerRpc(input, handbrake);
                 return;
             }
-        }
-
-        public void CopyTo(object destination) => this.CopyTo<VehicleEngine>(destination);
-        public void CopyTo(VehicleEngine destination)
-        {
-            destination.brake = brake;
-            destination.CenterOfMass = CenterOfMass;
-            destination.Collider = Collider;
-            destination.driftFactor = driftFactor;
-            destination.driftFactorWithHandbrake = driftFactorWithHandbrake;
-            destination.DustEmissionRate = DustEmissionRate;
-            destination.dustParticles = dustParticles;
-            destination.dustParticlesEmission = dustParticlesEmission;
-            destination.engineBrake = engineBrake;
-            destination.EngineForce = EngineForce;
-            destination.FlippedOverValue = FlippedOverValue;
-            destination.Handbrake = Handbrake;
-            destination.handbrake = handbrake;
-            destination.HasDustParticles = HasDustParticles;
-            destination.HasTrailRenderers = HasTrailRenderers;
-            destination.HasWaterParticles = HasWaterParticles;
-            destination.input = input;
-            destination.InWater = InWater;
-            destination.isBraking = isBraking;
-            destination.IsGrounded = IsGrounded;
-            destination.isHandbraking = isHandbraking;
-            destination.isHaveTracks = isHaveTracks;
-            destination.moveAccelerationFactor = moveAccelerationFactor;
-            destination.moveSpeedMax = moveSpeedMax;
-            destination.NextGroundCheck = NextGroundCheck;
-            destination.rb = rb;
-            destination.SmoothSteeringInput = SmoothSteeringInput;
-            destination.speedAndSteer = speedAndSteer;
-            destination.SpringDamper = SpringDamper;
-            destination.SpringStrength = SpringStrength;
-            destination.Steering = Steering;
-            destination.SteeringInput = SteeringInput;
-            destination.steeringSpeed = steeringSpeed;
-            destination.TireGripFactor = TireGripFactor;
-            destination.TireMass = TireMass;
-            destination.Torque = Torque;
-            destination.TorqueInput = TorqueInput;
-            destination.TrailEmission = TrailEmission;
-            destination.turnFactor = turnFactor;
-            destination.unit = unit;
-            destination.WaterEmissionRate = WaterEmissionRate;
-            destination.waterParticles = waterParticles;
-            destination.waterParticlesEmission = waterParticlesEmission;
-            destination.Wheels = Wheels;
         }
     }
 }

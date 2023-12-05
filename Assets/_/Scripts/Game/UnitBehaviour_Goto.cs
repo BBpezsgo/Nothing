@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_Goto : UnitBehaviour_Base, ICopyable<UnitBehaviour_Goto>
+    public class UnitBehaviour_Goto : UnitBehaviour_Base
     {
         internal const float DISTANCE_TO_STOP = 8f;
         internal const float DISTANCE_TO_STOP_BRUH = 4f;
@@ -54,14 +54,6 @@ namespace Game.Components
             { BrakingDistance = MovementEngine.CalculateBrakingDistance(); }
 
             return UnitBehaviour_Seek.CalculateInputVector(transform, Target, useBrakingCalculations ? BrakingDistance : null, maxDistanceToReverse, MovementEngine);
-        }
-
-        public override void CopyTo(object destination) => this.CopyTo<UnitBehaviour_Goto>(destination);
-        public void CopyTo(UnitBehaviour_Goto destination)
-        {
-            base.CopyTo(destination);
-            destination.maxDistanceToReverse = this.maxDistanceToReverse;
-            destination.useBrakingCalculations = this.useBrakingCalculations;
         }
     }
 }

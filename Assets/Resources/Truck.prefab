@@ -4901,6 +4901,7 @@ GameObject:
   - component: {fileID: 1807053928217628118}
   - component: {fileID: 4034326892452720732}
   - component: {fileID: 5430930951134685487}
+  - component: {fileID: 4071005505014928387}
   m_Layer: 0
   m_Name: Truck
   m_TagString: Untagged
@@ -4915,8 +4916,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6276130072880698484}
-  m_LocalRotation: {x: -0, y: 0.6947025, z: -0, w: 0.71929723}
-  m_LocalPosition: {x: -57.2, y: 0.779, z: -0.45}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4928,7 +4929,7 @@ Transform:
   - {fileID: 1589298287351482668}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 88.007, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &6276130072880698487
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4940,8 +4941,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2.0060356, y: 2.4588299, z: 4.7754517}
-  m_Center: {x: -0.016703876, y: 0.49093768, z: 0.03352332}
+  m_Size: {x: 2.0060356, y: 1.892435, z: 4.7754517}
+  m_Center: {x: -0.016703876, y: 0.77413255, z: 0.03352332}
 --- !u!54 &6276130072880698481
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4975,11 +4976,41 @@ MonoBehaviour:
   unit: {fileID: 0}
   input: {x: 0, y: 0}
   CenterOfMass: -0.5
-  Wheels: []
+  Wheels:
+  - Transform: {fileID: 1262392327116013091}
+    MaxSteerAngle: 40
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
+  - Transform: {fileID: 5806250914896799423}
+    MaxSteerAngle: 0
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
+  - Transform: {fileID: 5806250915905980101}
+    MaxSteerAngle: 0
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
+  - Transform: {fileID: 1262392327129368339}
+    MaxSteerAngle: 40
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
+  - Transform: {fileID: 1262392327563791936}
+    MaxSteerAngle: 0
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
+  - Transform: {fileID: 1262392328748831736}
+    MaxSteerAngle: 0
+    Radius: 0.4
+    _subtransform: {fileID: 0}
+    _hasSubtransform: 0
   SpringDamper: 1
   SpringStrength: 40
   TireGripFactor: 0.1
-  TireMass: 1
+  TireMass: 0.5
   EngineForce: 5
   Handbrake: 0.01
   moveAccelerationFactor: 30
@@ -5022,7 +5053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   btn_0: 
-  Behaviours: []
+  Behaviors: []
 --- !u!114 &8418969698647641390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5103,18 +5134,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae07cc7b087dfc54da828d7a5486e059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 15
+  MaxHP: 0
   Team: 
   TeamHash: -1
   teamRenderers:
   - {fileID: 1770685447361731}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 0}
   turret: {fileID: 0}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
-  HP: 15
   <CrossStyle>k__BackingField: 0
   <ReloadIndicatorStyle>k__BackingField: 0
   buttonDestroy: 
@@ -5241,6 +5271,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UiSelected: {fileID: 1330673634429230640}
   selectableState: 0
+--- !u!114 &4071005505014928387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6276130072880698484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &6276130074383172392
 GameObject:
   m_ObjectHideFlags: 0
@@ -5439,6 +5487,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1589298286701704211}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7440773892308971931 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589298286701704211}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5396963299794677845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7440773892308971931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!1001 &1589298287836929966
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5520,6 +5589,52 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1589298287836929966}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7440773893855795750 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: a9d82209bab037a4f9a84e01e6512eaf,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589298287836929966}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8299867056309325794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7440773893855795750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e941d03cfc53b4c925e03193f9a54b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InsideMaterial: {fileID: 0}
+  OptimizeMaterialUsage: 1
+  FractureTemplate: {fileID: 0}
+  PiecesParent: {fileID: 0}
+  FractureType: 0
+  SlicePlanes: []
+  NumFracturePieces: 5
+  NumIterations: 2
+  EvenlySizedPieces: 1
+  NumGenerations: 1
+  FractureRadius: -3.4028235e+38
+  FractureSize:
+    Space: 0
+    Value: 0
+  UVScale: 1
+  UVBounds:
+    StartUV: {x: 0, y: 0}
+    EndUV: {x: 1, y: 1}
+  DistributeMass: 1
+  SeparateDisjointPieces: 0
+  RandomSeed: 0
+  OnFractureCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  _uniqueId: 0de07653aea44dd2a0fff6aeadaebfca
+  _meshValidity: 0
+  SkipMeshCleaning: 0
+  Asynchronous: 1
 --- !u!1001 &1589298287912102315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5620,6 +5735,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1589298287912102315}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7440773893780761635 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589298287912102315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2879896671834444989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7440773893780761635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!1001 &1589298288334526920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5720,6 +5856,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1589298288334526920}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7440773892890598464 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589298288334526920}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3214804956165615476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7440773892890598464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!1001 &1589298288346325240
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5820,6 +5977,27 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1589298288346325240}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7440773892876707184 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589298288346325240}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4154053691670475214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7440773892876707184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!1001 &6276130072942453038
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5914,6 +6092,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7f43ef5921118843add134d25923c6e, type: 3}
+--- !u!1 &2762370395268965542 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 6276130072942453038}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8940433182876814693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2762370395268965542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!4 &5806250915905980101 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,
@@ -6014,6 +6213,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7f43ef5921118843add134d25923c6e, type: 3}
+--- !u!1 &2762370396415509724 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7f43ef5921118843add134d25923c6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 6276130073943245140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &668350015206966814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2762370396415509724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa27434264a58a24d9aa3bb1abf99b1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Material>k__BackingField: Rubber
+  <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!4 &5806250914896799423 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b7f43ef5921118843add134d25923c6e,

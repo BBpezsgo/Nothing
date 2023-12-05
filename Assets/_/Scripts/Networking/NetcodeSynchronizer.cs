@@ -13,7 +13,7 @@ namespace Networking
     [RequireComponent(typeof(RuntimeNetStatsMonitor))]
     public class NetcodeSynchronizer : NetworkBehaviour
     {
-        public static NetcodeSynchronizer Instance;
+        public static NetcodeSynchronizer? Instance;
 
         [SerializeField] internal bool Logs = true;
 
@@ -22,7 +22,7 @@ namespace Networking
             if (Instance != null)
             {
                 Debug.LogWarning($"[{nameof(NetcodeSynchronizer)}] Instance already registered, destroying this gameObject");
-                gameObject.Destroy();
+                Destroy(gameObject);
                 return;
             }
             Instance = this;

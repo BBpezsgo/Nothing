@@ -8,7 +8,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class UnitBehaviour_AvoidObstacles : UnitBehaviour_Base, ICopyable<UnitBehaviour_AvoidObstacles>
+    public class UnitBehaviour_AvoidObstacles : UnitBehaviour_Base
     {
         [SerializeField, ReadOnly] internal Transform IgnoreCollision;
         [SerializeField, ReadOnly] RaycastHitCache raycastHitCache;
@@ -178,12 +178,6 @@ namespace Game.Components
         void FixedUpdate()
         {
             TimeToCheck -= Time.fixedDeltaTime;
-        }
-
-        public override void CopyTo(object destination) => this.CopyTo<UnitBehaviour_AvoidObstacles>(destination);
-        public void CopyTo(UnitBehaviour_AvoidObstacles destination)
-        {
-            base.CopyTo(destination);
         }
     }
 }

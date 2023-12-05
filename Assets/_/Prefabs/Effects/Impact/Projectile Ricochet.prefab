@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 812897034027791834}
   - component: {fileID: 812897034027791832}
   - component: {fileID: 812897034027791833}
-  - component: {fileID: 6809642910715981149}
+  - component: {fileID: 2681028108516385926}
   m_Layer: 0
   m_Name: Projectile Ricochet
   m_TagString: Untagged
@@ -4872,7 +4872,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6809642910715981149
+--- !u!114 &2681028108516385926
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4881,7 +4881,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 812897034027791835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []

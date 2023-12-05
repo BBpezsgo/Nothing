@@ -4881,6 +4881,7 @@ GameObject:
   - component: {fileID: 346126464746661280}
   - component: {fileID: 346126464746661281}
   - component: {fileID: 346126464746661310}
+  - component: {fileID: -167771044190398143}
   m_Layer: 0
   m_Name: Drone Destroy
   m_TagString: Untagged
@@ -9743,6 +9744,23 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-167771044190398143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346126464746661311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []
 --- !u!1 &346126464987361646
 GameObject:
   m_ObjectHideFlags: 0

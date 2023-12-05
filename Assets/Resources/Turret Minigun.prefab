@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 2506376836180171314}
   - component: {fileID: 8489667657845955715}
   - component: {fileID: -4868118188652352305}
+  - component: {fileID: 6437312848448610149}
   m_Layer: 0
   m_Name: Turret Minigun
   m_TagString: Untagged
@@ -280,6 +281,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6437312848448610149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726614090810903875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &1726614091862829228
 GameObject:
   m_ObjectHideFlags: 0

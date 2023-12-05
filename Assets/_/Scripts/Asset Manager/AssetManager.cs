@@ -27,8 +27,6 @@ namespace AssetManager
 
         [SerializeField] List<Pair<string, GameObject>> BuiltinPrefabs = new();
 
-        #region Prefab Loader
-
         static GameObject InstantiatePrefab(GameObject prefab, bool spawnOverNetwork, Vector3 position, Quaternion rotation)
         {
             bool networked = spawnOverNetwork && prefab.HasComponent<Unity.Netcode.NetworkObject>();
@@ -77,14 +75,12 @@ namespace AssetManager
             return null;
         }
 
-        #endregion
-
         void Awake()
         {
             if (Instance != null)
             {
                 Debug.Log($"[{nameof(AssetManager)}]: Instance already registered, destroying self gameObject");
-                gameObject.Destroy();
+                Destroy(gameObject);
                 return;
             }
             Instance = this;

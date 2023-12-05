@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 310188028693343820}
   - component: {fileID: 8526302339328345812}
   - component: {fileID: 5533547658746983118}
+  - component: {fileID: 51393820868208187}
   m_Layer: 0
   m_Name: Smelter
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1029036110833637850}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -72.44607, y: -0.008066177, z: 17.92688}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -99,6 +100,24 @@ MonoBehaviour:
   ParticleSystems:
   - {fileID: 2885503610426804293}
   RateOverTimes: []
+--- !u!114 &51393820868208187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029036110833637850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &2775059009575679433
 GameObject:
   m_ObjectHideFlags: 0
@@ -5051,6 +5070,52 @@ MeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 2885503610666811205}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6433387735184620237 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b65985b3f0d7c6243a48d27b5b58a879,
+    type: 3}
+  m_PrefabInstance: {fileID: 2885503610666811205}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6472263968467716957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6433387735184620237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e941d03cfc53b4c925e03193f9a54b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InsideMaterial: {fileID: 0}
+  OptimizeMaterialUsage: 1
+  FractureTemplate: {fileID: 0}
+  PiecesParent: {fileID: 0}
+  FractureType: 0
+  SlicePlanes: []
+  NumFracturePieces: 5
+  NumIterations: 2
+  EvenlySizedPieces: 1
+  NumGenerations: 1
+  FractureRadius: -3.4028235e+38
+  FractureSize:
+    Space: 0
+    Value: 0
+  UVScale: 1
+  UVBounds:
+    StartUV: {x: 0, y: 0}
+    EndUV: {x: 1, y: 1}
+  DistributeMass: 1
+  SeparateDisjointPieces: 0
+  RandomSeed: 0
+  OnFractureCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  _uniqueId: d600816cfe1d425a8e4afcd5b4e455d3
+  _meshValidity: 0
+  SkipMeshCleaning: 0
+  Asynchronous: 1
 --- !u!1001 &2885503610791297245
 PrefabInstance:
   m_ObjectHideFlags: 0

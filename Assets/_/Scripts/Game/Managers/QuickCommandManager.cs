@@ -116,7 +116,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
         {
             Vector2 size = animationTime * Size * Vector2.one;
-            GUI.DrawTexture(RectUtils.Center(center, size), Sphere, ScaleMode.StretchToFill, true, 0f, CircleBackground.Opacity(animationTime), 0f, 0f);
+            GUI.DrawTexture(RectUtils.FromCenter(center, size), Sphere, ScaleMode.StretchToFill, true, 0f, CircleBackground.Opacity(animationTime), 0f, 0f);
         }
 
         Vector2 mousePosition = (Vector2)Input.mousePosition;
@@ -160,11 +160,11 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
             if (selected == i)
             {
-                GUI.DrawTexture(RectUtils.Center(center + point, size), SphereFilled, ScaleMode.StretchToFill, true, 0f, CommandSelectedBackground, 0f, 0f);
+                GUI.DrawTexture(RectUtils.FromCenter(center + point, size), SphereFilled, ScaleMode.StretchToFill, true, 0f, CommandSelectedBackground, 0f, 0f);
             }
             else
             {
-                GUI.DrawTexture(RectUtils.Center(center + point, size), SphereFilled, ScaleMode.StretchToFill, true, 0f, CommandBackground, 0f, 0f);
+                GUI.DrawTexture(RectUtils.FromCenter(center + point, size), SphereFilled, ScaleMode.StretchToFill, true, 0f, CommandBackground, 0f, 0f);
             }
         }
 
@@ -244,7 +244,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
             if (outOfScreen)
             {
-                GUI.DrawTexture(RectUtils.Center(projectedWorldPosition, Vector2.one * 32), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.red, 0f, 0f);
+                GUI.DrawTexture(RectUtils.FromCenter(projectedWorldPosition, Vector2.one * 32), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.red, 0f, 0f);
             }
         }
     }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace Game.UI
@@ -59,6 +58,8 @@ namespace Game.Managers
 
         void InfrequentUpdate()
         {
+            InfrequencyTimer = Infrequency;
+
             if (!MenuManager.AnyMenuVisible)
             {
                 for (int i = 0; i < CursorManagers.Count; i++)

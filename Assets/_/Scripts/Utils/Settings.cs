@@ -1,4 +1,4 @@
-#if false || !UNITY_EDITOR && PLATFORM_WEBGL
+#if !UNITY_EDITOR && PLATFORM_WEBGL
 #define DOWNLOAD_ASSETS
 #endif
 
@@ -135,7 +135,9 @@ public static class Settings
 public static class GameConfigManager
 {
     const string CONFIG_FILE = "config.json";
+#if PLATFORM_WEBGL && DOWNLOAD_ASSETS
     const string BASE_URI = "http://192.168.1.100:7777";
+#endif
 
 #if !PLATFORM_WEBGL || !DOWNLOAD_ASSETS
     static string Path => System.IO.Path.Combine(Application.streamingAssetsPath, CONFIG_FILE);
@@ -168,25 +170,13 @@ public static class GameConfigManager
         }
         var result = JsonUtility.FromJson<GameConfig>(req.downloadHandler.text);
 
-        Debug.Log($"[{nameof(GameConfigManager)}]: Config downloaded:" +
-            $"{{\n" +
-            $"  assets_path: '{result.assets_path}'\n" +
-            $"  netcode_tcpServer_port: '{result.netcode_tcpServer_port}'\n" +
-            $"  test_object: '{result.test_object}'\n" +
-            $"  test_scene: '{result.test_scene}'\n" +
-            $"}}"
-        );
-        Debug.Log($"[{nameof(GameConfigManager)}]: Modify 'assets_path' to '{BASE_URI + "/assets.bin"}'");
-        result.assets_path = BASE_URI + "/assets.bin";
+        // Debug.Log($"[{nameof(GameConfigManager)}]: Modify 'assets_path' to '{BASE_URI + "/assets.bin"}'");
+        // result.assets_path = BASE_URI + "/assets.bin";
         callback?.Invoke(result);
         yield break;
 #else
-        // Debug.Log($"[{nameof(GameConfigManager)}]: Loading config file from {Path} ...");
-
         if (!File.Exists(Path))
         {
-            // Debug.Log($"[{nameof(GameConfigManager)}]: Config file does not exists. Creating new one ...");
-
             SetDefaults();
             callback?.Invoke(GameConfig.Default);
             yield break;
@@ -194,51 +184,16 @@ public static class GameConfigManager
         string Json = File.ReadAllText(Path);
         if (string.IsNullOrEmpty(Json) || string.IsNullOrWhiteSpace(Json))
         {
-            // Debug.Log($"[{nameof(GameConfigManager)}]: Config file is empty. Creating new one ...");
-
             SetDefaults();
             callback?.Invoke(GameConfig.Default);
             yield break;
         }
         GameConfig result = JsonUtility.FromJson<GameConfig>(Json);
 
-        /*
-        Debug.Log($"[{nameof(GameConfigManager)}]: Config loaded:\n" +
-            $"{{\n" +
-            $"  assets_path: '{result.assets_path}'\n" +
-            $"  netcode_tcpServer_port: '{result.netcode_tcpServer_port}'\n" +
-            $"  test_object: '{result.test_object}'\n" +
-            $"  test_scene: '{result.test_scene}'\n" +
-            $"}}"
-        );
-        */
-
         callback?.Invoke(result);
         yield break;
 #endif
     }
-
-    /*
-    public static Data Get()
-    {
-#if PLATFORM_WEBGL && DOWNLOAD_ASSETS
-        return Data.Default;
-#else
-        if (!File.Exists(Path))
-        {
-            SetDefaults();
-            return Data.Default;
-        }
-        var Json = File.ReadAllText(Path);
-        if (string.IsNullOrEmpty(Json) || string.IsNullOrWhiteSpace(Json))
-        {
-            SetDefaults();
-            return Data.Default;
-        }
-        return JsonUtility.FromJson<Data>(Json);
-#endif
-    }
-    */
 
     public static void SetDefaults()
     {
@@ -257,23 +212,45 @@ public static class GameConfigManager
     }
 
     [Serializable]
-    public struct GameConfig
+    public struct GameConfig : ISerializable, ISerializable<GameConfig>, IFullySerializableText
     {
         public ushort netcode_tcpServer_port;
-        public string assets_path;
-        public string test_object;
-        public string test_scene;
 
         public static GameConfig Default => new()
         {
             netcode_tcpServer_port = 7779,
-#if PLATFORM_WEBGL && DOWNLOAD_ASSETS
-            assets_path = BASE_URI + "/assets.bin",
-#else
-            assets_path = "C:\\Users\\bazsi\\Desktop\\Nothing Assets 3D\\",
-#endif
-            test_object = "player_apc",
-            test_scene = "test",
         };
+
+        public GameConfig(SerializationInfo info, StreamingContext context)
+        {
+            netcode_tcpServer_port = info.GetUInt16("netcode_tcpServer_port");
+        }
+
+        public readonly void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("netcode_tcpServer_port", netcode_tcpServer_port);
+        }
+
+        public readonly void Serialize(Serializer serializer)
+        {
+            serializer.Serialize(netcode_tcpServer_port);
+        }
+
+        public void Deserialize(Deserializer deserializer)
+        {
+            netcode_tcpServer_port = deserializer.DeserializeUInt16();
+        }
+
+        public readonly Value SerializeText()
+        {
+            Value value = Value.Object();
+            value["netcode_tcpServer_port"] = Value.Literal(netcode_tcpServer_port);
+            return value;
+        }
+
+        public void DeserializeText(Value data)
+        {
+            netcode_tcpServer_port = (ushort)(data["netcode_tcpServer_port"].Int ?? Default.netcode_tcpServer_port);
+        }
     }
 }

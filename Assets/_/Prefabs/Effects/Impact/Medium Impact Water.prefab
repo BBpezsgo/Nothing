@@ -4881,8 +4881,8 @@ GameObject:
   - component: {fileID: 6917058538467329680}
   - component: {fileID: 6917058538467329695}
   - component: {fileID: 6917058538467329694}
-  - component: {fileID: 6917058538467329681}
   - component: {fileID: -7060758958175790068}
+  - component: {fileID: 4660437054309261783}
   m_Layer: 0
   m_Name: Medium Impact Water
   m_TagString: Untagged
@@ -9743,19 +9743,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6917058538467329681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6917058538467329693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!82 &-7060758958175790068
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9852,3 +9839,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4660437054309261783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6917058538467329693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []

@@ -22,6 +22,9 @@ namespace Game.Components
             if (DestroyEffect != null)
             { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
 
+            if (TryGetComponent(out Explode explode))
+            { explode.Do(); }
+
             GameObject.Destroy(gameObject);
         }
     }

@@ -1,200 +1,13 @@
+﻿#if UNITY_EDITOR
 using System;
 using System.Reflection;
-
+using UnityEditor;
 using UnityEngine;
 
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class LinkAttribute : PropertyAttribute
-{ public LinkAttribute() { } }
-
-[Serializable]
-public class UnityTimeSpan : UnityEngine.Object
-{
-    public TimeSpan v;
-
-    public UnityTimeSpan(TimeSpan v) => this.v = v;
-
-    public bool IsEmpty => this.v.Ticks == 0;
-
-    public override bool Equals(object other) => v.Equals(other);
-    public override int GetHashCode() => v.GetHashCode();
-    public override string ToString() => v.ToString();
-
-    public static implicit operator TimeSpan(UnityTimeSpan v) => v.v;
-    public static implicit operator UnityTimeSpan(TimeSpan v) => new(v);
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class TimeSpanAttribute : PropertyAttribute
-{
-    public TimeSpanAttribute()
-    { }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class ButtonAttribute : PropertyAttribute
-{
-    public string MethodName { get; }
-    public string Label { get; }
-    public bool WorksInEditor { get; }
-    public bool WorksInPlaytime { get; }
-    public ButtonAttribute(string methodName, bool worksInEditor, bool worksInPlaytime)
-    {
-        MethodName = methodName;
-        WorksInEditor = worksInEditor;
-        WorksInPlaytime = worksInPlaytime;
-        Label = methodName + "()";
-    }
-    public ButtonAttribute(string methodName, bool worksInEditor, bool worksInPlaytime, string label)
-    {
-        MethodName = methodName;
-        WorksInEditor = worksInEditor;
-        WorksInPlaytime = worksInPlaytime;
-        Label = label;
-    }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class ThumbnailAttribute : PropertyAttribute
-{
-    public string RenderFieldName;
-
-    public ThumbnailAttribute(string v)
-    {
-        this.RenderFieldName = v;
-    }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class SuffixAttribute : PropertyAttribute
-{
-    public string suffix;
-    public SuffixAttribute(string suffix) { this.suffix = suffix; }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class LabelAttribute : PropertyAttribute
-{
-    public string text;
-    public LabelAttribute(string text) { this.text = text; }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class ProgressBarAttribute : PropertyAttribute
-{
-    public enum PropertyLabelPosition
-    {
-        None,
-        Left,
-        Inside,
-    }
-
-    public readonly float Minimum;
-
-    public readonly float Maximum;
-    public readonly string MaximumFieldName;
-
-    public PropertyLabelPosition LabelPosition = PropertyLabelPosition.Left;
-    public bool ShowPercent = true;
-    public bool CanEdit;
-
-    public ProgressBarAttribute(float minimum, float maximum, bool canEdit = true)
-    {
-        this.Minimum = minimum;
-        this.Maximum = maximum;
-        this.MaximumFieldName = null;
-        this.CanEdit = canEdit;
-    }
-    public ProgressBarAttribute(float minimum, string maximum, bool canEdit = true)
-    {
-        this.Minimum = minimum;
-        this.Maximum = float.MaxValue;
-        this.MaximumFieldName = maximum;
-        this.CanEdit = canEdit;
-    }
-    public ProgressBarAttribute(float maximum, bool canEdit = true)
-    {
-        this.Minimum = 0f;
-        this.Maximum = maximum;
-        this.MaximumFieldName = null;
-        this.CanEdit = canEdit;
-    }
-    public ProgressBarAttribute(string maximum, bool canEdit = true)
-    {
-        this.Minimum = 0f;
-        this.Maximum = float.MaxValue;
-        this.MaximumFieldName = maximum;
-        this.CanEdit = canEdit;
-    }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class IfAttribute : PropertyAttribute
-{
-    public readonly string IfFieldName;
-    public IfAttribute(string ifFieldName) => this.IfFieldName = ifFieldName;
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class PlaceholderAttribute : PropertyAttribute
-{
-    public readonly string Placeholder;
-    public PlaceholderAttribute(string placeholder) => this.Placeholder = placeholder;
-}
-
-public class ReadOnlyAttribute : PropertyAttribute { }
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class MinMaxAttribute : PropertyAttribute
-{
-    public readonly float Minimum;
-    public readonly float Maximum;
-
-    public MinMaxAttribute(float minimum, float maximum)
-    {
-        this.Minimum = minimum;
-        this.Maximum = maximum;
-    }
-}
-
-public class EditorOnlyAttribute : PropertyAttribute { }
-
-[Serializable]
-class MessageBox
-{
-    public enum MessageType
-    {
-        None,
-        Info,
-        Warning,
-        Error
-    }
-
-    internal MessageType Type;
-    internal string Message;
-    internal bool Visible;
-
-    internal void Show(string message, MessageType type)
-    {
-        Visible = true;
-        Message = message;
-        Type = type;
-    }
-
-    internal void Hide()
-    {
-        Visible = false;
-    }
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-public class MessageBoxAttribute : PropertyAttribute { }
+#nullable enable
 
 namespace InspectorDrawers
 {
-#if UNITY_EDITOR
-    using UnityEditor;
-
     [CustomPropertyDrawer(typeof(LinkAttribute))]
     public class LinkDrawer : PropertyDrawer
     {
@@ -273,7 +86,7 @@ namespace InspectorDrawers
         }
     }
 
-    [CustomPropertyDrawer(typeof(UnityTimeSpan))]
+    [CustomPropertyDrawer(typeof(InspectorTimeSpan))]
     public class TimeSpanPropertyDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -291,8 +104,8 @@ namespace InspectorDrawers
             var field = targetObjectClassType.GetField(property.propertyPath, BindingFlags.NonPublic | BindingFlags.Instance);
             if (field != null)
             {
-                var value = field.GetValue(targetObject) as UnityTimeSpan;
-                EditorGUI.TextField(rect, value.v.ToString());
+                var value = field.GetValue(targetObject) as InspectorTimeSpan;
+                EditorGUI.TextField(rect, ((TimeSpan)value).ToString());
             }
             else
             {
@@ -306,7 +119,7 @@ namespace InspectorDrawers
     [CustomPropertyDrawer(typeof(ButtonAttribute))]
     public class ButtonDrawer : PropertyDrawer
     {
-        static MethodInfo FindMethod(Type type, string name)
+        static MethodInfo? FindMethod(Type type, string name)
         {
             MethodInfo method = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             if (method != null)
@@ -323,10 +136,10 @@ namespace InspectorDrawers
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            ButtonAttribute attr = attribute as ButtonAttribute;
+            ButtonAttribute attr = (ButtonAttribute)attribute;
             Type type = property.serializedObject.targetObject.GetType();
-            MethodInfo method = FindMethod(type, attr.MethodName);
-            
+            MethodInfo? method = FindMethod(type, attr.MethodName);
+
             if (method == null)
             {
                 EditorGUI.HelpBox(position, $"Method \"{attr.MethodName}\" could not be found", MessageType.Error);
@@ -365,7 +178,7 @@ namespace InspectorDrawers
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            ThumbnailAttribute attribute = base.attribute as ThumbnailAttribute;
+            ThumbnailAttribute attribute = (ThumbnailAttribute)base.attribute;
 
             var value = property.objectReferenceValue;
 
@@ -408,7 +221,7 @@ namespace InspectorDrawers
 
             if (CheckProperty(property))
             {
-                SuffixAttribute attribute = base.attribute as SuffixAttribute;
+                SuffixAttribute attribute = (SuffixAttribute)base.attribute;
                 var suffixDimensions = GUI.skin.label.CalcSize(new GUIContent(attribute.suffix));
 
                 bool savedEditorEnabled = GUI.enabled;
@@ -430,7 +243,7 @@ namespace InspectorDrawers
         {
             try
             {
-                LabelAttribute attribute = base.attribute as LabelAttribute;
+                LabelAttribute attribute = (LabelAttribute)base.attribute;
                 if (!IsItBloodyArrayTho(property))
                 {
                     label.text = attribute.text;
@@ -476,7 +289,7 @@ namespace InspectorDrawers
             }
             return attribute.Maximum;
         }
-        static float Minimum(SerializedProperty property, ProgressBarAttribute attribute)
+        static float Minimum(SerializedProperty _, ProgressBarAttribute attribute)
         {
             return attribute.Minimum;
         }
@@ -741,8 +554,8 @@ namespace InspectorDrawers
 
             Rect topPosition = new(foldoutPosition.xMax, position.y, position.width - foldoutPosition.width, EditorGUIUtility.singleLineHeight);
             var v = property.vector2Value;
-            float minValue = Maths.Clamp(Maths.Min(v.x, v.y), attribute.Minimum, attribute.Maximum);
-            float maxValue = Maths.Clamp(Maths.Max(v.x, v.y), attribute.Minimum, attribute.Maximum);
+            float minValue = Math.Clamp(Math.Min(v.x, v.y), attribute.Minimum, attribute.Maximum);
+            float maxValue = Math.Clamp(Math.Max(v.x, v.y), attribute.Minimum, attribute.Maximum);
             EditorGUI.MinMaxSlider(topPosition, ref minValue, ref maxValue, attribute.Minimum, attribute.Maximum);
             property.vector2Value = new Vector2(minValue, maxValue);
 
@@ -767,28 +580,29 @@ namespace InspectorDrawers
             { EditorGUI.PropertyField(new Rect(position.x, position.y + 2f + EditorGUIUtility.singleLineHeight, position.width, EditorGUIUtility.singleLineHeight), property, label, true); }
         }
     }
-    [CustomPropertyDrawer(typeof(MessageBox))]
+
+    [CustomPropertyDrawer(typeof(InspectorMessageBox))]
     public class MessageBoxDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            MessageBox value = Value(property);
+            InspectorMessageBox? value = Value(property);
             if (value == null) return EditorGUIUtility.singleLineHeight;
             return value.Visible ? EditorGUIUtility.singleLineHeight : 0f;
         }
 
-        MessageBox Value(SerializedProperty property)
+        InspectorMessageBox? Value(SerializedProperty property)
         {
-            var targetObject = property.serializedObject.targetObject;
-            var targetObjectClassType = targetObject.GetType();
-            var field = targetObjectClassType.GetField(property.propertyPath, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (field != null) return field.GetValue(targetObject) as MessageBox;
+            UnityEngine.Object targetObject = property.serializedObject.targetObject;
+            Type targetObjectClassType = targetObject.GetType();
+            FieldInfo field = targetObjectClassType.GetField(property.propertyPath, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null) return field.GetValue(targetObject) as InspectorMessageBox;
             return null;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            MessageBox value = Value(property);
+            InspectorMessageBox? value = Value(property);
 
             if (value == null)
             {
@@ -800,6 +614,5 @@ namespace InspectorDrawers
             EditorGUI.HelpBox(position, value.Message, (MessageType)value.Type);
         }
     }
-
-#endif
 }
+#endif

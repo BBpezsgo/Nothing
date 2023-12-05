@@ -120,20 +120,20 @@ public class SceneManager : SingleInstance<SceneManager>
 
             if (scene.buildIndex == BaseScene)
             {
-                Debug.Log($"[{nameof(SceneManager)}]: Skip unloading scene \"{scene}\"");
+                Debug.Log($"[{nameof(SceneManager)}]: Skip unloading scene \"{scene.name}\"");
                 continue;
             }
 
             if (Unity.Netcode.NetworkManager.Singleton == null ||
                 !Unity.Netcode.NetworkManager.Singleton.IsListening)
             {
-                Debug.Log($"[{nameof(SceneManager)}]: Unloading scene \"{scene}\" (unity)");
+                Debug.Log($"[{nameof(SceneManager)}]: Unloading scene \"{scene.name}\" (unity)");
                 AsyncOperation task = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
                 if (instance != null) instance.sceneUnloadings.Add(task);
             }
             else if (Unity.Netcode.NetworkManager.Singleton.IsServer)
             {
-                Debug.Log($"[{nameof(SceneManager)}]: Unloading scene \"{scene}\" (netcode)");
+                Debug.Log($"[{nameof(SceneManager)}]: Unloading scene \"{scene.name}\" (netcode)");
                 Unity.Netcode.SceneEventProgressStatus status = Unity.Netcode.NetworkManager.Singleton.SceneManager.UnloadScene(scene);
                 Debug.Log($"[{nameof(SceneManager)}]: Scene unloading status: {status}");
             }

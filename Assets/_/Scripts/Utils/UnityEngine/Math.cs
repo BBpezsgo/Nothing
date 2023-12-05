@@ -1007,5 +1007,86 @@ public struct Maths
         return projectedVectorAngle;
     }
 
+    public static Triangle[]? GetTriangles(Mesh mesh)
+    {
+        if (!mesh.isReadable) return null;
+
+        Vector3[] meshVertices = mesh.vertices;
+        int[] meshTriangles = mesh.triangles;
+
+        int triCount = meshTriangles.Length / 3;
+        Triangle[] triangles = new Triangle[triCount];
+
+        for (int i = 0; i < triCount; i++)
+        {
+            triangles[i] = new Triangle(
+                meshVertices[meshTriangles[(i * 3) + 0]],
+                meshVertices[meshTriangles[(i * 3) + 1]],
+                meshVertices[meshTriangles[(i * 3) + 2]]);
+        }
+
+        return triangles;
+    }
+
+    public static float Volume(Bounds bounds) => bounds.size.sqrMagnitude;
+
+    public static float Volume(GameObject @object)
+    {
+        if (@object.TryGetComponent(out MeshFilter meshFilter))
+        {
+            Triangle[]? triangles = Maths.GetTriangles(meshFilter.mesh);
+            if (triangles != null)
+            { return Maths.Volume(triangles); }
+        }
+
+        if (@object.TryGetComponent(out Collider collider))
+        { return Maths.Volume(collider.bounds); }
+
+        return 0f;
+    }
+
+    public static float Volume(MeshFilter? meshFilter, Collider? collider)
+    {
+        if (meshFilter != null)
+        {
+            Triangle[]? triangles = Maths.GetTriangles(meshFilter.mesh);
+            if (triangles != null)
+            { return Maths.Volume(triangles); }
+        }
+
+        if (collider != null)
+        { return Maths.Volume(collider.bounds); }
+
+        return 0f;
+    }
+
+    public static float Volume(Mesh mesh)
+    {
+        Triangle[]? triangles = Maths.GetTriangles(mesh);
+        if (triangles == null) return 0f;
+        return Maths.Volume(triangles);
+    }
+
+    public static float Volume(Triangle[] triangles)
+    {
+        float volumeSum = 0f;
+
+        for (int i = 0; i < triangles.Length; i++)
+        { volumeSum += Maths.SignedVolumeOfTriangle(triangles[i]); }
+
+        return Math.Abs(volumeSum);
+    }
+
+    static float SignedVolumeOfTriangle(Triangle triangle)
+    {
+        float v321 = triangle.C.x * triangle.B.y * triangle.A.z;
+        float v231 = triangle.B.x * triangle.C.y * triangle.A.z;
+        float v312 = triangle.C.x * triangle.A.y * triangle.B.z;
+        float v132 = triangle.A.x * triangle.C.y * triangle.B.z;
+        float v213 = triangle.B.x * triangle.A.y * triangle.C.z;
+        float v123 = triangle.A.x * triangle.B.y * triangle.C.z;
+        return (1.0f / 6.0f) * (-v321 + v231 + v312 - v132 - v213 + v123);
+    }
+
     #endregion
 }

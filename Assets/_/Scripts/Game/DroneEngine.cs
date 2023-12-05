@@ -1,12 +1,9 @@
-using AssetManager;
-
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class DroneEngine : MovementEngine, ICopyable<DroneEngine>
+    public class DroneEngine : MovementEngine
     {
         [SerializeField] float HoveringHeight = 5f;
         [SerializeField] float SpringStrength = 10f;
@@ -275,28 +272,6 @@ namespace Game.Components
                 InputRequest_ServerRpc(input);
                 return;
             }
-        }
-
-        public void CopyTo(object destination) => this.CopyTo<DroneEngine>(destination);
-        public void CopyTo(DroneEngine destination)
-        {
-            destination.brake = brake;
-            destination.Collider = Collider;
-            destination.engineBrake = engineBrake;
-            destination.handbrake = handbrake;
-            destination.HoveringHeight = HoveringHeight;
-            destination.isHandbraking = isHandbraking;
-            destination.moveAccelerationFactor = moveAccelerationFactor;
-            destination.moveSpeedMax = moveSpeedMax;
-            destination.rb = rb;
-            destination.SmoothSteeringInput = SmoothSteeringInput;
-            destination.SpringDamper = SpringDamper;
-            destination.SpringStrength = SpringStrength;
-            destination.Steering = Steering;
-            destination.SteeringInput = SteeringInput;
-            destination.steeringSpeed = steeringSpeed;
-            destination.TorqueInput = TorqueInput;
-            destination.turnFactor = turnFactor;
         }
     }
 }

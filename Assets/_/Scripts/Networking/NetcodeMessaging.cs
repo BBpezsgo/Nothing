@@ -15,7 +15,7 @@ namespace Networking
         static NetworkManager NetworkManager => NetworkManager.Singleton;
         public const int MessageSize = 1100;
         public const NetworkDelivery DefaultNetworkDelivery = NetworkDelivery.ReliableFragmentedSequenced;
-        static bool Logs => NetcodeSynchronizer.Instance.Logs;
+        static bool Logs => NetcodeSynchronizer.Instance!.Logs;
 
         public static BaseMessage DeserializeMessage(ulong clientId, FastBufferReader reader)
         {
@@ -52,7 +52,7 @@ namespace Networking
             string senderName = ((clientId == NetworkManager.ServerClientId) ? $"server" : $"client {clientId}");
             if (Logs) Debug.Log($"[{nameof(NetcodeMessaging)}]: Received {reader.Length} bytes from {senderName}");
             int endlessSafe = 5000;
-            List<BaseMessage> result = new();
+            List<BaseMessage> messages = new();
             while (reader.TryBeginRead(MessageHeader.Size))
             {
                 if (endlessSafe-- <= 0) { Debug.LogError($"[{nameof(NetcodeMessaging)}]: Endless loop!"); break; }
@@ -60,12 +60,12 @@ namespace Networking
                 try
                 {
                     var message = DeserializeMessage(clientId, reader);
-                    result.Add(message);
+                    messages.Add(message);
                 }
                 catch (Exception ex)
                 { Debug.LogException(ex); }
             }
-            return result.ToArray();
+            return messages.ToArray();
         }
 
         public static void BroadcastUnnamedMessage(INetworkSerializable data, NetworkDelivery networkDelivery = DefaultNetworkDelivery)

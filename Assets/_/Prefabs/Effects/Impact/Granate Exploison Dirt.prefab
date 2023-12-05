@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 5283358203876179655}
   - component: {fileID: 3544585477456209585}
   - component: {fileID: 2649838510863773532}
-  - component: {fileID: 7678709063175037995}
   - component: {fileID: 8934174101208656553}
+  - component: {fileID: 7065339990374562433}
   m_Layer: 0
   m_Name: Granate Exploison Dirt
   m_TagString: Untagged
@@ -4876,19 +4876,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &7678709063175037995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 461348867837444258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!82 &8934174101208656553
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4985,6 +4972,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7065339990374562433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461348867837444258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []
 --- !u!1 &3581723624799438998
 GameObject:
   m_ObjectHideFlags: 0
@@ -9866,7 +9870,6 @@ GameObject:
   - component: {fileID: 575092594240346769}
   - component: {fileID: 2901344444443507540}
   - component: {fileID: 7257344923238007623}
-  - component: {fileID: 5431214128767018254}
   m_Layer: 0
   m_Name: Fire
   m_TagString: Untagged
@@ -14726,19 +14729,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &5431214128767018254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4911188173911892890}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!1 &5995863929773384636
 GameObject:
   m_ObjectHideFlags: 0

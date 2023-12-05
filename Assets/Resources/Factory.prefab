@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: -3430128879076549079}
   - component: {fileID: 3190057481564433997}
   - component: {fileID: 6798426574847624917}
+  - component: {fileID: -2170082034073258669}
   m_Layer: 0
   m_Name: Factory
   m_TagString: Untagged
@@ -196,6 +197,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 401088f8e82e55144b9337c7180ea852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2170082034073258669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2759722349239998939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &4042548648224729359
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,3 +561,49 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3554866304119698495}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4618949530163950007 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: d8bc67c2b011c4a4a906dfaf5d6d3560,
+    type: 3}
+  m_PrefabInstance: {fileID: 3554866304119698495}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4229248743277688497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4618949530163950007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e941d03cfc53b4c925e03193f9a54b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InsideMaterial: {fileID: 0}
+  OptimizeMaterialUsage: 1
+  FractureTemplate: {fileID: 0}
+  PiecesParent: {fileID: 0}
+  FractureType: 0
+  SlicePlanes: []
+  NumFracturePieces: 5
+  NumIterations: 2
+  EvenlySizedPieces: 1
+  NumGenerations: 1
+  FractureRadius: -3.4028235e+38
+  FractureSize:
+    Space: 0
+    Value: 0
+  UVScale: 1
+  UVBounds:
+    StartUV: {x: 0, y: 0}
+    EndUV: {x: 1, y: 1}
+  DistributeMass: 1
+  SeparateDisjointPieces: 0
+  RandomSeed: 0
+  OnFractureCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  _uniqueId: c27e5cdcba20489b931a4052682355be
+  _meshValidity: 0
+  SkipMeshCleaning: 0
+  Asynchronous: 1

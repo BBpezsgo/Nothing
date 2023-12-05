@@ -1,5 +1,3 @@
-using AssetManager;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -44,6 +42,8 @@ namespace Game.Components
 
             base.TryDropLoot();
             this.OnUnitDestroy();
+            if (TryGetComponent(out Explode explode))
+            { explode.Do(); }
             GameObject.Destroy(gameObject);
         }
 

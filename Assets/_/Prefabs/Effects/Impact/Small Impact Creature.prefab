@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5613886100017410709}
   - component: {fileID: 5613886100017410714}
   - component: {fileID: 5613886100017410715}
-  - component: {fileID: 5613886100017410708}
+  - component: {fileID: 184416012376237821}
   m_Layer: 0
   m_Name: Small Impact Creature
   m_TagString: Untagged
@@ -4871,7 +4871,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &5613886100017410708
+--- !u!114 &184416012376237821
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4880,7 +4880,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5613886100017410712}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _particleSystem: {fileID: 0}
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []

@@ -106,7 +106,7 @@ public struct Triangle
 
 public readonly struct RectUtils
 {
-    public static Rect Center(Vector2 center, Vector2 size)
+    public static Rect FromCenter(Vector2 center, Vector2 size)
         => new(center - (size * .5f), size);
 
     public static Rect FromCorners(Vector2 topLeft, Vector2 bottomRight)
@@ -317,7 +317,6 @@ public static class GLUtils
         }
         GL.End();
     }
-
 }
 
 public readonly struct GUIUtils
@@ -327,7 +326,7 @@ public readonly struct GUIUtils
 
     public static Texture2D GenerateCircleFilled(Vector2Int size)
     {
-        var result = new Texture2D(size.x, size.y);
+        Texture2D result = new(size.x, size.y);
         Vector2 center = Vector2.one * .5f;
         for (int x = 0; x < result.width; x++)
         {
@@ -352,7 +351,7 @@ public readonly struct GUIUtils
     public static Texture2D GenerateCircle(Vector2Int size, float thickness = .25f)
     {
         thickness = Math.Clamp(thickness, 0f, .5f);
-        var result = new Texture2D(size.x, size.y);
+        Texture2D result = new(size.x, size.y);
         Vector2 center = Vector2.one * .5f;
         for (int x = 0; x < result.width; x++)
         {
@@ -380,28 +379,28 @@ public readonly struct GUIUtils
     public static GuiEnabled Enabled() => new(true);
     public static GuiEnabled Disabled() => new(false);
 
-    public static bool Active()
+    public static bool IsGUIFocused
     {
-        UnityEngine.UIElements.UIDocument[] uiDocuments = GameObject.FindObjectsOfType< UnityEngine.UIElements.UIDocument>(false);
-
-        if (GUIUtility.hotControl != 0)
+        get
         {
-            return true;
+            if (GUIUtility.hotControl != 0) return true;
+
+            UnityEngine.UIElements.UIDocument[] uiDocuments = GameObject.FindObjectsOfType<UnityEngine.UIElements.UIDocument>(false);
+
+            for (int i = 0; i < uiDocuments.Length; i++)
+            {
+                if (uiDocuments[i] == null) continue;
+                if (!uiDocuments[i].gameObject.activeSelf) continue;
+                if (!uiDocuments[i].isActiveAndEnabled) continue;
+                if (uiDocuments[i].rootVisualElement == null) continue;
+
+                if (uiDocuments[i].rootVisualElement.focusController.focusedElement == null) continue;
+
+                return true;
+            }
+
+            return false;
         }
-
-        for (int i = 0; i < uiDocuments.Length; i++)
-        {
-            if (uiDocuments[i] == null) continue;
-            if (!uiDocuments[i].gameObject.activeSelf) continue;
-            if (!uiDocuments[i].isActiveAndEnabled) continue;
-            if (uiDocuments[i].rootVisualElement == null) continue;
-
-            if (uiDocuments[i].rootVisualElement.focusController.focusedElement == null) continue;
-
-            return true;
-        }
-
-        return false;
     }
 }
 
@@ -647,7 +646,6 @@ namespace Utilities
         {
             public static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");
         }
-
 
         /// <summary>
         /// This is positive
@@ -1097,19 +1095,6 @@ namespace Utilities
             return a - (b / c);
         }
 
-        /*
-        public static float calculate_time_of_flight(float angle, float velocity, Vector2 position)
-        {
-            // Assuming no air resistance, calculate time of flight for a projectile
-            float x = position.x;  // Target position (x, y)
-            float y = position.y;
-            float v0 = velocity;  // Initial velocity
-
-            float time_of_flight = (x / (v0 * Maths.Cos(angle))) * (Maths.Sin(angle) + Maths.Sqrt((Maths.Pow(Maths.Sin(angle), 2f)) + (2f * G * y) / (v0 * v0 * Maths.Pow(Maths.Cos(angle), 2f))));
-            return time_of_flight;
-        }
-        */
-
         public static (Vector3 PredictedPosition, float TimeToReach)? CalculateInterceptCourse(float projectileVelocity, float projectileLifetime, Vector3 shootPosition, Trajectory targetTrajectory)
         {
             float? angle_;
@@ -1459,6 +1444,7 @@ namespace Utilities
         public static float CalculateDistance(float velocity, float time)
             => velocity * time;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateTime(float distance, float velocity)
             => velocity == 0f ? 0f : distance / velocity;
 
@@ -1709,8 +1695,8 @@ namespace Utilities
             Debug.DrawLine(position - forward, position + forward, color, duration);
         }
     }
-
 }
+
 public class SearcherCoroutine<T>
 {
     int i;
@@ -1778,43 +1764,6 @@ public readonly struct EditorUtils
     public static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
 }
 
-public static class UnityCopyables
-{
-    public static void CopyTo(Rigidbody source, Rigidbody destination)
-    {
-        destination.angularDrag = source.angularDrag;
-        destination.angularVelocity = source.angularVelocity;
-        destination.centerOfMass = source.centerOfMass;
-        destination.collisionDetectionMode = source.collisionDetectionMode;
-        destination.constraints = source.constraints;
-        destination.drag = source.drag;
-        destination.freezeRotation = source.freezeRotation;
-        destination.inertiaTensor = source.inertiaTensor;
-        destination.inertiaTensorRotation = source.inertiaTensorRotation;
-        destination.interpolation = source.interpolation;
-        destination.isKinematic = source.isKinematic;
-        destination.mass = source.mass;
-        destination.maxAngularVelocity = source.maxAngularVelocity;
-        destination.maxDepenetrationVelocity = source.maxDepenetrationVelocity;
-        destination.sleepThreshold = source.sleepThreshold;
-        destination.useGravity = source.useGravity;
-    }
-}
-
-public static class CopyableExtensions
-{
-    public static bool CopyTo<T>(this ICopyable<T> source, object destination)
-    {
-        if (destination is not T _destination)
-        {
-            Debug.LogError($"[{nameof(CopyableExtensions)}]: Invalid destination type");
-            return false;
-        }
-        source.CopyTo(_destination);
-        return true;
-    }
-}
-
 /// <summary>
 /// This can be converted into <see cref="Component"/>
 /// </summary>
@@ -1855,18 +1804,16 @@ public static class Intervals
 {
     public delegate bool Condition();
 
-    static bool AlwaysTrue() => true;
-
     public static void Timeout(this MonoBehaviour context, Action action, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        context.StartCoroutine(Intervals.TimeoutCoroutine(action, timeout, condition ?? AlwaysTrue));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, timeout, condition));
     }
 
-    static IEnumerator TimeoutCoroutine(Action action, float timeout, Condition condition)
+    static IEnumerator TimeoutCoroutine(Action action, float timeout, Condition? condition = null)
     {
         yield return new WaitForSeconds(timeout);
-        while (!condition.Invoke())
+        while (!(condition?.Invoke() ?? true))
         { yield return new WaitForSeconds(0.1f); }
         action.Invoke();
     }
@@ -1874,13 +1821,13 @@ public static class Intervals
     public static void Timeout<T0>(this MonoBehaviour context, Action<T0> action, T0 parameter0, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, timeout, condition ?? AlwaysTrue));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, timeout, condition));
     }
 
-    static IEnumerator TimeoutCoroutine<T0>(Action<T0> action, T0 parameter0, float timeout, Condition condition)
+    static IEnumerator TimeoutCoroutine<T0>(Action<T0> action, T0 parameter0, float timeout, Condition? condition = null)
     {
         yield return new WaitForSeconds(timeout);
-        while (!condition.Invoke())
+        while (!(condition?.Invoke() ?? true))
         { yield return new WaitForSeconds(0.1f); }
         action.Invoke(parameter0);
     }
@@ -1888,13 +1835,13 @@ public static class Intervals
     public static void Timeout<T0, T1>(this MonoBehaviour context, Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, timeout, condition ?? AlwaysTrue));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, timeout, condition));
     }
 
-    static IEnumerator TimeoutCoroutine<T0, T1>(Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition condition)
+    static IEnumerator TimeoutCoroutine<T0, T1>(Action<T0, T1> action, T0 parameter0, T1 parameter1, float timeout, Condition? condition = null)
     {
         yield return new WaitForSeconds(timeout);
-        while (!condition.Invoke())
+        while (!(condition?.Invoke() ?? true))
         { yield return new WaitForSeconds(0.1f); }
         action.Invoke(parameter0, parameter1);
     }
@@ -1902,13 +1849,13 @@ public static class Intervals
     public static void Timeout<T0, T1, T2>(this MonoBehaviour context, Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, parameter2, timeout, condition ?? AlwaysTrue));
+        context.StartCoroutine(Intervals.TimeoutCoroutine(action, parameter0, parameter1, parameter2, timeout, condition));
     }
 
-    static IEnumerator TimeoutCoroutine<T0, T1, T2>(Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition condition)
+    static IEnumerator TimeoutCoroutine<T0, T1, T2>(Action<T0, T1, T2> action, T0 parameter0, T1 parameter1, T2 parameter2, float timeout, Condition? condition = null)
     {
         yield return new WaitForSeconds(timeout);
-        while (!condition.Invoke())
+        while (!(condition?.Invoke() ?? true))
         { yield return new WaitForSeconds(0.1f); }
         action.Invoke(parameter0, parameter1, parameter2);
     }
@@ -1916,15 +1863,7 @@ public static class Intervals
     public static UnityIntervalDynamicCondition Interval(this MonoBehaviour context, Action action, float interval, Condition? condition = null)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        UnityIntervalDynamicCondition unityInterval = new(context, action, interval, condition ?? AlwaysTrue);
-        unityInterval.Start();
-        return unityInterval;
-    }
-
-    public static UnityIntervalStaticCondition Interval(this MonoBehaviour context, Action action, float interval, bool enabled = true)
-    {
-        if (action is null) throw new ArgumentNullException(nameof(action));
-        UnityIntervalStaticCondition unityInterval = new(context, action, interval, enabled);
+        UnityIntervalDynamicCondition unityInterval = new(context, action, interval, condition);
         unityInterval.Start();
         return unityInterval;
     }
@@ -1963,9 +1902,9 @@ public static class Intervals
 
     public class UnityIntervalDynamicCondition : UnityBaseInterval
     {
-        readonly Condition Condition;
+        readonly Condition? Condition;
 
-        public UnityIntervalDynamicCondition(MonoBehaviour context, Action action, float interval, Condition condition)
+        public UnityIntervalDynamicCondition(MonoBehaviour context, Action action, float interval, Condition? condition)
             : base(context, action, interval)
         {
             Condition = condition;
@@ -1976,28 +1915,7 @@ public static class Intervals
             yield return new WaitForSeconds(Interval);
             while (true)
             {
-                if (Condition.Invoke()) Action.Invoke();
-                yield return new WaitForSeconds(Interval);
-            }
-        }
-    }
-
-    public class UnityIntervalStaticCondition : UnityBaseInterval
-    {
-        public bool Enabled;
-
-        public UnityIntervalStaticCondition(MonoBehaviour context, Action action, float interval, bool enabled)
-            : base(context, action, interval)
-        {
-            Enabled = enabled;
-        }
-
-        protected override IEnumerator IntervalCoroutine()
-        {
-            yield return new WaitForSeconds(Interval);
-            while (true)
-            {
-                if (Enabled) Action.Invoke();
+                if (Condition?.Invoke() ?? true) Action.Invoke();
                 yield return new WaitForSeconds(Interval);
             }
         }
@@ -2008,8 +1926,11 @@ public struct MetricUtils
 {
     const float Multiplier = 0.001f;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float GetMeters(float value) => value * Multiplier;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2 GetMeters(Vector2 value) => value * Multiplier;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 GetMeters(Vector3 value) => value * Multiplier;
 }
 

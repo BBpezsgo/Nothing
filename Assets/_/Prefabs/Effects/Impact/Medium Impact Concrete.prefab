@@ -4881,7 +4881,7 @@ GameObject:
   - component: {fileID: 6353618440777652977}
   - component: {fileID: 6353618440777652990}
   - component: {fileID: 6353618440777652991}
-  - component: {fileID: 6353618440777652976}
+  - component: {fileID: 4423452788230199137}
   m_Layer: 0
   m_Name: Medium Impact Concrete
   m_TagString: Untagged
@@ -9743,7 +9743,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6353618440777652976
+--- !u!114 &4423452788230199137
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9752,10 +9752,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6353618440777652988}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
   ParticleSystems: []
+  AudioSources: []
 --- !u!1 &9181716678486892790
 GameObject:
   m_ObjectHideFlags: 0

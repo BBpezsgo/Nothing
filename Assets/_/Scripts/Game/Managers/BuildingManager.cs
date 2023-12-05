@@ -307,7 +307,7 @@ namespace Game.Managers
             {
                 Transform hologramColliders = hologram.transform.Find("Collider");
                 if (hologramColliders != null)
-                { hologramColliders.gameObject.Destroy(); }
+                { Destroy(hologramColliders.gameObject); }
             }
 
             GameObject hologramModels = GetHologramModelGroup(hologram.gameObject);
@@ -340,7 +340,7 @@ namespace Game.Managers
             if (hologram == null) return null;
             Transform hologramModels = hologram.transform.Find("Model");
             if (hologramModels != null)
-            { hologramModels.gameObject.Destroy(); }
+            { Destroy(hologramModels.gameObject); }
 
             hologramModels = new GameObject("Model").transform;
             hologramModels.SetParent(hologram.transform);

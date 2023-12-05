@@ -273,6 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Register: 0
   AudioSource: {fileID: 0}
+  Instant: 0
   Acceleration: 0
   ImpactForce: 1
   ImpactDamage: 1
@@ -334,6 +335,12 @@ MonoBehaviour:
   - MaterialID: Creature
     Sounds: []
     Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
+      type: 3}
+    UseNormal: 1
+    Hoe: {fileID: 0}
+  - MaterialID: Rubber
+    Sounds: []
+    Particles: {fileID: 5842737370272888045, guid: 4160146705659e0408a17ef485a48dec,
       type: 3}
     UseNormal: 1
     Hoe: {fileID: 0}

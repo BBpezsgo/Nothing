@@ -221,7 +221,7 @@ namespace Networking
             }));
         }
 
-        internal void OnUserData(Messages.UserDataHeader message)
+        public void OnUserData(UserDataHeader message)
         {
             for (int i = 0; i < UserDatas.Count; i++)
             {

@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 8062244046001752378}
   - component: {fileID: 9144028623863636501}
   - component: {fileID: 4402330003049463441}
+  - component: {fileID: -531353934970309227}
   m_Layer: 0
   m_Name: Drone
   m_TagString: Untagged
@@ -128,7 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   btn_0: 
-  Behaviours: []
+  Behaviors: []
 --- !u!114 &9201763386767749416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,19 +196,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1f54e6a934da4daaffacad5f2a064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP: 10
+  MaxHP: 0
   Team: a
   TeamHash: -1
   teamRenderers:
   - {fileID: 8785045182164787323}
   - {fileID: 8785045182532654318}
-  destination: {x: 0, y: 0, z: 0}
   vehicleEngine: {fileID: 8062244046001752368}
   turret: {fileID: 8062244046070208250}
-  controllingByUser: 0
   UnitBehaviour: {fileID: 0}
   DestroyEffect: {fileID: 346126464746661311, guid: 0237e651bb612e54e8985b43e3adb5ae,
     type: 3}
-  HP: 10
   <CrossStyle>k__BackingField: 1
   <ReloadIndicatorStyle>k__BackingField: 2
   buttonDestroy: 
@@ -238,7 +238,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd09eaa2d84a744ea8966ad32494eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   BaseObject: {fileID: 0}
   EnableTargetLocking: 1
   TargetLockingThreshold: 10
@@ -247,13 +246,6 @@ MonoBehaviour:
   HullRotationStabilizer: 0
   lastRotation: 0
   rotationDelta: 0
-  targets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  priorityTargets: []
   DetectionRadius: 300
 --- !u!114 &8062244046001752373
 MonoBehaviour:
@@ -425,6 +417,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375e508314bab3249915e1433b2cc4d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-531353934970309227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062244046001752334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &8062244046070208244
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,7 +505,7 @@ MonoBehaviour:
   reload: 0
   projectileVelocity: 500
   ProjectileLifetime: 2
-  RequiedProjectileLifetime: -1
+  RequiredProjectileLifetime: -1
   projectileIgnoreCollision:
   - {fileID: 8062244046001752333}
   shootPosition: {fileID: 8062244047100732454}
@@ -513,9 +523,13 @@ MonoBehaviour:
   ScopeHolder: {fileID: 0}
   target: {x: 0, y: 0, z: 0}
   targetTransform: {fileID: 0}
-  overridedInput: {x: 0, y: 0}
+  overriddenInput:
+    TurretAngle: 0
+    CannonAngle: 0
   base: {fileID: 0}
-  input: {x: 0, y: 0}
+  input:
+    TurretAngle: 0
+    CannonAngle: 0
   Range: 0
   ShowRadius: 0
   currentError: 1

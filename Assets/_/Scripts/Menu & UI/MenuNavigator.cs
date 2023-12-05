@@ -1,5 +1,4 @@
 using Game.Managers;
-
 using UnityEngine;
 
 namespace Game.UI
@@ -111,7 +110,7 @@ namespace Game.UI
             {
                 if (Input.GetKeyDown(Hotkeys[i].Key))
                 {
-                    if (GUIUtils.Active()) return;
+                    if (GUIUtils.IsGUIFocused) return;
                     Hotkeys[i].Toggle();
                 }
             }

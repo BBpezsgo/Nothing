@@ -1151,8 +1151,8 @@ namespace Game.Managers
 
                         float size = ReloadDotsSize * multiplier;
 
-                        GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
-                        GUI.DrawTexture(RectUtils.Center(center + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
+                        GUI.DrawTexture(RectUtils.FromCenter(center + (direction * ReloadDotsRadius) + Vector2.one, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, shadowColor, 0f, 0f);
+                        GUI.DrawTexture(RectUtils.FromCenter(center + (direction * ReloadDotsRadius), Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white, 0f, 0f);
                     }
                 }
             }
@@ -1184,7 +1184,7 @@ namespace Game.Managers
                             offset += direction * ReloadDotsRadius;
                             offset += direction * ((1f - fadeOutPercent) * 4f);
 
-                            GUI.DrawTexture(RectUtils.Center(center + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
+                            GUI.DrawTexture(RectUtils.FromCenter(center + offset, Vector2.one * size), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.white.Opacity(fadeOutPercent), 0f, 0f);
                         }
                     }
                 }

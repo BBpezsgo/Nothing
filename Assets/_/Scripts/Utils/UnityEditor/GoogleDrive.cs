@@ -247,6 +247,7 @@ namespace Utilities.Editor
 
         void OnEnable()
         {
+            titleContent = new GUIContent("Google Drive", EditorGUIUtility.IconContent("d_CloudConnect").image);
             LoadingIcon = new Texture[]
             {
                 EditorGUIUtility.IconContent("d_WaitSpin00").image,

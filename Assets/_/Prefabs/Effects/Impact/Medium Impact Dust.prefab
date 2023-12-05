@@ -4881,7 +4881,7 @@ GameObject:
   - component: {fileID: 5220818771854075122}
   - component: {fileID: 5220818771854075133}
   - component: {fileID: 5220818771854075132}
-  - component: {fileID: 5220818771854075123}
+  - component: {fileID: -1880067072861162678}
   m_Layer: 0
   m_Name: Medium Impact Dust
   m_TagString: Untagged
@@ -9751,7 +9751,7 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &5220818771854075123
+--- !u!114 &-1880067072861162678
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9760,7 +9760,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5220818771854075135}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
   ParticleSystems: []
+  AudioSources: []

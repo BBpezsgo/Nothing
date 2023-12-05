@@ -720,12 +720,6 @@ public static class ComponentEx
     public static bool HasComponent<T>(this Component obj) => obj.TryGetComponent<T>(out _);
 }
 
-public static class ObjectEx
-{
-    public static void Destroy(this UnityEngine.Object obj) => UnityEngine.Object.Destroy(obj);
-    public static void Destroy(this UnityEngine.Object obj, float t) => UnityEngine.Object.Destroy(obj, t);
-}
-
 public static class RectEx
 {
     public static Rect Padding(this Rect rect, float padding)

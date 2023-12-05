@@ -9919,6 +9919,7 @@ GameObject:
   - component: {fileID: 7518325145530454443}
   - component: {fileID: 8161849761146861834}
   - component: {fileID: -8233328850410975369}
+  - component: {fileID: -3860763802838413060}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -10042,7 +10043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   btn_0: 
-  Behaviours: []
+  Behaviors: []
 --- !u!114 &3673528625757124021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10402,6 +10403,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UiSelected: {fileID: 6946811753196514077}
   selectableState: 0
+--- !u!114 &-3860763802838413060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619412345505571582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc0a01ce6927f4eb3a38757bfcef4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplodeForce: 0.2
+  Density: 0.1
+  FragmentSmokeProbability: 0.2
+  FragmentSmokeScale: {x: 0.5, y: 2}
+  FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
+    type: 3}
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0
@@ -10719,6 +10738,52 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1674865958061141385}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7382230498771118081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: b7efcd3321f2e7449a5ebf10a7fdc71a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1674865958061141385}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7186969521987548003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7382230498771118081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e941d03cfc53b4c925e03193f9a54b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InsideMaterial: {fileID: 0}
+  OptimizeMaterialUsage: 1
+  FractureTemplate: {fileID: 0}
+  PiecesParent: {fileID: 0}
+  FractureType: 0
+  SlicePlanes: []
+  NumFracturePieces: 5
+  NumIterations: 2
+  EvenlySizedPieces: 1
+  NumGenerations: 1
+  FractureRadius: -3.4028235e+38
+  FractureSize:
+    Space: 0
+    Value: 0
+  UVScale: 1
+  UVBounds:
+    StartUV: {x: 0, y: 0}
+    EndUV: {x: 1, y: 1}
+  DistributeMass: 1
+  SeparateDisjointPieces: 0
+  RandomSeed: 0
+  OnFractureCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  _uniqueId: b65ff8bdc94b43a0941504d235d99777
+  _meshValidity: 0
+  SkipMeshCleaning: 0
+  Asynchronous: 1
 --- !u!1001 &1674865958669305692
 PrefabInstance:
   m_ObjectHideFlags: 0

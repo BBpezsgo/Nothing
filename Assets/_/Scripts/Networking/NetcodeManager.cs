@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-
 using UI;
-
 using Unity.Netcode;
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -305,14 +301,7 @@ namespace Networking.Managers
 
         void Singleton_OnServerStopped(bool isHost)
         {
-            if (isHost)
-            {
-                Debug.Log($"[{nameof(NetcodeManager)}]: Host stopped", this);
-            }
-            else
-            {
-                Debug.Log($"[{nameof(NetcodeManager)}]: Server stopped", this);
-            }
+            Debug.Log($"[{nameof(NetcodeManager)}]: {(isHost ? "Host" : "Server")} stopped", this);
             SceneManager.UnloadAllScenes();
         }
 

@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class UnitBehaviour : MonoBehaviour, ICopyable<UnitBehaviour>
+    public class UnitBehaviour : MonoBehaviour
     {
-        [SerializeField, Button(nameof(SetBehaviours), true, true, "Set Behaviours")] string btn_0;
-        [SerializeField, ReadOnly, NonReorderable] UnitBehaviour_Base[] Behaviours = new UnitBehaviour_Base[0];
+        [SerializeField, Button(nameof(SetBehaviours), true, true, "Set Behaviors")] string btn_0;
+        [SerializeField, ReadOnly, NonReorderable] UnitBehaviour_Base[] Behaviors = new UnitBehaviour_Base[0];
 
         class Comparer : IComparer<UnitBehaviour_Base>
         {
@@ -19,11 +19,11 @@ namespace Game.Components
         {
             Vector2 result = Vector2.zero;
 
-            using (ProfilerMarkers.UnitsBehaviour.Auto())
+            using (ProfilerMarkers.UnitsBehavior.Auto())
             {
-                for (int i = 0; i < Behaviours.Length; i++)
+                for (int i = 0; i < Behaviors.Length; i++)
                 {
-                    Vector2? subresult = Behaviours[i].GetOutput();
+                    Vector2? subresult = Behaviors[i].GetOutput();
                     if (!subresult.HasValue) continue;
                     result = subresult.Value;
                     break;
@@ -35,19 +35,13 @@ namespace Game.Components
 
         void SetBehaviours()
         {
-            Behaviours = GetComponents<UnitBehaviour_Base>();
-            System.Array.Sort(Behaviours, new Comparer());
+            Behaviors = GetComponents<UnitBehaviour_Base>();
+            System.Array.Sort(Behaviors, new Comparer());
         }
 
         void Start()
         {
             SetBehaviours();
-        }
-
-        public void CopyTo(object destination) => this.CopyTo<UnitBehaviour>(destination);
-        public void CopyTo(UnitBehaviour destination)
-        {
-
         }
     }
 }

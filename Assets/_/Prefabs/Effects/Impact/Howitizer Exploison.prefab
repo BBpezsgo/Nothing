@@ -4881,7 +4881,6 @@ GameObject:
   - component: {fileID: 8989560938411334597}
   - component: {fileID: 6015068334238792192}
   - component: {fileID: 2273527675916993043}
-  - component: {fileID: 3487468196739867738}
   m_Layer: 0
   m_Name: Fire 1
   m_TagString: Untagged
@@ -9741,19 +9740,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &3487468196739867738
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4544833779646423758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!1 &5418511066588490136
 GameObject:
   m_ObjectHideFlags: 0
@@ -9765,7 +9751,6 @@ GameObject:
   - component: {fileID: 2692314615790955932}
   - component: {fileID: 3566051617030311379}
   - component: {fileID: 464982707450301712}
-  - component: {fileID: 5236344227589690759}
   - component: {fileID: 9139751599992346528}
   m_Layer: 0
   m_Name: Dust
@@ -14626,19 +14611,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &5236344227589690759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5418511066588490136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!82 &9139751599992346528
 AudioSource:
   m_ObjectHideFlags: 0
@@ -14746,7 +14718,6 @@ GameObject:
   - component: {fileID: 8559569589497278901}
   - component: {fileID: 5683796439269499845}
   - component: {fileID: 7035339017562241815}
-  - component: {fileID: 117913489181271435}
   m_Layer: 0
   m_Name: Fire 2
   m_TagString: Untagged
@@ -19606,19 +19577,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &117913489181271435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6683298681471699223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!1 &8233344447578877358
 GameObject:
   m_ObjectHideFlags: 0
@@ -19797,8 +19755,8 @@ GameObject:
   - component: {fileID: 3632214581246705555}
   - component: {fileID: 5335235139848005605}
   - component: {fileID: 6916521563675438600}
-  - component: {fileID: 1272887655079978367}
   - component: {fileID: 6508769297274795376}
+  - component: {fileID: -6444258733070915805}
   m_Layer: 0
   m_Name: Howitizer Exploison
   m_TagString: Untagged
@@ -24663,19 +24621,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &1272887655079978367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9033517131993547254}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!82 &6508769297274795376
 AudioSource:
   m_ObjectHideFlags: 0
@@ -24772,3 +24717,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-6444258733070915805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9033517131993547254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []

@@ -173,7 +173,12 @@ namespace Game.Managers
         [field: SerializeField] internal bool AnyPopupVisible { get; set; } = false;
 
         [SerializeField, ReadOnly] bool _anyMenuVisible = false;
-        internal static bool AnyMenuVisible => Instance != null && Instance._anyMenuVisible;
+        internal static bool AnyMenuVisible =>
+            Instance != null &&
+            Instance.CurrentPanel != PanelType.None ||
+            Instance.CurrentStatus != StatusType.None ||
+            Instance.CurrentIntermediateMenu != IntermediateMenuType.None ||
+            Instance.CurrentMenu != MainMenuType.None;
 
         internal MainMenuType CurrentMenu
         {

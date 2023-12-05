@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7066947040622628524}
   - component: {fileID: 7907804803789101839}
   - component: {fileID: 3326826702483083781}
-  - component: {fileID: 7655992874921083103}
   m_Layer: 0
   m_Name: Fire (1)
   m_TagString: Untagged
@@ -4872,19 +4871,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &7655992874921083103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1660445875002701813}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!1 &3262027444536903431
 GameObject:
   m_ObjectHideFlags: 0
@@ -4896,7 +4882,6 @@ GameObject:
   - component: {fileID: 7968596829229809164}
   - component: {fileID: 4696869944434302921}
   - component: {fileID: 998184980892526554}
-  - component: {fileID: 2464185101572964755}
   m_Layer: 0
   m_Name: Fire
   m_TagString: Untagged
@@ -9756,19 +9741,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &2464185101572964755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3262027444536903431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!1 &4204269991170983713
 GameObject:
   m_ObjectHideFlags: 0
@@ -14650,8 +14622,8 @@ GameObject:
   - component: {fileID: 2323652320468130394}
   - component: {fileID: 6367494505136226860}
   - component: {fileID: 5596594605220154305}
-  - component: {fileID: 287462950190596278}
   - component: {fileID: 5189476781731582137}
+  - component: {fileID: -6286958705640185727}
   m_Layer: 0
   m_Name: Granate Exploison
   m_TagString: Untagged
@@ -19514,19 +19486,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &287462950190596278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8001222445431678015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eeb75da4ec98bb948b44ab7d8fc12a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ParticleSystems: []
 --- !u!82 &5189476781731582137
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19623,3 +19582,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-6286958705640185727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8001222445431678015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 714bb6c158c09964cbe2f0e51e5b3076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaitForParticles: 1
+  WaitForSound: 1
+  WaitForSeconds: 0
+  ParticleSystems: []
+  AudioSources: []

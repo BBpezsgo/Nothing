@@ -52,12 +52,6 @@ namespace Utilities
 
     public struct AI
     {
-        class PriorityComparer<T> : IComparer<(T, float)>
-        {
-            public int Compare((T, float) a, (T, float) b)
-                => Comparer.Default.Compare(a.Item2, b.Item2);
-        }
-
         public delegate float GetPriority<T>(T @object);
 
         public static void SortTargets<T>(T[] targets, GetPriority<T> getPriority) where T : UnityEngine.Object
@@ -68,13 +62,13 @@ namespace Utilities
             {
                 float priority = 0f;
 
-                if ((targets[i] as UnityEngine.Object) != null)
+                if ((UnityEngine.Object)targets[i] != null)
                 { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
 
                 priorities[i] = (targets[i], priority);
             }
 
-            Array.Sort(priorities, new PriorityComparer<T>());
+            Array.Sort(priorities, (a, b) => Comparer.Default.Compare(a.Item2, b.Item2));
 
             for (int i = 0; i < targets.Length; i++)
             { targets[i] = priorities[i].Item1; }
@@ -88,13 +82,13 @@ namespace Utilities
             {
                 float priority = 0f;
 
-                if ((targets[i] as UnityEngine.Object) != null)
+                if ((UnityEngine.Object)targets[i] != null)
                 { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
 
                 priorities[i] = (targets[i], priority);
             }
 
-            Array.Sort(priorities, new PriorityComparer<T>());
+            Array.Sort(priorities, (a, b) => Comparer.Default.Compare(a.Item2, b.Item2));
 
             for (int i = 0; i < priorities.Length; i++)
             { targets[i] = priorities[i].Item1; }
@@ -231,7 +225,7 @@ namespace Game
 public readonly partial struct ProfilerMarkers
 {
     public static readonly Unity.Profiling.ProfilerMarker Animations = new("Utilities.Animations");
-    public static readonly Unity.Profiling.ProfilerMarker UnitsBehaviour = new("Game.Units.Behaviour");
+    public static readonly Unity.Profiling.ProfilerMarker UnitsBehavior = new("Game.Units.Behavior");
     public static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Wheels = new("Game.VehicleEngine.Wheels");
     public static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Basic = new("Game.VehicleEngine.Basic");
 }
@@ -504,7 +498,6 @@ public static class NetcodeUtils
             Debug.LogError($"[{nameof(NetcodeUtils)}]: Failed to start client on {NetworkConfig}", context);
         }
     }
-
 }
 
 namespace InputUtils
