@@ -144,6 +144,8 @@ export interface UnityInstance {
 
 export interface UnityModule {
     // #region Internal
+    /*
+    
     AL(): unknown
     AsciiToString(): unknown
     Browser(): unknown
@@ -552,11 +554,13 @@ export interface UnityModule {
     get wasmBinary(): unknown
 
     readonly shouldQuit: boolean
-    onQuit?: () => void
 
+    */
     // #endregion
 
     // #region User
+    
+    onQuit?: () => void
 
     Quit(): void
     SendMessage(): void
