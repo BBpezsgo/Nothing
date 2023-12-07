@@ -123,7 +123,7 @@ namespace Game.Components
 
         public override void OnDestroy()
         {
-            if (gameObject.scene.isLoaded && ExplodeEffect != null)
+            if (gameObject.scene.isLoaded && ExplodeEffect != null && QualityHandler.EnableParticles)
             { GameObject.Instantiate(ExplodeEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
 
             base.OnDestroy();
@@ -213,7 +213,7 @@ namespace Game.Components
 
             if (!Flee())
             {
-                if (Destination == Vector3.zero)
+                if (Destination == default)
                 {
                     Destination = FindNewDestination();
                     return;
@@ -251,7 +251,7 @@ namespace Game.Components
 
         void Movement(Vector3 destination)
         {
-            float distanceToDestination = Vector2.Distance(transform.position.To2D(), destination.To2D());
+            float distanceToDestination = Maths.Distance(transform.position.To2D(), destination.To2D());
 
             if (distanceToDestination < 1f)
             {

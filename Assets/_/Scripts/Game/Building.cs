@@ -12,7 +12,7 @@ namespace Game.Components
 
         public override void OnDestroy()
         {
-            if (gameObject.scene.isLoaded && DestroyEffect != null)
+            if (gameObject.scene.isLoaded && DestroyEffect != null && QualityHandler.EnableParticles)
             { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
 
             base.OnDestroy();

@@ -18,7 +18,7 @@ namespace Game.Components
             { itemCollider.enabled = false; }
 
             transform.SetParent(holder);
-            transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            transform.SetLocalPositionAndRotation(default, Quaternion.identity);
         }
 
         internal void Drop()

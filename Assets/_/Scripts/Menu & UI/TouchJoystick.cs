@@ -57,15 +57,15 @@ namespace Game.Managers
 
         void OnTouchUp(AdvancedTouch sender)
         {
-            RelativePosition = Vector2.zero;
-            NormalizedInput = Vector2.zero;
-            NormalizedInput2 = Vector2.zero;
+            RelativePosition = default;
+            NormalizedInput = default;
+            NormalizedInput2 = default;
         }
         void OnTouchCancelled(AdvancedTouch sender)
         {
-            RelativePosition = Vector2.zero;
-            NormalizedInput = Vector2.zero;
-            NormalizedInput2 = Vector2.zero;
+            RelativePosition = default;
+            NormalizedInput = default;
+            NormalizedInput2 = default;
         }
 
         void Initialize()
@@ -74,12 +74,12 @@ namespace Game.Managers
             Circle = GUIUtils.GenerateCircle(Vector2Int.one * 128);
             Circle2 = GUIUtils.GenerateCircle(Vector2Int.one * 128, 0.05f);
 
-            NormalizedInput = Vector2.zero;
-            NormalizedInput2 = Vector2.zero;
+            NormalizedInput = default;
+            NormalizedInput2 = default;
 
             Refresh();
 
-            Touch = new AdvancedTouch(55, InputCondition, new RectInt(Vector2Int.zero, Size));
+            Touch = new AdvancedTouch(55, InputCondition, new RectInt(default, Size));
             Touch.OnDown += OnTouchDown;
             Touch.OnMove += OnTouchMove;
             Touch.OnUp += OnTouchUp;

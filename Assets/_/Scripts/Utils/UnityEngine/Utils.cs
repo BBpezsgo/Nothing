@@ -333,7 +333,7 @@ public readonly struct GUIUtils
             for (int y = 0; y < result.height; y++)
             {
                 Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Vector2.Distance(p, center);
+                float d = Maths.Distance(p, center);
                 if (d < .5f)
                 {
                     result.SetPixel(x, y, Color.white);
@@ -358,7 +358,7 @@ public readonly struct GUIUtils
             for (int y = 0; y < result.height; y++)
             {
                 Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Vector2.Distance(p, center);
+                float d = Maths.Distance(p, center);
                 if (d < .5f && d >= (.5f - thickness))
                 {
                     result.SetPixel(x, y, Color.white);
@@ -378,6 +378,8 @@ public readonly struct GUIUtils
 
     public static GuiEnabled Enabled() => new(true);
     public static GuiEnabled Disabled() => new(false);
+
+    public static GuiContentColor ContentColor(Color color) => new(color);
 
     public static bool IsGUIFocused
     {
@@ -436,6 +438,22 @@ public readonly struct GuiEnabled : IDisposable
     }
 }
 
+public readonly struct GuiContentColor : IDisposable
+{
+    readonly Color savedContentColor;
+
+    public GuiContentColor(Color contentColor)
+    {
+        savedContentColor = GUI.contentColor;
+        GUI.contentColor = contentColor;
+    }
+
+    public void Dispose()
+    {
+        GUI.contentColor = savedContentColor;
+    }
+}
+
 namespace Utilities
 {
     public static partial class UnityUtils
@@ -451,7 +469,7 @@ namespace Utilities
 
                 if (p.z < 0)
                 {
-                    corners = (Vector2.zero, Vector2.zero);
+                    corners = default;
                     return false;
                 }
 
@@ -618,7 +636,7 @@ namespace Utilities
 
                 if (p.z < 0)
                 {
-                    corners = (Vector2.zero, Vector2.zero);
+                    corners = default;
                     return false;
                 }
 
@@ -682,7 +700,7 @@ namespace Utilities
 
             public Vector3 Velocity3D()
             {
-                Vector3 result = Vector3.zero;
+                Vector3 result = default;
                 result.x = Maths.Sin(Direction * Maths.Deg2Rad);
                 result.y = Maths.Sin(Angle * Maths.Deg2Rad);
                 result.z = Maths.Cos(Direction * Maths.Deg2Rad);
@@ -692,7 +710,7 @@ namespace Utilities
             public Vector3 Position(float t)
             {
                 Vector2 displacement = Utilities.Ballistics.Displacement(Angle * Maths.Deg2Rad, Velocity, t);
-                Vector3 displacement3D = Vector3.zero;
+                Vector3 displacement3D = default;
 
                 displacement3D.x = displacement.x * Maths.Sin(Direction * Maths.Deg2Rad);
                 displacement3D.y = displacement.y;
@@ -1104,7 +1122,7 @@ namespace Utilities
 
             using (ProfilerMarkers.TrajectoryMath.Auto())
             {
-                projectileVelocity *= .95f;
+                // projectileVelocity *= .95f;
 
                 float lifetime = projectileLifetime + Time.fixedDeltaTime;
 
@@ -1115,7 +1133,7 @@ namespace Utilities
 
                 targetPosition = targetTrajectory.Position(lifetime);
 
-                float distance = Vector2.Distance(shootPosition.To2D(), targetPosition.To2D());
+                float distance = Maths.Distance(shootPosition.To2D(), targetPosition.To2D());
 
                 angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
 
@@ -1128,7 +1146,7 @@ namespace Utilities
 
                     targetPosition = targetTrajectory.Position(lifetime + t.Value);
 
-                    distance = Vector2.Distance(shootPosition.To2D(), targetPosition.To2D());
+                    distance = Maths.Distance(shootPosition.To2D(), targetPosition.To2D());
 
                     angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
 
@@ -1149,7 +1167,7 @@ namespace Utilities
 
             using (ProfilerMarkers.TrajectoryMath.Auto())
             {
-                projectileVelocity *= .95f;
+                // projectileVelocity *= .95f;
 
                 for (int i = 0; i < iterations; i++)
                 {
@@ -1181,8 +1199,6 @@ namespace Utilities
             PointA = pointA;
             PointB = pointB;
         }
-
-        public static Line Zero => new(Vector2.zero, Vector2.zero);
 
         public static implicit operator (Vector2, Vector2)(Line v)
             => (v.PointA, v.PointB);
@@ -1384,7 +1400,7 @@ namespace Utilities
             int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
                 time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
             }
@@ -1402,7 +1418,7 @@ namespace Utilities
             int iterations = 4;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
                 time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
                 targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
@@ -1421,7 +1437,7 @@ namespace Utilities
             int iterations = 4;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 time = Velocity.CalculateTime(distance, projectileVelocity);
                 targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
             }
@@ -1434,7 +1450,7 @@ namespace Utilities
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateTime(Vector2 pointA, Vector2 pointB, float speed)
-            => CalculateTime(Vector2.Distance(pointA, pointB), speed);
+            => CalculateTime(Maths.Distance(pointA, pointB), speed);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateSpeed(float distance, float time)
@@ -1457,7 +1473,7 @@ namespace Utilities
             int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
-                distance = Vector2.Distance(projectilePosition, targetPosition + (targetVelocity * time));
+                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
                 time = CalculateTime(distance, projectileVelocity);
             }
 
@@ -1468,13 +1484,13 @@ namespace Utilities
         {
             float p = 1 / projectileVelocity;
 
-            float distance = Vector2.Distance(projectilePosition, targetPosition);
+            float distance = Maths.Distance(projectilePosition, targetPosition);
             float time = distance * p;
 
-            distance = Vector2.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
+            distance = Maths.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
             time = distance * p;
 
-            distance = Vector2.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
+            distance = Maths.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
             time = distance * p;
 
             Vector2 aim = circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition));
@@ -1524,25 +1540,25 @@ namespace Utilities
         static readonly Vector4[] s_UnitSquare =
 #pragma warning restore IDE0052 // Remove unread private members
         {
-            new Vector4(-0.5f, 0.5f, 0, 1),
-            new Vector4(0.5f, 0.5f, 0, 1),
-            new Vector4(0.5f, -0.5f, 0, 1),
-            new Vector4(-0.5f, -0.5f, 0, 1),
+            new(-0.5f, 0.5f, 0, 1),
+            new(0.5f, 0.5f, 0, 1),
+            new(0.5f, -0.5f, 0, 1),
+            new(-0.5f, -0.5f, 0, 1),
         };
         /// <summary>
         /// Cube with edge of length 1
         /// </summary>
         static readonly Vector4[] s_UnitCube =
         {
-            new Vector4(-0.5f,  0.5f, -0.5f, 1),
-            new Vector4(0.5f,  0.5f, -0.5f, 1),
-            new Vector4(0.5f, -0.5f, -0.5f, 1),
-            new Vector4(-0.5f, -0.5f, -0.5f, 1),
+            new(-0.5f,  0.5f, -0.5f, 1),
+            new(0.5f,  0.5f, -0.5f, 1),
+            new(0.5f, -0.5f, -0.5f, 1),
+            new(-0.5f, -0.5f, -0.5f, 1),
 
-            new Vector4(-0.5f,  0.5f,  0.5f, 1),
-            new Vector4(0.5f,  0.5f,  0.5f, 1),
-            new Vector4(0.5f, -0.5f,  0.5f, 1),
-            new Vector4(-0.5f, -0.5f,  0.5f, 1)
+            new(-0.5f,  0.5f,  0.5f, 1),
+            new(0.5f,  0.5f,  0.5f, 1),
+            new(0.5f, -0.5f,  0.5f, 1),
+            new(-0.5f, -0.5f,  0.5f, 1)
         };
         static readonly Vector4[] s_UnitSphere = MakeUnitSphere(16);
 
@@ -1769,6 +1785,7 @@ public readonly struct EditorUtils
 /// </summary>
 public interface IComponent { }
 
+#pragma warning disable UNT0014 // Invalid type for call to GetComponent
 public static class IObjectExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1799,6 +1816,7 @@ public static class IObjectExtensions
     public static bool TryGetComponentInChildren<T>(this IComponent self, out T component)
         => ((Component)self).TryGetComponentInChildren(out component);
 }
+#pragma warning restore UNT0014 // Invalid type for call to GetComponent
 
 public static class Intervals
 {

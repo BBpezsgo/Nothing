@@ -27,10 +27,10 @@ namespace Game.Components
 
             if (TryGetComponent(out UnitBehaviour_Seek seek))
             {
-                if (!turret.HasNoTarget && Vector3.Distance(turret.TargetPosition, turret.ShootPosition) >= turret.Range)
+                if (!turret.HasNoTarget && Maths.Distance(turret.TargetPosition, turret.ShootPosition) >= turret.Range)
                 { seek.Target = turret.TargetPosition; }
                 else
-                { seek.Target = Vector3.zero; }
+                { seek.Target = default; }
             }
         }
 

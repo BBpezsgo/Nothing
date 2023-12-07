@@ -47,7 +47,7 @@ namespace Game.Components
             if (TimeToCheck <= 0f)
             {
                 DetectObstacles();
-                if (MovementEngine.Velocity == Vector3.zero)
+                if (MovementEngine.Velocity == default)
                 {
                     TimeToCheck = MaxDetectionCooldown;
                 }
@@ -96,7 +96,7 @@ namespace Game.Components
 
         ThinkResult Think(Collider obstacle, ref float closest, out Vector2 result)
         {
-            result = Vector2.zero;
+            result = default;
 
             Vector2 offset = (obstacle.transform.position - transform.position).To2D();
 

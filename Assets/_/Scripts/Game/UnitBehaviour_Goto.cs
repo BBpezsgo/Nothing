@@ -41,14 +41,14 @@ namespace Game.Components
 
         internal override Vector2? GetOutput()
         {
-            if (Target == Vector3.zero) return null;
+            if (Target == default) return null;
 
             return CalculateInputVector();
         }
 
         Vector2 CalculateInputVector()
         {
-            if (currentlyStopping) return Vector2.zero;
+            if (currentlyStopping) return default;
 
             if (useBrakingCalculations)
             { BrakingDistance = MovementEngine.CalculateBrakingDistance(); }

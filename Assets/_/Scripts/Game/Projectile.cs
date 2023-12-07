@@ -234,7 +234,9 @@ namespace Game.Components
                 {
                     ticksUntilTrailClear = int.MaxValue;
 
-                    if (trail != null && trail.TryGetComponent(out TrailRenderer trailRenderer))
+                    if (trail != null &&
+                        trail.TryGetComponent(out TrailRenderer trailRenderer) &&
+                        QualityHandler.EnableParticles)
                     {
                         trailRenderer.Clear();
                         trailRenderer.emitting = true;
@@ -318,7 +320,7 @@ namespace Game.Components
             else
             {
                 var rotation = Quaternion.FromToRotation(Vector3.forward, positionDelta.normalized);
-                if (positionDelta != Vector3.zero) transform.rotation = rotation;
+                if (positionDelta != default) transform.rotation = rotation;
             }
 
             if (!InfinityLifetime)
@@ -326,17 +328,16 @@ namespace Game.Components
                 LifeLeft -= Time.fixedDeltaTime;
                 if (LifeLeft <= 0f)
                 {
-                    if (Owner != null && Owner is UnitAttacker owner2)
-                    { owner2.Turret.NotifyImpact(this, Position); }
+                    NotifyImpact(Position);
 
                     if (ExplodeWhenExpires)
                     {
                         Vector3 position = transform.position;
 
-                        if (TargetPosition != Vector3.zero && (TargetPosition - position).sqrMagnitude < 2f)
+                        if (TargetPosition != default && (TargetPosition - position).sqrMagnitude < 2f)
                         { position = TargetPosition; }
 
-                        if (ExploisonEffect != null) GameObject.Instantiate(ExploisonEffect, position, Quaternion.identity, ObjectGroups.Effects);
+                        if (ExploisonEffect != null && QualityHandler.EnableParticles) GameObject.Instantiate(ExploisonEffect, position, Quaternion.identity, ObjectGroups.Effects);
                         Explode(position, 0f);
                     }
 
@@ -442,7 +443,8 @@ namespace Game.Components
                     var newVelocity = Vector3.Reflect(rb.velocity * remainingEnergy, normal);
                     rb.velocity = newVelocity;
 
-                    if (RicochetEffect != null)
+                    if (RicochetEffect != null &&
+                        QualityHandler.EnableParticles)
                     { GameObject.Instantiate(RicochetEffect, at, Quaternion.LookRotation(newVelocity, Vector3.up), ObjectGroups.Effects); }
 
                     return false;
@@ -463,10 +465,9 @@ namespace Game.Components
             if (!impactEffectCreated)
             { impactEffectCreated = CreateImpactEffect(obj.gameObject, at, normal, material); }
 
-            if (Owner != null && Owner is UnitAttacker owner2)
-            { owner2.Turret.NotifyImpact(this, at); }
+            NotifyImpact(at);
 
-            if (!impactEffectCreated && impactEffect != null) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
+            if (!impactEffectCreated && impactEffect != null && QualityHandler.EnableParticles) GameObject.Instantiate(impactEffect, at, Quaternion.FromToRotation(Vector3.up, normal), ObjectGroups.Effects);
 
             gameObject.SetActive(false);
             OwnerTeamHash = -1;
@@ -535,12 +536,14 @@ namespace Game.Components
             if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamageable))
             {
                 detailedDamageable.Damage(ImpactDamage, this);
+                NotifyDamage((at, ImpactDamage, DamageKind.Physical));
                 return;
             }
 
             if (other.gameObject.TryGetComponentInParent(out IDamagable damageable))
             {
                 damageable.Damage(ImpactDamage);
+                NotifyDamage((at, ImpactDamage, DamageKind.Physical));
                 return;
             }
         }
@@ -561,22 +564,22 @@ namespace Game.Components
                 {
                     if (ImpactEffects[i].Particles != null)
                     {
-                        Vector3 direction = ImpactEffects[i].UseNormal ? normal : Vector3.up;
-
-                        if (other.HasComponent<TerrainCollider>())
+                        if (QualityHandler.EnableParticles)
                         {
-                            direction = Vector3.up;
-                        }
+                            Vector3 direction = ImpactEffects[i].UseNormal ? normal : Vector3.up;
 
-                        GameObject.Instantiate(ImpactEffects[i].Particles, at, Quaternion.LookRotation(Vector3.up, direction), ObjectGroups.Effects);
+                            if (other.HasComponent<TerrainCollider>())
+                            { direction = Vector3.up; }
+
+                            GameObject.Instantiate(ImpactEffects[i].Particles, at, Quaternion.LookRotation(Vector3.up, direction), ObjectGroups.Effects);
+                        }
 
                         impactEffectCreated = true;
                     }
 
-                    if (ImpactEffects[i].Hoe != null)
-                    {
-                        GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform);
-                    }
+                    if (ImpactEffects[i].Hoe != null &&
+                        QualityHandler.EnableParticles)
+                    { GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform); }
 
                     var sound = ImpactEffects[i].GetRandomSound();
                     if (sound != null)
@@ -634,22 +637,25 @@ namespace Game.Components
 
                     GameObject @object = objectCollider.gameObject;
 
-                    float distanceSqr = Maths.Max(1f, (@object.transform.position - origin).sqrMagnitude);
+                    float distance = Maths.Max(1f, Maths.Distance(@object.transform.position, origin));
+                    float amount = (ExploisonDamage * (1f - absorbed)) / distance;
 
                     if (@object.TryGetComponent(out IDetailedDamagable detailedDamageable))
                     {
-                        detailedDamageable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr, this);
+                        detailedDamageable.Damage(amount, this);
+                        NotifyDamage((@object.transform.position, amount, DamageKind.Explosive));
                     }
-                    else if (@object.TryGetComponent<IDamagable>(out var damageable))
+                    else if (@object.TryGetComponent(out IDamagable damageable))
                     {
-                        damageable.Damage((ExploisonDamage * (1f - absorbed)) / distanceSqr);
+                        damageable.Damage(amount);
+                        NotifyDamage((@object.transform.position, amount, DamageKind.Explosive));
                     }
                 }
             }
 
             if (ExploisonEffect != null)
             {
-                GameObject.Instantiate(ExploisonEffect, origin, Quaternion.identity, ObjectGroups.Effects);
+                if (QualityHandler.EnableParticles) GameObject.Instantiate(ExploisonEffect, origin, Quaternion.identity, ObjectGroups.Effects);
                 return true;
             }
 
@@ -673,14 +679,30 @@ namespace Game.Components
             if (ExploisonRadius > 0f)
             { Explode(Position, 0f); }
 
-            if (Owner != null && Owner is UnitAttacker owner2)
-            { owner2.Turret.NotifyImpact(this, Position); }
+            NotifyImpact(Position);
 
-            if (impactEffect != null) GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects);
+            if (impactEffect != null && QualityHandler.EnableParticles)
+            { GameObject.Instantiate(impactEffect, Position, Quaternion.FromToRotation(transform.forward, Vector3.up), ObjectGroups.Effects); }
 
             gameObject.SetActive(false);
             OwnerTeamHash = -1;
             Owner = null;
+        }
+
+        void NotifyImpact(Vector3 at)
+        {
+            if (Owner == null) return;
+            if (Owner is not UnitAttacker owner) return;
+
+            owner.Turret.NotifyImpact(this, at);
+        }
+
+        void NotifyDamage(params (Vector3 Position, float Amount, DamageKind Kind)[] damages)
+        {
+            if (Owner == null) return;
+            if (Owner is not UnitAttacker owner) return;
+
+            owner.Turret.NotifyDamage(this, damages);
         }
     }
 }

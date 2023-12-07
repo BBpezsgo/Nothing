@@ -52,7 +52,7 @@ namespace Game.Components
                 processed -= CurrentRawMaterials;
 
                 CurrentProcessedMaterials += processed;
-                SetParticleSystemsEnabled(true);
+                SetParticleSystemsEnabled(true && QualityHandler.EnableParticles);
             }
             else
             {

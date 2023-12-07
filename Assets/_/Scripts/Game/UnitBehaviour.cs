@@ -17,7 +17,7 @@ namespace Game.Components
 
         internal Vector2 GetOutput()
         {
-            Vector2 result = Vector2.zero;
+            Vector2 result = default;
 
             using (ProfilerMarkers.UnitsBehavior.Auto())
             {

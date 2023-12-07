@@ -26,8 +26,8 @@ public class PlayerData : MonoBehaviour
         {
             get
             {
-                if (Building == null) return Vector3.zero;
-                if (!Building.TryGetComponent<Game.Components.Building>(out var building)) return Vector3.zero;
+                if (Building == null) return default;
+                if (!Building.TryGetComponent<Game.Components.Building>(out var building)) return default;
                 return building.GroundOrigin;
             }
         }

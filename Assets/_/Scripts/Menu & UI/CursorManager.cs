@@ -154,7 +154,7 @@ namespace Game.Managers
 
             if (instance.CurrentCursor == null) return;
 
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(null, default, CursorMode.Auto);
             instance.CurrentCursor = null;
         }
     }

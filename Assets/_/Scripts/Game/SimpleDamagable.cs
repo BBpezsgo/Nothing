@@ -19,7 +19,7 @@ namespace Game.Components
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
-            if (DestroyEffect != null)
+            if (DestroyEffect != null && QualityHandler.EnableParticles)
             { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
 
             if (TryGetComponent(out Explode explode))

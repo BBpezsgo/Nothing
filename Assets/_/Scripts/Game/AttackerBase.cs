@@ -80,7 +80,7 @@ namespace Game.Components
 
             if (TakeControlManager.Instance.IsScoping && turret.ScopeHolder != null)
             {
-                Vector3 lockFix = Vector3.zero;
+                Vector3 lockFix = default;
 
                 if (HullRotationStabilizer)
                 { lockFix.y = rotationDelta; }

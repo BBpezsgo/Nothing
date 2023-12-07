@@ -42,7 +42,7 @@ namespace Game.Managers
 
             if (renderThis != null)
             {
-                placedObject = GameObject.Instantiate(renderThis, Vector3.zero, Quaternion.Euler(0f, -220f, 0f), _photographyStudio);
+                placedObject = GameObject.Instantiate(renderThis, default, Quaternion.Euler(0f, -220f, 0f), _photographyStudio);
 
                 float baseTop = _photographyPosition.y - (_photographySize / 2);
 
@@ -131,7 +131,7 @@ namespace Game.Managers
                     {
                         Vector3 a = new(pixel.r, pixel.g, pixel.b);
                         Vector3 b = new(transparentColor.r, transparentColor.g, transparentColor.b);
-                        d = Vector3.Distance(a, b);
+                        d = Maths.Distance(a, b);
                     }
 
                     if (d < tolerance)

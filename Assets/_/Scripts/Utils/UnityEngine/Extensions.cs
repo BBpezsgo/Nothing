@@ -56,8 +56,7 @@ public static partial class UnclassifiedExtensions
         return bounds;
     }
 
-    public static Color Opacity(this Color c, float alpha)
-        => new(c.r, c.g, c.b, c.a * alpha);
+    public static Color Opacity(this Color c, float alpha) => new(c.r, c.g, c.b, c.a * alpha);
 
     public static bool Contains(this UnityEngine.Object[] self, UnityEngine.Object v)
     {
@@ -318,7 +317,7 @@ public static partial class UnclassifiedExtensions
             worldPosition = hit.point;
             return true;
         }
-        worldPosition = Vector3.zero;
+        worldPosition = default;
         return false;
     }
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance)
@@ -345,7 +344,7 @@ public static partial class UnclassifiedExtensions
             worldPosition = hit.point;
             return true;
         }
-        worldPosition = Vector3.zero;
+        worldPosition = default;
         return false;
     }
     public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, LayerMask layerMask)
@@ -402,7 +401,7 @@ public static class MeshEx
     public static Vector3 ClosestPointSimple(this Mesh mesh, Vector3 point)
     {
         float minDistance = float.PositiveInfinity;
-        Vector3 nearestPoint = Vector3.zero;
+        Vector3 nearestPoint = default;
 
         for (int i = 0; i < mesh.vertices.Length; i++)
         {
@@ -450,7 +449,7 @@ public static class MeshEx
         // Get the list of triangles in which the nearest vert "participates".
         int[] nearTris = vt[nearest];
 
-        Vector3 nearestPt = Vector3.zero;
+        Vector3 nearestPt = default;
         float nearestSqDist = float.MaxValue;
 
         for (int i = 0; i < nearTris.Length; i++)
@@ -494,7 +493,7 @@ public static class MeshEx
         //	Get the list of triangles in which the nearest vert "participates".
         int[] nearTris = vt[nearest];
 
-        Vector3 nearestPt = Vector3.zero;
+        Vector3 nearestPt = default;
         nearestSqDist = 100000000f;
 
         for (int i = 0; i < nearTris.Length; i++)
@@ -645,6 +644,7 @@ public static class RigidbodyEx
     }
 }
 
+#pragma warning disable UNT0014 // Invalid type for call to GetComponent
 public static class GameObjectEx
 {
     public static void SetLayerRecursive(this GameObject @object, LayerMask layer)
@@ -719,6 +719,7 @@ public static class ComponentEx
 {
     public static bool HasComponent<T>(this Component obj) => obj.TryGetComponent<T>(out _);
 }
+#pragma warning restore UNT0014 // Invalid type for call to GetComponent
 
 public static class RectEx
 {

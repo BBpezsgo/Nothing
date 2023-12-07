@@ -4097,10 +4097,7 @@ namespace Discord
         {
             get
             {
-                if (MethodsStructure == null)
-                {
-                    MethodsStructure = Marshal.PtrToStructure(MethodsPtr, typeof(FFIMethods));
-                }
+                MethodsStructure ??= Marshal.PtrToStructure(MethodsPtr, typeof(FFIMethods));
                 return (FFIMethods)MethodsStructure;
             }
 
@@ -4190,10 +4187,7 @@ namespace Discord
         {
             GCHandle h = GCHandle.FromIntPtr(ptr);
             Discord d = (Discord)h.Target;
-            if (d.AchievementManagerInstance.OnUserAchievementUpdate != null)
-            {
-                d.AchievementManagerInstance.OnUserAchievementUpdate.Invoke(ref userAchievement);
-            }
+            d.AchievementManagerInstance.OnUserAchievementUpdate?.Invoke(ref userAchievement);
         }
     }
 }

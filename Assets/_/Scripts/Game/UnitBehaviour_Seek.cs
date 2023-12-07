@@ -28,14 +28,14 @@ namespace Game.Components
                 { Target = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition); }
             }
 
-            if (Target == Vector3.zero) return null;
+            if (Target == default) return null;
 
             return CalculateInputVector();
         }
 
         Vector2 CalculateInputVector()
         {
-            if (currentlyStopping) return Vector2.zero;
+            if (currentlyStopping) return default;
 
             if (useBrakingCalculations)
             { BrakingDistance = MovementEngine.CalculateBrakingDistance(); }
@@ -49,20 +49,20 @@ namespace Game.Components
             Vector3 destinationPosition = target;
 
             // No destination?
-            if (destinationPosition == Vector3.zero) return Vector2.zero;
+            if (destinationPosition == default) return default;
 
-            float distanceToDestination = Vector3.Distance(transform.position, destinationPosition);
+            float distanceToDestination = Maths.Distance(transform.position, destinationPosition);
 
             // === Braking ===
             if (distanceToDestination <= DISTANCE_TO_STOP_BRUH)
-            { return Vector2.zero; }
+            { return default; }
             else if (brakingDistance.HasValue)
             {
                 if (distanceToDestination <= Maths.Abs(brakingDistance.Value) + BRAKING_DISTANCE_ERROR)
-                { return Vector2.zero; }
+                { return default; }
             }
             else if (distanceToDestination <= DISTANCE_TO_STOP)
-            { return Vector2.zero; }
+            { return default; }
             // === ===
 
             // === Normal ===

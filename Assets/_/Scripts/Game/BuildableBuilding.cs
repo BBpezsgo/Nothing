@@ -77,7 +77,7 @@ namespace Game.Components
             if (IsConstructed)
             { return true; }
 
-            if (Particles != null)
+            if (Particles != null && QualityHandler.EnableParticles)
             { Particles.Emit(Maths.RoundToInt(ParticlesAmmount * progress)); }
 
             BuildingProcess += progress;

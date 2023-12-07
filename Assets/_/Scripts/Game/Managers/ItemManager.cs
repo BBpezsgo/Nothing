@@ -10,10 +10,10 @@ namespace Game.Managers
             [SerializeField] internal string ID;
             [SerializeField] internal GameObject Prefab;
 
-            internal GameObject Instantiate() => Instantiate(Vector3.zero, Quaternion.identity, ObjectGroups.Items);
+            internal GameObject Instantiate() => Instantiate(default, Quaternion.identity, ObjectGroups.Items);
             internal GameObject Instantiate(Vector3 position) => Instantiate(position, Quaternion.identity, ObjectGroups.Items);
             internal GameObject Instantiate(Vector3 position, Quaternion rotation) => Instantiate(position, rotation, ObjectGroups.Items);
-            internal GameObject Instantiate(Transform parent) => Instantiate(Vector3.zero, Quaternion.identity, parent);
+            internal GameObject Instantiate(Transform parent) => Instantiate(default, Quaternion.identity, parent);
             internal GameObject Instantiate(Vector3 position, Transform parent) => Instantiate(position, Quaternion.identity, parent);
             internal GameObject Instantiate(Vector3 position, Quaternion rotation, Transform parent)
             {

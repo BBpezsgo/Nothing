@@ -87,7 +87,7 @@ namespace Game.Components
                     return;
                 }
 
-                TransportingItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                TransportingItem.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
 
                 Transform itemNeeder = ((Component)CurrentItemNeeder).transform;
 
@@ -98,7 +98,7 @@ namespace Game.Components
                     GameObject.Destroy(TransportingItem.gameObject);
 
                     if (TryGetComponent(out UnitBehaviour_Seek seek))
-                    { seek.Target = Vector3.zero; }
+                    { seek.Target = default; }
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace Game.Components
                 {
                     Targets.RemoveAt(0);
                     if (TryGetComponent(out UnitBehaviour_Seek seek))
-                    { seek.Target = Vector3.zero; }
+                    { seek.Target = default; }
                 }
                 else if ((Targets[0].transform.position - transform.position).To2D().sqrMagnitude <= (ReachDistance * ReachDistance))
                 {
@@ -125,7 +125,7 @@ namespace Game.Components
                     TransportingItem.PickUp(CargoPosition);
 
                     if (TryGetComponent(out UnitBehaviour_Seek seek))
-                    { seek.Target = Vector3.zero; }
+                    { seek.Target = default; }
                 }
                 else
                 {
@@ -164,7 +164,7 @@ namespace Game.Components
             }
 
             if (TryGetComponent(out UnitBehaviour_Seek seek))
-            { seek.Target = Vector3.zero; }
+            { seek.Target = default; }
 
             if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
             { avoidObstacles.IgnoreCollision = null; }

@@ -47,7 +47,7 @@ namespace Authentication.Providers
         {
             ResetHaveAccount();
 
-            loginMenu.OnEnabled()!.onEnable += () =>
+            loginMenu.OnEnabled()!.On += () =>
             {
                 loginMenu!.rootVisualElement.Q<Button>("button-anonymous").clicked += Login;
                 ResetHaveAccount();
@@ -79,7 +79,13 @@ namespace Authentication.Providers
 
         public void OnButtonUpdateAccount()
         {
-            DisplayName = accountMenu?.rootVisualElement.Q<TextField>("inp-name").value;
+            if (accountMenu == null)
+            {
+                DisplayName = null;
+                return;
+            }
+
+            DisplayName = accountMenu.rootVisualElement.Q<TextField>("inp-name").value;
         }
 
         public void OnButtonLogout() { }
@@ -120,7 +126,7 @@ namespace Authentication.Providers
 
         public void Show()
         {
-            if (accountMenu?.rootVisualElement != null)
+            if (accountMenu != null && accountMenu.rootVisualElement != null)
             { accountMenu.rootVisualElement.Q<TextField>("inp-name").value = AccountData?.DisplayName ?? string.Empty; }
         }
 

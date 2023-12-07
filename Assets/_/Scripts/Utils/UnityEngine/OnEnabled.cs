@@ -9,8 +9,8 @@ namespace Game.Components
 
     public class OnEnabled : MonoBehaviour
     {
-        public event OnEnableEvent? onEnable;
-        void OnEnable() => onEnable?.Invoke();
+        public event OnEnableEvent? On;
+        void OnEnable() => On?.Invoke();
     }
 
     public static class OnEnableExtension

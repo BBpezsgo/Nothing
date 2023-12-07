@@ -21,6 +21,7 @@ namespace Game.Components
 
         [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
         [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }
+        public System.Action<(Vector3 Position, float Amount, DamageKind Kind)[]> OnDamagedSomebody { get; set; }
 
         [Header("Debug")]
         [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
@@ -47,7 +48,7 @@ namespace Game.Components
 
         public override void OnDestroy()
         {
-            if (gameObject.scene.isLoaded && DestroyEffect != null)
+            if (gameObject.scene.isLoaded && DestroyEffect != null && QualityHandler.EnableParticles)
             { GameObject.Instantiate(DestroyEffect, transform.position, Quaternion.identity, ObjectGroups.Effects); }
 
             base.OnDestroy();
@@ -123,7 +124,7 @@ namespace Game.Components
 
         Vector2 GetInputVector()
         {
-            if (UnitBehaviour == null) return Vector2.zero;
+            if (UnitBehaviour == null) return default;
             return UnitBehaviour.GetOutput();
         }
 

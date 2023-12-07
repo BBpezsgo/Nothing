@@ -70,7 +70,7 @@ namespace Game.Managers
                 else
                 {
                     float closestDistance = float.MaxValue;
-                    Vector3 closestPoint = Vector3.zero;
+                    Vector3 closestPoint = default;
 
                     var meshes = RayHit.collider.gameObject.GetComponentsInChildren<MeshFilter>(false);
                     for (int i = 0; i < meshes.Length; i++)

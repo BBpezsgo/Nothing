@@ -637,6 +637,7 @@ GameObject:
   - component: {fileID: 5278498343419542871}
   - component: {fileID: 5278498343419542870}
   - component: {fileID: 5278498343419542864}
+  - component: {fileID: 3824124278512204864}
   - component: {fileID: 5278498343419542865}
   - component: {fileID: 6354613679234611687}
   - component: {fileID: 3765480637226646993}
@@ -645,14 +646,12 @@ GameObject:
   - component: {fileID: 9180679375099183831}
   - component: {fileID: 3790386922350675729}
   - component: {fileID: 8421062637140710642}
-  - component: {fileID: 3824124278512204864}
   - component: {fileID: 2208870706455817139}
   - component: {fileID: 5466001084010902814}
   - component: {fileID: 6747003029182905032}
   - component: {fileID: 8284725795724639234}
   - component: {fileID: -7701502354257926143}
   - component: {fileID: -4898287237346471518}
-  - component: {fileID: -132366868128719849}
   - component: {fileID: 159265257070568026}
   m_Layer: 0
   m_Name: Scavenger 1
@@ -712,6 +711,26 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &3824124278512204864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5278498343419542869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3432874735
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &5278498343419542865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -925,26 +944,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &3824124278512204864
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5278498343419542869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 0
 --- !u!114 &2208870706455817139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -957,6 +956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -1125,19 +1125,6 @@ MonoBehaviour:
   - ItemID: scrap
     Ammount: {x: 1, y: 1}
     Propability: 0.2
---- !u!114 &-132366868128719849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5278498343419542869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 898f081804eee854395a3256a0d14969, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Loots: []
 --- !u!114 &159265257070568026
 MonoBehaviour:
   m_ObjectHideFlags: 0

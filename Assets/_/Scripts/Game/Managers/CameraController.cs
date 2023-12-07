@@ -198,8 +198,8 @@ namespace Game.Managers
             { HandleMovementInput(); }
             else
             {
-                MovementInput = Vector2.zero;
-                TargetVelocity = Vector2.zero;
+                MovementInput = default;
+                TargetVelocity = default;
             }
 
             if (Input.GetKeyDown(KeyCode.F5))
@@ -246,8 +246,8 @@ namespace Game.Managers
         {
             if (MenuManager.AnyMenuVisible)
             {
-                MovementInput = Vector2.zero;
-                TargetVelocity = Vector2.zero;
+                MovementInput = default;
+                TargetVelocity = default;
                 return;
             }
 
@@ -330,7 +330,7 @@ namespace Game.Managers
             if (IsTotallyLocked)
             {
                 transform.SetPositionAndRotation(LockOn.position, LockOn.rotation);
-                theCamera.transform.localPosition = Vector3.zero;
+                theCamera.transform.localPosition = default;
             }
             else
             {
@@ -390,13 +390,13 @@ namespace Game.Managers
         void DoMovement(float deltaTime)
         {
             if (float.IsNaN(Velocity.x) || float.IsNaN(Velocity.y))
-            { Velocity = Vector2.zero; }
+            { Velocity = default; }
 
             Velocity = Vector2.MoveTowards(Velocity, TargetVelocity, deltaTime * acceleration / 2);
 
             float verticalVelocity = Height - transform.position.y;
 
-            if (Velocity != Vector2.zero || verticalVelocity != 0f)
+            if (Velocity != default || verticalVelocity != 0f)
             {
                 // float heightMultiplier = Maths.Clamp((ZoomValue) * 0.1f, 0.5f, 1.0f);
                 float heightMultiplier = Maths.Max(.2f, Maths.Log(ZoomValue));

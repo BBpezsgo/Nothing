@@ -57,9 +57,10 @@ namespace Game.Components
             else
             { Debug.LogWarning($"Failed to add component {nameof(MeshRenderer)} to {obj}", this); }
 
-            if (obj.TryGetComponent(out BoxCollider boxCollider))
+            if (obj.TryGetComponent(out BoxCollider boxCollider) && meshRenderer != null)
             {
-                boxCollider.size = mesh.GetComponent<MeshRenderer>().localBounds.size;
+                boxCollider.center = meshRenderer.localBounds.center;
+                boxCollider.size = meshRenderer.localBounds.size;
             }
             else
             { Debug.LogWarning($"Failed to add component {nameof(BoxCollider)} to {obj}", this); }
@@ -82,7 +83,8 @@ namespace Game.Components
 
             float selfMass = (selfRigidbody != null) ? selfRigidbody.mass : 0f;
 
-            if (mesh.TryGetComponent(out DinoFracture.RuntimeFracturedGeometry selfFracture))
+            if (mesh.TryGetComponent(out DinoFracture.RuntimeFracturedGeometry selfFracture) &&
+                QualityHandler.EnableModelFragmentation)
             {
                 DinoFracture.RuntimeFracturedGeometry fracture = obj.AddComponent<DinoFracture.RuntimeFracturedGeometry>();
                 fracture.CopyFrom(selfFracture);
@@ -99,19 +101,19 @@ namespace Game.Components
                         if (child.TryGetComponent(out BoxCollider childBoxCollider) &&
                             child.TryGetComponent(out MeshRenderer childMeshRenderer))
                         {
-                            childBoxCollider.size = childMeshRenderer.localBounds.size;
                             childBoxCollider.center = childMeshRenderer.localBounds.center;
+                            childBoxCollider.size = childMeshRenderer.localBounds.size;
                         }
 
                         FracturedObjectScript fracturedObject = child.AddComponent<FracturedObjectScript>();
                         fracturedObject.LifeTime = Random.Range(20f, 40f);
-                        fracturedObject.Do = true;
 
                         if (FragmentSmokePrefab != null &&
-                            Random.value >= FragmentSmokeProbability)
+                            Random.value >= FragmentSmokeProbability &&
+                            QualityHandler.EnableParticles)
                         {
                             GameObject smoke = Instantiate(FragmentSmokePrefab, child.transform);
-                            smoke.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                            smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
                             smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
                         }
 
@@ -134,16 +136,16 @@ namespace Game.Components
             {
                 FracturedObjectScript fracturedObject = obj.AddComponent<FracturedObjectScript>();
                 fracturedObject.LifeTime = Random.Range(20f, 40f);
-                fracturedObject.Do = true;
 
                 if (ExplodeForce > float.Epsilon && rigidbody != null)
                 { rigidbody.AddExplosionForce(ExplodeForce, transform.position, 20f, 5f); }
 
                 if (FragmentSmokePrefab != null &&
-                    Random.value >= FragmentSmokeProbability)
+                    Random.value >= FragmentSmokeProbability &&
+                    QualityHandler.EnableParticles)
                 {
                     GameObject smoke = Instantiate(FragmentSmokePrefab, mesh.transform);
-                    smoke.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
                     smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
                 }
 

@@ -177,7 +177,7 @@ namespace Game.Components
             float springVelocity = Vector3.Dot(springDirection, rb.velocity);
             float springForce = (offset * SpringStrength) - (springVelocity * SpringDamper);
 
-            Vector3 force = Vector3.zero;
+            Vector3 force = default;
 
             force += springDirection * springForce;
 
@@ -185,7 +185,7 @@ namespace Game.Components
 
             rb.AddForce(force);
 
-            if (InputVector != Vector2.zero)
+            if (InputVector != default)
             {
                 rb.drag = 0f;
             }
@@ -251,7 +251,7 @@ namespace Game.Components
 
         internal override void DoUserInput()
         {
-            Vector3 input = Vector3.zero;
+            Vector3 input = default;
 
             input.z = Input.GetAxis("Horizontal");
             input.y = Input.GetAxis("Vertical");

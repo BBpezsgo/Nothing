@@ -74,11 +74,11 @@ public class KDTree
         return root;
     }
 
-    static void SwapElements(int[] array, int a, int b)
+    static void SwapElements(int[] array, int indexA, int indexB)
     {
-        int temp = array[a];
-        array[a] = array[b];
-        array[b] = temp;
+        int temp = array[indexA];
+        array[indexA] = array[indexB];
+        array[indexB] = temp;
     }
 
     /// <summary>

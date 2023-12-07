@@ -31,8 +31,8 @@ namespace Game.Components
         /// </summary>
         public float AngularVelocity => rb.angularVelocity.y;
 
-        Vector3 lastSpeed = Vector3.zero;
-        [SerializeField, ReadOnly] Vector3 acceleration = Vector3.zero;
+        Vector3 lastSpeed = default;
+        [SerializeField, ReadOnly] Vector3 acceleration = default;
         public Vector3 Acceleration => acceleration;
 
         protected virtual void Start()

@@ -87,7 +87,7 @@ namespace Game.Components
 
                 projPosition = shot.Position(lifetime);
 
-                float d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
+                float d = Maths.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
 
                 angle_ = Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
 
@@ -100,7 +100,7 @@ namespace Game.Components
 
                     projPosition = shot.Position(lifetime + t.Value);
 
-                    d = Vector2.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
+                    d = Maths.Distance(turret.ShootPosition.To2D(), projPosition.To2D());
 
                     angle_ = Ballistics.AngleOfReach2(v, turret.ShootPosition, projPosition);
 
@@ -126,7 +126,7 @@ namespace Game.Components
             else
             {
                 turret.Input = default;
-                turret.SetTarget(Vector3.zero);
+                turret.SetTarget(default(Vector3));
             }
 
             // turret.target = transform.position + relativePosition;

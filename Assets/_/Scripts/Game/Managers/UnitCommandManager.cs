@@ -66,7 +66,7 @@ namespace Game.Managers
                 if (((Component)SelectionManager.Selected[i]).TryGetComponent(out Components.UnitBehaviour_Goto @goto))
                 {
                     SeekTargetInstances[i].transform.position = @goto.Target + new Vector3(0f, 0.05f, 0f);
-                    if (@goto.Target != Vector3.zero)
+                    if (@goto.Target != default)
                     {
                         bool clustered = false;
                         for (int j = 0; j < positions.Count; j++)

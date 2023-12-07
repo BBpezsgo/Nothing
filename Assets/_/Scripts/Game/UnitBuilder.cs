@@ -102,7 +102,7 @@ namespace Game.Components
                 { TimeToNextTargetSearch = 0f; }
 
                 if (TryGetComponent(out UnitBehaviour_Seek seek))
-                { seek.Target = Vector3.zero; }
+                { seek.Target = default; }
             }
             else
             {
@@ -138,7 +138,7 @@ namespace Game.Components
                 }
 
                 if (TryGetComponent(out UnitBehaviour_Seek seek))
-                { seek.Target = Vector3.zero; }
+                { seek.Target = default; }
             }
             else
             {
@@ -176,10 +176,10 @@ namespace Game.Components
                 TimeToNextTargetSearch = 2f;
             }
 
-            if (turret != null) turret.SetTarget(Vector3.zero);
+            if (turret != null) turret.SetTarget(default(Vector3));
 
             if (TryGetComponent(out UnitBehaviour_Seek seek))
-            { seek.Target = Vector3.zero; }
+            { seek.Target = default; }
 
             if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
             { avoidObstacles.IgnoreCollision = null; }

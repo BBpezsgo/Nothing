@@ -117,6 +117,6 @@ namespace Grid
         }
 
         internal static void DebugDraw<T>(this Grid<T> grid, Color color)
-            => DebugDraw(grid, Vector3.zero, color);
+            => DebugDraw(grid, default, color);
     }
 }

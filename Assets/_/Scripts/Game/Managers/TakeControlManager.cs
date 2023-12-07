@@ -53,7 +53,7 @@ namespace Game.Managers
         public int CursorPriority => 5;
 
         [SerializeField, ReadOnly] CameraController CameraController = null!;
-        [SerializeField] ICanTakeControl? ControllingObject;
+        ICanTakeControl? ControllingObject;
 
         [SerializeField] LayerMask CursorHitLayer;
 
@@ -99,7 +99,7 @@ namespace Game.Managers
         [SerializeField, ReadOnly] CrossStyle CurrentCrossStyle = CrossStyle.Cross;
 
         Texture2D? SphereFilled;
-        Rect targetRect = Rect.zero;
+        Rect targetRect = default;
 
         static readonly (float Inner, float Outer) CrossSize = (4f, 12f);
         static readonly Color ShadowColor = new(0f, 0f, 0f, .8f);
@@ -168,6 +168,18 @@ namespace Game.Managers
             ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
             ControllingObjects.OnListChanged += ControllingObjectsChanged;
             ControllingObjects.Initialize(this);
+        }
+
+        void HandleOnDamagedSomebody((Vector3 Position, float Amount, DamageKind Kind)[] damages)
+        {
+            for (int i = 0; i < damages.Length; i++)
+            { HandleOnDamagedSomebody(damages[i].Position, damages[i].Amount, damages[i].Kind); }
+        }
+
+        void HandleOnDamagedSomebody(Vector3 position, float amount, DamageKind damageKind)
+        {
+            if (DamagePopupManager.Instance != null)
+            { DamagePopupManager.Instance.Add(position, amount, damageKind); }
         }
 
         public void ShouldAlwaysControl(ulong clientId, ulong objectId, bool should)
@@ -518,6 +530,7 @@ namespace Game.Managers
             CameraController.FollowObject = ((Component)unit).transform;
             CameraController.JustFollow = false;
             ControllingObject = unit;
+            unit.OnDamagedSomebody = HandleOnDamagedSomebody;
 
             if ((Object?)ControllingObject != null &&
                 ((Component)ControllingObject).TryGetComponent(out HoveringLabel label) &&
@@ -583,6 +596,7 @@ namespace Game.Managers
             CameraController.FollowObject = ((Component)unit).transform;
             CameraController.JustFollow = false;
             ControllingObject = unit;
+            unit.OnDamagedSomebody = HandleOnDamagedSomebody;
 
             UI.gameObject.SetActive(true);
             BarHealth = UI.rootVisualElement.Q<ProgressBar>("bar-health");
@@ -670,9 +684,10 @@ namespace Game.Managers
 
             if (ControllingObject is ICanTakeControlAndHasTurret hasTurret &&
                 hasTurret.Turret != null)
-            { hasTurret.Turret.SetTarget(Vector3.zero); }
+            { hasTurret.Turret.SetTarget(default(Vector3)); }
 
             CameraController.FollowObject = null;
+            ControllingObject.OnDamagedSomebody = null;
             ControllingObject = null;
 
             if (CursorManager.Instance != null) CursorManager.Instance.ForceUpdate();
@@ -691,6 +706,7 @@ namespace Game.Managers
             if ((Object?)ControllingObject == null) return;
 
             CameraController.FollowObject = null;
+            ControllingObject.OnDamagedSomebody = null;
             ControllingObject = null;
 
             if (CursorManager.Instance != null) CursorManager.Instance.ForceUpdate();
@@ -923,17 +939,17 @@ namespace Game.Managers
             if (!IsControlling)
             { return; }
 
-            Vector2 predictedHitPosition = Vector2.zero;
-            Vector2 mousePosition = Vector2.zero;
+            Vector2 predictedHitPosition = default;
+            Vector2 mousePosition = default;
 
             float reloadPercent = 1f;
             bool isAccurate = true;
 
             bool hasTargetRect = false;
-            Rect targetRect = Rect.zero;
+            Rect targetRect = default;
 
-            Vector2 targetPosition = Vector2.zero;
-            Vector2 predictedTargetPosition = Vector2.zero;
+            Vector2 targetPosition = default;
+            Vector2 predictedTargetPosition = default;
 
             bool showReload = false;
 
@@ -979,12 +995,12 @@ namespace Game.Managers
                 showReload = hasTurret.Turret.reloadTime >= .5f;
 
                 Vector3 _targetPosition = hasTurret.Turret.TargetPosition;
-                if (_targetPosition != Vector3.zero)
+                if (_targetPosition != default)
                 {
                     targetPosition = GUIUtils.TransformPoint(MainCamera.Camera.WorldToScreenPoint(_targetPosition));
 
                     Vector3 _targetPredictedOffset = hasTurret.Turret.PredictedOffset;
-                    if (_targetPredictedOffset != Vector3.zero)
+                    if (_targetPredictedOffset != default)
                     {
                         predictedTargetPosition = GUIUtils.TransformPoint(MainCamera.Camera.WorldToScreenPoint(_targetPosition + _targetPredictedOffset));
                     }
@@ -1034,7 +1050,7 @@ namespace Game.Managers
             TargetLockingAnimationController.Refresh(!hasTargetRect);
             TargetLockingAnimation.Refresh();
 
-            if (this.targetRect == Rect.zero)
+            if (this.targetRect == default)
             { this.targetRect = targetRect; }
             else
             {
@@ -1042,7 +1058,7 @@ namespace Game.Managers
                 {
                     if (!TargetLockingAnimation.IsStarted || TargetLockingAnimation.IsFinished)
                     {
-                        this.targetRect = Rect.zero;
+                        this.targetRect = default;
                     }
                 }
                 else
@@ -1057,9 +1073,9 @@ namespace Game.Managers
             if (MouseManager.MouseOnWindow)
             { mousePosition = GUIUtils.TransformPoint(Input.mousePosition); }
 
-            if (predictedHitPosition == Vector2.zero &&
-                mousePosition == Vector2.zero &&
-                targetPosition == Vector2.zero)
+            if (predictedHitPosition == default &&
+                mousePosition == default &&
+                targetPosition == default)
             { return; }
 
             Vector2 reloadIndicatorCenter = mousePosition;
@@ -1073,12 +1089,12 @@ namespace Game.Managers
             {
                 if (trajectoryPath != null) DrawTrajectory(trajectoryPath);
 
-                Vector2 _targetPosition = (predictedTargetPosition != Vector2.zero) ? predictedTargetPosition : targetPosition;
+                Vector2 _targetPosition = (predictedTargetPosition != default) ? predictedTargetPosition : targetPosition;
 
-                if (_targetPosition != Vector2.zero && (_targetPosition - mousePosition).sqrMagnitude > MeltDistance)
+                if (_targetPosition != default && (_targetPosition - mousePosition).sqrMagnitude > MeltDistance)
                 { DrawCross(_targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction); }
 
-                if (mousePosition != Vector2.zero)
+                if (mousePosition != default)
                 {
                     float animation = TargetLockingAnimation.Percent;
                     if (hasTargetRect || animation > 0f)
@@ -1099,7 +1115,7 @@ namespace Game.Managers
                     }
                 }
 
-                if (predictedHitPosition != Vector2.zero && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
+                if (predictedHitPosition != default && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
                 {
                     DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
                 }
@@ -1179,7 +1195,7 @@ namespace Game.Managers
 
                             size += (1f - fadeOutPercent) * 4f;
 
-                            Vector2 offset = Vector2.zero;
+                            Vector2 offset = default;
 
                             offset += direction * ReloadDotsRadius;
                             offset += direction * ((1f - fadeOutPercent) * 4f);
@@ -1235,6 +1251,8 @@ namespace Game.Components
 {
     public interface ICanTakeControl : IComponent
     {
+        public System.Action<(Vector3 Position, float Amount, DamageKind Kind)[]>? OnDamagedSomebody { get; set; }
+
         void DoInput();
         void DoFrequentInput();
 

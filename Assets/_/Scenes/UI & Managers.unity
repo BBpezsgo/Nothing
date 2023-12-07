@@ -311,8 +311,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 48012913}
-  - component: {fileID: 48012912}
   - component: {fileID: 48012911}
+  - component: {fileID: 48012912}
   m_Layer: 0
   m_Name: Netcode Services
   m_TagString: GameController
@@ -2998,6 +2998,53 @@ Transform:
   m_Father: {fileID: 1642061746}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1275343257
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1275343258}
+  - component: {fileID: 1275343259}
+  m_Layer: 0
+  m_Name: Damage Popup Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1275343258
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275343257}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 24
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1275343259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275343257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76733e7b43eda574e8a4d33a67fb5d2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LabelOffset: {x: 4, y: -6}
+  PhysicalDamageColor: {r: 0.9622642, g: 0.83253515, b: 0.32226774, a: 1}
+  ExplosiveDamageColor: {r: 0.8584906, g: 0.36235, b: 0, a: 1}
 --- !u!1 &1290309619
 GameObject:
   m_ObjectHideFlags: 0
@@ -3231,6 +3278,8 @@ Transform:
   - {fileID: 277554303}
   - {fileID: 1702828254}
   - {fileID: 1154673029}
+  - {fileID: 1513750505}
+  - {fileID: 1275343258}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3382,7 +3431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58e82f17a7b2c7c4dba9ce04b5f00f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartOffline: 0
+  StartOffline: 1
   LoadScene: Testing
 --- !u!114 &1376606815
 MonoBehaviour:
@@ -3491,6 +3540,52 @@ MonoBehaviour:
   scenes:
   - Testing
   - Testing 1
+--- !u!1 &1513750504
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1513750505}
+  - component: {fileID: 1513750506}
+  m_Layer: 0
+  m_Name: Quality Handler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1513750505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513750504}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1358086404}
+  m_RootOrder: 23
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1513750506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1513750504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98ed31d0063c58c4bb4a2f3de48ee6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enableParticles: 1
+  _enableModelFragmentation: 1
 --- !u!1 &1541074568
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,7 +21,7 @@ namespace Authentication.Providers
 
         void Start()
         {
-            loginMenu.OnEnabled().onEnable += () =>
+            loginMenu.OnEnabled().On += () =>
             {
 #if UNITY_EDITOR
                 loginMenu.rootVisualElement.Q<Button>("button-quit").clicked += () => UnityEditor.EditorApplication.isPlaying = false;

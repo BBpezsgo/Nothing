@@ -610,7 +610,7 @@ namespace InputUtils
 
         public void Reset()
         {
-            this.DragStart = Vector2.zero;
+            this.DragStart = default;
             this.ClickedOnUI = false;
             this.Drag = false;
             this.UpInvoked = true;
@@ -689,7 +689,7 @@ namespace InputUtils
                 }
             }
 
-            DragStart = Vector2.zero;
+            DragStart = default;
             Drag = false;
             UpInvoked = true;
             PressedAt = 0f;
@@ -1031,7 +1031,7 @@ namespace InputUtils
 
         float StartDistance;
         float LastDistanceDiff;
-        float Distance => Vector2.Distance(Touch1Position.Current, Touch2Position.Current);
+        float Distance => Maths.Distance(Touch1Position.Current, Touch2Position.Current);
 
         public bool BothTouchActive => Touch1.IsActive && Touch2.IsActive;
         public bool BothTouchActiveAndCaptured => Touch1.IsActiveAndCaptured && Touch2.IsActiveAndCaptured;
@@ -1040,10 +1040,10 @@ namespace InputUtils
         {
             get
             {
-                if (BothTouchActive) return Vector2.zero;
+                if (BothTouchActive) return default;
                 if (Touch1.IsActive) return Touch1.PositionDelta;
                 if (Touch2.IsActive) return Touch2.PositionDelta;
-                return Vector2.zero;
+                return default;
             }
         }
 
@@ -1076,7 +1076,7 @@ namespace InputUtils
 
         void StartZooming()
         {
-            StartDistance = Vector2.Distance(Touch1Position.Start, Touch2Position.Start);
+            StartDistance = Maths.Distance(Touch1Position.Start, Touch2Position.Start);
             LastDistanceDiff = Distance - StartDistance;
         }
 

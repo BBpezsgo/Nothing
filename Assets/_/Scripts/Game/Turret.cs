@@ -413,9 +413,9 @@ namespace Game.Components
 
             Vector3 targetPosition = TargetPosition;
 
-            if (targetPosition == Vector3.zero)
+            if (targetPosition == default)
             {
-                predictedOffset = Vector3.zero;
+                predictedOffset = default;
                 currentError = 1f;
                 if (ResetAfterTime)
                 {
@@ -436,14 +436,14 @@ namespace Game.Components
                 TurretInput input;
                 if (overriddenInput != default)
                 {
-                    predictedOffset = Vector3.zero;
+                    predictedOffset = default;
                     input = overriddenInput;
                     this.input = input;
                 }
                 else
                 {
-                    Vector3 targetVelocity = Vector3.zero;
-                    Vector3 targetAcceleration = Vector3.zero;
+                    Vector3 targetVelocity = default;
+                    Vector3 targetAcceleration = default;
                     if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out Rigidbody targetRigidbody))
                     {
                         targetVelocity = targetRigidbody.velocity;
@@ -467,7 +467,7 @@ namespace Game.Components
         TurretInput Aim(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration)
         {
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Vector2.Distance(selfGround, shootPosition.position.To2D());
+            float cannonLength = Maths.Distance(selfGround, shootPosition.position.To2D());
 
             targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
 
@@ -490,7 +490,7 @@ namespace Game.Components
                     targetPosition += offset3;
                 }
                 else
-                { predictedOffset = Vector3.zero; }
+                { predictedOffset = default; }
 
                 // Debug.DrawLine(transform.position, targetPosition, Color.green, Time.fixedDeltaTime);
             }
@@ -504,7 +504,7 @@ namespace Game.Components
                     targetPosition += offset.To3D();
                 }
                 else
-                { predictedOffset = Vector3.zero; }
+                { predictedOffset = default; }
             }
 
             return Aim(targetPosition);
@@ -521,7 +521,7 @@ namespace Game.Components
             // cannonAngle = -(90f - cannonAngle);
 
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Vector2.Distance(selfGround, shootPosition.position.To2D());
+            float cannonLength = Maths.Distance(selfGround, shootPosition.position.To2D());
 
             targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
 
@@ -636,7 +636,7 @@ namespace Game.Components
 
             Vector3 impact = _impact.Value;
 
-            float d = Vector3.Distance(ShootPosition, impact);
+            float d = Maths.Distance(ShootPosition, impact);
 
             if (IsBallisticProjectile)
             {
@@ -823,7 +823,7 @@ namespace Game.Components
             if (!instantiatedAnyProjectile)
             { return false; }
 
-            if (Shells != null)
+            if (Shells != null && QualityHandler.EnableParticles)
             { Shells.Emit(1); }
 
             if (IsServer)
@@ -844,13 +844,16 @@ namespace Game.Components
 
             reload = reloadTime;
 
-            for (int i = 0; i < ShootEffectInstances.Length; i++)
-            { ShootEffectInstances[i].Emit(); }
+            if (QualityHandler.EnableParticles)
+            {
+                for (int i = 0; i < ShootEffectInstances.Length; i++)
+                { ShootEffectInstances[i].Emit(); }
+            }
 
             return true;
         }
 
-        internal void NotifyImpact(Projectile projectile, Vector3 at)
+        public void NotifyImpact(Projectile projectile, Vector3 at)
         {
             for (int i = shots.Count - 1; i >= 0; i--)
             {
@@ -860,7 +863,13 @@ namespace Game.Components
             }
         }
 
-        internal float GetRange()
+        public void NotifyDamage(Projectile projectile, (Vector3 Position, float Amount, DamageKind Kind)[] damages)
+        {
+            if (@base is ICanTakeControl canTakeControl)
+            { canTakeControl.OnDamagedSomebody?.Invoke(damages); }
+        }
+
+        public float GetRange()
         {
             float range;
             using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
@@ -893,7 +902,7 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            if (TargetPosition != Vector3.zero)
+            if (TargetPosition != default)
             {
                 Gizmos.color = Color.red;
                 Gizmos.DrawWireSphere(TargetPosition, .5f);
@@ -947,9 +956,9 @@ namespace Game.Components
             get
             {
                 if (NetcodeUtils.IsClient)
-                { return targetTransform == null && netTarget.Value == Vector3.zero; }
+                { return targetTransform == null && netTarget.Value == default; }
                 else
-                { return targetTransform == null && target == Vector3.zero; }
+                { return targetTransform == null && target == default; }
             }
         }
     }

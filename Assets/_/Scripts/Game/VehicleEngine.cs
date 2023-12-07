@@ -11,7 +11,7 @@ namespace Game.Components
     {
         [SerializeField, ReadOnly] Unit unit;
 
-        [SerializeField, ReadOnly] Vector2 input = Vector2.zero;
+        [SerializeField, ReadOnly] Vector2 input = default;
 
         [Serializable]
         public class Wheel
@@ -276,19 +276,19 @@ namespace Game.Components
 
         void Update()
         {
-            if (HasTrailRenderers)
+            if (HasTrailRenderers && QualityHandler.EnableParticles)
             {
                 for (int i = 0; i < trailRenderers.Count; i++)
                 { trailRenderers[i].emitting = TrailEmission; }
             }
 
-            if (HasDustParticles)
+            if (HasDustParticles && QualityHandler.EnableParticles)
             {
                 DustEmissionRate = Maths.Lerp(DustEmissionRate, 0, Time.deltaTime * 5);
                 dustParticlesEmission.rateOverTime = InWater ? 0f : DustEmissionRate;
             }
 
-            if (HasWaterParticles)
+            if (HasWaterParticles && QualityHandler.EnableParticles)
             {
                 WaterEmissionRate = Maths.Lerp(WaterEmissionRate, 0, Time.deltaTime * 5);
                 waterParticlesEmission.rateOverTime = InWater ? WaterEmissionRate : 0f;
@@ -302,7 +302,7 @@ namespace Game.Components
         {
             rb.MovePosition(transform.position + new Vector3(0f, 2f, 0f));
             rb.MoveRotation(Quaternion.Euler(0f, rb.rotation.eulerAngles.y, 0f));
-            rb.angularVelocity = Vector3.zero;
+            rb.angularVelocity = default;
         }
 
         protected override void FixedUpdate()
@@ -375,7 +375,7 @@ namespace Game.Components
 
                     Vector3 tireWorldVelocity = rb.GetPointVelocity(wheelPosition);
 
-                    Vector3 force = Vector3.zero;
+                    Vector3 force = default;
 
                     // Spring
                     {
@@ -659,7 +659,7 @@ namespace Game.Components
 
         internal override void DoUserInput()
         {
-            Vector2 input = Vector2.zero;
+            Vector2 input = default;
 
             input.x = Input.GetAxis("Horizontal");
             input.y = Input.GetAxis("Vertical");

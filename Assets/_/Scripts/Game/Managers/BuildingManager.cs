@@ -311,7 +311,7 @@ namespace Game.Managers
             }
 
             GameObject hologramModels = GetHologramModelGroup(hologram.gameObject);
-            hologramModels.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            hologramModels.transform.SetPositionAndRotation(default, Quaternion.identity);
             CopyModel(building.Building, hologramModels);
 
             GameObject colliders = building.Building.transform.Find("Collider").gameObject;
@@ -325,7 +325,7 @@ namespace Game.Managers
             if (hologram == null) return;
 
             GameObject hologramModels = GetHologramModelGroup(hologram);
-            hologramModels.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            hologramModels.transform.SetPositionAndRotation(default, Quaternion.identity);
             CopyModel(buildingPrefab.Building, hologramModels);
 
             List<MeshRenderer> renderers = new();
@@ -344,7 +344,7 @@ namespace Game.Managers
 
             hologramModels = new GameObject("Model").transform;
             hologramModels.SetParent(hologram.transform);
-            hologramModels.localPosition = Vector3.zero;
+            hologramModels.localPosition = default;
             return hologramModels.gameObject;
         }
 

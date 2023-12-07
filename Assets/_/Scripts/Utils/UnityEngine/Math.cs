@@ -1088,5 +1088,20 @@ public struct Maths
         return (1.0f / 6.0f) * (-v321 + v231 + v312 - v132 - v213 + v123);
     }
 
+    public static float Distance(Vector3 a, Vector3 b)
+    {
+        float x = a.x - b.x;
+        float y = a.y - b.y;
+        float z = a.z - b.z;
+        return MathF.Sqrt((x * x) + (y * y) + (z * z));
+    }
+
+    public static float Distance(Vector2 a, Vector2 b)
+    {
+        float x = a.x - b.x;
+        float y = a.y - b.y;
+        return MathF.Sqrt((x * x) + (y * y));
+    }
+
     #endregion
 }

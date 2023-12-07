@@ -8,7 +8,7 @@ public class LinkAttribute : PropertyAttribute
 [Serializable]
 public class InspectorTimeSpan : UnityEngine.Object, IEquatable<TimeSpan>, IEquatable<InspectorTimeSpan>
 {
-    TimeSpan v;
+    readonly TimeSpan v;
 
     public InspectorTimeSpan(TimeSpan v) => this.v = v;
 
@@ -26,20 +26,20 @@ public class InspectorTimeSpan : UnityEngine.Object, IEquatable<TimeSpan>, IEqua
     public static bool operator !=(InspectorTimeSpan a, InspectorTimeSpan b) => !(a == b);
     public static bool operator ==(InspectorTimeSpan a, InspectorTimeSpan b)
     {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
+        if ((UnityEngine.Object)a == null && (UnityEngine.Object)b == null) return true;
+        if ((UnityEngine.Object)a == null || (UnityEngine.Object)b == null) return false;
         return a.Equals(b);
     }
     public static bool operator !=(InspectorTimeSpan a, TimeSpan b) => !(a == b);
     public static bool operator ==(InspectorTimeSpan a, TimeSpan b)
     {
-        if (a == null) return false;
+        if ((UnityEngine.Object)a == null) return false;
         return a.v.Equals(b);
     }
     public static bool operator !=(TimeSpan a, InspectorTimeSpan b) => !(a == b);
     public static bool operator ==(TimeSpan a, InspectorTimeSpan b)
     {
-        if (b == null) return false;
+        if ((UnityEngine.Object)b == null) return false;
         return a.Equals(b.v);
     }
 }

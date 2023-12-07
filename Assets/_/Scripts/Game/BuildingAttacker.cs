@@ -1,7 +1,4 @@
-using AssetManager;
-
 using Game.Managers;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -14,6 +11,7 @@ namespace Game.Components
 
         [field: SerializeField] public TakeControlManager.CrossStyle CrossStyle { get; set; }
         [field: SerializeField] public TakeControlManager.ReloadIndicatorStyle ReloadIndicatorStyle { get; set; }
+        public System.Action<(Vector3 Position, float Amount, DamageKind Kind)[]> OnDamagedSomebody { get; set; }
 
         public virtual void DoInput() => Attacker.DoInput();
         public virtual void DoFrequentInput() => Attacker.DoFrequentInput();

@@ -46,7 +46,7 @@ namespace Game.Components
             if (!IsGrounded && !InWater) return;
             if (IsFlippedOver) return;
 
-            if (Destination == Vector3.zero)
+            if (Destination == default)
             {
                 Destination = FindNewDestination();
                 return;
@@ -79,11 +79,11 @@ namespace Game.Components
             currentSpitCooldown = SpitCooldown;
 
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Vector2.Distance(selfGround, SpitPosition.position.To2D());
+            float cannonLength = Maths.Distance(selfGround, SpitPosition.position.To2D());
 
             Vector3 targetPosition = target.transform.position;
 
-            Vector3 targetVelocity = Vector3.zero;
+            Vector3 targetVelocity = default;
             if (target.TryGetComponent(out Rigidbody targetRigidbody))
             { targetVelocity = targetRigidbody.velocity; }
             if (targetVelocity.To2D().sqrMagnitude > .1f)
@@ -125,10 +125,7 @@ namespace Game.Components
             }
             if (spit.TryGetComponent(out Projectile projectile))
             {
-                projectile.ignoreCollision = new Transform[]
-                {
-                transform,
-                };
+                projectile.ignoreCollision = new Transform[] { transform };
             }
         }
 
@@ -146,7 +143,7 @@ namespace Game.Components
 
         void Movement(Vector3 destination)
         {
-            float distanceToDestination = Vector2.Distance(transform.position.To2D(), destination.To2D());
+            float distanceToDestination = Maths.Distance(transform.position.To2D(), destination.To2D());
 
             if (distanceToDestination < 1f)
             {

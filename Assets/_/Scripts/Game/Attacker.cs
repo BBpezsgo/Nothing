@@ -49,7 +49,7 @@ namespace Game.Components
                 if (allUnit[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allUnit[i].TeamHash) <= 0f)
                 { continue; }
-                if (Vector3.Distance(transform.position, allUnit[i].transform.position) > DetectionRadius)
+                if (Maths.Distance(transform.position, allUnit[i].transform.position) > DetectionRadius)
                 { continue; }
 
                 targets[j++] = allUnit[i];
@@ -61,7 +61,7 @@ namespace Game.Components
                 if (allBuilding[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allBuilding[i].TeamHash) <= 0f)
                 { continue; }
-                if (Vector3.Distance(transform.position, allBuilding[i].transform.position) > DetectionRadius)
+                if (Maths.Distance(transform.position, allBuilding[i].transform.position) > DetectionRadius)
                 { continue; }
 
                 targets[j++] = allBuilding[i];
@@ -124,7 +124,7 @@ namespace Game.Components
 
             if (turret != null)
             {
-                turret.SetTarget(Vector3.zero);
+                turret.SetTarget(default(Vector3));
                 turret.PrepareShooting = false;
             }
         }
@@ -137,14 +137,15 @@ namespace Game.Components
                 { return false; }
             }
 
-            bool first = false;
-            if (turret.HasNoTarget)
-            { first = true; }
+            bool firstFound = turret.HasNoTarget;
 
             turret.SetTarget(target.transform);
             turret.PrepareShooting = true;
 
-            if (!first && turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
+            if (!firstFound &&
+                turret.IsAccurateShoot &&
+                NetcodeUtils.IsOfflineOrServer &&
+                Maths.Distance(turret.ShootPosition, target.transform.position) <= turret.GetRange())
             {
                 if (target.TryGetComponent(out requiredShoots))
                 { turret.Shoot(requiredShoots); }

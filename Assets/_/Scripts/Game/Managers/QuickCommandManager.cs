@@ -126,7 +126,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
         int selected = -1;
 
-        if (Vector2.Distance(mousePosition, center) >= InnerRadius)
+        if (Maths.Distance(mousePosition, center) >= InnerRadius)
         {
             Vector2 mouseDirection = mouseOffset.normalized;
             float smallestDot = float.MaxValue;
