@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    internal class Building : BaseObject, IDamagable
+    public class Building : BaseObject, IDamagable
     {
         [SerializeField] GameObject DestroyEffect;
         [SerializeField] public Vector3 GroundOrigin;
@@ -23,7 +23,7 @@ namespace Game.Components
         void OnDisable()
         { RegisteredObjects.Buildings.Remove(this); }
 
-        protected virtual void Start()
+        protected override void Start()
         {
             UpdateTeam();
         }

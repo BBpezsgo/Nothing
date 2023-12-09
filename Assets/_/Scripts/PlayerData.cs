@@ -1,28 +1,27 @@
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
-public class PlayerData : MonoBehaviour
+public class PlayerData : SingleInstance<PlayerData>
 {
     [Serializable]
-    internal class ProducableUnit
+    public class ProducableUnit
     {
-        [SerializeField, ReadOnly] internal uint Hash;
-        [SerializeField] internal GameObject Unit;
-        [SerializeField] internal float ProgressRequied;
-        [SerializeField] internal string ThumbnailID;
+        [SerializeField, ReadOnly] public uint Hash;
+        [SerializeField] public GameObject Unit;
+        [SerializeField] public float ProgressRequied;
+        [SerializeField] public string ThumbnailID;
     }
 
     [Serializable]
-    internal class ConstructableBuilding
+    public class ConstructableBuilding
     {
-        [SerializeField, ReadOnly] internal uint Hash;
-        [SerializeField] internal Vector3 SpaceNeed = Vector3.one;
-        [SerializeField] internal GameObject Building;
-        [SerializeField] internal float ProgressRequied;
-        [SerializeField] internal string ThumbnailID;
-        internal Vector3 GroundOrigin
+        [SerializeField, ReadOnly] public uint Hash;
+        [SerializeField] public Vector3 SpaceNeed = Vector3.one;
+        [SerializeField] public GameObject Building;
+        [SerializeField] public float ProgressRequied;
+        [SerializeField] public string ThumbnailID;
+        public Vector3 GroundOrigin
         {
             get
             {
@@ -33,11 +32,13 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    [SerializeField] internal string Team;
+    [SerializeField] public string Team;
 
-    [SerializeField] internal List<ProducableUnit> ProducableUnits = new();
-    [SerializeField] internal List<ConstructableBuilding> ConstructableBuildings = new();
+    [SerializeField] public List<ProducableUnit> ProducableUnits = new();
+    [SerializeField] public List<ConstructableBuilding> ConstructableBuildings = new();
     [SerializeField, Button(nameof(GenerateHashes), true, false, "Generate Hashes")] string btn_GenHash;
+
+#nullable enable
 
     bool IsHashUnique(uint hash)
     {
@@ -67,7 +68,15 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    internal static PlayerData GetPlayerData(string team)
+    public static PlayerData? GetCurrentPlayerData()
+    {
+        PlayerData[] playerDatas = GameObject.FindObjectsOfType<PlayerData>();
+        for (int i = 0; i < playerDatas.Length; i++)
+        { if (playerDatas[i].Team == instance.Team) return playerDatas[i]; }
+        return null;
+    }
+
+    public static PlayerData? GetPlayerData(string team)
     {
         PlayerData[] playerDatas = GameObject.FindObjectsOfType<PlayerData>();
         for (int i = 0; i < playerDatas.Length; i++)
@@ -75,7 +84,7 @@ public class PlayerData : MonoBehaviour
         return null;
     }
 
-    internal static bool TryGetThumbnail(string id, out Texture2D thumbnail)
+    public static bool TryGetThumbnail(string id, out Texture2D thumbnail)
     {
         string path = $"Thumbnails/{id}";
         thumbnail = Resources.Load<Texture2D>(path);

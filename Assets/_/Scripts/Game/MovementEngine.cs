@@ -35,7 +35,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] Vector3 acceleration = default;
         public Vector3 Acceleration => acceleration;
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             if (!TryGetComponent(out rb))
             { Debug.LogError($"[{nameof(MovementEngine)}]: {nameof(rb)} is null", this); }

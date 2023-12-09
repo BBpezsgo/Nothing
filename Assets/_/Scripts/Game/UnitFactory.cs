@@ -6,16 +6,16 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    internal class UnitFactory : Building, INeedDirectWorldCursor
+    public class UnitFactory : Building, INeedDirectWorldCursor
     {
         [Serializable]
-        internal struct QueuedUnit : INetworkSerializable, IEquatable<QueuedUnit>
+        public struct QueuedUnit : INetworkSerializable, IEquatable<QueuedUnit>
         {
-            [SerializeField, ReadOnly] internal FixedString32Bytes PrefabID;
-            [SerializeField, ReadOnly] internal float RequiedProgress;
-            [SerializeField, ReadOnly] internal FixedString32Bytes ThumbnailID;
+            [SerializeField, ReadOnly] public FixedString32Bytes PrefabID;
+            [SerializeField, ReadOnly] public float RequiedProgress;
+            [SerializeField, ReadOnly] public FixedString32Bytes ThumbnailID;
 
-            [SerializeField, ReadOnly] internal float Progress;
+            [SerializeField, ReadOnly] public float Progress;
 
             public readonly bool Equals(QueuedUnit other) => this.PrefabID == other.PrefabID;
 
@@ -27,7 +27,10 @@ namespace Game.Components
             }
         }
 
-        internal NetworkList<QueuedUnit> Queue;
+        public NetworkList<QueuedUnit> Queue;
+        [SerializeField] Transform DepotSpawn;
+
+#nullable enable
 
         public int CursorPriority => 0;
 
@@ -41,16 +44,13 @@ namespace Game.Components
             }
         }
 
-        [SerializeField] Transform DepotSpawn;
-
         void OnEnable()
         { WorldCursorManager.Instance.Register(this); }
         void OnDisable()
         { WorldCursorManager.Instance.Deregister(this); }
 
-        protected override void Awake()
+        void Awake()
         {
-            base.Awake();
             Queue = new NetworkList<QueuedUnit>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
             Queue.OnListChanged += OnQueueChanged;
         }
@@ -113,7 +113,7 @@ namespace Game.Components
             return true;
         }
 
-        internal void QueueUnit(UnitFactoryManager.ProducableUnit unit)
+        public void QueueUnit(UnitFactoryManager.ProducableUnit unit)
         {
             if (!NetcodeUtils.IsOfflineOrServer)
             {

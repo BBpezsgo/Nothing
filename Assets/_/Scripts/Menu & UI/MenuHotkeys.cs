@@ -25,14 +25,9 @@ namespace Game.UI
         [SerializeField] VisualTreeAsset HotkeyButton;
         [SerializeField] internal Hotkey[] Hotkeys = new Hotkey[0];
 
-        protected override void Awake()
-        {
-            base.Awake();
-            UI = GetComponent<UIDocument>();
-        }
-
         void Start()
         {
+            UI = GetComponent<UIDocument>();
             StartCoroutine(Refresh());
         }
 

@@ -10,9 +10,13 @@ public class ProceduralTerrain : MonoBehaviour
 
     [SerializeField, Button(nameof(Generate), false, true)] string ButtonGenerate;
 
-    void Start()
+    void Awake()
     {
         Terrain = GetComponent<Terrain>();
+    }
+
+    void Start()
+    {
         Data = new TerrainData();
         Terrain.terrainData = Data;
         Generate();

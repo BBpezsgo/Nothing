@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game;
+using Game.Components;
 using Game.Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -53,13 +54,13 @@ public class GameManager : SingleNetworkInstance<GameManager>
         {
             if (!TryGetClientObject(clientId, out _))
             {
-                ClientObjectInstances.Add(InstantiatePlayerObject(ClientObjectPrefab, clientId));
+                ClientObjectInstances.Add(InstantiatePlayerObject(ClientObjectPrefab, clientId, PlayerData.Instance.Team));
             }
         }
 
         if (!TryGetClientObject(NetworkManager.ServerClientId, out _))
         {
-            ClientObjectInstances.Add(InstantiatePlayerObject(ClientObjectPrefab, NetworkManager.ServerClientId));
+            ClientObjectInstances.Add(InstantiatePlayerObject(ClientObjectPrefab, NetworkManager.ServerClientId, PlayerData.Instance.Team));
         }
     }
 
@@ -107,7 +108,7 @@ public class GameManager : SingleNetworkInstance<GameManager>
         TakeControlManager.Instance.ShouldAlwaysControl(clientId, objectId, true);
     }
 
-    GameObject InstantiatePlayerObject(GameObject prefab, ulong ownerId)
+    GameObject InstantiatePlayerObject(GameObject prefab, ulong ownerId, string team)
     {
         if (NetcodeUtils.IsClient)
         {
@@ -116,10 +117,15 @@ public class GameManager : SingleNetworkInstance<GameManager>
         }
 
         GameObject instance = GameObject.Instantiate(prefab, ObjectGroups.Game);
-        if (instance.TryGetComponent(out Game.Components.Unit unit))
-        {
 
-        }
+        BaseObject baseObject = instance.GetComponentInChildren<BaseObject>(false);
+        if (baseObject != null)
+        { baseObject.Team = team; }
+
+        instance.SetActive(true);
+
+        instance.SpawnOverNetwork(true);
+
         instance.SpawnOverNetwork();
         SetClientObject(ownerId, instance.GetComponent<NetworkObject>().NetworkObjectId);
         return instance;

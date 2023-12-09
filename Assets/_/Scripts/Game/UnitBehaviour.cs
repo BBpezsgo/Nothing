@@ -39,7 +39,7 @@ namespace Game.Components
             System.Array.Sort(Behaviors, new Comparer());
         }
 
-        void Start()
+        void Awake()
         {
             SetBehaviours();
         }

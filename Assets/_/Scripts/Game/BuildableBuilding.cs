@@ -13,19 +13,19 @@ namespace Game.Components
 
         [SerializeField, ReadOnly] float BuildingProcessRequied = 1f;
         [SerializeField, ReadOnly] float BuildingProcess = 0f;
-        readonly NetworkVariable<float> NetBuildingProcess = new(0f);
+        readonly NetworkVariable<float> NetBuildingProcess = new();
         [SerializeField] ParticleSystem Particles;
         [SerializeField, Min(1)] float ParticlesAmmount = 1f;
         ParticleSystem.EmissionModule ParticlesEmission;
         [SerializeField, ReadOnly, NonReorderable] Material[] materials;
-        [SerializeField, ReadOnly] internal string Team;
+        [SerializeField, ReadOnly] public string Team;
 
         void OnEnable()
         { RegisteredObjects.BuildableBuildings.Add(this); }
         void OnDisable()
         { RegisteredObjects.BuildableBuildings.Remove(this); }
 
-        internal void Init(uint buildingHash, float processRequied)
+        public void Init(uint buildingHash, float processRequied)
         {
             BuildingHash = buildingHash;
             BuildingProcessRequied = processRequied;
@@ -45,7 +45,7 @@ namespace Game.Components
             BuildingProcess = 0f;
         }
 
-        void Start()
+        void Awake()
         {
             List<Renderer> renderers = new();
             renderers.AddRange(GetComponentsInChildren<Renderer>());
@@ -72,7 +72,7 @@ namespace Game.Components
             BuildingProcess = newValue;
         }
 
-        internal bool Build(float progress)
+        public bool Build(float progress)
         {
             if (IsConstructed)
             { return true; }
@@ -94,7 +94,7 @@ namespace Game.Components
             return BuildingProcess >= BuildingProcessRequied;
         }
 
-        internal void SetMaterial(Material material)
+        public void SetMaterial(Material material)
         {
             List<Renderer> renderers = new();
             renderers.AddRange(GetComponentsInChildren<Renderer>());

@@ -26,11 +26,15 @@ namespace Game.Managers
         [SerializeField] float Lazyness;
         [SerializeField, ReadOnly] float NextRefresh;
 
+        void Awake()
+        {
+            Camera = GetComponent<Camera>();
+        }
+
         void Start()
         {
             Volume.TryGet(out DepthOfField);
             FocusDistance = DepthOfField.focusDistance;
-            Camera = GetComponent<Camera>();
             NextRefresh = Lazyness;
         }
 

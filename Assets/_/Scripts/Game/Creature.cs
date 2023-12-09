@@ -110,15 +110,17 @@ namespace Game.Components
             StartCoroutine(filteredCreatures.ClosestIAsync(transform.position, (i, d) => callback.Invoke(filteredCreatures[i]), (i, d) => IsSearchingForFood = false));
         }
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             Collider = GetComponent<Collider>();
             rb = GetComponent<Rigidbody>();
-            _maxHp = HP == 0f ? 1f : HP;
-
-            IdleSoundTimer = Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
-
             AudioSource = GetComponent<AudioSource>();
+        }
+
+        protected virtual void Start()
+        {
+            _maxHp = HP == 0f ? 1f : HP;
+            IdleSoundTimer = Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
         }
 
         public override void OnDestroy()

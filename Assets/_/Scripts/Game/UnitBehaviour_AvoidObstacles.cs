@@ -24,9 +24,8 @@ namespace Game.Components
             [SerializeField, ReadOnly, NonReorderable] internal List<Collider> Obstacles;
         }
 
-        protected override void Start()
+        protected virtual void Start()
         {
-            base.Start();
             TimeToCheck = Random.value + 1f;
             raycastHitCache = new RaycastHitCache()
             {

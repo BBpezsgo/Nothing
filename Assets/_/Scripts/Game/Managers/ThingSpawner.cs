@@ -21,7 +21,7 @@ namespace Game.Components
         [Header("Properties")]
         [SerializeField] Vector2 Area;
 
-        void Start()
+        void Awake()
         {
             Terrain = FindObjectOfType<Terrain>();
         }

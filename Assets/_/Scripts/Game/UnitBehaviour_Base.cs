@@ -10,7 +10,7 @@ namespace Game.Components
         [SerializeField] internal float Priority;
         [SerializeField, ReadOnly] protected MovementEngine MovementEngine;
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             if (!TryGetComponent(out MovementEngine))
             { Debug.LogWarning($"[{nameof(UnitBehaviour_Base)}]: {nameof(MovementEngine)} is null", this); }

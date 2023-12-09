@@ -6,7 +6,7 @@ namespace Game.Components
     {
         Rigidbody rb;
 
-        void Start()
+        void Awake()
         {
             rb = GetComponent<Rigidbody>();
         }

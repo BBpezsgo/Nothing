@@ -145,10 +145,9 @@ namespace Game.Components
 
         #region Mono Callbacks
 
-        protected override void Start()
+        protected override void Awake()
         {
-            base.Start();
-
+            base.Awake();
             if (!TryGetComponent(out Collider))
             { Debug.LogError($"[{nameof(DroneEngine)}]: {nameof(Collider)} is null", this); }
         }

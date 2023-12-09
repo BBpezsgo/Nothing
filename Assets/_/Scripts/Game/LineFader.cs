@@ -16,7 +16,7 @@ namespace Game.Components
         [SerializeField, ReadOnly, ColorUsage(true, true)] Color transparentStartColor;
         [SerializeField, ReadOnly, ColorUsage(true, true)] Color transparentEndColor;
 
-        void Start()
+        void Awake()
         {
             LineRenderer = GetComponent<LineRenderer>();
         }

@@ -267,9 +267,8 @@ namespace Game.Managers
             }
         }
 
-        protected override void Awake()
+        void Start()
         {
-            base.Awake();
             _mainMenus = mainMenus.ToArray();
             _intermediateMenus = intermediateMenus.ToArray();
             _statusPanels = statusPanels.ToArray();

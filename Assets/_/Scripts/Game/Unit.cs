@@ -15,7 +15,7 @@ namespace Game.Components
             set => turret = value;
         }
 
-        [SerializeField, ReadOnly] internal UnitBehaviour UnitBehaviour;
+        [SerializeField, ReadOnly] internal UnitBehaviour UnitBehavior;
 
         [SerializeField] internal GameObject DestroyEffect;
 
@@ -26,18 +26,17 @@ namespace Game.Components
         [Header("Debug")]
         [SerializeField, Button(nameof(DebugDestroy), false, true, "Destroy")] string buttonDestroy;
 
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
+            if (!TryGetComponent(out UnitBehavior))
+            { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehavior)} is null", this); }
+            if (!TryGetComponent(out vehicleEngine))
+            { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
             if (turret != null) turret.@base = this;
         }
 
-        void Start()
+        protected override void Start()
         {
-            if (!TryGetComponent(out UnitBehaviour))
-            { Debug.LogWarning($"[{nameof(Unit)}]: {nameof(UnitBehaviour)} is null", this); }
-            if (!TryGetComponent(out vehicleEngine))
-            { Debug.LogWarning($"[{nameof(Unit)}]: No VehicleEngine", this); }
             UpdateTeam();
         }
 
@@ -124,8 +123,8 @@ namespace Game.Components
 
         Vector2 GetInputVector()
         {
-            if (UnitBehaviour == null) return default;
-            return UnitBehaviour.GetOutput();
+            if (UnitBehavior == null) return default;
+            return UnitBehavior.GetOutput();
         }
 
         public void Damage(float ammount)

@@ -26,9 +26,10 @@ namespace Game.Managers
         Vector2Int Size;
 
         Vector2 RelativePosition;
+        Vector2 LerpedRelativePosition;
 
-        [SerializeField, ReadOnly] public Vector2 NormalizedInput;
-        [SerializeField, ReadOnly] public Vector2 NormalizedInput2;
+        [SerializeField, ReadOnly] public Vector2 RawInput;
+        [SerializeField, ReadOnly] public Vector2 WorldSpaceInput;
         public bool IsActiveAndCaptured => Touch.IsActiveAndCaptured;
 
         void Start() => Initialize();
@@ -40,9 +41,7 @@ namespace Game.Managers
             RelativePosition = GUIUtils.TransformPoint(sender.Position) - Origin;
             RelativePosition = Vector2.ClampMagnitude(RelativePosition, Size.x / 2);
 
-            Vector2 normalizedInput = RelativePosition / (Size.x / 2);
-            NormalizedInput = new Vector2(normalizedInput.x, -normalizedInput.y);
-            NormalizedInput2 = new Vector2(-normalizedInput.y, -normalizedInput.x);
+            CalculateInput();
         }
 
         void OnTouchMove(AdvancedTouch sender)
@@ -50,22 +49,33 @@ namespace Game.Managers
             RelativePosition = GUIUtils.TransformPoint(sender.Position) - Origin;
             RelativePosition = Vector2.ClampMagnitude(RelativePosition, Size.x / 2);
 
+            CalculateInput();
+        }
+
+        void CalculateInput()
+        {
             Vector2 normalizedInput = RelativePosition / (Size.x / 2);
-            NormalizedInput = new Vector2(normalizedInput.x, -normalizedInput.y);
-            NormalizedInput2 = new Vector2(-normalizedInput.y, -normalizedInput.x);
+            normalizedInput *= new Vector2(1, -1);
+            normalizedInput.Rotate(-45f);
+
+            RawInput = normalizedInput;
+            WorldSpaceInput = MainCamera.Camera.transform.TransformVector(normalizedInput.To3D()).To2D();
+
+            // NormalizedInput = new Vector2(normalizedInput.x, -normalizedInput.y);
+            // NormalizedInput2 = new Vector2(-normalizedInput.y, -normalizedInput.x);
         }
 
         void OnTouchUp(AdvancedTouch sender)
         {
             RelativePosition = default;
-            NormalizedInput = default;
-            NormalizedInput2 = default;
+            RawInput = default;
+            WorldSpaceInput = default;
         }
         void OnTouchCancelled(AdvancedTouch sender)
         {
             RelativePosition = default;
-            NormalizedInput = default;
-            NormalizedInput2 = default;
+            RawInput = default;
+            WorldSpaceInput = default;
         }
 
         void Initialize()
@@ -74,8 +84,8 @@ namespace Game.Managers
             Circle = GUIUtils.GenerateCircle(Vector2Int.one * 128);
             Circle2 = GUIUtils.GenerateCircle(Vector2Int.one * 128, 0.05f);
 
-            NormalizedInput = default;
-            NormalizedInput2 = default;
+            RawInput = default;
+            WorldSpaceInput = default;
 
             Refresh();
 
@@ -94,7 +104,11 @@ namespace Game.Managers
             Origin = Pivot + new Vector2Int(Size.x / 2, Size.y / 2);
         }
 
-        void FixedUpdate() => Refresh();
+        void FixedUpdate()
+        {
+            Refresh();
+            LerpedRelativePosition = Vector2.Lerp(LerpedRelativePosition, RelativePosition, 30f * Time.fixedDeltaTime);
+        }
 
         bool InputCondition()
         {
@@ -107,13 +121,13 @@ namespace Game.Managers
 
             if (IsActiveAndCaptured)
             {
-                GUI.DrawTexture(new Rect(Origin + RelativePosition - (Size / 4), Size / 2), FilledCircle, ScaleMode.StretchToFill, true, 0f, ForegroundFillColorActive, 0, 0);
-                GUI.DrawTexture(new Rect(Origin + RelativePosition - (Size / 4), Size / 2), Circle2, ScaleMode.StretchToFill, true, 0f, ForegroundOutlineColorActive, 0, 0);
+                GUI.DrawTexture(new Rect(Origin + LerpedRelativePosition - (Size / 4), Size / 2), FilledCircle, ScaleMode.StretchToFill, true, 0f, ForegroundFillColorActive, 0, 0);
+                GUI.DrawTexture(new Rect(Origin + LerpedRelativePosition - (Size / 4), Size / 2), Circle2, ScaleMode.StretchToFill, true, 0f, ForegroundOutlineColorActive, 0, 0);
             }
             else
             {
-                GUI.DrawTexture(new Rect(Origin + RelativePosition - (Size / 4), Size / 2), FilledCircle, ScaleMode.StretchToFill, true, 0f, ForegroundFillColor, 0, 0);
-                GUI.DrawTexture(new Rect(Origin + RelativePosition - (Size / 4), Size / 2), Circle2, ScaleMode.StretchToFill, true, 0f, ForegroundOutlineColor, 0, 0);
+                GUI.DrawTexture(new Rect(Origin + LerpedRelativePosition - (Size / 4), Size / 2), FilledCircle, ScaleMode.StretchToFill, true, 0f, ForegroundFillColor, 0, 0);
+                GUI.DrawTexture(new Rect(Origin + LerpedRelativePosition - (Size / 4), Size / 2), Circle2, ScaleMode.StretchToFill, true, 0f, ForegroundOutlineColor, 0, 0);
             }
         }
     }

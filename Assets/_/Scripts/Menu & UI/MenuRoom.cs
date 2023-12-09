@@ -24,7 +24,7 @@ namespace Game.UI
 
         [SerializeField, ReadOnly] float UpdatePlayersTimer;
 
-        void Awake()
+        void Start()
         {
             UI = GetComponent<UIDocument>();
         }

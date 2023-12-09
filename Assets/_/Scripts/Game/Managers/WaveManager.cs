@@ -1,5 +1,4 @@
 using Game.Components;
-
 using UnityEngine;
 
 namespace Game.Managers
@@ -11,10 +10,10 @@ namespace Game.Managers
 
         [SerializeField] float Cooldown;
 
-        void Start()
+        void Awake()
         {
             if (!TryGetComponent(out Spawner))
-            { Debug.LogError($"[{nameof(WaveManager)}]: Spawner is null", this); }
+            { Debug.LogError($"[{nameof(WaveManager)}]: {nameof(Spawner)} is null", this); }
         }
 
         void FixedUpdate()

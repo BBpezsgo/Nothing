@@ -1,10 +1,7 @@
-using Game.Components;
-
 using System;
 using System.Collections.Generic;
-
+using Game.Components;
 using Unity.Netcode;
-
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,9 +9,7 @@ namespace Game.Managers
 {
     public class UnitFactoryManager : SingleInstance<UnitFactoryManager>
     {
-        [SerializeField] string Team;
-
-        [SerializeField, ReadOnly] internal UnitFactory SelectedFactory;
+        [SerializeField, ReadOnly] public UnitFactory SelectedFactory;
 
         [Header("UI")]
         [SerializeField] UIDocument FactoryUI;
@@ -24,17 +19,18 @@ namespace Game.Managers
 
         [SerializeField, ReadOnly, NonReorderable] ProducableUnit[] Units;
 
+        InputUtils.PriorityKey KeyEsc;
+
+#nullable enable
+
         [Serializable]
-        internal class ProducableUnit : INetworkSerializable
+        public class ProducableUnit : INetworkSerializable
         {
-            [SerializeField, ReadOnly] internal string PrefabID;
-            [SerializeField, ReadOnly] internal float ProgressRequied;
-            [SerializeField, ReadOnly] internal string ThumbnailID;
+            [SerializeField, ReadOnly] public string PrefabID;
+            [SerializeField, ReadOnly] public float ProgressRequied;
+            [SerializeField, ReadOnly] public string ThumbnailID;
 
-            public ProducableUnit()
-            { }
-
-            public ProducableUnit(PlayerData.ProducableUnit other) : this()
+            public ProducableUnit(PlayerData.ProducableUnit other)
             {
                 PrefabID = other.Unit.name;
                 ProgressRequied = other.ProgressRequied;
@@ -47,8 +43,6 @@ namespace Game.Managers
                 serializer.SerializeValue(ref ProgressRequied);
             }
         }
-
-        InputUtils.PriorityKey KeyEsc;
 
         void ListUnits(ProducableUnit[] units)
         {
@@ -81,12 +75,12 @@ namespace Game.Managers
             SelectedFactory.QueueUnit(unit);
         }
 
-        internal void Show(UnitFactory factory)
+        public void Show(UnitFactory? factory)
         {
             if (factory == null)
             { return; }
 
-            Units = GetUnits();
+            Units = GetUnits(factory.Team);
 
             SelectedFactory = factory;
             FactoryUI.gameObject.SetActive(true);
@@ -97,9 +91,9 @@ namespace Game.Managers
             BarProgress = FactoryUI.rootVisualElement.Q<ProgressBar>("progressbar-progress");
         }
 
-        ProducableUnit[] GetUnits()
+        static ProducableUnit[] GetUnits(string team)
         {
-            PlayerData playerData = PlayerData.GetPlayerData(Team);
+            PlayerData? playerData = PlayerData.GetPlayerData(team);
             List<ProducableUnit> units = new();
 
             if (playerData != null)

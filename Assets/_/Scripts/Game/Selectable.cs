@@ -38,7 +38,7 @@ namespace Game.Components
             }
         }
 
-        void Awake()
+        void Start()
         {
             if (UiSelected == null)
             {

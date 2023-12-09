@@ -1,4 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/_/UI/Hotkeys.uss?fileID=7433441132597879392&amp;guid=637869753c964214d9a56d1c24c32acd&amp;type=3#Hotkeys" />
-    <ui:VisualElement name="root" style="position: absolute; left: 0; top: 0; right: 0; flex-direction: row;" />
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Hotkeys.uss?fileID=7433441132597879392&amp;guid=637869753c964214d9a56d1c24c32acd&amp;type=3#Hotkeys" />
+    <ui:VisualElement name="root" style="position: absolute; left: 0; top: 0; flex-direction: row;" />
 </ui:UXML>

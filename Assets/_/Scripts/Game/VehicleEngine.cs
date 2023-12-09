@@ -226,8 +226,24 @@ namespace Game.Components
 
         #region Mono Callbacks
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
+            if (!this.TryGetComponentInChildren(out Collider))
+            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(Collider)} is null", this); }
+
+            if (!TryGetComponent(out unit))
+            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(unit)} is null", this); }
+        }
+
+        void Start()
+        {
+            rb.centerOfMass = new Vector3(0f, rb.centerOfMass.x + CenterOfMass, rb.centerOfMass.z);
+
+            for (int i = 0; i < Wheels.Length; i++)
+            { Wheels[i].Init(); }
+
             if (trailRenderers.Count == 0) HasTrailRenderers = false;
             for (int i = 0; i < trailRenderers.Count; i++)
             {
@@ -256,22 +272,6 @@ namespace Game.Components
             {
                 HasWaterParticles = false;
             }
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-
-            if (!this.TryGetComponentInChildren(out Collider))
-            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(Collider)} is null", this); }
-
-            if (!TryGetComponent(out unit))
-            { Debug.LogError($"[{nameof(VehicleEngine)}]: {nameof(unit)} is null", this); }
-
-            rb.centerOfMass = new Vector3(0f, rb.centerOfMass.x + CenterOfMass, rb.centerOfMass.z);
-
-            for (int i = 0; i < Wheels.Length; i++)
-            { Wheels[i].Init(); }
         }
 
         void Update()
@@ -666,8 +666,7 @@ namespace Game.Components
 
             if (TouchJoystick.Instance != null && TouchJoystick.Instance.IsActiveAndCaptured)
             {
-                input = TouchJoystick.Instance.NormalizedInput2;
-                input.Rotate(-45f);
+                input = TouchJoystick.Instance.WorldSpaceInput;
                 input = transform.InverseTransformDirection(input.To3D()).To2D();
             }
 

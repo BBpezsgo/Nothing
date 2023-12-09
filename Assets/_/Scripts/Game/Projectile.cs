@@ -132,11 +132,14 @@ namespace Game.Components
             if (Register) RegisteredObjects.Projectiles.Remove(this);
         }
 
-        void Start()
+        void Awake()
         {
             rb = GetComponent<Rigidbody>();
             AudioSource = GetComponentInChildren<AudioSource>();
+        }
 
+        void Start()
+        {
             if (trail != null)
             {
                 trailData = new TrailData()

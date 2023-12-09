@@ -1,10 +1,6 @@
 using System.Collections.Generic;
-using AssetManager;
-
 using Game.Managers;
-
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -22,7 +18,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] internal int TeamHash = -1;
         [SerializeField] protected Renderer[] teamRenderers = new Renderer[0];
 
-        protected virtual void Awake()
+        protected virtual void Start()
         {
             MaxHP = HP == 0f ? 1f : HP;
         }

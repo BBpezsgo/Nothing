@@ -17,7 +17,7 @@ public class EffectLight : MonoBehaviour
 
     [SerializeField, ReadOnly] float OriginalIntensity;
 
-    void Start()
+    void Awake()
     {
         if (!TryGetComponent(out Light))
         {

@@ -77,7 +77,7 @@ namespace Game.Managers
 
         [Header("UI")]
         [SerializeField] Projectiles Projectiles = null!;
-        [SerializeField, ReadOnly] UIDocument UI = null!;
+        [SerializeField] UIDocument UI = null!;
         [SerializeField] VisualTreeAsset ProjectileButton = null!;
         [SerializeField] GUISkin GUISkin = null!;
 
@@ -107,6 +107,8 @@ namespace Game.Managers
         PriorityKey? KeyEsc;
 
         ProgressBar BarHealth = null!;
+
+        bool IsUIInitialized = false;
 
         [SerializeField] SimpleAnimation ReloadIndicatorFadeoutAnimation = null!;
         [SerializeField] SimpleReversableAnimation TargetLockingAnimation = null!;
@@ -139,22 +141,18 @@ namespace Game.Managers
             if (SphereFilled != null)
             { Texture2D.Destroy(SphereFilled); }
             SphereFilled = GUIUtils.GenerateCircleFilled(Vector2Int.one * 32);
+
+            ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+            ControllingObjects.OnListChanged += ControllingObjectsChanged;
+            ControllingObjects.Initialize(this);
+
+            CameraController = FindObjectOfType<CameraController>();
+            if (CameraController == null)
+            { Debug.LogError($"[{nameof(TakeControlManager)}]: CameraController is null", this); }
         }
 
         void Start()
         {
-            CameraController = FindObjectOfType<CameraController>();
-            if (CameraController == null)
-            { Debug.LogError($"[{nameof(TakeControlManager)}]: CameraController is null", this); }
-
-            {
-                TakeControlUI takeControlUiObject = FindObjectOfType<TakeControlUI>(true);
-                if (takeControlUiObject == null)
-                { Debug.LogError($"[{nameof(TakeControlManager)}]: UI not found", this); }
-                else if (!takeControlUiObject.TryGetComponent(out UI))
-                { Debug.LogError($"[{nameof(TakeControlManager)}]: UI does not have an UIDocument", takeControlUiObject); }
-            }
-
             LeftMouse = new AdvancedMouse(Mouse.Left, 11, InputCondition);
             LeftMouse.OnDown += OnLeftMouseDown;
 
@@ -164,10 +162,6 @@ namespace Game.Managers
 
             KeyEsc = new PriorityKey(KeyCode.Escape, 1, EscKeyCondition);
             KeyEsc.OnDown += OnKeyEsc;
-
-            ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-            ControllingObjects.OnListChanged += ControllingObjectsChanged;
-            ControllingObjects.Initialize(this);
         }
 
         void HandleOnDamagedSomebody((Vector3 Position, float Amount, DamageKind Kind)[] damages)
@@ -377,6 +371,12 @@ namespace Game.Managers
             }
             else
             { CameraController.TryOverrideLock(null, CameraLockable.Priorities.ControllableThing); }
+
+            if (!IsUIInitialized && UI.rootVisualElement != null)
+            {
+                IsUIInitialized = true;
+                UI.rootVisualElement.Q<Button>("button-exit").clicked += OnKeyEsc;
+            }
         }
 
         ICanTakeControl? GetControllableAt(Vector3 worldPosition)

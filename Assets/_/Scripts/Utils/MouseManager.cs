@@ -9,8 +9,8 @@ namespace Game.Managers
     {
         static MouseManager Instance;
 
-        List<AdvancedMouse> Mouses;
-        List<AdvancedTouch> Touches;
+        [SerializeField, ReadOnly, NonReorderable] List<AdvancedMouse> Mouses;
+        [SerializeField, ReadOnly, NonReorderable] List<AdvancedTouch> Touches;
 
         [SerializeField, ReadOnly] float TimeToNextUICollecting = 1f;
         [SerializeField, ReadOnly, NonReorderable] UIDocument[] UIDocuments;

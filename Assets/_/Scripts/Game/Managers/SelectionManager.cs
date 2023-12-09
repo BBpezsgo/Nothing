@@ -43,12 +43,16 @@ namespace Game.Managers
 
         public int CursorPriority => 4;
 
-        void Start()
+        protected override void Awake()
         {
+            base.Awake();
             CommandManager = FindObjectOfType<UnitCommandManager>();
             if (CommandManager == null)
             { Debug.LogWarning($"[{nameof(SelectionManager)}]: {nameof(CommandManager)} is null"); }
+        }
 
+        void Start()
+        {
             MouseLeftButton = new AdvancedMouse(Mouse.Left, 10, MouseCondition);
             MouseLeftButton.OnDragged += OnLeftDragged;
             MouseLeftButton.OnClick += OnLeftClicked;

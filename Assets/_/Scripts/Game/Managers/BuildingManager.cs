@@ -1,13 +1,11 @@
-using Game.Components;
-using InputUtils;
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
+using Game.Components;
+using InputUtils;
 using Unity.Netcode;
-
 using UnityEngine;
 using UnityEngine.UIElements;
-
 using Utilities;
 
 namespace Game.Managers
@@ -16,9 +14,7 @@ namespace Game.Managers
     {
         static BuildingManager instance;
 
-        internal static BuildingManager Instance => instance;
-
-        [SerializeField] string Team;
+        public static BuildingManager Instance => instance;
 
         [SerializeField] PlayerData.ConstructableBuilding SelectedBuilding;
         [SerializeField] GameObject BuildingHologramPrefab;
@@ -26,8 +22,8 @@ namespace Game.Managers
 
         [SerializeField] GameObject BuildableBuildingPrefab;
 
-        [SerializeField] internal Material BuildableMaterial;
-        [SerializeField] internal Material HologramMaterial;
+        [SerializeField] public Material BuildableMaterial;
+        [SerializeField] public Material HologramMaterial;
 
         [SerializeField, ReadOnly] bool IsValidPosition = false;
         [SerializeField, ReadOnly] bool CheckValidity = false;
@@ -38,7 +34,7 @@ namespace Game.Managers
 
         public bool IsBuilding => SelectedBuilding != null && SelectedBuilding.Building != null;
 
-        InputUtils.AdvancedMouse LeftMouse;
+        AdvancedMouse LeftMouse;
 
         [Header("Buildings")]
         [SerializeField, ReadOnly, NonReorderable] PlayerData.ConstructableBuilding[] Buildings;
@@ -47,7 +43,9 @@ namespace Game.Managers
         [SerializeField] VisualTreeAsset BuildingButton;
         [SerializeField] UIDocument BuildingUI;
 
-        InputUtils.PriorityKey KeyEsc;
+        PriorityKey KeyEsc;
+
+#nullable enable
 
         void Awake()
         {
@@ -131,9 +129,9 @@ namespace Game.Managers
         }
 
         [ServerRpc(Delivery = RpcDelivery.Reliable, RequireOwnership = false)]
-        void PlaceBuildingRequest_ServerRpc(Vector3 position, uint buildingHash)
+        void PlaceBuildingRequest_ServerRpc(Vector3 position, uint buildingHash, string team)
         {
-            PlayerData playerData = PlayerData.GetPlayerData(Team);
+            PlayerData? playerData = PlayerData.GetPlayerData(team);
             Buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
             for (int i = 0; i < Buildings.Length; i++)
             {
@@ -152,13 +150,13 @@ namespace Game.Managers
                 GameObject newObject = GameObject.Instantiate(BuildableBuildingPrefab, fixedWorldPosition, Quaternion.identity, transform);
 
                 BuildableBuilding hologram = newObject.GetComponent<BuildableBuilding>();
-                ApplyBuildableHologram(hologram, this.Team, building);
+                ApplyBuildableHologram(hologram, PlayerData.Instance.Team, building);
 
                 newObject.SpawnOverNetwork();
             }
             else if (NetcodeUtils.IsClient)
             {
-                PlaceBuildingRequest_ServerRpc(fixedWorldPosition, building.Hash);
+                PlaceBuildingRequest_ServerRpc(fixedWorldPosition, building.Hash, PlayerData.Instance.Team);
             }
         }
 
@@ -168,13 +166,13 @@ namespace Game.Managers
             int i = int.Parse(button.name.Split('-')[1]);
             PlayerData.ConstructableBuilding building = Buildings[i];
             SelectedBuilding = building;
-            if (BuildingHologram != null) { }
+            if (BuildingHologram != null)
             { ApplyHologram(BuildingHologram, SelectedBuilding); }
         }
 
         void Show()
         {
-            PlayerData playerData = PlayerData.GetPlayerData(Team);
+            PlayerData? playerData = PlayerData.GetCurrentPlayerData();
             Buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
 
             BuildingUI.gameObject.SetActive(true);
@@ -190,7 +188,7 @@ namespace Game.Managers
             if (BuildingHologram != null)
             { BuildingHologram.SetActive(false); }
 
-            Buildings = null;
+            Buildings = Array.Empty<PlayerData.ConstructableBuilding>();
         }
 
         void Update()
@@ -267,39 +265,38 @@ namespace Game.Managers
 
         void FixedUpdate()
         {
-            if (CheckValidity)
+            if (CheckValidity &&
+                MouseManager.MouseOnWindow &&
+                SelectedBuilding != null)
             {
-                if (MouseManager.MouseOnWindow)
+                Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
+
+                position.y = TheTerrain.Height(position);
+
+                if (Input.GetKey(KeyCode.LeftControl))
+                { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
+
+                Vector3 checkPosition = position - SelectedBuilding.GroundOrigin;
+
+                Debug3D.DrawBox(checkPosition, SelectedBuilding.SpaceNeed, Color.white, Time.fixedDeltaTime);
+
+                if (Physics.OverlapBox(checkPosition, SelectedBuilding.SpaceNeed / 2, Quaternion.identity, LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Water)).Length > 0)
+                { IsValidPosition = false; }
+                else
+                { IsValidPosition = true; }
+
+                MeshRenderer[] renderers = BuildingHologram.GetComponentsInChildren<MeshRenderer>();
+
+                for (int i = 0; i < renderers.Length; i++)
                 {
-                    Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
-
-                    position.y = TheTerrain.Height(position);
-
-                    if (Input.GetKey(KeyCode.LeftControl))
-                    { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
-
-                    Vector3 checkPosition = position - SelectedBuilding.GroundOrigin;
-
-                    Debug3D.DrawBox(checkPosition, SelectedBuilding.SpaceNeed, Color.white, Time.fixedDeltaTime);
-
-                    if (Physics.OverlapBox(checkPosition, SelectedBuilding.SpaceNeed / 2, Quaternion.identity, LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Water)).Length > 0)
-                    { IsValidPosition = false; }
-                    else
-                    { IsValidPosition = true; }
-
-                    MeshRenderer[] renderers = BuildingHologram.GetComponentsInChildren<MeshRenderer>();
-
-                    for (int i = 0; i < renderers.Length; i++)
-                    {
-                        var material = renderers[i].material;
-                        material.color = IsValidPosition ? ValidHologramColor : InvalidHologramColor;
-                        material.SetEmissionColor(IsValidPosition ? ValidHologramColor : InvalidHologramColor, HologramEmission);
-                    }
+                    var material = renderers[i].material;
+                    material.color = IsValidPosition ? ValidHologramColor : InvalidHologramColor;
+                    material.SetEmissionColor(IsValidPosition ? ValidHologramColor : InvalidHologramColor, HologramEmission);
                 }
             }
         }
 
-        internal static void ApplyBuildableHologram(BuildableBuilding hologram, string team, PlayerData.ConstructableBuilding building)
+        public static void ApplyBuildableHologram(BuildableBuilding hologram, string team, PlayerData.ConstructableBuilding building)
         {
             hologram.Team = team;
             hologram.Init(building.Hash, building.ProgressRequied);
@@ -320,7 +317,7 @@ namespace Game.Managers
             hologram.SetMaterial(instance.BuildableMaterial);
         }
 
-        internal static void ApplyHologram(GameObject hologram, PlayerData.ConstructableBuilding buildingPrefab)
+        public static void ApplyHologram(GameObject? hologram, PlayerData.ConstructableBuilding buildingPrefab)
         {
             if (hologram == null) return;
 
@@ -335,7 +332,8 @@ namespace Game.Managers
             { renderers[i].materials = new Material[] { Material.Instantiate(instance.HologramMaterial) }; }
         }
 
-        static GameObject GetHologramModelGroup(GameObject hologram)
+        [return: NotNullIfNotNull("hologram")]
+        static GameObject? GetHologramModelGroup(GameObject? hologram)
         {
             if (hologram == null) return null;
             Transform hologramModels = hologram.transform.Find("Model");

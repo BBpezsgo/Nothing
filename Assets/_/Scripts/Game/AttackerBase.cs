@@ -1,16 +1,10 @@
-using AssetManager;
-
 using Game.Managers;
-
-using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
 {
-    public class AttackerBase : NetworkBehaviour
+    public class AttackerBase : Unity.Netcode.NetworkBehaviour
     {
         [SerializeField, ReadOnly] protected BaseObject BaseObject;
         ICanTakeControlAndHasTurret CanTakeControlObject;
@@ -38,7 +32,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] float lastRotation;
         [SerializeField, ReadOnly] float rotationDelta;
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             if (!TryGetComponent(out BaseObject))
             { Debug.LogError($"[{nameof(AttackerBase)}]: {nameof(BaseObject)} is null", this); }

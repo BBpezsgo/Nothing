@@ -22,7 +22,7 @@ namespace Game.Components
             }
         }
 
-        protected virtual void Awake()
+        protected virtual void Start()
         {
             this.Interval(TryFindTargets, 1f, TargetCondition);
         }

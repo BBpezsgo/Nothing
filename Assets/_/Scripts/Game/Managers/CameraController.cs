@@ -14,10 +14,8 @@ namespace Game.Managers
 
     internal delegate void OnCameraModeChanged(CameraMode mode);
 
-    public class CameraController : MonoBehaviour
+    public class CameraController : SingleInstance<CameraController>
     {
-        public static CameraController Instance;
-
         [SerializeField] Camera theCamera;
         [SerializeField] Transform cameraRotation;
         [SerializeField] internal CameraMode cameraMode;
@@ -87,18 +85,6 @@ namespace Game.Managers
         internal event OnCameraModeChanged OnCameraModeChanged;
 
         TouchZoom TouchZoom;
-
-        private void Awake()
-        {
-            if (Instance != null)
-            {
-                Debug.LogWarning($"[{nameof(CameraController)}]: Instance already registered, destroying self");
-                GameObject.Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-        }
 
         void Start()
         {
@@ -253,7 +239,8 @@ namespace Game.Managers
 
             if (TouchJoystick.Instance != null && TouchJoystick.Instance.IsActiveAndCaptured)
             {
-                MovementInput = TouchJoystick.Instance.NormalizedInput;
+                MovementInput = TouchJoystick.Instance.RawInput;
+                MovementInput = new Vector2(MovementInput.y, MovementInput.x);
             }
             else
             {

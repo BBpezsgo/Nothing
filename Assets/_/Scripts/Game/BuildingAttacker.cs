@@ -16,10 +16,8 @@ namespace Game.Components
         public virtual void DoInput() => Attacker.DoInput();
         public virtual void DoFrequentInput() => Attacker.DoFrequentInput();
 
-        protected override void Start()
+        protected virtual void Awake()
         {
-            base.Start();
-
             if (!TryGetComponent(out Attacker))
             { Debug.LogError($"[{nameof(BuildingAttacker)}]: {nameof(Attacker)} is null", this); }
         }

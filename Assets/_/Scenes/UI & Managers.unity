@@ -170,6 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5cd281091f0dfa46958eaf6d98577c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mouses: []
+  Touches: []
   TimeToNextUICollecting: 1
   UIDocuments: []
   ShowDebugStuff: 0
@@ -705,8 +707,8 @@ MonoBehaviour:
   ForegroundOutlineColor: {r: 0.18823531, g: 0.18823531, b: 0.18823531, a: 1}
   ForegroundFillColorActive: {r: 0.27450982, g: 0.3764706, b: 0.4862745, a: 1}
   ForegroundOutlineColorActive: {r: 0.14117648, g: 0.14117648, b: 0.14117648, a: 1}
-  NormalizedInput: {x: 0, y: 0}
-  NormalizedInput2: {x: 0, y: 0}
+  RawInput: {x: 0, y: 0}
+  WorldSpaceInput: {x: 0, y: 0}
 --- !u!1 &310034299
 GameObject:
   m_ObjectHideFlags: 0
@@ -2819,7 +2821,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b56893f68efe1e4b89430d535359e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Team: a
   SelectedFactory: {fileID: 0}
   FactoryUI: {fileID: 853663603}
   ProducableElement: {fileID: 9197481963319205126, guid: c1d9a2790d990eb419dc0aa22a720ee7,
@@ -2894,7 +2895,7 @@ MonoBehaviour:
     Hotspot: {x: 16, y: 16}
   ShouldAlwaysControlObjects: []
   Projectiles: {fileID: 11400000, guid: d695b36251ae1c741aa18018464d3ef7, type: 2}
-  UI: {fileID: 0}
+  UI: {fileID: 1290309621}
   ProjectileButton: {fileID: 9197481963319205126, guid: 4f143812c58ccb94ba8a2d1c87f32e78,
     type: 3}
   GUISkin: {fileID: 11400000, guid: af3d39844691caf4d8459ee247b12571, type: 2}
@@ -3055,7 +3056,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1290309620}
   - component: {fileID: 1290309621}
-  - component: {fileID: 1290309622}
   m_Layer: 5
   m_Name: Controlling
   m_TagString: Untagged
@@ -3095,18 +3095,6 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: dc6fb64044977f146af6e97539008754,
     type: 3}
   m_SortingOrder: 0
---- !u!114 &1290309622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1290309619}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97b0dece87a24dc4a8610e3c2ef2189e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1356665771
 GameObject:
   m_ObjectHideFlags: 0
@@ -4360,8 +4348,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2093730559}
-  - component: {fileID: 2093730558}
   - component: {fileID: 2093730560}
+  - component: {fileID: 2093730558}
   m_Layer: 0
   m_Name: BuildingManager
   m_TagString: GameController
@@ -4381,7 +4369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69871d22ea6819945a7f209975f049a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Team: a
   SelectedBuilding:
     Hash: 0
     SpaceNeed: {x: 1, y: 1, z: 1}

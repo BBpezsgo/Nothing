@@ -5,10 +5,8 @@ using UnityEngine.SceneManagement;
 
 namespace AssetManager
 {
-    public class AssetManager : MonoBehaviour
+    public class AssetManager : SingleInstance<AssetManager>
     {
-        public static AssetManager Instance;
-
         static Scene? CurrentScene
         {
             get
@@ -75,17 +73,14 @@ namespace AssetManager
             return null;
         }
 
-        void Awake()
+        protected override void Awake()
         {
-            if (Instance != null)
+            base.Awake();
+            if (this != null && this == instance)
             {
-                Debug.Log($"[{nameof(AssetManager)}]: Instance already registered, destroying self gameObject");
-                Destroy(gameObject);
-                return;
+                transform.SetParent(null);
+                DontDestroyOnLoad(this);
             }
-            Instance = this;
-            transform.SetParent(null);
-            DontDestroyOnLoad(this);
         }
     }
 }

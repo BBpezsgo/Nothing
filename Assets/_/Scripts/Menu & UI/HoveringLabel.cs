@@ -45,8 +45,8 @@ namespace Game.UI.Components
 
         GUIContent GUIContent = GUIContent.none;
 
-        readonly NetworkVariable<Unity.Collections.FixedString32Bytes> NetworkedText = new(new Unity.Collections.FixedString32Bytes());
-        readonly NetworkVariable<bool> NetworkedVisible = new(false);
+        readonly NetworkVariable<Unity.Collections.FixedString32Bytes> NetworkedText = new();
+        readonly NetworkVariable<bool> NetworkedVisible = new();
 
         void Start()
         {

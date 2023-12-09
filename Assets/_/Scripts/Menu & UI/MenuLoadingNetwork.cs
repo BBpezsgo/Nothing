@@ -14,7 +14,7 @@ namespace Game.UI
 
         Label LabelStatus;
 
-        void Awake()
+        void Start()
         {
             UI = GetComponent<UIDocument>();
         }
