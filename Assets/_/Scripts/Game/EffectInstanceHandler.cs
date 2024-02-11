@@ -24,7 +24,7 @@ namespace Game.Components
             AudioSources = WaitForSound ? GetComponentsInChildren<AudioSource>(false) : System.Array.Empty<AudioSource>();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             for (int i = 0; i < ParticleSystems.Length; i++)
             {
@@ -38,7 +38,7 @@ namespace Game.Components
                 if (AudioSources[i].isPlaying) return;
             }
 
-            if ((WaitForSeconds -= Time.fixedDeltaTime) >= 0f) return;
+            if ((WaitForSeconds -= Time.deltaTime) >= 0f) return;
 
             GameObject.Destroy(gameObject);
         }

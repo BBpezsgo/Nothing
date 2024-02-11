@@ -44,7 +44,7 @@ public class GameManager : SingleNetworkInstance<GameManager>
         ClientObjects.Initialize(this);
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!NetworkManager.IsListening || NetcodeUtils.IsClient)
         { return; }

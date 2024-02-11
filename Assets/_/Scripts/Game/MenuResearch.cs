@@ -45,7 +45,7 @@ namespace Game.UI
             }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             for (int i = 0; i < ResearchableProgressbars.Count; i++)
             {

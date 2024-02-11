@@ -26,7 +26,7 @@ namespace Game.Components
             Terrain = FindObjectOfType<Terrain>();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
@@ -40,7 +40,7 @@ namespace Game.Components
 
             if (NextSpawn > 0f)
             {
-                NextSpawn -= Time.fixedDeltaTime;
+                NextSpawn -= Time.deltaTime;
                 return;
             }
 

@@ -8696,7 +8696,7 @@ ParticleSystem:
       emitter: {fileID: 1739596643175496271}
       type: 0
       properties: 0
-      emitProbability: 0.2
+      emitProbability: 0.6
   LightsModule:
     enabled: 0
     ratio: 0
@@ -9921,7 +9921,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.2784314}
+      maxColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.3254902}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}

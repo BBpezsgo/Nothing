@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8062244046001752333}
   - component: {fileID: 8062244046001752374}
   - component: {fileID: 8062244046001752375}
+  - component: {fileID: 8062244046001752373}
   - component: {fileID: 8062244046001752368}
   - component: {fileID: 8062244046001752369}
   - component: {fileID: 9201763386767749416}
@@ -19,7 +20,6 @@ GameObject:
   - component: {fileID: 8062244046001752332}
   - component: {fileID: 8062244046001752379}
   - component: {fileID: 8062244046001752372}
-  - component: {fileID: 8062244046001752373}
   - component: {fileID: 8062244046001752377}
   - component: {fileID: 8062244046001752378}
   - component: {fileID: 9144028623863636501}
@@ -86,6 +86,26 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &8062244046001752373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8062244046001752334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3579691036
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &8062244046001752368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviors: []
+  ShowGizmos: 0
 --- !u!114 &9201763386767749416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,7 +226,7 @@ MonoBehaviour:
   - {fileID: 8785045182532654318}
   vehicleEngine: {fileID: 8062244046001752368}
   turret: {fileID: 8062244046070208250}
-  UnitBehaviour: {fileID: 0}
+  UnitBehavior: {fileID: 0}
   DestroyEffect: {fileID: 346126464746661311, guid: 0237e651bb612e54e8985b43e3adb5ae,
     type: 3}
   <CrossStyle>k__BackingField: 1
@@ -247,26 +268,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &8062244046001752373
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8062244046001752334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 0
 --- !u!114 &8062244046001752377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,6 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -435,6 +437,8 @@ MonoBehaviour:
   FragmentSmokeScale: {x: 0.5, y: 2}
   FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
     type: 3}
+  AudioClips:
+  - {fileID: 8300000, guid: 8610309072247b941865843f845dd3b3, type: 3}
 --- !u!1 &8062244046070208244
 GameObject:
   m_ObjectHideFlags: 0

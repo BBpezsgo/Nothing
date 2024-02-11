@@ -979,6 +979,17 @@ public struct Maths
         return output;
     }
 
+    public static (Vector3 Turret, Vector3 Barrel) TurretAim(Vector3 targetPosition, Transform turret, Transform barrel)
+    {
+        float targetPlaneAngle = Vector3AngleOnPlane(targetPosition - turret.position, -turret.up, turret.forward);
+        Vector3 turretRotation = new(0f, targetPlaneAngle, 0f);
+
+        float barrelAngle = Vector3.Angle(targetPosition, barrel.up);
+        Vector3 barrelRotation = new(-barrelAngle + 90f, 0f, 0f);
+
+        return (turretRotation, barrelRotation);
+    }
+
     /// <summary>
     /// Source: <see href="https://www.youtube.com/watch?v=bCz7awDbl58"/>
     /// </summary>
@@ -1030,19 +1041,19 @@ public struct Maths
 
     public static float Volume(Bounds bounds) => bounds.size.sqrMagnitude;
 
-    public static float Volume(GameObject @object)
+    public static float TotalMeshVolume(GameObject @object, bool fallbackToBounds = true)
     {
-        if (@object.TryGetComponent(out MeshFilter meshFilter))
+        float volume = 0f;
+
+        MeshFilter[] meshFilters = @object.GetComponentsInChildren<MeshFilter>(false);
+
+        for (int i = 0; i < meshFilters.Length; i++)
         {
-            Triangle[]? triangles = Maths.GetTriangles(meshFilter.mesh);
-            if (triangles != null)
-            { return Maths.Volume(triangles); }
+            float meshVolume = Maths.MeshVolume(meshFilters[i].mesh, fallbackToBounds);
+            volume += meshVolume;
         }
 
-        if (@object.TryGetComponent(out Collider collider))
-        { return Maths.Volume(collider.bounds); }
-
-        return 0f;
+        return volume;
     }
 
     public static float Volume(MeshFilter? meshFilter, Collider? collider)
@@ -1057,19 +1068,29 @@ public struct Maths
         if (collider != null)
         { return Maths.Volume(collider.bounds); }
 
-        return 0f;
+        return default;
     }
 
-    public static float Volume(Mesh mesh)
+    public static float MeshVolume(MeshFilter mesh, bool fallbackToBounds = true)
+        => Maths.MeshVolume(mesh.mesh, fallbackToBounds);
+
+    public static float MeshVolume(Mesh mesh, bool fallbackToBounds = true)
     {
+        if (!mesh.isReadable)
+        {
+            if (!fallbackToBounds)
+            { return default; }
+
+            return Maths.Volume(mesh.bounds) * .75f;
+        }
         Triangle[]? triangles = Maths.GetTriangles(mesh);
-        if (triangles == null) return 0f;
+        if (triangles == null) return default;
         return Maths.Volume(triangles);
     }
 
     public static float Volume(Triangle[] triangles)
     {
-        float volumeSum = 0f;
+        float volumeSum = default;
 
         for (int i = 0; i < triangles.Length; i++)
         { volumeSum += Maths.SignedVolumeOfTriangle(triangles[i]); }

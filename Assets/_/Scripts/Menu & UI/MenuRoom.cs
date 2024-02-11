@@ -24,13 +24,9 @@ namespace Game.UI
 
         [SerializeField, ReadOnly] float UpdatePlayersTimer;
 
-        void Start()
-        {
-            UI = GetComponent<UIDocument>();
-        }
-
         void OnEnable()
         {
+            UI = GetComponent<UIDocument>();
             LabelRoomName = UI.rootVisualElement.Q<Label>("label-room-name");
             PlayersScrollView = UI.rootVisualElement.Q<ScrollView>("players");
 
@@ -115,12 +111,12 @@ namespace Game.UI
 
         void Clickable_clickedWithEventInfo(EventBase obj)
         {
-            var clientId = ulong.Parse(((VisualElement)obj.target).userData.ToString());
+            ulong clientId = ulong.Parse(((VisualElement)obj.target).userData.ToString());
             Debug.Log($"[{nameof(MenuRoom)}]: Kick client {clientId}");
             NetworkManager.Singleton.DisconnectClient(clientId);
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!string.IsNullOrWhiteSpace(NetworkManager.Singleton.ConnectedHostname))
             { LabelRoomName.text = NetworkManager.Singleton.ConnectedHostname; }
@@ -131,7 +127,7 @@ namespace Game.UI
             else
             { LabelRoomName.text = "?"; }
 
-            UpdatePlayersTimer -= Time.fixedDeltaTime;
+            UpdatePlayersTimer -= Time.deltaTime;
             if (UpdatePlayersTimer <= 0f)
             {
                 UpdatePlayersTimer = 2f;

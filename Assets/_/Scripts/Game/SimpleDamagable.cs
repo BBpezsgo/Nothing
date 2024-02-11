@@ -3,14 +3,16 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class SimpleDamagable : NetworkBehaviour, IDamagable
+    public class SimpleDamagable : NetworkBehaviour, IDamageable
     {
         [SerializeField] float HP;
         [SerializeField] GameObject DestroyEffect;
 
-        public void Damage(float ammount)
+        [SerializeField, Button(nameof(Explode), false, true, "Destroy")] string ButtonExplode;
+
+        public void Damage(float amount)
         {
-            HP -= ammount;
+            HP -= amount;
             if (HP <= 0)
             { Explode(); }
         }

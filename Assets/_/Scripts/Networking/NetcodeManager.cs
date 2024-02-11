@@ -157,7 +157,7 @@ namespace Networking.Managers
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
-        void FixedUpdate()
+        void Update()
         {
             Window.Visible = sceneLoadings.Count != 0 && sceneUnloadings.Count != 0;
 
@@ -338,14 +338,14 @@ namespace Networking.Managers
         void Singleton_OnClientDisconnectCallback(ulong clientId)
         {
             Debug.Log($"[{nameof(NetcodeManager)}]: Client {clientId} disconnected", this);
-            var v = FindObjectOfType<Game.UI.MenuRoom>();
+            Game.UI.MenuRoom v = FindObjectOfType<Game.UI.MenuRoom>();
             if (v != null) v.RefreshPlayerList();
         }
 
         void Singleton_OnClientConnectedCallback(ulong clientId)
         {
             Debug.Log($"[{nameof(NetcodeManager)}]: Client #{clientId} connected", this);
-            var v = FindObjectOfType<Game.UI.MenuRoom>();
+            Game.UI.MenuRoom v = FindObjectOfType<Game.UI.MenuRoom>();
             if (v != null) v.RefreshPlayerList();
         }
     }

@@ -1,8 +1,9 @@
 using UnityEngine;
+using Utilities;
 
 namespace Game.Components
 {
-    public class Building : BaseObject, IDamagable
+    public class Building : BaseObject, IDamageable
     {
         [SerializeField] GameObject DestroyEffect;
         [SerializeField] public Vector3 GroundOrigin;
@@ -51,12 +52,7 @@ namespace Game.Components
 
         protected virtual void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(GroundOrigin - Vector3.right, GroundOrigin + Vector3.right);
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(GroundOrigin - Vector3.up, GroundOrigin + Vector3.up);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawLine(GroundOrigin - Vector3.forward, GroundOrigin + Vector3.forward);
+            GizmosPlus.DrawAxes(GroundOrigin);
         }
 
         void DebugDestroy() => Destroy();

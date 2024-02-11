@@ -8,9 +8,9 @@ namespace Game.Components
 {
     internal class ProjectileAttacker : AttackerBase
     {
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
+            base.Update();
 
             if (turret != null)
             {
@@ -48,7 +48,7 @@ namespace Game.Components
 
             for (int i = 0; i < projectiles.Length; i++)
             {
-                var result = ThinkOnTarget(projectiles[i]);
+                bool result = ThinkOnTarget(projectiles[i]);
                 if (result) return;
             }
 
@@ -63,7 +63,7 @@ namespace Game.Components
                 { return false; }
             }
 
-            var predictedAim = Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition, projectile.Shot);
+            (Vector3 PredictedPosition, float TimeToReach)? predictedAim = Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition, projectile.Shot);
 
             /*
             float? angle_;
@@ -75,7 +75,7 @@ namespace Game.Components
                 Projectile.Trajectory shot = projectile.Shot;
                 float v = turret.projectileVelocity * .95f;
 
-                float lifetime = projectile.Lifetime + Time.fixedDeltaTime;
+                float lifetime = projectile.Lifetime + Time.deltaTime;
 
                 var projectileTOF = Ballistics.CalculateTime(shot.Velocity, shot.ShootAngle * Maths.Deg2Rad, shot.ShootPosition.y);
 
@@ -109,7 +109,7 @@ namespace Game.Components
             }
             */
 
-            // Debug.DrawLine(projectile.Position, projPosition, Color.red, Time.fixedDeltaTime, false);
+            // Debug.DrawLine(projectile.Position, projPosition, Color.red, Time.deltaTime, false);
 
             if (predictedAim.HasValue)
             {
@@ -117,10 +117,10 @@ namespace Game.Components
 
                 // Vector3 predictedTargetPos = turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f;
 
-                // Debug.DrawLine(turret.ShootPosition, predictedTargetPos, Color.white, Time.fixedDeltaTime, false);
+                // Debug.DrawLine(turret.ShootPosition, predictedTargetPos, Color.white, Time.deltaTime, false);
 
                 // turret.Input = new Vector2(0f, angle_.Value * Maths.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
-                turret.RequiredProjectileLifetime = predictedAim.Value.TimeToReach - Time.fixedDeltaTime;
+                turret.RequiredProjectileLifetime = predictedAim.Value.TimeToReach - Time.deltaTime;
                 turret.SetTarget(predictedAim.Value.PredictedPosition);
             }
             else
@@ -133,7 +133,9 @@ namespace Game.Components
 
             turret.LoseTarget();
 
-            if (turret.IsAccurateShoot && NetcodeUtils.IsOfflineOrServer)
+            if (turret.IsAccurateShoot &&
+                !turret.OutOfRange &&
+                NetcodeUtils.IsOfflineOrServer)
             {
                 if (predictedAim.HasValue && requiredShoots != null)
                 { turret.Shoot(requiredShoots, predictedAim.Value.TimeToReach); }

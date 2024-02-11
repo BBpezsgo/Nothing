@@ -11,7 +11,7 @@ namespace Game.Components
             rb = GetComponent<Rigidbody>();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (transform.position.y < -100)
             {

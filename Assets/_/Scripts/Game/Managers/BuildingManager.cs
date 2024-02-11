@@ -26,7 +26,6 @@ namespace Game.Managers
         [SerializeField] public Material HologramMaterial;
 
         [SerializeField, ReadOnly] bool IsValidPosition = false;
-        [SerializeField, ReadOnly] bool CheckValidity = false;
 
         [SerializeField] Color ValidHologramColor = Color.white;
         [SerializeField] Color InvalidHologramColor = Color.red;
@@ -193,7 +192,6 @@ namespace Game.Managers
 
         void Update()
         {
-            CheckValidity = false;
             if (Input.GetKeyDown(KeyCode.Home) &&
                 !MenuManager.AnyMenuVisible)
             {
@@ -239,8 +237,6 @@ namespace Game.Managers
 
             if (!MenuManager.AnyMenuVisible)
             {
-                CheckValidity = true;
-
                 if (MouseManager.MouseOnWindow)
                 {
                     Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
@@ -251,47 +247,31 @@ namespace Game.Managers
                     { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
 
                     BuildingHologram.transform.position = position - SelectedBuilding.GroundOrigin;
+
+                    Vector3 checkPosition = position - SelectedBuilding.GroundOrigin;
+
+                    Debug3D.DrawBox(checkPosition, SelectedBuilding.SpaceNeed, Color.white, Time.deltaTime);
+
+                    if (Physics.OverlapBox(checkPosition, SelectedBuilding.SpaceNeed / 2, Quaternion.identity, LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Water)).Length > 0)
+                    { IsValidPosition = false; }
+                    else
+                    { IsValidPosition = true; }
+
+                    MeshRenderer[] renderers = BuildingHologram.GetComponentsInChildren<MeshRenderer>();
+
+                    for (int i = 0; i < renderers.Length; i++)
+                    {
+                        Material material = renderers[i].material;
+                        material.color = IsValidPosition ? ValidHologramColor : InvalidHologramColor;
+                        material.SetEmissionColor(IsValidPosition ? ValidHologramColor : InvalidHologramColor, HologramEmission);
+                    }
                 }
 
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     SelectedBuilding = null;
                     BuildingHologram.SetActive(false);
-                    CheckValidity = false;
                     IsValidPosition = false;
-                }
-            }
-        }
-
-        void FixedUpdate()
-        {
-            if (CheckValidity &&
-                MouseManager.MouseOnWindow &&
-                SelectedBuilding != null)
-            {
-                Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
-
-                position.y = TheTerrain.Height(position);
-
-                if (Input.GetKey(KeyCode.LeftControl))
-                { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
-
-                Vector3 checkPosition = position - SelectedBuilding.GroundOrigin;
-
-                Debug3D.DrawBox(checkPosition, SelectedBuilding.SpaceNeed, Color.white, Time.fixedDeltaTime);
-
-                if (Physics.OverlapBox(checkPosition, SelectedBuilding.SpaceNeed / 2, Quaternion.identity, LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Water)).Length > 0)
-                { IsValidPosition = false; }
-                else
-                { IsValidPosition = true; }
-
-                MeshRenderer[] renderers = BuildingHologram.GetComponentsInChildren<MeshRenderer>();
-
-                for (int i = 0; i < renderers.Length; i++)
-                {
-                    var material = renderers[i].material;
-                    material.color = IsValidPosition ? ValidHologramColor : InvalidHologramColor;
-                    material.SetEmissionColor(IsValidPosition ? ValidHologramColor : InvalidHologramColor, HologramEmission);
                 }
             }
         }
@@ -371,7 +351,7 @@ namespace Game.Managers
             to.transform.localScale = from.transform.localScale;
             to.transform.SetLocalPositionAndRotation(from.transform.localPosition, from.transform.localRotation);
 
-            if (from.TryGetComponent<MeshRenderer>(out var meshRenderer) &&
+            if (from.TryGetComponent<MeshRenderer>(out MeshRenderer? meshRenderer) &&
                 !to.TryGetComponent<MeshRenderer>(out _))
             {
                 MeshRenderer.Instantiate(meshRenderer, to.transform);

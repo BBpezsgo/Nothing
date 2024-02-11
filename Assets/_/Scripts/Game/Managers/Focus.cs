@@ -38,13 +38,13 @@ namespace Game.Managers
             NextRefresh = Lazyness;
         }
 
-        void FixedUpdate()
+        void Update()
         {
-            FocusDistance.value = Maths.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.fixedUnscaledDeltaTime);
+            FocusDistance.value = Maths.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.unscaledDeltaTime);
 
             if (NextRefresh > 0f)
             {
-                NextRefresh -= Time.fixedUnscaledDeltaTime;
+                NextRefresh -= Time.unscaledDeltaTime;
                 return;
             }
             NextRefresh = Lazyness;

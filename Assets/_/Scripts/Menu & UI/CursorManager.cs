@@ -40,13 +40,13 @@ namespace Game.Managers
         const float Infrequency = 2f;
         float InfrequencyTimer = Infrequency;
 
-        void FixedUpdate()
+        void Update()
         {
             if (!MouseManager.MouseOnWindow) return;
 
             FrequentUpdate();
 
-            InfrequencyTimer -= Time.fixedDeltaTime;
+            InfrequencyTimer -= Time.deltaTime;
             if (InfrequencyTimer <= 0f)
             {
                 InfrequencyTimer = Infrequency;
@@ -96,7 +96,7 @@ namespace Game.Managers
 
             if (ResortIn > 0f)
             {
-                ResortIn -= Time.fixedDeltaTime;
+                ResortIn -= Time.deltaTime;
                 return;
             }
 

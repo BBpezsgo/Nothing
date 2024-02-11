@@ -104,10 +104,10 @@ namespace Game.Managers
             Origin = Pivot + new Vector2Int(Size.x / 2, Size.y / 2);
         }
 
-        void FixedUpdate()
+        void Update()
         {
             Refresh();
-            LerpedRelativePosition = Vector2.Lerp(LerpedRelativePosition, RelativePosition, 30f * Time.fixedDeltaTime);
+            LerpedRelativePosition = Vector2.Lerp(LerpedRelativePosition, RelativePosition, 30f * Time.deltaTime);
         }
 
         bool InputCondition()

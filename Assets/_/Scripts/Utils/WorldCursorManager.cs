@@ -33,16 +33,14 @@ namespace Game.Managers
             CursorManager.Instance.Register(this);
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NeedResort)
-            {
-                return;
-            }
+            { return; }
 
             if (ResortIn > 0f)
             {
-                ResortIn -= Time.fixedDeltaTime;
+                ResortIn -= Time.deltaTime;
                 return;
             }
 
@@ -108,7 +106,7 @@ namespace Game.Managers
 
                     if (hit.collider != null)
                     {
-                        var v = hit.collider.gameObject.GetComponentsInParent<MonoBehaviour>(false);
+                        MonoBehaviour[] v = hit.collider.gameObject.GetComponentsInParent<MonoBehaviour>(false);
                         foreach (MonoBehaviour v1 in v)
                         {
                             if (v1.gameObject == NeedDirectWorldCursor[i].gameObject)

@@ -3,11 +3,39 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 
 using UnityEngine;
+using System.Diagnostics.CodeAnalysis;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 #nullable enable
+
+public struct CoolColors
+{
+    public static Color White => new(1f, 1f, 1f);
+    public static Color Black => new(0f, 0f, 0f);
+
+    public static Color Red => new(0.921568632f, 0.137254909f, 0.08235294f);
+    public static Color BrightRed => new(0.8588235f, 0.3607843f, 0.282353f);
+    public static Color DarkRed => new(0.4313726f, 0.05490196f, 0.1176471f);
+
+    public static Color Green => new(0.06666667f, 0.7411765f, 0.235294119f);
+    public static Color BrightGreen => new(0.4941176f, 0.8392157f, 0.3176471f);
+    public static Color DarkGreen => new(0.09411765f, 0.3803922f, 0.2f);
+
+    public static Color Blue => new(0.117647059f, 0.254901975f, 0.921568632f);
+    public static Color BrightBlue => new(0.1098039f, 0.4352941f, 1f);
+    public static Color DarkBlue => new(0.05490196f, 0.0627451f, 0.549019635f);
+
+    public static Color Yellow => new(0.8862745f, 0.9294118f, 0.09411765f);
+    public static Color Magenta => new(0.6980392f, 0.01960784f, 0.7098039f);
+    public static Color Cyan => new(0.1647059f, 0.8313726f, 0.9215686f);
+
+    public static Color Orange => new(0.9215686f, 0.5450981f, 0.01960784f);
+    public static Color Pink => new(0.9490196f, 0.3647059f, 0.9607843f);
+    public static Color Purple => new(0.5568628f, 0.06666667f, 0.9607843f);
+}
 
 public struct Triangle
 {
@@ -548,7 +576,7 @@ namespace Utilities
 
         public static float ModularClamp(float val, float min, float max, float rangeMin = -180f, float rangeMax = 180f)
         {
-            var modulus = Maths.Abs(rangeMax - rangeMin);
+            float modulus = Maths.Abs(rangeMax - rangeMin);
             if ((val %= modulus) < 0f) val += modulus;
             return System.Math.Clamp(val + Maths.Min(rangeMin, rangeMax), min, max);
         }
@@ -728,6 +756,40 @@ namespace Utilities
             };
         }
 
+        public static Vector3? PredictImpact(Transform shootPosition, float projectileVelocity, float projectileLifetime, out bool outOfRange)
+        {
+            outOfRange = false;
+            float? _relativeHitDistance;
+            float angle = -shootPosition.eulerAngles.x;
+
+            using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+            { _relativeHitDistance = Ballistics.CalculateX(angle * Maths.Deg2Rad, projectileVelocity, shootPosition.position.y); }
+            if (!_relativeHitDistance.HasValue) return null;
+            float relativeHitDistance = _relativeHitDistance.Value;
+
+            Vector3 turretRotation = shootPosition.forward.Flatten();
+            Vector3 point = shootPosition.position + (relativeHitDistance * turretRotation);
+            point.y = 0f;
+
+            if (projectileLifetime > 0f)
+            {
+                Vector2 maxHitDistance;
+                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+                { maxHitDistance = Ballistics.Displacement(angle * Maths.Deg2Rad, projectileVelocity, projectileLifetime); }
+
+                if (maxHitDistance.x < relativeHitDistance)
+                {
+                    outOfRange = true;
+                    point = shootPosition.position + (maxHitDistance.x * turretRotation);
+                    point.y = maxHitDistance.y;
+                }
+            }
+
+            // point.y = Maths.Max(point.y, TheTerrain.Height(point));
+
+            return point;
+        }
+
         /// <param name="v">
         /// Projectile's initial velocity
         /// </param>
@@ -787,7 +849,7 @@ namespace Utilities
         /// </returns>
         public static (float, float)? AngleOfReach(float v, Vector3 from, Vector3 target)
         {
-            var diff = target - from;
+            Vector3 diff = target - from;
             float y = diff.y;
             float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
             return Ballistics.AngleOfReach(v, new Vector2(x, y));
@@ -805,7 +867,7 @@ namespace Utilities
         /// </returns>
         public static float? AngleOfReach1(float v, Vector3 from, Vector3 target)
         {
-            var diff = target - from;
+            Vector3 diff = target - from;
             float y = diff.y;
             float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
             return Ballistics.AngleOfReach1(v, new Vector2(x, y));
@@ -823,7 +885,7 @@ namespace Utilities
         /// </returns>
         public static float? AngleOfReach2(float v, Vector3 from, Vector3 target)
         {
-            var diff = target - from;
+            Vector3 diff = target - from;
             float y = diff.y;
             float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
             return Ballistics.AngleOfReach2(v, new Vector2(x, y));
@@ -903,7 +965,7 @@ namespace Utilities
         }
 
         /// <summary>
-        /// To hit a target at range x and altitude y when fired from (0,0) and with initial speed v.
+        /// To hit a <paramref name="target"/> at range <c>x</c> and altitude <c>y</c> when fired from <c>(0,0)</c> and with initial speed <paramref name="v"/>.
         /// </summary>
         public static float? AngleOfReach1(float v, Vector2 target)
         {
@@ -927,7 +989,7 @@ namespace Utilities
         }
 
         /// <summary>
-        /// To hit a target at range x and altitude y when fired from (0,0) and with initial speed v.
+        /// To hit a <paramref name="target"/> at range <c>x</c> and altitude <c>y</c> when fired from <c>(0,0)</c> and with initial speed <paramref name="v"/>.
         /// </summary>
         public static float? AngleOfReach2(float v, Vector2 target)
         {
@@ -1565,10 +1627,10 @@ namespace Utilities
         static Vector4[] MakeUnitSphere(int len)
         {
             Debug.Assert(len > 2);
-            var v = new Vector4[len * 3];
+            Vector4[] v = new Vector4[len * 3];
             for (int i = 0; i < len; i++)
             {
-                var f = i / (float)len;
+                float f = i / (float)len;
                 float c = Maths.Cos(f * Maths.PI * 2f);
                 float s = Maths.Sin(f * Maths.PI * 2f);
                 v[0 * len + i] = new Vector4(c, s, 0, 1);
@@ -1624,20 +1686,20 @@ namespace Utilities
             Vector4 sz = new(size.x, size.y, size.z, 1);
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[i], sz);
-                var e = pos + Vector4.Scale(v[(i + 1) % 4], sz);
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[(i + 1) % 4], sz);
                 Debug.DrawLine(s, e, color);
             }
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[4 + i], sz);
-                var e = pos + Vector4.Scale(v[4 + ((i + 1) % 4)], sz);
+                Vector4 s = pos + Vector4.Scale(v[4 + i], sz);
+                Vector4 e = pos + Vector4.Scale(v[4 + ((i + 1) % 4)], sz);
                 Debug.DrawLine(s, e, color);
             }
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[i], sz);
-                var e = pos + Vector4.Scale(v[i + 4], sz);
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[i + 4], sz);
                 Debug.DrawLine(s, e, color);
             }
         }
@@ -1648,20 +1710,20 @@ namespace Utilities
             Vector4 sz = new(size.x, size.y, size.z, 1);
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[i], sz);
-                var e = pos + Vector4.Scale(v[(i + 1) % 4], sz);
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[(i + 1) % 4], sz);
                 Debug.DrawLine(s, e, color, duration);
             }
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[4 + i], sz);
-                var e = pos + Vector4.Scale(v[4 + ((i + 1) % 4)], sz);
+                Vector4 s = pos + Vector4.Scale(v[4 + i], sz);
+                Vector4 e = pos + Vector4.Scale(v[4 + ((i + 1) % 4)], sz);
                 Debug.DrawLine(s, e, color, duration);
             }
             for (int i = 0; i < 4; i++)
             {
-                var s = pos + Vector4.Scale(v[i], sz);
-                var e = pos + Vector4.Scale(v[i + 4], sz);
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[i + 4], sz);
                 Debug.DrawLine(s, e, color, duration);
             }
         }
@@ -1709,6 +1771,143 @@ namespace Utilities
             Debug.DrawLine(position - up, position + up, color, duration);
             Debug.DrawLine(position - right, position + right, color, duration);
             Debug.DrawLine(position - forward, position + forward, color, duration);
+        }
+    }
+
+    public static class GizmosPlus
+    {
+        public static void DrawMesh(Mesh mesh)
+        {
+            int[] triangles = mesh.triangles;
+            Vector3[] vertices = mesh.vertices;
+
+            for (int i = 0; i < triangles.Length; i += 3)
+            {
+                if (i + 1 < vertices.Length)
+                {
+                    UnityEngine.Gizmos.DrawLine(vertices[i], vertices[i + 1]);
+
+                    if (i + 2 < vertices.Length)
+                    {
+                        UnityEngine.Gizmos.DrawLine(vertices[i + 1], vertices[i + 2]);
+                        UnityEngine.Gizmos.DrawLine(vertices[i + 2], vertices[i]);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Square with edge of length 1
+        /// </summary>
+        static readonly Vector4[] s_UnitSquare =
+        {
+            new(-0.5f, 0.5f, 0, 1),
+            new(0.5f, 0.5f, 0, 1),
+            new(0.5f, -0.5f, 0, 1),
+            new(-0.5f, -0.5f, 0, 1),
+        };
+        /// <summary>
+        /// Cube with edge of length 1
+        /// </summary>
+        static readonly Vector4[] s_UnitCube =
+        {
+            new(-0.5f,  0.5f, -0.5f, 1),
+            new(0.5f,  0.5f, -0.5f, 1),
+            new(0.5f, -0.5f, -0.5f, 1),
+            new(-0.5f, -0.5f, -0.5f, 1),
+
+            new(-0.5f,  0.5f,  0.5f, 1),
+            new(0.5f,  0.5f,  0.5f, 1),
+            new(0.5f, -0.5f,  0.5f, 1),
+            new(-0.5f, -0.5f,  0.5f, 1)
+        };
+        static readonly Vector4[] s_UnitSphere = MakeUnitSphere(16);
+
+        static Vector4[] MakeUnitSphere(int len)
+        {
+            Debug.Assert(len > 2);
+            Vector4[] v = new Vector4[len * 3];
+            for (int i = 0; i < len; i++)
+            {
+                float f = i / (float)len;
+                float c = Maths.Cos(f * Maths.PI * 2f);
+                float s = Maths.Sin(f * Maths.PI * 2f);
+                v[0 * len + i] = new Vector4(c, s, 0, 1);
+                v[1 * len + i] = new Vector4(0, c, s, 1);
+                v[2 * len + i] = new Vector4(s, 0, c, 1);
+            }
+            return v;
+        }
+
+        public static void DrawSphere(Vector4 pos, float radius)
+        {
+            Vector4[] v = s_UnitSphere;
+            int len = v.Length / 3;
+            for (int i = 0; i < len; i++)
+            {
+                Vector4 sX = pos + radius * v[0 * len + i];
+                Vector4 eX = pos + radius * v[0 * len + (i + 1) % len];
+                Gizmos.DrawLine(sX, eX);
+
+                Vector4 sY = pos + radius * v[1 * len + i];
+                Vector4 eY = pos + radius * v[1 * len + (i + 1) % len];
+                Gizmos.DrawLine(sY, eY);
+
+                Vector4 sZ = pos + radius * v[2 * len + i];
+                Vector4 eZ = pos + radius * v[2 * len + (i + 1) % len];
+                Gizmos.DrawLine(sZ, eZ);
+            }
+        }
+
+        public static void DrawBox(Vector4 pos, Vector3 size)
+        {
+            Vector4[] v = s_UnitCube;
+            Vector4 sz = new(size.x, size.y, size.z, 1);
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[(i + 1) % 4], sz);
+                Gizmos.DrawLine(s, e);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4 s = pos + Vector4.Scale(v[4 + i], sz);
+                Vector4 e = pos + Vector4.Scale(v[4 + ((i + 1) % 4)], sz);
+                Gizmos.DrawLine(s, e);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4 s = pos + Vector4.Scale(v[i], sz);
+                Vector4 e = pos + Vector4.Scale(v[i + 4], sz);
+                Gizmos.DrawLine(s, e);
+            }
+        }
+
+        public static void DrawBox(Bounds bounds)
+            => DrawBox(bounds.center, bounds.size);
+
+        public static void DrawAxes(Vector4 pos)
+            => DrawAxes(pos, 1f);
+
+        public static void DrawAxes(Vector4 pos, float scale)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(pos, pos + new Vector4(scale, 0, 0));
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(pos, pos + new Vector4(0, scale, 0));
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(pos, pos + new Vector4(0, 0, scale));
+        }
+
+        public static void DrawPoint(Vector3 position, float scale)
+        {
+            Vector3 up = Vector3.up * scale;
+            Vector3 right = Vector3.right * scale;
+            Vector3 forward = Vector3.forward * scale;
+
+            Gizmos.DrawLine(position - up, position + up);
+            Gizmos.DrawLine(position - right, position + right);
+            Gizmos.DrawLine(position - forward, position + forward);
         }
     }
 }

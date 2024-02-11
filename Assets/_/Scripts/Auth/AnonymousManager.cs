@@ -60,9 +60,9 @@ namespace Authentication.Providers
         }
 
         float timeToNextResetHaveAccount = 0f;
-        void FixedUpdate()
+        void Update()
         {
-            timeToNextResetHaveAccount += Time.fixedDeltaTime;
+            timeToNextResetHaveAccount += Time.deltaTime;
             if (timeToNextResetHaveAccount >= 1f)
             {
                 timeToNextResetHaveAccount = 0f;

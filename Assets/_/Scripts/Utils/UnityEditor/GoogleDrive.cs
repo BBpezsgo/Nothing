@@ -84,14 +84,16 @@ namespace Utilities.Editor
             {
                 get
                 {
-                    if (ThreadingTask != null)
-                    {
-                        return ThreadingTask.GetProgress();
-                    }
-
                     if (RequestTask != null)
                     {
+                        if (RequestTask.IsDone) return 1f;
                         return RequestTask.Progress;
+                    }
+
+                    if (ThreadingTask != null)
+                    {
+                        if (ThreadingTask.IsCompleted) return 1f;
+                        return ThreadingTask.GetProgress();
                     }
 
                     return 0f;
@@ -645,6 +647,14 @@ namespace Utilities.Editor
                         }
                     }
 
+                    content = new GUIContent("Open");
+                    rect = rect.CutLeft(EditorStyles.linkLabel.CalcSize(content).x, out subrect);
+
+                    if (EditorGUI.LinkButton(subrect, content))
+                    {
+                        Application.OpenURL($"https://drive.google.com/file/d/{file.Id}/view");
+                    }
+
                     content = new GUIContent("Copy Download Link");
                     rect = rect.CutLeft(EditorStyles.linkLabel.CalcSize(content).x, out subrect);
 
@@ -728,7 +738,25 @@ namespace Utilities.Editor
                 EditorGUILayout.LabelField("Request Queue", EditorStyles.boldLabel);
                 foreach (GoogleDriveRequest request in RequestQueue)
                 {
-                    EditorGUI.LabelField(EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight), request.Method, request.Uri);
+                    if (request.IsRunning)
+                    {
+                        Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+                        EditorGUI.ProgressBar(rect, request.Progress, $"{request.Method} {request.Uri}");
+                    }
+                    else if (request.IsDone)
+                    {
+                        if (request.IsError)
+                        {
+                            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+                            rect = EditorGUI.PrefixLabel(rect, EditorGUIUtility.IconContent("Error"));
+                            EditorGUI.LabelField(rect, request.Error);
+                        }
+                    }
+                    else
+                    {
+                        Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+                        EditorGUI.LabelField(rect, $"{request.Method} {request.Uri}");
+                    }
                 }
                 EditorGUILayout.EndVertical();
             }

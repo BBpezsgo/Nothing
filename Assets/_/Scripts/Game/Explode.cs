@@ -1,4 +1,5 @@
 using UnityEngine;
+using Utilities;
 
 namespace Game.Components
 {
@@ -6,15 +7,34 @@ namespace Game.Components
     {
         [SerializeField, Min(0f)] float ExplodeForce;
         [Tooltip("Mass/Volume")]
-        [SerializeField, Min(0f)] float Density;
+        [SerializeField, ReadOnly] float Density;
         [SerializeField, Range(0f, 1f)] float FragmentSmokeProbability;
         [SerializeField, MinMax(0f, 2f)] Vector2 FragmentSmokeScale;
         [SerializeField] GameObject FragmentSmokePrefab;
 
+        [SerializeField] AudioClip[] AudioClips;
+
+        [SerializeField, Button(nameof(Do), false, true, "Explode")] string ButtonExplode;
+
         void Reset()
         {
             ExplodeForce = .2f;
-            Density = .1f;
+            AudioClips = new AudioClip[0];
+        }
+
+        float CalculateDensity()
+        {
+            if (!TryGetComponent(out Rigidbody rigidbody)) return default;
+
+            float mass = rigidbody.mass;
+            float volume = Maths.TotalMeshVolume(gameObject, true);
+
+            return mass / volume;
+        }
+
+        void Start()
+        {
+            Density = CalculateDensity();
         }
 
         public void Do()
@@ -50,20 +70,22 @@ namespace Game.Components
             else
             { Debug.LogWarning($"Failed to add component {nameof(MeshFilter)} to {obj}", this); }
 
+            BoxCollider boxCollider = null;
+
             if (obj.TryGetComponent(out MeshRenderer meshRenderer))
             {
                 meshRenderer.materials = mesh.GetComponent<MeshRenderer>().materials;
+
+                if (obj.TryGetComponent(out boxCollider))
+                {
+                    boxCollider.center = meshRenderer.localBounds.center;
+                    boxCollider.size = meshRenderer.localBounds.size;
+                }
+                else
+                { Debug.LogWarning($"Failed to add component {nameof(BoxCollider)} to {obj}", this); }
             }
             else
             { Debug.LogWarning($"Failed to add component {nameof(MeshRenderer)} to {obj}", this); }
-
-            if (obj.TryGetComponent(out BoxCollider boxCollider) && meshRenderer != null)
-            {
-                boxCollider.center = meshRenderer.localBounds.center;
-                boxCollider.size = meshRenderer.localBounds.size;
-            }
-            else
-            { Debug.LogWarning($"Failed to add component {nameof(BoxCollider)} to {obj}", this); }
 
             Rigidbody selfRigidbody = null;
 
@@ -92,29 +114,20 @@ namespace Game.Components
                 fracture.Fracture().OnFractureComplete += (e) =>
                 {
                     if (mesh != null) Destroy(mesh);
+                    if (obj != null) Destroy(obj);
                     int childCount = e.FracturePiecesRootObject.transform.childCount;
                     e.FracturePiecesRootObject.AddComponent<FracturedObjectsRoot>();
                     for (int i = 0; i < childCount; i++)
                     {
                         GameObject child = e.FracturePiecesRootObject.transform.GetChild(i).gameObject;
 
+                        HandleFracture(child);
+
                         if (child.TryGetComponent(out BoxCollider childBoxCollider) &&
                             child.TryGetComponent(out MeshRenderer childMeshRenderer))
                         {
                             childBoxCollider.center = childMeshRenderer.localBounds.center;
                             childBoxCollider.size = childMeshRenderer.localBounds.size;
-                        }
-
-                        FracturedObjectScript fracturedObject = child.AddComponent<FracturedObjectScript>();
-                        fracturedObject.LifeTime = Random.Range(20f, 40f);
-
-                        if (FragmentSmokePrefab != null &&
-                            Random.value >= FragmentSmokeProbability &&
-                            QualityHandler.EnableParticles)
-                        {
-                            GameObject smoke = Instantiate(FragmentSmokePrefab, child.transform);
-                            smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
-                            smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
                         }
 
                         if (child.TryGetComponent(out Rigidbody childRigidbody))
@@ -134,20 +147,10 @@ namespace Game.Components
             }
             else
             {
-                FracturedObjectScript fracturedObject = obj.AddComponent<FracturedObjectScript>();
-                fracturedObject.LifeTime = Random.Range(20f, 40f);
+                HandleFracture(obj);
 
                 if (ExplodeForce > float.Epsilon && rigidbody != null)
                 { rigidbody.AddExplosionForce(ExplodeForce, transform.position, 20f, 5f); }
-
-                if (FragmentSmokePrefab != null &&
-                    Random.value >= FragmentSmokeProbability &&
-                    QualityHandler.EnableParticles)
-                {
-                    GameObject smoke = Instantiate(FragmentSmokePrefab, mesh.transform);
-                    smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
-                    smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
-                }
 
                 float childVolume = Maths.Volume(meshFilter, boxCollider);
 
@@ -158,6 +161,30 @@ namespace Game.Components
             }
 
             return obj;
+        }
+
+        void HandleFracture(GameObject fracture)
+        {
+            fracture.layer = LayerMask.GetMask(LayerMaskNames.IgnoreRaycast);
+
+            if (AudioClips.Length > 0)
+            {
+                AudioSource childAudio = fracture.AddComponent<AudioSource>();
+                childAudio.maxDistance = 10f;
+            }
+
+            FracturedObjectScript fracturedObject = fracture.AddComponent<FracturedObjectScript>();
+            fracturedObject.LifeTime = Random.Range(20f, 40f);
+            fracturedObject.AudioClips = AudioClips;
+
+            if (FragmentSmokePrefab != null &&
+                Random.value >= FragmentSmokeProbability &&
+                QualityHandler.EnableParticles)
+            {
+                GameObject smoke = Instantiate(FragmentSmokePrefab, fracture.transform);
+                smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
+                smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
+            }
         }
     }
 }

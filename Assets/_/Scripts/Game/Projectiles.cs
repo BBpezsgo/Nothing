@@ -23,8 +23,5 @@ public class Projectiles : ScriptableObject
         set => projectiles[index] = value;
     }
 
-    public Projectile this[Index index]
-    {
-        get => projectiles[index];
-    }
+    public Projectile this[Index index] => projectiles[index];
 }

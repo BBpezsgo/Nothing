@@ -129,7 +129,7 @@ namespace Game.Managers
             DamagePopupLabels.Add(new DamagePopupLabel(worldPosition, Time.time, amount, damageKind));
         }
 
-        void FixedUpdate()
+        void Update()
         {
             for (int i = DamagePopupLabels.Count - 1; i >= 0; i--)
             {

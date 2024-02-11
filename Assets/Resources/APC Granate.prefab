@@ -340,6 +340,7 @@ GameObject:
   - component: {fileID: 4032902050812513780}
   - component: {fileID: 4032902050812513781}
   - component: {fileID: 4032902050812513779}
+  - component: {fileID: 694226811761553559}
   - component: {fileID: 4032902050812513778}
   - component: {fileID: 2776291270581045572}
   - component: {fileID: 5931494210968893531}
@@ -349,7 +350,6 @@ GameObject:
   - component: {fileID: 134846350387278452}
   - component: {fileID: 7771530061436261717}
   - component: {fileID: 2152026266353132283}
-  - component: {fileID: 694226811761553559}
   - component: {fileID: 7101392919599067077}
   - component: {fileID: 5867078746325976924}
   - component: {fileID: 2237418352075832577}
@@ -418,6 +418,26 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &694226811761553559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4032902050812513782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 996622765
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &4032902050812513778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -477,6 +497,7 @@ MonoBehaviour:
   moveSpeedMax: 50
   engineBrake: 2
   Torque: 0
+  AudioSource: {fileID: 0}
   brake: 1
   handbrake: 2.5
   isHandbraking: 0
@@ -513,6 +534,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviors: []
+  ShowGizmos: 0
 --- !u!114 &5931494210968893531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,19 +589,7 @@ MonoBehaviour:
   Priority: 2
   MovementEngine: {fileID: 0}
   IgnoreCollision: {fileID: 0}
-  raycastHitCache:
-    Obstacles: []
-  DetectedThings:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Obstacles: []
   TimeToCheck: 0.1
 --- !u!114 &869638110986485263
 MonoBehaviour:
@@ -618,7 +628,7 @@ MonoBehaviour:
   - {fileID: 2405582640826139468}
   vehicleEngine: {fileID: 4032902050812513778}
   turret: {fileID: 4032902049885679787}
-  UnitBehaviour: {fileID: 0}
+  UnitBehavior: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   <CrossStyle>k__BackingField: 3
@@ -660,26 +670,6 @@ MonoBehaviour:
   lastRotation: 0
   rotationDelta: 0
   DetectionRadius: 300
---- !u!114 &694226811761553559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4032902050812513782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 0
 --- !u!114 &7101392919599067077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,6 +682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -876,6 +867,8 @@ MonoBehaviour:
   FragmentSmokeScale: {x: 0.5, y: 2}
   FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
     type: 3}
+  AudioClips:
+  - {fileID: 8300000, guid: 8610309072247b941865843f845dd3b3, type: 3}
 --- !u!1 &4032902050905775096
 GameObject:
   m_ObjectHideFlags: 0

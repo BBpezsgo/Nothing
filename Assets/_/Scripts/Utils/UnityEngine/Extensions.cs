@@ -61,12 +61,11 @@ public static partial class UnclassifiedExtensions
     public static bool Contains(this UnityEngine.Object[] self, UnityEngine.Object v)
     {
         for (int i = 0; i < self.Length; i++)
-        {
-            if (self[i] == v) return true;
-        }
+        { if (self[i] == v) return true; }
         return false;
     }
-    public static RaycastHit[] Exclude(this RaycastHit[] hits, params Transform[] exclude)
+
+    public static RaycastHit[] ExcludeTransforms(this RaycastHit[] hits, params Transform[] exclude)
     {
         List<RaycastHit> result = new();
         for (int i = 0; i < hits.Length; i++)
@@ -90,7 +89,7 @@ public static partial class UnclassifiedExtensions
         return result.ToArray();
     }
 
-    public static RaycastHit Closest(this RaycastHit[] hits, Vector3 origin)
+    public static (int Index, float DistanceSqr) Closest(this RaycastHit[] hits, Vector3 origin)
     {
         float closest = (origin - hits[0].point).sqrMagnitude;
         int closestI = 0;
@@ -105,30 +104,9 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return hits[closestI];
+        return new ValueTuple<int, float>(closestI, closest);
     }
-
-    public static Transform? Closest(this Transform[] v, Vector3 origin)
-    {
-        if (v.Length == 0) return null;
-        float closest = float.MaxValue;
-        int closestI = -1;
-
-        for (int i = 1; i < v.Length; i++)
-        {
-            if (v[i] == null) continue;
-            float d = (origin - v[i].position).sqrMagnitude;
-            if (closestI == -1 || closest > d)
-            {
-                closest = d;
-                closestI = i;
-            }
-        }
-
-        return v[closestI];
-    }
-
-    public static (int Index, float Distance) ClosestI(this Transform[] v, Vector3 origin)
+    public static (int Index, float DistanceSqr) Closest(this Transform[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -145,9 +123,9 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, closest);
     }
-    public static (int Index, float Distance) ClosestI(this Component[] v, Vector3 origin)
+    public static (int Index, float DistanceSqr) Closest(this Component[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -164,9 +142,9 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, closest);
     }
-    public static (int Index, float Distance) ClosestI(this IComponent[] v, Vector3 origin)
+    public static (int Index, float DistanceSqr) Closest(this IComponent[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -183,9 +161,9 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, closest);
     }
-    public static (int Index, float Distance) ClosestI(this GameObject[] v, Vector3 origin)
+    public static (int Index, float DistanceSqr) Closest(this GameObject[] v, Vector3 origin)
     {
         if (v.Length == 0) return new ValueTuple<int, float>(-1, 0f);
         float closest = float.MaxValue;
@@ -202,19 +180,20 @@ public static partial class UnclassifiedExtensions
             }
         }
 
-        return new ValueTuple<int, float>(closestI, Maths.Sqrt(closest));
+        return new ValueTuple<int, float>(closestI, closest);
     }
 
     public delegate void SearchCallback<T1>(T1 p0);
     public delegate void SearchCallback<T1, T2>(T1 p0, T2 p1);
 
-    public static IEnumerator ClosestIAsync(this Transform[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
+    public static IEnumerator ClosestAsync(this Transform[] v, Vector3 origin, SearchCallback<int, float>? intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
+
         float closest = float.MaxValue;
         int closestI = -1;
 
-        for (int i = 1; i < v.Length; i++)
+        for (int i = 0; i < v.Length; i++)
         {
             yield return new WaitForFixedUpdate();
 
@@ -225,15 +204,16 @@ public static partial class UnclassifiedExtensions
                 closest = d;
                 closestI = i;
 
-                intermediateCallback.Invoke(closestI, closest);
+                intermediateCallback?.Invoke(closestI, closest);
             }
         }
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this Component[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
+    public static IEnumerator ClosestAsync(this Component[] v, Vector3 origin, SearchCallback<int, float>? intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
+
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -248,15 +228,16 @@ public static partial class UnclassifiedExtensions
                 closest = d;
                 closestI = i;
 
-                intermediateCallback.Invoke(closestI, closest);
+                intermediateCallback?.Invoke(closestI, closest);
             }
         }
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this IComponent[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
+    public static IEnumerator ClosestAsync(this IComponent[] v, Vector3 origin, SearchCallback<int, float>? intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
+
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -271,15 +252,16 @@ public static partial class UnclassifiedExtensions
                 closest = d;
                 closestI = i;
 
-                intermediateCallback.Invoke(closestI, closest);
+                intermediateCallback?.Invoke(closestI, closest);
             }
         }
 
         doneCallback?.Invoke(closestI, closest);
     }
-    public static IEnumerator ClosestIAsync(this GameObject[] v, Vector3 origin, SearchCallback<int, float> intermediateCallback, SearchCallback<int, float>? doneCallback = null)
+    public static IEnumerator ClosestAsync(this GameObject[] v, Vector3 origin, SearchCallback<int, float>? intermediateCallback, SearchCallback<int, float>? doneCallback = null)
     {
         if (v.Length == 0) yield break;
+
         float closest = float.MaxValue;
         int closestI = -1;
 
@@ -294,7 +276,31 @@ public static partial class UnclassifiedExtensions
                 closest = d;
                 closestI = i;
 
-                intermediateCallback.Invoke(closestI, closest);
+                intermediateCallback?.Invoke(closestI, closest);
+            }
+        }
+
+        doneCallback?.Invoke(closestI, closest);
+    }
+    public static IEnumerator ClosestAsync<T>(this T[] v, Func<T, float> distanceCalculator, SearchCallback<int, float>? intermediateCallback, SearchCallback<int, float>? doneCallback = null)
+    {
+        if (v.Length == 0) yield break;
+
+        float closest = float.MaxValue;
+        int closestI = -1;
+
+        for (int i = 1; i < v.Length; i++)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if (v[i] == null) continue;
+            float d = distanceCalculator.Invoke(v[i]);
+            if (closestI == -1 || closest > d)
+            {
+                closest = d;
+                closestI = i;
+
+                intermediateCallback?.Invoke(closestI, closest);
             }
         }
 
@@ -351,9 +357,7 @@ public static partial class UnclassifiedExtensions
     {
         Ray ray = camera.ScreenPointToRay(screenPosition);
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, layerMask))
-        {
-            return hit.point;
-        }
+        { return hit.point; }
         return ray.GetPoint(maxDistance);
     }
 
@@ -365,9 +369,19 @@ public static partial class UnclassifiedExtensions
         Ray ray = camera.ScreenPointToRay(screenPosition);
         hits = Physics.RaycastAll(ray, maxDistance).ExcludeTriggers();
         if (hits.Length > 0)
-        {
-            return hits[0].point;
-        }
+        { return hits[0].point; }
+        return ray.GetPoint(maxDistance);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, int layerMask, out RaycastHit[] hits)
+        => ScreenToWorldPosition(camera, screenPosition, ScreenRayMaxDistance, layerMask, out hits);
+    public static Vector3 ScreenToWorldPosition(this Camera camera, Vector2 screenPosition, float maxDistance, int layerMask, out RaycastHit[] hits)
+    {
+        Ray ray = camera.ScreenPointToRay(screenPosition);
+        hits = Physics.RaycastAll(ray, maxDistance, layerMask).ExcludeTriggers();
+        if (hits.Length > 0)
+        { return hits[0].point; }
         return ray.GetPoint(maxDistance);
     }
 
@@ -768,4 +782,14 @@ public static class RectIntEx
     public static Vector2Int TopRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
     public static Vector2Int BottomLeft(this RectInt rect) => new(rect.position.x, rect.position.y + rect.height);
     public static Vector2Int BottomRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
+}
+
+public static class TransformEx
+{
+    public static bool IsChildOfRecursive(this Transform child, Transform parent)
+    {
+        if (child.parent == null) return false;
+        if (child.parent == parent) return true;
+        return IsChildOfRecursive(child.parent, parent);
+    }
 }

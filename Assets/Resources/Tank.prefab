@@ -9991,7 +9991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 727815273
+  GlobalObjectIdHash: 3419784383
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -10028,6 +10028,7 @@ MonoBehaviour:
   moveSpeedMax: 50
   engineBrake: 2
   Torque: 0
+  AudioSource: {fileID: 0}
   brake: 1
   handbrake: 0.2
   isHandbraking: 0
@@ -10064,6 +10065,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviors: []
+  ShowGizmos: 0
 --- !u!114 &3673528625757124021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10118,19 +10120,7 @@ MonoBehaviour:
   Priority: 2
   MovementEngine: {fileID: 0}
   IgnoreCollision: {fileID: 0}
-  raycastHitCache:
-    Obstacles: []
-  DetectedThings:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Obstacles: []
   TimeToCheck: 0.1
 --- !u!114 &2286748800339120391
 MonoBehaviour:
@@ -10169,7 +10159,7 @@ MonoBehaviour:
   - {fileID: 87338082549523861}
   vehicleEngine: {fileID: 2619412345505571578}
   turret: {fileID: 2619412344863678371}
-  UnitBehaviour: {fileID: 0}
+  UnitBehavior: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   <CrossStyle>k__BackingField: 1
@@ -10422,6 +10412,8 @@ MonoBehaviour:
   FragmentSmokeScale: {x: 0.5, y: 2}
   FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
     type: 3}
+  AudioClips:
+  - {fileID: 8300000, guid: 8610309072247b941865843f845dd3b3, type: 3}
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0

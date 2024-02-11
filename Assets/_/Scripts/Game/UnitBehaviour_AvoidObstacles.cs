@@ -1,47 +1,32 @@
-using AssetManager;
-
 using System.Collections.Generic;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
 {
     public class UnitBehaviour_AvoidObstacles : UnitBehaviour_Base
     {
-        [SerializeField, ReadOnly] internal Transform IgnoreCollision;
-        [SerializeField, ReadOnly] RaycastHitCache raycastHitCache;
-        [SerializeField, ReadOnly, NonReorderable] Collider[] DetectedThings = new Collider[10];
+        const float MaxDistanceToThink = 200f;
+
+        [SerializeField, ReadOnly] public Transform IgnoreCollision;
+        [SerializeField, ReadOnly, NonReorderable] List<Collider> Obstacles = new(10);
+        readonly Collider[] DetectedThings = new Collider[10];
         [SerializeField, ReadOnly] float TimeToCheck = .1f;
 
         const float DetectionRange = 10f;
         const float MaxDetectionCooldown = 5f;
 
-        [System.Serializable]
-        struct RaycastHitCache
-        {
-            [SerializeField, ReadOnly, NonReorderable] internal List<Collider> Obstacles;
-        }
-
         protected virtual void Start()
         {
             TimeToCheck = Random.value + 1f;
-            raycastHitCache = new RaycastHitCache()
-            {
-                Obstacles = new List<Collider>(),
-            };
         }
 
-        static bool IsChildOf(Transform child, Transform parent)
+        void Update()
         {
-            if (child == parent) return true;
-            if (child.parent == null) return false;
-            if (child.parent == parent) return true;
-            return IsChildOf(child.parent, parent);
+            TimeToCheck -= Time.deltaTime;
         }
 
-        internal override Vector2? GetOutput()
+        public override Vector2? GetOutput()
         {
             if (TimeToCheck <= 0f)
             {
@@ -60,15 +45,16 @@ namespace Game.Components
 
             Vector2? result = null;
 
-            for (int i = 0; i < raycastHitCache.Obstacles.Count; i++)
+            for (int i = 0; i < Obstacles.Count; i++)
             {
-                Collider obstacle = raycastHitCache.Obstacles[i];
-                if (obstacle == null) continue;
-                if (IgnoreCollision != null && IsChildOf(obstacle.transform, IgnoreCollision))
+                Collider obstacle = Obstacles[i];
+
+                if (obstacle == null ||
+                    IgnoreCollision != null &&
+                    obstacle.transform.IsChildOf(IgnoreCollision))
                 { continue; }
 
-                var thinkResult = Think(obstacle, ref closest, out Vector2 _result);
-                switch (thinkResult)
+                switch (Think(obstacle, ref closest, out Vector2 _result))
                 {
                     case ThinkResult.Primary:
                         return _result;
@@ -91,8 +77,6 @@ namespace Game.Components
             Secondary,
         }
 
-        const float MaxDistanceToThink = 200f;
-
         ThinkResult Think(Collider obstacle, ref float closest, out Vector2 result)
         {
             result = default;
@@ -113,7 +97,7 @@ namespace Game.Components
             // Start reverse
             if (dot > .6f && distance < 10f)
             {
-                Debug.DrawLine(transform.position, closestPoint, Color.red, Time.fixedDeltaTime);
+                Debug.DrawLine(transform.position, closestPoint, Color.red, Time.deltaTime);
 
                 result = new Vector2(-1f, -0.5f);
                 return ThinkResult.Primary;
@@ -122,7 +106,7 @@ namespace Game.Components
             // Continue reverse
             if (dot > .45f && distance < 50f && MovementEngine.IsReverse)
             {
-                Debug.DrawLine(transform.position, closestPoint, Color.red, Time.fixedDeltaTime);
+                Debug.DrawLine(transform.position, closestPoint, Color.red, Time.deltaTime);
 
                 result = new Vector2(-1f, -0.35f);
                 return ThinkResult.Primary;
@@ -138,7 +122,7 @@ namespace Game.Components
 
             steering *= 1f - dot;
 
-            Debug.DrawLine(transform.position, closestPoint, Color.yellow, Time.fixedDeltaTime);
+            Debug.DrawLine(transform.position, closestPoint, Color.yellow, Time.deltaTime);
 
             result = new Vector2(steering, .5f);
 
@@ -147,36 +131,55 @@ namespace Game.Components
 
         void OnCollisionEnter(Collision collision)
         {
-            if (raycastHitCache.Obstacles.Contains(collision.collider))
+            if (Obstacles.Contains(collision.collider))
             { return; }
             if (collision.gameObject.layer != LayerMask.NameToLayer(LayerMaskNames.Default))
             { return; }
-            raycastHitCache.Obstacles.Add(collision.collider);
+            Obstacles.Add(collision.collider);
         }
 
         void DetectObstacles()
         {
             int hits = Physics.OverlapSphereNonAlloc(transform.position, DetectionRange, DetectedThings);
 
-            Debug3D.DrawSphere(transform.position, DetectionRange, Color.white, Time.fixedDeltaTime);
+            Debug3D.DrawSphere(transform.position, DetectionRange, Color.white, Time.deltaTime);
 
-            raycastHitCache.Obstacles.Clear();
+            Obstacles.Clear();
 
             for (int i = 0; i < hits; i++)
             {
-                var hit = DetectedThings[i];
+                Collider hit = DetectedThings[i];
                 if (hit.gameObject.layer != LayerMask.NameToLayer(LayerMaskNames.Default)) continue;
                 if (hit.gameObject == gameObject) continue;
 
-                // Debug.DrawLine(transform.position, DetectedThings[i].transform.position, Color.red, Time.fixedDeltaTime);
+                // Debug.DrawLine(transform.position, DetectedThings[i].transform.position, Color.red, Time.deltaTime);
 
-                raycastHitCache.Obstacles.Add(hit);
+                Obstacles.Add(hit);
             }
         }
 
-        void FixedUpdate()
+        public override void DrawGizmos()
         {
-            TimeToCheck -= Time.fixedDeltaTime;
+            base.DrawGizmos();
+
+            for (int i = 0; i < Obstacles.Count; i++)
+            {
+                Collider obstacle = Obstacles[i];
+
+                if (obstacle == null)
+                { continue; }
+
+                if (IgnoreCollision != null &&
+                    obstacle.transform.IsChildOf(IgnoreCollision))
+                {
+                    Gizmos.color = CoolColors.Orange;
+                    Gizmos.DrawWireCube(obstacle.bounds.center, obstacle.bounds.size);
+                    continue;
+                }
+
+                Gizmos.color = CoolColors.Red;
+                Gizmos.DrawWireCube(obstacle.bounds.center, obstacle.bounds.size);
+            }
         }
     }
 }

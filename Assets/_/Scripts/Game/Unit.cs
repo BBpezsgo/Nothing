@@ -4,7 +4,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    internal class Unit : BaseObject, IDamagable, ICanTakeControlAndHasTurret
+    internal class Unit : BaseObject, IDamageable, ICanTakeControlAndHasTurret
     {
         [SerializeField] MovementEngine vehicleEngine;
         [SerializeField] protected Turret turret;
@@ -62,9 +62,9 @@ namespace Game.Components
 
             if (!Input.GetKey(KeyCode.LeftAlt))
             {
-                var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-                var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
-                Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit[] hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).ExcludeTransforms(transform);
+                Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits[hits.Closest(transform.position).Index].point;
 
                 if (NetcodeUtils.IsOfflineOrServer)
                 {
@@ -103,7 +103,7 @@ namespace Game.Components
         public virtual void DoFrequentInput()
         { }
 
-        protected virtual void FixedUpdate()
+        protected virtual void Update()
         {
             if (vehicleEngine == null)
             { return; }
@@ -127,9 +127,9 @@ namespace Game.Components
             return UnitBehavior.GetOutput();
         }
 
-        public void Damage(float ammount)
+        public void Damage(float amount)
         {
-            HP -= ammount;
+            HP -= amount;
 
             if (HP <= 0f)
             { Destroy(); }

@@ -4,7 +4,7 @@ namespace Game.Components
 {
     public class FracturedObjectsRoot : MonoBehaviour
     {
-        void FixedUpdate()
+        void Update()
         {
             if (transform.childCount == 0)
             { Destroy(gameObject); }

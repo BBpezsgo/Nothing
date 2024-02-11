@@ -46,7 +46,7 @@ namespace Game.Components
             if (turret != null) turret.@base = BaseObject;
         }
 
-        protected virtual void FixedUpdate()
+        protected virtual void Update()
         {
             if (HullRotationStabilizer &&
                 CanTakeControl &&
@@ -115,9 +115,9 @@ namespace Game.Components
 
                     if (!targetLocked)
                     {
-                        var ray = MainCamera.Camera.ScreenPointToRay(screenCenter);
-                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
-                        Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                        Ray ray = MainCamera.Camera.ScreenPointToRay(screenCenter);
+                        RaycastHit[] hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).ExcludeTransforms(transform);
+                        Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits[hits.Closest(transform.position).Index].point;
 
                         if (NetcodeUtils.IsOfflineOrServer)
                         {
@@ -177,18 +177,18 @@ namespace Game.Components
 
                         if (!targetLocked)
                         {
-                            var ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
-                            var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
-                            Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                            Ray ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
+                            RaycastHit[] hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).ExcludeTransforms(transform);
+                            Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits[hits.Closest(transform.position).Index].point;
 
                             turret.SetTarget(point);
                         }
                     }
                     else if (NetcodeUtils.IsClient)
                     {
-                        var ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
-                        var hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).Exclude(transform);
-                        Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits.Closest(transform.position).point;
+                        Ray ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
+                        RaycastHit[] hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).ExcludeTransforms(transform);
+                        Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits[hits.Closest(transform.position).Index].point;
 
                         if ((turret.TargetPosition - point).sqrMagnitude > .5f)
                         {

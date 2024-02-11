@@ -1,9 +1,6 @@
 using System.Collections;
-
 using Unity.Netcode;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
@@ -25,7 +22,7 @@ namespace Game.Components
         {
             if (currentSpitCooldown > 0f)
             {
-                currentSpitCooldown -= Time.fixedDeltaTime;
+                currentSpitCooldown -= Time.deltaTime;
             }
 
             if (!Flee())
@@ -147,7 +144,7 @@ namespace Game.Components
 
             if (distanceToDestination < 1f)
             {
-                Bored += Time.fixedDeltaTime;
+                Bored += Time.deltaTime;
                 return;
             }
 

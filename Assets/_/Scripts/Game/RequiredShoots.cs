@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace Game.Components
@@ -20,6 +20,7 @@ namespace Game.Components
         }
 
         [SerializeField, ReadOnly, NonReorderable] List<IncomingBullet> incomingBullets = new List<IncomingBullet>();
+        [SuppressMessage("", "IDE0052")]
         [SerializeField, ReadOnly] float estimatedHP;
 
         float HP
@@ -61,18 +62,22 @@ namespace Game.Components
         }
 
         public void Shoot(float timeToImpact, float damage)
-            => incomingBullets.Add(new IncomingBullet(timeToImpact, damage));
+        {
+            if (timeToImpact < 0f) return;
+            if (damage <= 0.01f) return;
+            incomingBullets.Add(new IncomingBullet(timeToImpact, damage));
+        }
 
         void Start()
         {
             estimatedHP = HP;
         }
 
-        void FixedUpdate()
+        void Update()
         {
             for (int i = incomingBullets.Count - 1; i >= 0; i--)
             {
-                incomingBullets[i].timeToImpact -= Time.fixedDeltaTime;
+                incomingBullets[i].timeToImpact -= Time.deltaTime;
                 if (incomingBullets[i].timeToImpact <= 0f)
                 { incomingBullets.RemoveAt(i); }
             }

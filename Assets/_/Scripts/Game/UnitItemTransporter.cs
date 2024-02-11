@@ -34,12 +34,11 @@ namespace Game.Components
             }
         }
 
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
+            base.Update();
             if (this.AnybodyControllingThis())
             { return; }
-
 
             if (TryGetComponent(out UnitBehaviour_AvoidObstacles avoidObstacles))
             { avoidObstacles.IgnoreCollision = null; }
@@ -54,7 +53,7 @@ namespace Game.Components
             {
                 if (TimeToNextItemNeederSearch > 0)
                 {
-                    TimeToNextItemNeederSearch -= Time.fixedDeltaTime;
+                    TimeToNextItemNeederSearch -= Time.deltaTime;
                 }
                 else
                 {
@@ -142,7 +141,7 @@ namespace Game.Components
         {
             if (TimeToNextTargetSearch > 0)
             {
-                TimeToNextTargetSearch -= Time.fixedDeltaTime;
+                TimeToNextTargetSearch -= Time.deltaTime;
             }
             else
             {
@@ -185,7 +184,7 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.white;
+            Gizmos.color = CoolColors.White;
             Gizmos.DrawWireSphere(transform.position, ReachDistance);
         }
     }

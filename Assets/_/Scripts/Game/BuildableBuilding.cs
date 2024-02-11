@@ -134,7 +134,7 @@ namespace Game.Components
             }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!IsConstructed) return;
 

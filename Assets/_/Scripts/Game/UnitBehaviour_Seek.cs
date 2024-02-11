@@ -1,26 +1,27 @@
 using Game.Managers;
 using UnityEngine;
+using Utilities;
 
 namespace Game.Components
 {
     public class UnitBehaviour_Seek : UnitBehaviour_Base
     {
-        internal const float DISTANCE_TO_STOP = 4f;
-        internal const float BRAKING_DISTANCE_ERROR = .5f;
-        internal const float DISTANCE_TO_STOP_BRUH = 4f;
+        public const float DISTANCE_TO_STOP = 4f;
+        public const float BRAKING_DISTANCE_ERROR = .5f;
+        public const float DISTANCE_TO_STOP_BRUH = 4f;
 
         [SerializeField] bool FollowCursor;
 
-        [SerializeField, ReadOnly] internal Vector3 Target;
+        [SerializeField, ReadOnly] public Vector3 Target;
 
         [Header("Movement")]
         [SerializeField] float maxDistanceToReverse = 32f;
-        [SerializeField] internal bool useBrakingCalculations;
+        [SerializeField] public bool useBrakingCalculations;
 
-        [SerializeField, ReadOnly] internal bool currentlyStopping;
+        [SerializeField, ReadOnly] public bool currentlyStopping;
         [SerializeField, ReadOnly] float BrakingDistance;
 
-        internal override Vector2? GetOutput()
+        public override Vector2? GetOutput()
         {
             if (FollowCursor)
             {
@@ -43,7 +44,7 @@ namespace Game.Components
             return UnitBehaviour_Seek.CalculateInputVector(transform, Target, useBrakingCalculations ? BrakingDistance : null, maxDistanceToReverse, MovementEngine);
         }
 
-        internal static Vector2 CalculateInputVector(Transform transform, Vector3 target, float? brakingDistance, float maxDistanceToReverse, MovementEngine movementEngine)
+        public static Vector2 CalculateInputVector(Transform transform, Vector3 target, float? brakingDistance, float maxDistanceToReverse, MovementEngine movementEngine)
         {
             // Get destination
             Vector3 destinationPosition = target;
@@ -125,6 +126,20 @@ namespace Game.Components
                 return new Vector2(steerAmount, torque);
             }
             // === ===
+        }
+
+        public override void DrawGizmos()
+        {
+            base.DrawGizmos();
+            if (Target == default) return;
+            if (currentlyStopping) return;
+
+            Gizmos.color = new Color(1f, 1f, 1f, .5f);
+            Gizmos.DrawLine(transform.position, Target);
+            Gizmos.color = CoolColors.White;
+            GizmosPlus.DrawPoint(Target, 1f);
+
+            Debug3D.Label(Target, "Seek Target");
         }
     }
 }

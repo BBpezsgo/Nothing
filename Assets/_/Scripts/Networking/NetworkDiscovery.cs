@@ -104,7 +104,7 @@ namespace Networking
             RuntimePlatform.EmbeddedLinuxX86,
         };
 
-        void FixedUpdate()
+        void Update()
         {
             if (!IsSupported) return;
 

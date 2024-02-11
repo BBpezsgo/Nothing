@@ -4,14 +4,13 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    internal class UnitAttacker : Unit, IDetailedDamagable
+    internal class UnitAttacker : Unit, IDetailedDamageable
     {
         [Header("Other")]
         [SerializeField, ReadOnly] AttackerBase Attacker;
 
         public override void DoInput()
         {
-            base.DoInput();
             Attacker.DoInput();
         }
 
@@ -21,9 +20,9 @@ namespace Game.Components
             Attacker.DoFrequentInput();
         }
 
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
+            base.Update();
 
             if (TryGetComponent(out UnitBehaviour_Seek seek))
             {

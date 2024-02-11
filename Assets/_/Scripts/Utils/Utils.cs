@@ -11,7 +11,6 @@ using Game.Components;
 using Game.Managers;
 
 using Networking;
-using UI;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.Netcode.Transports.UTP;
@@ -19,19 +18,21 @@ using Netcode.Transports.WebSocket;
 using Netcode.Transports.Offline;
 using System.Net;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace Utilities
 {
     public readonly struct LayerMaskNames
     {
+        #region Builtin
         public const string Default = "Default";
+        public const string TransparentFX = "TransparentFX";
+        public const string IgnoreRaycast = "Ignore Raycast";
+        public const string Water = "Water";
+        public const string UI = "UI";
+        #endregion
+
         public const string Ground = "Ground";
         public const string Projectile = "Projectile";
         public const string PhotographyStudio = "PhotographyStudio";
-        public const string Water = "Water";
     }
 
     public readonly struct DefaultLayerMasks

@@ -16,7 +16,7 @@ namespace Game.Managers
             { Debug.LogError($"[{nameof(WaveManager)}]: {nameof(Spawner)} is null", this); }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
@@ -25,7 +25,7 @@ namespace Game.Managers
 
             if (Cooldown > 0f)
             {
-                Cooldown -= Time.fixedDeltaTime;
+                Cooldown -= Time.deltaTime;
                 return;
             }
 

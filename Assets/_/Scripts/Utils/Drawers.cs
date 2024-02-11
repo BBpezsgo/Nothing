@@ -22,28 +22,36 @@ namespace Utilities.Drawers
             GLUtils.DrawLine(center - innerPointH, center - outerPointH, thickness, color);
         }
 
-        internal static void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        public static Vector2 DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
         {
             if (!rect.HasValue || animation == 0f)
             {
                 CrossDrawer.Draw(cross, innerSize, outerSize, 1f, color, shadowColor);
-                return;
+                return cross;
             }
 
             Rect _rect = rect.Value;
+
             if (animation != 1f)
             {
                 CrossDrawer.DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
-                CrossDrawer.DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
+                return CrossDrawer.DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
             }
             else
             {
                 CornerBoxDrawer.Draw(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
                 CornerBoxDrawer.Draw(_rect.center, _rect.size, 8f, color);
+                return _rect.center;
             }
         }
 
-        internal static void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        public static Vector2 DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
         {
             Vector2 halfSize = boxSize / 2;
 
@@ -78,46 +86,48 @@ namespace Utilities.Drawers
                 GL.End();
             }
 
-            Vector2 topleft = new(-halfSize.x, -halfSize.y);
-            Vector2 topright = new(halfSize.x, -halfSize.y);
-            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
-            Vector2 bottomright = new(halfSize.x, halfSize.y);
+            Vector2 topLeft = new(-halfSize.x, -halfSize.y);
+            Vector2 topRight = new(halfSize.x, -halfSize.y);
+            Vector2 bottomLeft = new(-halfSize.x, halfSize.y);
+            Vector2 bottomRight = new(halfSize.x, halfSize.y);
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topleft.x + boxCornerSizeWidth, topleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topleft.x, topleft.y + boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topLeft.x + boxCornerSizeWidth, topLeft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topLeft, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topLeft.x, topLeft.y + boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topright.x - boxCornerSizeWidth, topright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topright, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topright.x, topright.y + boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topRight.x - boxCornerSizeWidth, topRight.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topRight, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topRight.x, topRight.y + boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomleft.x + boxCornerSizeWidth, bottomleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomleft.x, bottomleft.y - boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomLeft.x + boxCornerSizeWidth, bottomLeft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomLeft, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomLeft.x, bottomLeft.y - boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomright.x - boxCornerSizeWidth, bottomright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomright, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomright.x, bottomright.y - boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomRight.x - boxCornerSizeWidth, bottomRight.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomRight, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomRight.x, bottomRight.y - boxCornerSizeHeight), t));
                 GL.End();
             }
+
+            return center;
         }
     }
 
@@ -141,28 +151,36 @@ namespace Utilities.Drawers
             GLUtils.DrawLine(center - innerPointH, center - outerPointH, thickness, color);
         }
 
-        internal static void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        public static Vector2 DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
         {
             if (!rect.HasValue || animation == 0f)
             {
                 DiagonalCrossDrawer.Draw(cross, innerSize, outerSize, 1f, color, shadowColor);
-                return;
+                return cross;
             }
 
             Rect _rect = rect.Value;
+
             if (animation != 1f)
             {
                 DiagonalCrossDrawer.DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
-                DiagonalCrossDrawer.DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
+                return DiagonalCrossDrawer.DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
             }
             else
             {
                 CornerBoxDrawer.Draw(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
                 CornerBoxDrawer.Draw(_rect.center, _rect.size, 8f, color);
+                return _rect.center;
             }
         }
 
-        internal static void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        public static Vector2 DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
         {
             Vector2 halfSize = boxSize / 2;
 
@@ -197,46 +215,48 @@ namespace Utilities.Drawers
                 GL.End();
             }
 
-            Vector2 topleft = new(-halfSize.x, -halfSize.y);
-            Vector2 topright = new(halfSize.x, -halfSize.y);
-            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
-            Vector2 bottomright = new(halfSize.x, halfSize.y);
+            Vector2 topLeft = new(-halfSize.x, -halfSize.y);
+            Vector2 topRight = new(halfSize.x, -halfSize.y);
+            Vector2 bottomLeft = new(-halfSize.x, halfSize.y);
+            Vector2 bottomRight = new(halfSize.x, halfSize.y);
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topleft.x + boxCornerSizeWidth, topleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topleft.x, topleft.y + boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topLeft.x + boxCornerSizeWidth, topLeft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topLeft, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topLeft.x, topLeft.y + boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topright.x - boxCornerSizeWidth, topright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topright, t));
-                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topright.x, topright.y + boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, new Vector2(topRight.x - boxCornerSizeWidth, topRight.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Outer, topRight, t));
+                GL.Vertex(center + Vector2.Lerp(crossDown.Inner, new Vector2(topRight.x, topRight.y + boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomleft.x + boxCornerSizeWidth, bottomleft.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomleft, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomleft.x, bottomleft.y - boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomLeft.x + boxCornerSizeWidth, bottomLeft.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomLeft, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomLeft.x, bottomLeft.y - boxCornerSizeHeight), t));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomright.x - boxCornerSizeWidth, bottomright.y), t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomright, t));
-                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomright.x, bottomright.y - boxCornerSizeHeight), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, new Vector2(bottomRight.x - boxCornerSizeWidth, bottomRight.y), t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Outer, bottomRight, t));
+                GL.Vertex(center + Vector2.Lerp(crossUp.Inner, new Vector2(bottomRight.x, bottomRight.y - boxCornerSizeHeight), t));
                 GL.End();
             }
+
+            return center;
         }
     }
 
@@ -303,15 +323,19 @@ namespace Utilities.Drawers
             GLUtils.DrawLine(center + innerPoint3, center + outerPoint3, thickness, color);
         }
 
-        internal static void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        public static Vector2 DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color, Color shadowColor)
         {
             if (!rect.HasValue || animation == 0f)
             {
                 Cross3Drawer.Draw(cross, innerSize, outerSize, 1f, color, shadowColor);
-                return;
+                return cross;
             }
 
             Rect _rect = rect.Value;
+
             if (animation != 1f)
             {
                 Cross3Drawer.DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
@@ -322,9 +346,10 @@ namespace Utilities.Drawers
                 CornerBoxDrawer.Draw(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
                 CornerBoxDrawer.Draw(_rect.center, _rect.size, 8f, color);
             }
+            return _rect.center;
         }
 
-        internal static void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
+        public static void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
         {
             CornerBoxDrawer.Draw(boxCenter, boxSize, boxCornerSize, color);
         }
@@ -332,7 +357,7 @@ namespace Utilities.Drawers
 
     internal readonly struct CornerBoxDrawer
     {
-        internal static void Draw(Vector2 center, Vector2 size, float cornerSize, Color color)
+        public static void Draw(Vector2 center, Vector2 size, float cornerSize, Color color)
         {
             if (size.x <= .1f || size.y <= .1f)
             { return; }
@@ -342,44 +367,44 @@ namespace Utilities.Drawers
             float cornerSizeWidth = Maths.Min(halfSize.x, cornerSize);
             float cornerSizeHeight = Maths.Min(halfSize.y, cornerSize);
 
-            Vector2 topleft = new(-halfSize.x, -halfSize.y);
-            Vector2 topright = new(halfSize.x, -halfSize.y);
-            Vector2 bottomleft = new(-halfSize.x, halfSize.y);
-            Vector2 bottomright = new(halfSize.x, halfSize.y);
+            Vector2 topLeft = new(-halfSize.x, -halfSize.y);
+            Vector2 topRight = new(halfSize.x, -halfSize.y);
+            Vector2 bottomLeft = new(-halfSize.x, halfSize.y);
+            Vector2 bottomRight = new(halfSize.x, halfSize.y);
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + new Vector2(topleft.x + cornerSizeWidth, topleft.y));
-                GL.Vertex(center + topleft);
-                GL.Vertex(center + new Vector2(topleft.x, topleft.y + cornerSizeHeight));
+                GL.Vertex(center + new Vector2(topLeft.x + cornerSizeWidth, topLeft.y));
+                GL.Vertex(center + topLeft);
+                GL.Vertex(center + new Vector2(topLeft.x, topLeft.y + cornerSizeHeight));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + new Vector2(topright.x - cornerSizeWidth, topright.y));
-                GL.Vertex(center + topright);
-                GL.Vertex(center + new Vector2(topright.x, topright.y + cornerSizeHeight));
+                GL.Vertex(center + new Vector2(topRight.x - cornerSizeWidth, topRight.y));
+                GL.Vertex(center + topRight);
+                GL.Vertex(center + new Vector2(topRight.x, topRight.y + cornerSizeHeight));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + new Vector2(bottomleft.x + cornerSizeWidth, bottomleft.y));
-                GL.Vertex(center + bottomleft);
-                GL.Vertex(center + new Vector2(bottomleft.x, bottomleft.y - cornerSizeHeight));
+                GL.Vertex(center + new Vector2(bottomLeft.x + cornerSizeWidth, bottomLeft.y));
+                GL.Vertex(center + bottomLeft);
+                GL.Vertex(center + new Vector2(bottomLeft.x, bottomLeft.y - cornerSizeHeight));
                 GL.End();
             }
 
             {
                 GL.Begin(GL.LINE_STRIP);
                 GL.Color(color);
-                GL.Vertex(center + new Vector2(bottomright.x - cornerSizeWidth, bottomright.y));
-                GL.Vertex(center + bottomright);
-                GL.Vertex(center + new Vector2(bottomright.x, bottomright.y - cornerSizeHeight));
+                GL.Vertex(center + new Vector2(bottomRight.x - cornerSizeWidth, bottomRight.y));
+                GL.Vertex(center + bottomRight);
+                GL.Vertex(center + new Vector2(bottomRight.x, bottomRight.y - cornerSizeHeight));
                 GL.End();
             }
         }

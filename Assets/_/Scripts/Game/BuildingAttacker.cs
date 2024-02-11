@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    internal class BuildingAttacker : Building, IDetailedDamagable, ICanTakeControlAndHasTurret
+    internal class BuildingAttacker : Building, IDetailedDamageable, ICanTakeControlAndHasTurret
     {
         public Turret Turret => Attacker.Turret;
 

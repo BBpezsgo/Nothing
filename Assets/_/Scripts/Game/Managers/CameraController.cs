@@ -205,6 +205,28 @@ namespace Game.Managers
             DoZooming(Time.unscaledDeltaTime);
 
             DoAngle(Time.unscaledDeltaTime);
+
+            if (IsLocked)
+            {
+                if (!IsTotallyLocked)
+                {
+                    if (LockedValue < .0001f)
+                    { IsTotallyLocked = true; }
+                }
+
+                return;
+            }
+
+            Height = TheTerrain.Height(transform.position) + 1f;
+
+            theCamera.transform.localRotation = Quaternion.identity;
+            IsTotallyLocked = false;
+
+            if (cameraMode != lastCameraMode)
+            {
+                OnCameraModeChanged?.Invoke(cameraMode);
+                lastCameraMode = cameraMode;
+            }
         }
 
         void HandleZooming()
@@ -451,31 +473,6 @@ namespace Game.Managers
         void DoAngle(float deltaTime)
         {
             cameraRotation.transform.localRotation = Quaternion.Lerp(cameraRotation.transform.localRotation, Quaternion.Euler(TargetAngle, 0f, 0f), 1f - Maths.Pow(.5f, AngleSpeed * deltaTime));
-        }
-
-        void FixedUpdate()
-        {
-            if (IsLocked)
-            {
-                if (!IsTotallyLocked)
-                {
-                    if (LockedValue < .0001f)
-                    { IsTotallyLocked = true; }
-                }
-
-                return;
-            }
-
-            Height = TheTerrain.Height(transform.position) + 1f;
-
-            theCamera.transform.localRotation = Quaternion.identity;
-            IsTotallyLocked = false;
-
-            if (cameraMode != lastCameraMode)
-            {
-                OnCameraModeChanged?.Invoke(cameraMode);
-                lastCameraMode = cameraMode;
-            }
         }
     }
 }

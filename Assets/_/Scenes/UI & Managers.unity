@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 16150921}
   - component: {fileID: 16150922}
   - component: {fileID: 16150923}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mouse Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 48012913}
   - component: {fileID: 48012911}
   - component: {fileID: 48012912}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Netcode Services
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -335,6 +335,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1508048086
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -386,7 +387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 96634724}
   - component: {fileID: 96634725}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Item Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -517,7 +518,7 @@ GameObject:
   m_Component:
   - component: {fileID: 196294526}
   - component: {fileID: 196294527}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Quick Commands
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -620,7 +621,7 @@ GameObject:
   m_Component:
   - component: {fileID: 260706540}
   - component: {fileID: 260706539}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: IMGUI
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -841,7 +842,7 @@ GameObject:
   m_Component:
   - component: {fileID: 326525616}
   - component: {fileID: 326525617}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Unit Command Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -1154,7 +1155,7 @@ GameObject:
   - component: {fileID: 437662613}
   - component: {fileID: 437662612}
   - component: {fileID: 437662611}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Auth Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -1566,7 +1567,7 @@ GameObject:
   m_Component:
   - component: {fileID: 673795877}
   - component: {fileID: 673795878}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Selection Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -1625,7 +1626,7 @@ GameObject:
   m_Component:
   - component: {fileID: 712866115}
   - component: {fileID: 712866116}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Object Pool
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -1670,7 +1671,7 @@ GameObject:
   m_Component:
   - component: {fileID: 728120206}
   - component: {fileID: 728120207}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Keyboard Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -1776,7 +1777,7 @@ GameObject:
   m_Component:
   - component: {fileID: 808182007}
   - component: {fileID: 808182006}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TeamManager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -2246,7 +2247,7 @@ GameObject:
   m_Component:
   - component: {fileID: 936371021}
   - component: {fileID: 936371022}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Research Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -2642,12 +2643,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1154673029}
   - component: {fileID: 1154673030}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fracture Engine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1154673029
 Transform:
@@ -2786,7 +2787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1202693340}
   - component: {fileID: 1202693341}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: UnitFactoryManager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -2839,7 +2840,7 @@ GameObject:
   - component: {fileID: 1222227741}
   - component: {fileID: 1222227740}
   - component: {fileID: 1222227739}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Take Control Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -2859,6 +2860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1054005916
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -3009,12 +3011,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1275343258}
   - component: {fileID: 1275343259}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Damage Popup Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1275343258
 Transform:
@@ -3105,7 +3107,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1356665773}
   - component: {fileID: 1356665772}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerData
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3224,7 +3226,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1358086404}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Managers
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3286,7 +3288,7 @@ GameObject:
   - component: {fileID: 1376606813}
   - component: {fileID: 1376606815}
   - component: {fileID: 1376606814}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Networking
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3443,7 +3445,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1410994569}
   - component: {fileID: 1410994570}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cursor Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3491,7 +3493,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1413804965}
   - component: {fileID: 1413804966}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Scene Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3538,12 +3540,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1513750505}
   - component: {fileID: 1513750506}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Quality Handler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1513750505
 Transform:
@@ -3574,6 +3576,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enableParticles: 1
   _enableModelFragmentation: 1
+  _targetFps: 10
 --- !u!1 &1541074568
 GameObject:
   m_ObjectHideFlags: 0
@@ -3587,7 +3590,7 @@ GameObject:
   - component: {fileID: 1541074575}
   - component: {fileID: 1541074574}
   - component: {fileID: 1541074573}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Netcode
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -3657,6 +3660,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1663625461
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -3999,12 +4003,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1702828254}
   - component: {fileID: 1702828255}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Popup Label Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1702828254
 Transform:
@@ -4158,7 +4162,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2014832345}
   - component: {fileID: 2014832344}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AssetManager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -4350,7 +4354,7 @@ GameObject:
   - component: {fileID: 2093730559}
   - component: {fileID: 2093730560}
   - component: {fileID: 2093730558}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BuildingManager
   m_TagString: GameController
   m_Icon: {fileID: 0}
@@ -4420,6 +4424,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1500434050
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -4437,7 +4442,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2130527467}
   - component: {fileID: 2130527468}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Photography Studio Manager
   m_TagString: GameController
   m_Icon: {fileID: 0}

@@ -138,7 +138,7 @@ namespace Game.Managers
             }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (SelectedFactory == null)
             {

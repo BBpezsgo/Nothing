@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Game.Managers;
 using UnityEngine;
+using Utilities;
 
 namespace Game.Components
 {
@@ -82,9 +83,9 @@ namespace Game.Components
                 !canTakeControl.AnybodyControllingThis()
             );
 
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
+            base.Update();
 
             if (!NetcodeUtils.IsOfflineOrServer)
             { return; }
@@ -97,7 +98,7 @@ namespace Game.Components
             /*
             if (NewTargetCooldown > 0f)
             {
-                NewTargetCooldown -= Time.fixedDeltaTime;
+                NewTargetCooldown -= Time.deltaTime;
             }
             else
             {
@@ -144,6 +145,7 @@ namespace Game.Components
 
             if (!firstFound &&
                 turret.IsAccurateShoot &&
+                !turret.OutOfRange &&
                 NetcodeUtils.IsOfflineOrServer &&
                 Maths.Distance(turret.ShootPosition, target.transform.position) <= turret.GetRange())
             {
@@ -177,26 +179,28 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.white;
+            Gizmos.color = CoolColors.White;
             Gizmos.DrawWireSphere(transform.position, DetectionRadius);
 
             if (targets != null)
             {
-                Gizmos.color = Color.white;
+                Gizmos.color = CoolColors.Blue;
                 for (int i = 0; i < targets.Length; i++)
                 {
                     if (targets[i] == null) continue;
-                    Gizmos.DrawWireSphere(targets[i].transform.position, 1f);
+                    GizmosPlus.DrawPoint(targets[i].transform.position, 1f);
+                    Debug3D.Label(targets[i].transform.position, "Target");
                 }
             }
 
             if (priorityTargets != null)
             {
-                Gizmos.color = Color.yellow;
+                Gizmos.color = CoolColors.Blue;
                 for (int i = 0; i < priorityTargets.Count; i++)
                 {
                     if (priorityTargets[i] == null) continue;
                     Gizmos.DrawWireSphere(priorityTargets[i].transform.position, 1f);
+                    Debug3D.Label(priorityTargets[i].transform.position, "Priority Target");
                 }
             }
         }

@@ -77,7 +77,7 @@ namespace Game.Managers
             !QuickCommandManager.Instance.IsShown &&
             !MenuManager.AnyMenuVisible;
 
-        void FixedUpdate()
+        void Update()
         {
             if (selectionChanged)
             {
@@ -102,7 +102,7 @@ namespace Game.Managers
             }
             else
             {
-                AlmostSelectTimer -= Time.fixedDeltaTime;
+                AlmostSelectTimer -= Time.deltaTime;
             }
         }
 
@@ -132,7 +132,7 @@ namespace Game.Managers
         void OnLeftClicked(AdvancedMouse sender)
         {
             if (sender.HoldTime >= QuickCommandManager.HOLD_TIME_REQUIREMENT) return;
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, out RaycastHit[] hits);
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, Utilities.DefaultLayerMasks.Solids, out RaycastHit[] hits);
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].transform.gameObject.TryGetComponent(out Selectable unit))

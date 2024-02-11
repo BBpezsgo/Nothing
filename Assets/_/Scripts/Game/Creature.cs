@@ -7,7 +7,7 @@ using Utilities;
 
 namespace Game.Components
 {
-    public class Creature : NetworkBehaviour, IDamagable
+    public class Creature : NetworkBehaviour, IDamageable
     {
         [SerializeField] internal string CreatureName;
 
@@ -51,8 +51,8 @@ namespace Game.Components
 
         bool Grounded()
         {
-            var rayOrigin = Collider.bounds.center - (transform.up * .2f);
-            var raySize = Collider.bounds.size;
+            Vector3 rayOrigin = Collider.bounds.center - (transform.up * .2f);
+            Vector3 raySize = Collider.bounds.size;
 
             int n = Physics.OverlapBoxNonAlloc(
                 rayOrigin,
@@ -83,7 +83,7 @@ namespace Game.Components
             Creature[] filteredCreatures = filteredCreatures_.ToArray();
             if (filteredCreatures.Length == 0) return null;
 
-            (int, float) closest = filteredCreatures.ClosestI(transform.position);
+            (int, float) closest = filteredCreatures.Closest(transform.position);
             return filteredCreatures[closest.Item1];
         }
 
@@ -107,7 +107,7 @@ namespace Game.Components
             if (filteredCreatures.Length == 0) return;
 
             IsSearchingForFood = true;
-            StartCoroutine(filteredCreatures.ClosestIAsync(transform.position, (i, d) => callback.Invoke(filteredCreatures[i]), (i, d) => IsSearchingForFood = false));
+            StartCoroutine(filteredCreatures.ClosestAsync(transform.position, (i, d) => callback.Invoke(filteredCreatures[i]), (i, d) => IsSearchingForFood = false));
         }
 
         protected virtual void Awake()
@@ -131,10 +131,10 @@ namespace Game.Components
             base.OnDestroy();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (NextGroundCheck > 0f)
-            { NextGroundCheck -= Time.fixedDeltaTime; }
+            { NextGroundCheck -= Time.deltaTime; }
             else
             {
                 NextGroundCheck = 2f;
@@ -143,7 +143,7 @@ namespace Game.Components
 
             if (IdleSoundTimer > 0f)
             {
-                IdleSoundTimer -= Time.fixedDeltaTime;
+                IdleSoundTimer -= Time.deltaTime;
             }
             else
             {
@@ -159,17 +159,16 @@ namespace Game.Components
 
             FlippedOverValue = Vector3.Dot(Vector3.up, transform.up);
 
+            Thinking();
+        }
+
+        void FixedUpdate()
+        {
             if (Collider.bounds.center.y <= WaterManager.WaterLevel)
-            {
-                rb.AddForce(Vector3.up * 3f, ForceMode.Force);
-            }
+            { rb.AddForce(Vector3.up * 3f, ForceMode.Force); }
 
             if (Collider.bounds.max.y <= WaterManager.WaterLevel)
-            {
-                rb.AddForce(Vector3.up * 8f, ForceMode.Force);
-            }
-
-            Thinking();
+            { rb.AddForce(Vector3.up * 8f, ForceMode.Force); }
         }
 
         protected virtual Vector3 FindNewDestination()
@@ -196,7 +195,7 @@ namespace Game.Components
 
         void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.TryGetComponent<VehicleEngine>(out var vehicle))
+            if (collision.gameObject.TryGetComponent(out VehicleEngine vehicle))
             {
                 if (vehicle.rb.velocity.sqrMagnitude > .1f)
                 {
@@ -237,11 +236,11 @@ namespace Game.Components
         {
             if (FleeCooldown <= 0f) return false;
 
-            FleeCooldown -= Time.fixedDeltaTime;
+            FleeCooldown -= Time.deltaTime;
 
             if (NextFleePosition > 0f)
             {
-                NextFleePosition -= Time.fixedDeltaTime;
+                NextFleePosition -= Time.deltaTime;
             }
             else
             {
@@ -257,7 +256,7 @@ namespace Game.Components
 
             if (distanceToDestination < 1f)
             {
-                Bored += Time.fixedDeltaTime;
+                Bored += Time.deltaTime;
                 return;
             }
 
@@ -312,9 +311,11 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.white;
+            Gizmos.color = new Color(1f, 1f, 1f, .5f);
             Gizmos.DrawLine(transform.position, Destination);
-            Gizmos.DrawWireSphere(Destination, .5f);
+            Gizmos.color = CoolColors.White;
+            GizmosPlus.DrawPoint(Destination, 1f);
+            Debug3D.Label(Destination, "Target");
         }
     }
 }

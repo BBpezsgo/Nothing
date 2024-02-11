@@ -619,6 +619,7 @@ GameObject:
   - component: {fileID: 2446189828402193636}
   - component: {fileID: 8539614811349770126}
   - component: {fileID: -5089080617889631753}
+  - component: {fileID: 6953229048314902523}
   m_Layer: 0
   m_Name: Builder
   m_TagString: Untagged
@@ -687,7 +688,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1036926870
+  GlobalObjectIdHash: 2630877845
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -754,6 +755,7 @@ MonoBehaviour:
   moveSpeedMax: 50
   engineBrake: 2
   Torque: 0
+  AudioSource: {fileID: 0}
   brake: 1
   handbrake: 2.5
   isHandbraking: 0
@@ -790,6 +792,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   btn_0: 
   Behaviors: []
+  ShowGizmos: 0
 --- !u!114 &7122550610033809814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,22 +844,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ba1ddaae9c7d84c8cbf0645a58c188, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Priority: 2
+  Priority: 3
   MovementEngine: {fileID: 0}
   IgnoreCollision: {fileID: 0}
-  raycastHitCache:
-    Obstacles: []
-  DetectedThings:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Obstacles: []
   TimeToCheck: 0.1
 --- !u!114 &8858920348296688437
 MonoBehaviour:
@@ -893,7 +884,7 @@ MonoBehaviour:
   - {fileID: 6305882758630173195}
   vehicleEngine: {fileID: 4690245384110751944}
   turret: {fileID: 0}
-  UnitBehaviour: {fileID: 0}
+  UnitBehavior: {fileID: 0}
   DestroyEffect: {fileID: 2576850171094146370, guid: 8c71f7a1d9ff4f846ac535d075a21dac,
     type: 3}
   <CrossStyle>k__BackingField: 0
@@ -1007,6 +998,27 @@ MonoBehaviour:
   FragmentSmokeScale: {x: 0.5, y: 2}
   FragmentSmokePrefab: {fileID: 3626855886116838959, guid: 382107570a2b1a84ab358cce5dd247b5,
     type: 3}
+  AudioClips:
+  - {fileID: 8300000, guid: 8610309072247b941865843f845dd3b3, type: 3}
+--- !u!114 &6953229048314902523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690245384110751948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f0f76c820e47404cb87205e3856bb01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 2
+  MovementEngine: {fileID: 0}
+  FleeDistance: 300
+  FleeFrom: {fileID: 0}
+  TimeToCheck: 0.1
+  BaseObject: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
 --- !u!1 &4690245385307051920
 GameObject:
   m_ObjectHideFlags: 0

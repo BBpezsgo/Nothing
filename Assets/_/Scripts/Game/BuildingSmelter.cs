@@ -42,13 +42,13 @@ namespace Game.Components
             }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (CurrentRawMaterials > 0f)
             {
                 float processed = CurrentRawMaterials;
 
-                CurrentRawMaterials = Math.Max(CurrentRawMaterials - (Time.fixedDeltaTime * processingSpeed), 0f);
+                CurrentRawMaterials = Math.Max(CurrentRawMaterials - (Time.deltaTime * processingSpeed), 0f);
                 processed -= CurrentRawMaterials;
 
                 CurrentProcessedMaterials += processed;

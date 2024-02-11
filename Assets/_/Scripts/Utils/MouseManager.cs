@@ -55,6 +55,13 @@ namespace Game.Managers
 
         void Update()
         {
+            TimeToNextUICollecting -= Time.deltaTime;
+            if (TimeToNextUICollecting <= 0f)
+            {
+                TimeToNextUICollecting = 10f;
+                UIDocuments = GameObject.FindObjectsOfType<UIDocument>(true);
+            }
+
             if (MenuManager.AnyMenuVisible) return;
 
             for (int i = 0; i < Mouses.Count; i++)
@@ -62,16 +69,6 @@ namespace Game.Managers
 
             for (int i = 0; i < Touches.Count; i++)
             { Touches[i].Update(); }
-        }
-
-        void FixedUpdate()
-        {
-            TimeToNextUICollecting -= Time.fixedDeltaTime;
-            if (TimeToNextUICollecting <= 0f)
-            {
-                TimeToNextUICollecting = 10f;
-                UIDocuments = GameObject.FindObjectsOfType<UIDocument>(true);
-            }
         }
 
         internal static bool IsOverUI(Vector2 screenPosition)

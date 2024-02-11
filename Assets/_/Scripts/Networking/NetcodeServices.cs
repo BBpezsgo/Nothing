@@ -101,7 +101,7 @@ namespace Networking
 
         private IEnumerator GetPublicIP()
         {
-            var www = new UnityWebRequest("https://api.ipify.org")
+            UnityWebRequest www = new("https://api.ipify.org")
             {
                 downloadHandler = new DownloadHandlerBuffer()
             };
@@ -146,14 +146,14 @@ namespace Networking
             }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (NetworkManager.Singleton.IsListening && (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsConnectedClient))
             {
 #if UNITY_EDITOR
                 if (disableHeartbeat) return;
 #endif
-                timeToNextHeartbeat -= Time.fixedDeltaTime;
+                timeToNextHeartbeat -= Time.deltaTime;
                 if (timeToNextHeartbeat <= 0f)
                 {
                     timeToNextHeartbeat = 2f;

@@ -30,7 +30,7 @@ namespace Game.UI
             NetworkManager.Singleton.Shutdown();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             string result = "";
 

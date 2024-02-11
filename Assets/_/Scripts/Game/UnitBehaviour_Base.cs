@@ -7,7 +7,7 @@ namespace Game.Components
     [RequireComponent(typeof(UnitBehaviour))]
     public class UnitBehaviour_Base : NetworkBehaviour, IComparable<UnitBehaviour_Base>
     {
-        [SerializeField] internal float Priority;
+        [SerializeField] public float Priority;
         [SerializeField, ReadOnly] protected MovementEngine MovementEngine;
 
         protected virtual void Awake()
@@ -24,6 +24,11 @@ namespace Game.Components
         /// <b>Acceleration (Y):</b> <br/>
         /// <code>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</code> <br/>
         /// </summary>
-        internal virtual Vector2? GetOutput() => null;
+        public virtual Vector2? GetOutput() => null;
+
+        public virtual void DrawGizmos()
+        {
+
+        }
     }
 }

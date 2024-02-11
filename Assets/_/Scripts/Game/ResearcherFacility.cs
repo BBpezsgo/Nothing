@@ -18,7 +18,7 @@ namespace Game.Components
             UpdateTeam();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
@@ -30,7 +30,7 @@ namespace Game.Components
 
             StatusLight.color = Color.yellow;
 
-            bool isDone = Research.ResearchManager.Instance.AddProgress(ResearchingID, Time.fixedDeltaTime);
+            bool isDone = Research.ResearchManager.Instance.AddProgress(ResearchingID, Time.deltaTime);
 
             if (isDone)
             { ResearchingID = null; }

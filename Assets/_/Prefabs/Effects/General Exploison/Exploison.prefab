@@ -1473,8 +1473,8 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 0.83183765, b: 0, a: 1}
-        key1: {r: 1, g: 0, b: 0, a: 0}
-        key2: {r: 0, g: 0, b: 0, a: 0}
+        key1: {r: 0.6603774, g: 0, b: 0, a: 0}
+        key2: {r: 0.3301887, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
         key5: {r: 0, g: 0, b: 0, a: 0}
@@ -1482,7 +1482,7 @@ ParticleSystem:
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 0
         ctime1: 8481
-        ctime2: 0
+        ctime2: 21203
         ctime3: 0
         ctime4: 0
         ctime5: 0
@@ -1497,7 +1497,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_NumColorKeys: 2
+        m_NumColorKeys: 3
         m_NumAlphaKeys: 2
       minGradient:
         serializedVersion: 2
@@ -5147,9 +5147,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 100
-      minScalar: 5
+      minMaxState: 3
+      scalar: 200
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -14894,9 +14894,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 100
-      minScalar: 5
+      minMaxState: 3
+      scalar: 200
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -14947,7 +14947,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startColor:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 2
       minColor: {r: 1, g: 1, b: 1, a: 1}
       maxColor: {r: 0.36862746, g: 0.36862746, b: 0.36862746, a: 1}
       maxGradient:
@@ -17135,9 +17135,9 @@ ParticleSystem:
     enabled: 0
     multiplierCurve:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
-      minScalar: 1
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -17189,7 +17189,7 @@ ParticleSystem:
     influenceFilter: 0
     influenceMask:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 65
     influenceList: []
   ClampVelocityModule:
     enabled: 1
@@ -23556,7 +23556,7 @@ ParticleSystem:
       serializedVersion: 2
       m_Bits: 4294967295
     maxCollisionShapes: 256
-    quality: 2
+    quality: 1
     voxelSize: 0.5
     collisionMessages: 0
     collidesWithDynamic: 1
@@ -29624,9 +29624,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0.1
-      minScalar: 5
+      minMaxState: 3
+      scalar: 0.5
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -31807,9 +31807,9 @@ ParticleSystem:
     enabled: 0
     multiplierCurve:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
-      minScalar: 1
+      minScalar: 0.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -31861,7 +31861,7 @@ ParticleSystem:
     influenceFilter: 0
     influenceMask:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 65
     influenceList: []
   ClampVelocityModule:
     enabled: 0

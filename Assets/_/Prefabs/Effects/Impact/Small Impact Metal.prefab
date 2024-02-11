@@ -4886,7 +4886,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WaitForParticles: 1
   WaitForSound: 1
-  WaitForSeconds: 0
+  WaitForSeconds: 1
   ParticleSystems: []
   AudioSources: []
 --- !u!1001 &5398519988226265107

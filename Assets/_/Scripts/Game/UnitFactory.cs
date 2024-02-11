@@ -63,14 +63,14 @@ namespace Game.Components
             { UnitFactoryManager.Instance.RefreshQueue(Queue.ToArray()); }
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
             if (Queue.Count <= 0) return;
 
             QueuedUnit first = Queue[0];
-            first.Progress += Time.fixedDeltaTime;
+            first.Progress += Time.deltaTime;
             Queue[0] = first;
 
             if (first.Progress < first.RequiedProgress) return;

@@ -80,6 +80,7 @@ namespace Game.Components
         [SerializeField] internal float moveSpeedMax = 50f;
         [SerializeField] internal float engineBrake = 2.0f;
         [SerializeField, ReadOnly] internal float Torque;
+        [SerializeField] AudioSource AudioSource;
 
         [Header("Braking")]
         [SerializeField] internal float brake = 3.0f;
@@ -314,6 +315,24 @@ namespace Game.Components
             if (InWater)
             { rb.AddForce(rb.velocity * -0.2f); }
 
+            if (AudioSource != null)
+            {
+                float speed = Maths.Abs(input.y);
+                if (speed > Maths.Epsilon)
+                {
+                    speed = Maths.Clamp01(speed);
+                    if (!AudioSource.isPlaying)
+                    { AudioSource.Play(); }
+                    AudioSource.volume = Maths.Clamp(speed - .1f, 0f, 1f);
+                    AudioSource.pitch = speed * .5f;
+                }
+                else
+                {
+                    if (AudioSource.isPlaying)
+                    { AudioSource.Stop(); }
+                }
+            }
+
             FlippedOverValue = Vector3.Dot(Vector3.up, transform.up);
 
             if (FlippedOverValue < .5f) return;
@@ -508,7 +527,7 @@ namespace Game.Components
 
             if (Collider == null) return;
 
-            Gizmos.color = IsGrounded ? Color.green : Color.red;
+            Gizmos.color = IsGrounded ? CoolColors.Green : CoolColors.Red;
 
             Vector3 rayOrigin = Collider.bounds.center;
             Vector3 raySize = Collider.bounds.size;

@@ -35,9 +35,9 @@ namespace Game.Components
             LineRenderer.widthMultiplier = 1f;
         }
 
-        void FixedUpdate()
+        void Update()
         {
-            currentTime += UnityEngine.Time.fixedDeltaTime;
+            currentTime += UnityEngine.Time.deltaTime;
 
             float t = System.Math.Clamp(currentTime, 0f, Time) / Time;
             LineRenderer.startColor = Color.Lerp(originalStartColor, transparentStartColor, t);

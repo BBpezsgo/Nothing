@@ -129,7 +129,7 @@ namespace Game.UI
             MenuNavigator.Instance.IsPaused = false;
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (!NetcodeUtils.IsActiveOffline)
             {
@@ -142,7 +142,7 @@ namespace Game.UI
                 else
                 { LabelRoomName.text = "?"; }
 
-                UpdatePlayersTimer -= Time.fixedDeltaTime;
+                UpdatePlayersTimer -= Time.deltaTime;
                 if (UpdatePlayersTimer <= 0f)
                 {
                     UpdatePlayersTimer = 2f;

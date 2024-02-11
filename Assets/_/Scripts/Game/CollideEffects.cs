@@ -8,7 +8,7 @@ namespace Game.Components
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.layer != gameObject.layer || !QualityHandler.EnableParticles)
+            if (!QualityHandler.EnableParticles)
             { return; }
 
             ContactPoint contact = collision.GetContact(0);

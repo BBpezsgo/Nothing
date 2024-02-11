@@ -259,7 +259,7 @@ namespace Game.Components
 
             positionDelta = transform.position - lastPosition;
 
-            Debug.DrawRay(lastPosition, positionDelta, Color.black, Time.fixedDeltaTime);
+            Debug.DrawRay(lastPosition, positionDelta, Color.white, Time.fixedDeltaTime);
 
             int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude, HitLayerMask);
 
@@ -536,14 +536,14 @@ namespace Game.Components
             if (ImpactDamage <= 0f)
             { return; }
 
-            if (other.gameObject.TryGetComponentInParent(out IDetailedDamagable detailedDamageable))
+            if (other.gameObject.TryGetComponentInParent(out IDetailedDamageable detailedDamageable))
             {
                 detailedDamageable.Damage(ImpactDamage, this);
                 NotifyDamage((at, ImpactDamage, DamageKind.Physical));
                 return;
             }
 
-            if (other.gameObject.TryGetComponentInParent(out IDamagable damageable))
+            if (other.gameObject.TryGetComponentInParent(out IDamageable damageable))
             {
                 damageable.Damage(ImpactDamage);
                 NotifyDamage((at, ImpactDamage, DamageKind.Physical));
@@ -643,12 +643,12 @@ namespace Game.Components
                     float distance = Maths.Max(1f, Maths.Distance(@object.transform.position, origin));
                     float amount = (ExploisonDamage * (1f - absorbed)) / distance;
 
-                    if (@object.TryGetComponent(out IDetailedDamagable detailedDamageable))
+                    if (@object.TryGetComponent(out IDetailedDamageable detailedDamageable))
                     {
                         detailedDamageable.Damage(amount, this);
                         NotifyDamage((@object.transform.position, amount, DamageKind.Explosive));
                     }
-                    else if (@object.TryGetComponent(out IDamagable damageable))
+                    else if (@object.TryGetComponent(out IDamageable damageable))
                     {
                         damageable.Damage(amount);
                         NotifyDamage((@object.transform.position, amount, DamageKind.Explosive));

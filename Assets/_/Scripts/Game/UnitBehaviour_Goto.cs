@@ -1,15 +1,16 @@
 using Unity.Netcode;
 using UnityEngine;
+using Utilities;
 
 namespace Game.Components
 {
     public class UnitBehaviour_Goto : UnitBehaviour_Base
     {
-        internal const float DISTANCE_TO_STOP = 8f;
-        internal const float DISTANCE_TO_STOP_BRUH = 4f;
-        internal const float BRAKING_DISTANCE_ERROR = .5f;
+        public const float DISTANCE_TO_STOP = 8f;
+        public const float DISTANCE_TO_STOP_BRUH = 4f;
+        public const float BRAKING_DISTANCE_ERROR = .5f;
 
-        internal Vector3 Target
+        public Vector3 Target
         {
             get
             {
@@ -34,26 +35,39 @@ namespace Game.Components
 
         [Header("Movement")]
         [SerializeField] float maxDistanceToReverse = 32f;
-        [SerializeField] internal bool useBrakingCalculations;
+        [SerializeField] public bool useBrakingCalculations;
 
-        [SerializeField, ReadOnly] internal bool currentlyStopping;
+        [SerializeField, ReadOnly] public bool currentlyStopping;
         [SerializeField, ReadOnly] float BrakingDistance;
 
-        internal override Vector2? GetOutput()
+        protected virtual void Start()
+        {
+            Target = transform.position;
+        }
+
+        public override Vector2? GetOutput()
         {
             if (Target == default) return null;
 
-            return CalculateInputVector();
-        }
-
-        Vector2 CalculateInputVector()
-        {
             if (currentlyStopping) return default;
 
             if (useBrakingCalculations)
             { BrakingDistance = MovementEngine.CalculateBrakingDistance(); }
 
             return UnitBehaviour_Seek.CalculateInputVector(transform, Target, useBrakingCalculations ? BrakingDistance : null, maxDistanceToReverse, MovementEngine);
+        }
+
+        public override void DrawGizmos()
+        {
+            base.DrawGizmos();
+            if (Target == default) return;
+            if (currentlyStopping) return;
+
+            Gizmos.color = new Color(1f, 1f, 1f, .5f);
+            Gizmos.DrawLine(transform.position, Target);
+            Gizmos.color = CoolColors.White;
+            GizmosPlus.DrawPoint(Target, 1f);
+            Debug3D.Label(Target, "Goto Target");
         }
     }
 }

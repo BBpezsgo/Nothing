@@ -1,21 +1,16 @@
-using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace Game.Components
 {
     public class UnitBehaviour : MonoBehaviour
     {
-        [SerializeField, Button(nameof(SetBehaviours), true, true, "Set Behaviors")] string btn_0;
+        [SerializeField, Button(nameof(SetBehaviors), true, true, "Set Behaviors")] string btn_0;
         [SerializeField, ReadOnly, NonReorderable] UnitBehaviour_Base[] Behaviors = new UnitBehaviour_Base[0];
 
-        class Comparer : IComparer<UnitBehaviour_Base>
-        {
-            public int Compare(UnitBehaviour_Base x, UnitBehaviour_Base y)
-                => x.CompareTo(y);
-        }
+        [Header("Debug")]
+        [SerializeField] bool ShowGizmos;
 
-        internal Vector2 GetOutput()
+        public Vector2 GetOutput()
         {
             Vector2 result = default;
 
@@ -33,15 +28,23 @@ namespace Game.Components
             return result;
         }
 
-        void SetBehaviours()
+        void SetBehaviors()
         {
             Behaviors = GetComponents<UnitBehaviour_Base>();
-            System.Array.Sort(Behaviors, new Comparer());
+            System.Array.Sort(Behaviors);
         }
 
         void Awake()
         {
-            SetBehaviours();
+            SetBehaviors();
+        }
+
+        void OnDrawGizmos()
+        {
+            for (int i = 0; i < Behaviors.Length; i++)
+            {
+                Behaviors[i].DrawGizmos();
+            }
         }
     }
 }

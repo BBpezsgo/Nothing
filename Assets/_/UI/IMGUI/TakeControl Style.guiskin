@@ -270,7 +270,7 @@ MonoBehaviour:
       m_Bottom: 0
     m_Font: {fileID: 12800000, guid: b8af58820f69b474e8f63dc40a702fbc, type: 3}
     m_FontSize: 12
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_Alignment: 0
     m_WordWrap: 0
     m_RichText: 0

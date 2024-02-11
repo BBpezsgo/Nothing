@@ -279,6 +279,12 @@ namespace Game.Managers
 
         void Update()
         {
+            if ((TimeToNextUnitCollecting -= Time.deltaTime) <= 0f)
+            {
+                TimeToNextUnitCollecting = 1f;
+                units = GameObject.FindObjectsOfType<MonoBehaviour>(false).OfType<ICanTakeControl>().ToArray();
+            }
+
             if (!InputCondition())
             { return; }
 
@@ -295,34 +301,15 @@ namespace Game.Managers
             if (EnableMouseCooldown <= 0f &&
                 !MouseManager.IsPointerOverUI())
             { ControllingObject.DoFrequentInput(); }
-        }
-
-        void FixedUpdate()
-        {
-            if (TimeToNextUnitCollecting > 0f)
-            {
-                TimeToNextUnitCollecting -= Time.fixedDeltaTime;
-            }
-            else
-            {
-                TimeToNextUnitCollecting = 5f;
-                units = GameObject.FindObjectsOfType<MonoBehaviour>(false).OfType<ICanTakeControl>().ToArray();
-            }
-
-            if (!InputCondition())
-            { return; }
 
             if (EnableMouseCooldown <= 0f)
             {
-                if (IsControlling &&
-                    !MouseManager.IsPointerOverUI())
+                if (!MouseManager.IsPointerOverUI())
                 {
                     IsScoping = Input.GetKey(KeyCode.LeftShift);
 
                     if (MouseManager.MouseOnWindow)
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                    { ControllingObject.DoInput(); }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                    { ControllingObject?.DoInput(); }
                 }
                 else
                 {
@@ -335,26 +322,11 @@ namespace Game.Managers
                 IsScoping = false;
             }
 
-            if (IsScoping)
-            {
+            if (!IsScoping)
+            { Scope = null; }
 
-            }
-            else
-            {
-                Scope = null;
-            }
-
-            if (IsControlling)
-            {
-                if (ControllingObject is Unit controllingUnit)
-                {
-                    BarHealth.value = controllingUnit.NormalizedHP;
-                }
-                else if (ControllingObject is Building controllingBuilding)
-                {
-                    BarHealth.value = controllingBuilding.NormalizedHP;
-                }
-            }
+            if (ControllingObject is BaseObject baseObject)
+            { BarHealth.value = baseObject.NormalizedHP; }
 
             if (IsScoping)
             {
@@ -381,7 +353,7 @@ namespace Game.Managers
 
         ICanTakeControl? GetControllableAt(Vector3 worldPosition)
         {
-            System.ValueTuple<int, float> closest = units.ClosestI(worldPosition);
+            System.ValueTuple<int, float> closest = units.Closest(worldPosition);
 
             if (closest.Item2 < 5f)
             {
@@ -397,9 +369,9 @@ namespace Game.Managers
             if (!Input.GetKey(KeyCode.LeftControl)) return;
             if (!MouseManager.MouseOnWindow) return;
 
-            var worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
 
-            var controllable = GetControllableAt(worldPosition);
+            ICanTakeControl? controllable = GetControllableAt(worldPosition);
 
             if ((Object?)controllable != null)
             {
@@ -435,7 +407,7 @@ namespace Game.Managers
 
                     TemplateContainer newButton = ProjectileButton!.Instantiate();
 
-                    if (TryGetProjectile(projectile, out var projectileInfo))
+                    if (TryGetProjectile(projectile, out Projectiles.Projectile projectileInfo))
                     {
                         newButton.Q<Label>("label-name").text = projectileInfo.Name;
                         newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
@@ -460,7 +432,7 @@ namespace Game.Managers
 
                         TemplateContainer newButton = ProjectileButton.Instantiate();
 
-                        if (TryGetProjectile(projectile, out var projectileInfo))
+                        if (TryGetProjectile(projectile, out Projectiles.Projectile projectileInfo))
                         {
                             newButton.Q<Label>("label-name").text = projectileInfo.Name;
                             newButton.Q<VisualElement>("image-icon").style.backgroundImage = new StyleBackground(projectileInfo.Image);
@@ -1006,10 +978,11 @@ namespace Game.Managers
                     }
                 }
 
-                Vector3 screenPos = MainCamera.Camera.WorldToScreenPoint(hasTurret.Turret.PredictImpact() ?? _targetPosition);
-
-                if (screenPos.z > 0f)
-                { predictedHitPosition = GUIUtils.TransformPoint(screenPos); }
+                {
+                    Vector3 screenPos = MainCamera.Camera.WorldToScreenPoint(hasTurret.Turret.PredictImpact() ?? _targetPosition);
+                    if (screenPos.z > 0f)
+                    { predictedHitPosition = GUIUtils.TransformPoint(screenPos); }
+                }
 
                 if (hasTurret.Turret.ReloadPercent < 1f)
                 { ReloadIndicatorFadeoutAnimation.Reset(); }
@@ -1032,7 +1005,7 @@ namespace Game.Managers
                     }
                     else
                     {
-                        hasTargetRect = UnityUtils.GetScreenCorners(MainCamera.Camera, bounds, out var corners);
+                        hasTargetRect = UnityUtils.GetScreenCorners(MainCamera.Camera, bounds, out (Vector2 TopLeft, Vector2 BottomRight) corners);
 
                         if (hasTargetRect)
                         {
@@ -1082,49 +1055,69 @@ namespace Game.Managers
 
             const float MeltDistance = 5f;
 
-            GUISkin savedSkin = GUI.skin;
-            GUI.skin = GUISkin;
-            GL.PushMatrix();
-            if (GLUtils.SolidMaterial.SetPass(0))
+            using (GUIUtils.Skin(GUISkin))
             {
-                if (trajectoryPath != null) DrawTrajectory(trajectoryPath);
-
-                Vector2 _targetPosition = (predictedTargetPosition != default) ? predictedTargetPosition : targetPosition;
-
-                if (_targetPosition != default && (_targetPosition - mousePosition).sqrMagnitude > MeltDistance)
-                { DrawCross(_targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction); }
-
-                if (mousePosition != default)
+                GL.PushMatrix();
+                if (GLUtils.SolidMaterial.SetPass(0))
                 {
-                    float animation = TargetLockingAnimation.Percent;
-                    if (hasTargetRect || animation > 0f)
-                    {
-                        DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor);
-                        reloadIndicatorCenter = Vector2.Lerp(mousePosition, this.targetRect.center, animation);
+                    if (trajectoryPath != null) DrawTrajectory(trajectoryPath);
 
-                        if (targetObject != null)
+                    Vector2 _targetPosition = (predictedTargetPosition != default) ? predictedTargetPosition : targetPosition;
+
+                    if (_targetPosition != default && (_targetPosition - mousePosition).sqrMagnitude > MeltDistance)
+                    { DrawCross(_targetPosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColorPrediction); }
+
+                    if (mousePosition != default)
+                    {
+                        float animation = TargetLockingAnimation.Percent;
+                        if (hasTargetRect || animation > 0f)
                         {
-#pragma warning disable CS8604 // Possible null reference argument.
-                            GUI.Label(new Rect(new Vector2(this.targetRect.xMax, this.targetRect.yMin - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize)), $"{Maths.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m");
-#pragma warning restore CS8604 // Possible null reference argument.
+                            reloadIndicatorCenter = DrawCrossOrRect(mousePosition, CrossSize.Inner, CrossSize.Outer, this.targetRect, animation, CrosshairColor);
+                        }
+                        else
+                        {
+                            DrawCross(mousePosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColor);
                         }
                     }
-                    else
+
+                    if (predictedHitPosition != default && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
                     {
-                        DrawCross(mousePosition, CrossSize.Inner, CrossSize.Outer, 1f, CrosshairColor);
+                        DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
                     }
-                }
 
-                if (predictedHitPosition != default && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
-                {
-                    DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
+                    if (showReload)
+                    { DrawReloadIndicator(reloadPercent, reloadIndicatorCenter, ShadowColor); }
                 }
+                GL.PopMatrix();
 
-                if (showReload)
-                { DrawReloadIndicator(reloadPercent, reloadIndicatorCenter, ShadowColor); }
+                if (hasTargetRect &&
+                    targetObject != null)
+                { DrawLabels(new Vector2(targetRect.xMax, targetRect.yMin), targetObject); }
             }
-            GL.PopMatrix();
-            GUI.skin = savedSkin;
+        }
+
+        void DrawLabels(Vector2 point, Transform targetObject)
+        {
+            if (ControllingObject as Object == null)
+            { return; }
+
+            Rect labelRect = new(new Vector2(point.x, point.y - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize));
+
+            DrawLabelShadowed(labelRect, $"{Maths.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m", Color.white);
+
+            if (targetObject.TryGetComponent(out RequiredShoots requiredShoots))
+            {
+                labelRect = new Rect(labelRect.x, labelRect.y - labelRect.height, labelRect.width, labelRect.height);
+                DrawLabelShadowed(labelRect, $"eHP: {Maths.Round(requiredShoots.EstimatedHP)}", Color.white);
+            }
+        }
+
+        void DrawLabelShadowed(Rect rect, string text, Color color)
+        {
+            GUIStyle shadowStyle = new(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.black } };
+            GUIStyle normalStyle = new(GUI.skin.label) { normal = new GUIStyleState() { textColor = color } };
+            GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadowStyle);
+            GUI.Label(rect, text, new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = color } });
         }
 
         void DrawTrajectory(Vector3[] trajectoryPath)
@@ -1227,22 +1220,18 @@ namespace Game.Managers
             }
         }
 
-        void DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color)
+        /// <returns>
+        /// Lerped center
+        /// </returns>
+        Vector2 DrawCrossOrRect(Vector2 cross, float innerSize, float outerSize, Rect? rect, float animation, Color color)
         {
-            switch (CurrentCrossStyle)
+            return CurrentCrossStyle switch
             {
-                case CrossStyle.Cross:
-                    CrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
-                    break;
-                case CrossStyle.DiagonalCross:
-                    DiagonalCrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
-                    break;
-                case CrossStyle.Cross3:
-                    Cross3Drawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor);
-                    break;
-                default:
-                    break;
-            }
+                CrossStyle.Cross => CrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor),
+                CrossStyle.DiagonalCross => DiagonalCrossDrawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor),
+                CrossStyle.Cross3 => Cross3Drawer.DrawCrossOrRect(cross, innerSize, outerSize, rect, animation, color, ShadowColor),
+                _ => cross,
+            };
         }
     }
 }

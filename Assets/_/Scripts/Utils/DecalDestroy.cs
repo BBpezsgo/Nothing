@@ -6,12 +6,12 @@ namespace Utilities.Components
     {
         [SerializeField] float LifeTime;
 
-        void FixedUpdate()
+        void Update()
         {
             if (LifeTime <= 0f)
             { return; }
 
-            LifeTime -= Time.fixedDeltaTime;
+            LifeTime -= Time.deltaTime;
 
             if (LifeTime >= 0f)
             { return; }
