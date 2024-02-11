@@ -111,7 +111,14 @@ namespace Game.Components
                 DinoFracture.RuntimeFracturedGeometry fracture = obj.AddComponent<DinoFracture.RuntimeFracturedGeometry>();
                 fracture.CopyFrom(selfFracture);
                 Vector3 position = transform.position;
-                fracture.Fracture().OnFractureComplete += (e) =>
+                DinoFracture.AsyncFractureResult fractureJob = fracture.Fracture();
+                fracture.Timeout(() =>
+                {
+                    if (!fractureJob.IsComplete) fractureJob.StopFracture();
+                    if (obj != null) Destroy(obj);
+                    Debug.Log($"Cancelling fracture for object {obj}");
+                }, 2f);
+                fractureJob.OnFractureComplete += (e) =>
                 {
                     if (mesh != null) Destroy(mesh);
                     if (obj != null) Destroy(obj);

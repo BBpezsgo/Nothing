@@ -37,6 +37,10 @@ namespace Game.Components
         protected override void Update()
         {
             base.Update();
+
+            if (TransportingItem != null)
+            { TransportingItem.transform.SetLocalPositionAndRotation(default, Quaternion.identity); }
+
             if (this.AnybodyControllingThis())
             { return; }
 
@@ -83,10 +87,9 @@ namespace Game.Components
                 if ((Object)CurrentItemNeeder == null)
                 {
                     GameObject.Destroy(TransportingItem.gameObject);
+                    TransportingItem = null;
                     return;
                 }
-
-                TransportingItem.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
 
                 Transform itemNeeder = ((Component)CurrentItemNeeder).transform;
 
@@ -95,6 +98,7 @@ namespace Game.Components
                     CurrentItemNeeder.GiveItem(1f);
 
                     GameObject.Destroy(TransportingItem.gameObject);
+                    TransportingItem = null;
 
                     if (TryGetComponent(out UnitBehaviour_Seek seek))
                     { seek.Target = default; }

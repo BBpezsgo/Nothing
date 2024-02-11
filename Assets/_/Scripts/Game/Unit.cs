@@ -37,6 +37,7 @@ namespace Game.Components
 
         protected override void Start()
         {
+            base.Start();
             UpdateTeam();
         }
 

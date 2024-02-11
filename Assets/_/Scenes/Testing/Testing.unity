@@ -1603,11 +1603,6 @@ PrefabInstance:
       propertyPath: reloadTime
       value: 0.2
       objectReference: {fileID: 0}
-    - target: {fileID: 2619412345505571579, guid: f3eb8de6ca84409448c3357a9943d4cd,
-        type: 3}
-      propertyPath: m_IsKinematic
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2619412345505571580, guid: f3eb8de6ca84409448c3357a9943d4cd,
         type: 3}
       propertyPath: m_RootOrder

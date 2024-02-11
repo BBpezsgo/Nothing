@@ -24,7 +24,7 @@ public class FracturedObjectScript : MonoBehaviour
 
         AudioSource.pitch = Random.Range(.75f, 1.25f);
         AudioSource.volume = Random.Range(.5f, 1f);
-        AudioSource.PlayOneShot(AudioClips[Random.Range(0, AudioClips.Length - 1)]);
+        AudioSource.PlayOneShot(AudioClips[Random.Range(0, AudioClips.Length - 1)], Random.Range(.1f, .5f));
     }
 
     void Start()

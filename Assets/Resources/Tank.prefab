@@ -9887,7 +9887,9 @@ MonoBehaviour:
     CannonAngle: 0
   Range: 9176.791
   ShowRadius: 0
-  currentError: 1
+  _error: 1
+  _outOfRange: 0
+  MaxError: 0.001
   ResetAfterTime: 1
   TimeToReset: 3
   IdleTime: 0
@@ -9992,6 +9994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 3419784383
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -10029,8 +10032,8 @@ MonoBehaviour:
   engineBrake: 2
   Torque: 0
   AudioSource: {fileID: 0}
-  brake: 1
-  handbrake: 0.2
+  brake: 2
+  handbrake: 2
   isHandbraking: 0
   isBraking: 0
   driftFactor: 0.95
@@ -10414,6 +10417,7 @@ MonoBehaviour:
     type: 3}
   AudioClips:
   - {fileID: 8300000, guid: 8610309072247b941865843f845dd3b3, type: 3}
+  ButtonExplode: 
 --- !u!1 &2619412345589989143
 GameObject:
   m_ObjectHideFlags: 0
