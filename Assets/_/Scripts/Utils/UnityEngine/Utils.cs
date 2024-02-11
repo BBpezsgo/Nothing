@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
-
 using UnityEngine;
-using System.Diagnostics.CodeAnalysis;
-
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1912,50 +1910,46 @@ namespace Utilities
     }
 }
 
-public class SearcherCoroutine<T>
+public static class Searcher
+{
+    public static void Search<T>(MonoBehaviour caller, T[] list, Action<T> callback)
+        => new ArraySearcherCoroutine<T>(callback).Search(caller, list);
+
+    public static void Search<T>(MonoBehaviour caller, IEnumerable<T> list, Action<T> callback)
+        => new AnySearcherCoroutine<T>(callback).Search(caller, list);
+}
+
+public class ArraySearcherCoroutine<T>
 {
     int i;
     T[]? gotList = null;
     bool isRunning;
 
-    readonly Func<T[]> list;
     readonly Action<T> callback;
 
     public bool IsRunning => isRunning;
 
-    public SearcherCoroutine(Func<T[]> list, Action<T> callback)
+    public ArraySearcherCoroutine(Action<T> callback)
     {
-        i = 0;
-        this.list = list;
+        this.i = 0;
+        this.gotList = null;
         this.callback = callback;
-        isRunning = false;
+        this.isRunning = false;
     }
 
-    public void Search(MonoBehaviour caller)
+    public void Search(MonoBehaviour caller, T[] list)
     {
         isRunning = true;
-        caller.StartCoroutine(Search());
+        caller.StartCoroutine(Search(list));
     }
 
-    public IEnumerator Search()
+    public IEnumerator Search(T[] list)
     {
         i = 0;
+        gotList = list;
 
-        if (list == null)
-        {
-            isRunning = false;
-            yield break;
-        }
-
-        if (callback == null)
-        {
-            isRunning = false;
-            yield break;
-        }
-
-        gotList = list?.Invoke();
-
-        if (gotList == null)
+        if (callback == null ||
+            gotList == null)
         {
             isRunning = false;
             yield break;
@@ -1965,8 +1959,50 @@ public class SearcherCoroutine<T>
         {
             yield return new WaitForFixedUpdate();
 
-            this.callback?.Invoke(gotList[i]);
+            callback?.Invoke(gotList[i]);
             i++;
+        }
+
+        isRunning = false;
+    }
+}
+
+public class AnySearcherCoroutine<T>
+{
+    IEnumerable<T>? gotList = null;
+    bool isRunning;
+
+    readonly Action<T> callback;
+
+    public bool IsRunning => isRunning;
+
+    public AnySearcherCoroutine(Action<T> callback)
+    {
+        this.gotList = null;
+        this.callback = callback;
+        this.isRunning = false;
+    }
+
+    public void Search(MonoBehaviour caller, IEnumerable<T> list)
+    {
+        isRunning = true;
+        caller.StartCoroutine(Search(list));
+    }
+
+    public IEnumerator Search(IEnumerable<T> list)
+    {
+        gotList = list;
+
+        if (callback == null)
+        {
+            isRunning = false;
+            yield break;
+        }
+
+        foreach (T item in gotList)
+        {
+            yield return new WaitForFixedUpdate();
+            callback?.Invoke(item);
         }
 
         isRunning = false;

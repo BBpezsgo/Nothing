@@ -2,21 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-using UnityEngine;
-
-using Unity.Netcode;
-
-using Game.Components;
-using Game.Managers;
-
-using Networking;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Unity.Netcode.Transports.UTP;
-using Netcode.Transports.WebSocket;
+using Game.Components;
+using Game.Managers;
 using Netcode.Transports.Offline;
-using System.Net;
+using Netcode.Transports.WebSocket;
+using Networking;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using UnityEngine;
 
 namespace Utilities
 {
@@ -48,7 +44,7 @@ namespace Utilities
         /// <summary>
         /// <see cref="LayerMaskNames.Default"/> ; <see cref="LayerMaskNames.Projectile"/>
         /// </summary>
-        public static int PossiblyDamagables => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Projectile);
+        public static int PossiblyDamageables => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Projectile);
     }
 
     public struct AI
@@ -57,42 +53,48 @@ namespace Utilities
 
         public static void SortTargets<T>(T[] targets, GetPriority<T> getPriority) where T : UnityEngine.Object
         {
-            (T, float)[] priorities = new (T, float)[targets.Length];
-
-            for (int i = 0; i < targets.Length; i++)
+            using (ProfilerMarkers.AI.Auto())
             {
-                float priority = 0f;
+                (T, float)[] priorities = new (T, float)[targets.Length];
 
-                if ((UnityEngine.Object)targets[i] != null)
-                { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    float priority = 0f;
 
-                priorities[i] = (targets[i], priority);
+                    if (targets[i] != null)
+                    { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
+
+                    priorities[i] = (targets[i], priority);
+                }
+
+                Array.Sort(priorities, (a, b) => a.Item2.CompareTo(b.Item2));
+
+                for (int i = 0; i < targets.Length; i++)
+                { targets[i] = priorities[i].Item1; }
             }
-
-            Array.Sort(priorities, (a, b) => Comparer.Default.Compare(a.Item2, b.Item2));
-
-            for (int i = 0; i < targets.Length; i++)
-            { targets[i] = priorities[i].Item1; }
         }
 
         public static void SortTargets<T>(IList<T> targets, GetPriority<T> getPriority) where T : UnityEngine.Object
         {
-            (T, float)[] priorities = new (T, float)[targets.Count];
-
-            for (int i = 0; i < targets.Count; i++)
+            using (ProfilerMarkers.AI.Auto())
             {
-                float priority = 0f;
+                (T, float)[] priorities = new (T, float)[targets.Count];
 
-                if ((UnityEngine.Object)targets[i] != null)
-                { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
+                for (int i = 0; i < targets.Count; i++)
+                {
+                    float priority = 0f;
 
-                priorities[i] = (targets[i], priority);
+                    if (targets[i] != null)
+                    { priority = getPriority?.Invoke(targets[i]) ?? 0f; }
+
+                    priorities[i] = (targets[i], priority);
+                }
+
+                Array.Sort(priorities, (a, b) => a.Item2.CompareTo(b.Item2));
+
+                for (int i = 0; i < priorities.Length; i++)
+                { targets[i] = priorities[i].Item1; }
             }
-
-            Array.Sort(priorities, (a, b) => Comparer.Default.Compare(a.Item2, b.Item2));
-
-            for (int i = 0; i < priorities.Length; i++)
-            { targets[i] = priorities[i].Item1; }
         }
 
         public static void SortTargets(BaseObject[] targets, Vector3 origin, string team)
@@ -226,6 +228,7 @@ namespace Game
 public readonly partial struct ProfilerMarkers
 {
     public static readonly Unity.Profiling.ProfilerMarker Animations = new("Utilities.Animations");
+    public static readonly Unity.Profiling.ProfilerMarker AI = new("Utilities.AI");
     public static readonly Unity.Profiling.ProfilerMarker UnitsBehavior = new("Game.Units.Behavior");
     public static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Wheels = new("Game.VehicleEngine.Wheels");
     public static readonly Unity.Profiling.ProfilerMarker VehicleEngine_Basic = new("Game.VehicleEngine.Basic");

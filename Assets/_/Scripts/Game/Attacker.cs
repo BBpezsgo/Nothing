@@ -68,7 +68,7 @@ namespace Game.Components
                 targets[j++] = allBuilding[i];
             }
 
-            Utilities.AI.SortTargets(targets, transform.position, this.TeamHash);
+            AI.SortTargets(targets, transform.position, this.TeamHash);
         }
 
         void TryFindTargets()
@@ -173,7 +173,7 @@ namespace Game.Components
             if (!alreadyAdded)
             {
                 priorityTargets.Add(source);
-                Utilities.AI.SortTargets(priorityTargets, transform.position, this.TeamHash);
+                AI.SortTargets(priorityTargets, transform.position, this.TeamHash);
             }
         }
 

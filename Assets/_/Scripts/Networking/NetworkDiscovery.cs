@@ -137,7 +137,7 @@ namespace Networking
 
         protected override void ResponseReceived(IPEndPoint sender, NetworkDiscovery.DiscoveryResponseData response)
         {
-            discoveredServers.AddOrModify(sender.Address, response);
+            discoveredServers[sender.Address] = response;
             OnDiscoveredSomething?.Invoke();
         }
     }

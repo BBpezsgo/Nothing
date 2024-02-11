@@ -15,6 +15,9 @@ public struct Pair<TKey, TValue>
         Key = key;
         Value = value;
     }
+
+    public static implicit operator KeyValuePair<TKey, TValue>(Pair<TKey, TValue> pair) => new(pair.Key, pair.Value);
+    public static implicit operator Pair<TKey, TValue>(KeyValuePair<TKey, TValue> pair) => new(pair.Key, pair.Value);
 }
 
 namespace Utilities
@@ -22,25 +25,27 @@ namespace Utilities
     public static partial class GeneralUtils
     {
         /// <summary>
-        /// Normalizes the angle <paramref name="a"/> between <c>[-180,180[</c>
+        /// Normalizes the angle <paramref name="angle"/> between <c>[-180,180[</c>
         /// </summary>
-        public static float NormalizeAngle(float a)
+        public static float NormalizeAngle(float angle)
         {
-            float angle = a % 360;
-            angle = angle > 180 ? angle - 360 : angle;
-            return angle;
+            angle %= 360;
+            if (angle > 180)
+            { return angle - 360; }
+            else
+            { return angle; }
         }
 
         /// <summary>
-        /// Normalizes the angle <paramref name="a"/> between <c>[0,360[</c>
+        /// Normalizes the angle <paramref name="angle"/> between <c>[0,360[</c>
         /// </summary>
-        public static float NormalizeAngle360(float a)
+        public static float NormalizeAngle360(float angle)
         {
-            if (a < 0f)
-            { a += 360f; }
-            if (a >= 360f)
-            { a -= 360f; }
-            return a;
+            angle %= 360;
+            if (angle < 0f)
+            { return angle + 360f; }
+            else
+            { return angle; }
         }
     }
 }
@@ -68,33 +73,20 @@ public static partial class ListUtils
 
         return builder.ToString();
     }
-    public static string ToReadableString<T>(this IReadOnlyList<T> self)
-    {
-        if (self == null)
-        { return "null"; }
 
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Count; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T element = self[i];
-            builder.Append(element?.ToString() ?? "null");
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
     public static string ToReadableString<T>(this IEnumerable<T> self)
     {
-        if (self == null)
-        { return "null"; }
-
         StringBuilder builder = new();
+        self.ToReadableString(builder);
+        return builder.ToString();
+    }
+    public static StringBuilder ToReadableString<T>(this IEnumerable<T> self, StringBuilder builder)
+    {
+        if (self == null)
+        {
+            builder.Append("null");
+            return builder;
+        }
 
         builder.Append("{ ");
 
@@ -111,53 +103,9 @@ public static partial class ListUtils
 
         builder.Append(" }");
 
-        return builder.ToString();
+        return builder;
     }
 
-    public static string ToReadableString<T1, T2>(this T1[] self, Func<T1, T2> converter)
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Length; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T1 element = self[i];
-            T2 converted = converter.Invoke(element);
-            builder.Append(converted?.ToString() ?? "null");
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
-    public static string ToReadableString<T1, T2>(this IReadOnlyList<T1> self, Func<T1, T2> converter)
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Count; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T1 element = self[i];
-            T2 converted = converter.Invoke(element);
-            builder.Append(converted?.ToString() ?? "null");
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
     public static string ToReadableString<T1, T2>(this IEnumerable<T1> self, Func<T1, T2> converter)
     {
         if (self == null)
@@ -184,52 +132,6 @@ public static partial class ListUtils
         return builder.ToString();
     }
 
-    public static string ToReadableString<T1, T2>(this T1[] self, IReadOnlyDictionary<T1, T2> converter)
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Length; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T1 element = self[i];
-            if (!converter.TryGetValue(element, out T2? converted))
-            { converted = default; }
-            builder.Append(converted?.ToString() ?? "null");
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
-    public static string ToReadableString<T1, T2>(this IReadOnlyList<T1> self, IReadOnlyDictionary<T1, T2> converter)
-    {
-        if (self == null)
-        { return "null"; }
-
-        StringBuilder builder = new();
-
-        builder.Append("{ ");
-
-        for (int i = 0; i < self.Count; i++)
-        {
-            if (i > 0)
-            { builder.Append(", "); }
-            T1 element = self[i];
-            if (!converter.TryGetValue(element, out T2? converted))
-            { converted = default; }
-            builder.Append(converted?.ToString() ?? "null");
-        }
-
-        builder.Append(" }");
-
-        return builder.ToString();
-    }
     public static string ToReadableString<T1, T2>(this IEnumerable<T1> self, IReadOnlyDictionary<T1, T2> converter)
     {
         if (self == null)

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
@@ -17,9 +18,8 @@ static class CookiesLib
     [DllImport("__Internal")]
     public static extern string GetCookies();
 #else
-#pragma warning disable IDE0060 // Remove unused parameter
+    [SuppressMessage("Style", "IDE0060")]
     public static void SetCookies(string cookies) { }
-#pragma warning restore IDE0060 // Remove unused parameter
 
     public static string GetCookies() => string.Empty;
 #endif
@@ -43,14 +43,12 @@ public static class Cookies
         return result;
     }
 
-    static void SetCookies(Cookie[] cookies)
+    static void SetCookies(ReadOnlySpan<Cookie> cookies)
     {
-        string result = "";
+        StringBuilder builder = new();
         for (int i = 0; i < cookies.Length; i++)
-        {
-            result += cookies[i].ToString();
-        }
-        CookiesLib.SetCookies(result);
+        { cookies[i].ToString(builder); }
+        CookiesLib.SetCookies(builder.ToString());
     }
 
     public struct Cookie
@@ -65,10 +63,10 @@ public static class Cookies
         public bool Secure;
         public SameSite SameSite;
 
-        public Cookie(string key, string value)
+        public Cookie(string? key, string? value)
         {
-            Key = key ?? "";
-            Value = value ?? "";
+            Key = key ?? string.Empty;
+            Value = value ?? string.Empty;
             Domain = null;
             Expires = null;
             MaxAge = uint.MaxValue;
@@ -78,10 +76,10 @@ public static class Cookies
             SameSite = SameSite.Undefined;
         }
 
-        public Cookie(string key, string value, CookieParser.CookieClass cookieClass)
+        public Cookie(string? key, string? value, CookieParser.CookieClass cookieClass)
         {
-            Key = key ?? "";
-            Value = value ?? "";
+            Key = key ?? string.Empty;
+            Value = value ?? string.Empty;
             Domain = cookieClass.Domain;
             Expires = cookieClass.Expires;
             MaxAge = cookieClass.MaxAge;
@@ -91,41 +89,46 @@ public static class Cookies
             SameSite = cookieClass.SameSite;
         }
 
-        public static implicit operator Cookie((string Key, string Value) v)
-            => new(v.Key ?? "", v.Value ?? "");
+        public static implicit operator Cookie(ValueTuple<string, string> v)
+            => new(v.Item1 ?? string.Empty, v.Item2 ?? string.Empty);
 
-        public static implicit operator (string key, string value)(Cookie v)
-            => (v.Key ?? "", v.Value ?? "");
+        public static implicit operator ValueTuple<string, string>(Cookie v)
+            => (v.Key ?? string.Empty, v.Value ?? string.Empty);
 
         public static implicit operator Cookie(KeyValuePair<string, string> v)
-            => new(v.Key ?? "", v.Value ?? "");
+            => new(v.Key ?? string.Empty, v.Value ?? string.Empty);
 
         public static implicit operator KeyValuePair<string, string>(Cookie v)
-            => new(v.Key ?? "", v.Value ?? "");
+            => new(v.Key ?? string.Empty, v.Value ?? string.Empty);
 
         public override readonly string ToString()
         {
-            string result = $"{Uri.EscapeUriString(Key)}={Uri.EscapeUriString(Value)};";
+            StringBuilder builder = new();
+            ToString(builder);
+            return builder.ToString();
+        }
+
+        public readonly void ToString(StringBuilder builder)
+        {
+            builder.Append($"{Uri.EscapeUriString(Key)}={Uri.EscapeUriString(Value)};");
 
             if (!string.IsNullOrWhiteSpace(Domain))
-            { result += $" domain={Domain};"; }
+            { builder.Append($" domain={Domain};"); }
 
             if (!string.IsNullOrWhiteSpace(Expires))
-            { result += $" expires={Expires};"; }
+            { builder.Append($" expires={Expires};"); }
 
             if (MaxAge != uint.MaxValue)
-            { result += $" max-age={MaxAge};"; }
+            { builder.Append($" max-age={MaxAge};"); }
 
             if (Partitioned)
-            { result += $" partitioned;"; }
+            { builder.Append($" partitioned;"); }
 
             if (!string.IsNullOrWhiteSpace(Path))
-            { result += $" path={Path};"; }
+            { builder.Append($" path={Path};"); }
 
             if (SameSite != SameSite.Undefined)
-            { result += $" samesite={SameSite.ToString().ToLowerInvariant()};"; }
-
-            return result;
+            { builder.Append($" samesite={SameSite.ToString().ToLowerInvariant()};"); }
         }
     }
 
@@ -145,13 +148,13 @@ public static class Cookies
         SetCookies(convertedCookies);
     }
 
-    public static string? GetCookie(string key)
+    public static string? GetCookie(string? key)
     {
-        Cookie[] cookies = GetCookies();
-        for (int i = 0; i < cookies.Length; i++)
+        if (key is null) return null;
+        foreach (Cookie cookie in GetCookies())
         {
-            if (cookies[i].Key == key)
-            { return cookies[i].Value; }
+            if (string.Equals(cookie.Key, key))
+            { return cookie.Value; }
         }
         return null;
     }
@@ -159,16 +162,15 @@ public static class Cookies
     public static bool TryGetCookie(string key, [NotNullWhen(true)] out string? value)
     {
         value = GetCookie(key);
-        return value != null;
+        return value is not null;
     }
 
-    public static void ClearCookies() => CookiesLib.SetCookies("");
+    public static void ClearCookies() => CookiesLib.SetCookies(string.Empty);
 
-    public static Cookie[] GetCookies()
+    public static IEnumerable<Cookie> GetCookies()
     {
         string data = CookiesLib.GetCookies();
-        Cookie[] result = CookieParser.Parse(data);
-        return result;
+        return CookieParser.Parse(data);
     }
 
     public class CookieParser
@@ -187,8 +189,8 @@ public static class Cookies
 
             public CookieClass()
             {
-                Key = "";
-                Value = "";
+                Key = string.Empty;
+                Value = string.Empty;
                 Domain = null;
                 Expires = null;
                 MaxAge = uint.MaxValue;
@@ -204,12 +206,11 @@ public static class Cookies
             }
         }
 
-        public static Cookie[] Parse(string data)
+        public static IEnumerable<Cookie> Parse(string data)
         {
             string[] pairs = data.Split(';');
 
             CookieClass? currentCookie = null;
-            List<Cookie> result = new();
 
             for (int i = 0; i < pairs.Length; i++)
             {
@@ -231,122 +232,120 @@ public static class Cookies
                 switch (key)
                 {
                     case "domain":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else if (value == null)
+                        { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else if (value == null)
-                            { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
-                            else
-                            {
-                                currentCookie.Domain = value;
-                            }
-                            break;
+                            currentCookie.Domain = value;
                         }
+                        break;
+                    }
                     case "expires":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else if (value == null)
+                        { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else if (value == null)
-                            { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
-                            else
-                            {
-                                currentCookie.Expires = value;
-                            }
-                            break;
+                            currentCookie.Expires = value;
                         }
+                        break;
+                    }
                     case "max-age":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else if (value == null)
+                        { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
+                        else if (!uint.TryParse(value, out uint _value))
+                        { UnityEngine.Debug.LogWarning($"Invalid cookie value for key \"{key}\": \"{value}\""); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else if (value == null)
-                            { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
-                            else if (!uint.TryParse(value, out uint _value))
-                            { UnityEngine.Debug.LogWarning($"Invalid cookie value for key \"{key}\": \"{value}\""); }
-                            else
-                            {
-                                currentCookie.MaxAge = _value;
-                            }
-                            break;
+                            currentCookie.MaxAge = _value;
                         }
+                        break;
+                    }
                     case "partitioned":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else
-                            {
-                                currentCookie.Partitioned = true;
-                            }
-                            break;
+                            currentCookie.Partitioned = true;
                         }
+                        break;
+                    }
                     case "path":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else if (value == null)
+                        { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else if (value == null)
-                            { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
-                            else
-                            {
-                                currentCookie.Path = value;
-                            }
-                            break;
+                            currentCookie.Path = value;
                         }
+                        break;
+                    }
                     case "samesite":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else if (value == null)
+                        { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else if (value == null)
-                            { UnityEngine.Debug.LogWarning($"Cookie value for key \"{key}\" not specified"); }
-                            else
+                            switch (value)
                             {
-                                switch (value)
-                                {
-                                    case "lax":
-                                        currentCookie.SameSite = SameSite.Lax;
-                                        break;
-                                    case "strict":
-                                        currentCookie.SameSite = SameSite.Strict;
-                                        break;
-                                    case "none":
-                                        currentCookie.SameSite = SameSite.None;
-                                        break;
-                                    default:
-                                        UnityEngine.Debug.LogWarning($"Invalid cookie value for key \"{key}\": \"{value}\"");
-                                        break;
-                                }
+                                case "lax":
+                                    currentCookie.SameSite = SameSite.Lax;
+                                    break;
+                                case "strict":
+                                    currentCookie.SameSite = SameSite.Strict;
+                                    break;
+                                case "none":
+                                    currentCookie.SameSite = SameSite.None;
+                                    break;
+                                default:
+                                    UnityEngine.Debug.LogWarning($"Invalid cookie value for key \"{key}\": \"{value}\"");
+                                    break;
                             }
-                            break;
                         }
+                        break;
+                    }
                     case "secure":
+                    {
+                        if (currentCookie == null)
+                        { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
+                        else
                         {
-                            if (currentCookie == null)
-                            { UnityEngine.Debug.LogWarning($"Unexpected cookie key \"{key}\""); }
-                            else
-                            {
-                                currentCookie.Secure = true;
-                            }
-                            break;
+                            currentCookie.Secure = true;
                         }
+                        break;
+                    }
                     default:
+                    {
+                        if (currentCookie == null)
                         {
-                            if (currentCookie == null)
+                            currentCookie = new CookieClass()
                             {
-                                currentCookie = new CookieClass()
-                                {
-                                    Key = key,
-                                    Value = value ?? string.Empty,
-                                };
-                            }
-                            else
-                            {
-                                result.Add(currentCookie.ToCookie());
-                                currentCookie = null;
-                            }
-                            break;
+                                Key = key,
+                                Value = value ?? string.Empty,
+                            };
                         }
+                        else
+                        {
+                            yield return currentCookie.ToCookie();
+                            currentCookie = null;
+                        }
+                        break;
+                    }
                 }
             }
-
-            return result.ToArray();
         }
     }
 }
