@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 5
+  version: 9
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -23,14 +23,18 @@ Material:
   m_Name: Water
   m_Shader: {fileID: -6465566751694194690, guid: f036b046a4c6daa438020e39360d1696,
     type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2999
+  m_CustomRenderQueue: 1999
   stringTagMap: {}
-  disabledShaderPasses: []
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -74,3 +78,4 @@ Material:
     - _Shallow_Color: {r: 0.24474901, g: 0.41509432, b: 0.36142388, a: 0}
     - _Waves_Strength: {r: 0, g: 0.37, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

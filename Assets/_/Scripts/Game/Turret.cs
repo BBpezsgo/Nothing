@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Utilities;
-using System.Diagnostics.CodeAnalysis;
-
 
 #nullable enable
 
@@ -63,61 +61,74 @@ namespace Game.Components
         public override readonly string ToString() => $"(Turret: {TurretAngle}° Cannon: {CannonAngle}°)";
     }
 
+    [Serializable]
+    public struct TurretBarrel
+    {
+        [SerializeField] public Transform? Barrel;
+        [SerializeField] public Transform ShootPosition;
+
+        [Header("Debug")]
+        [SerializeField, ReadOnly, NonReorderable] public TurretBurstParticles[] BurstParticles;
+        [SerializeField, ReadOnly] public Vector3 OriginalLocalPosition;
+        [SerializeField, ReadOnly] public TurretCannonKnockbackState KnockbackState;
+        [SerializeField, ReadOnly] public (float Original, float Current, float Target) KnockbackPosition;
+    }
+
+    [Serializable]
+    public readonly struct TurretBurstParticles
+    {
+        readonly ParticleSystem ParticleSystem;
+        readonly int BurstCount;
+        readonly float Probability;
+
+        public TurretBurstParticles(ParticleSystem particleSystem)
+        {
+            if (particleSystem == null) throw new ArgumentNullException(nameof(particleSystem));
+
+            ParticleSystem = particleSystem;
+            ParticleSystem.Burst burst = particleSystem.emission.GetBurst(0);
+            ParticleSystem.MinMaxCurve count = burst.count;
+            BurstCount = count.mode switch
+            {
+                ParticleSystemCurveMode.Constant => Maths.RoundToInt(count.constant),
+                ParticleSystemCurveMode.TwoConstants => Maths.RoundToInt((count.constantMin + count.constantMax) / 2f),
+                _ => 0,
+            };
+            Probability = particleSystem.emission.GetBurst(0).probability;
+        }
+
+        internal readonly void Emit()
+        {
+            if (Probability != 1f && UnityEngine.Random.value > Probability) return;
+            ParticleSystem.Emit(BurstCount);
+        }
+    }
+
+    public enum TurretCannonKnockbackState
+    {
+        Still,
+        Knockback,
+        Restore,
+    }
+
     public class Turret : NetworkBehaviour
     {
-        readonly struct BurstParticles
-        {
-            readonly ParticleSystem ParticleSystem;
-            readonly int BurstCount;
-            readonly float Probability;
-
-            public BurstParticles(ParticleSystem particleSystem)
-            {
-                if (particleSystem == null) throw new ArgumentNullException(nameof(particleSystem));
-
-                ParticleSystem = particleSystem;
-                ParticleSystem.Burst burst = particleSystem.emission.GetBurst(0);
-                ParticleSystem.MinMaxCurve count = burst.count;
-                BurstCount = count.mode switch
-                {
-                    ParticleSystemCurveMode.Constant => Maths.RoundToInt(count.constant),
-                    ParticleSystemCurveMode.TwoConstants => Maths.RoundToInt((count.constantMin + count.constantMax) / 2f),
-                    _ => 0,
-                };
-                Probability = particleSystem.emission.GetBurst(0).probability;
-            }
-
-            internal readonly void Emit()
-            {
-                if (Probability != 1f && UnityEngine.Random.value > Probability) return;
-                ParticleSystem.Emit(BurstCount);
-            }
-        }
-
-        enum CannonKnockbackStates
-        {
-            Still,
-            Knockback,
-            Restore,
-        }
-
         [SerializeField, Min(0f)] float Knockback = 1f;
         [SerializeField, Min(0f)] float CannonKnockback = 0f;
         [SerializeField, Min(0f)] float CannonKnockbackRestoreSpeed = 1f;
         [SerializeField, Min(0f)] float CannonKnockbackSpeed = 1f;
-        [SerializeField, ReadOnly] (float original, float current, float target) CannonKnockbackPosition;
         [SerializeField] bool UseBarrelInstead;
-        [SerializeField, ReadOnly] CannonKnockbackStates CannonKnockbackState;
-        [SerializeField, ReadOnly] Vector3 CannonOriginalLocalPosition;
-
-        Transform? KnockbackTransform => UseBarrelInstead ? Barrel : cannon;
 
         [Header("Sound")]
         [SerializeField] AudioSource? AudioSource;
         [SerializeField] AudioClip? ShootSound;
 
         [Header("Barrel")]
-        [SerializeField] public Transform? Barrel;
+        [SerializeField] Transform? Barrel;
+        [SerializeField] public TurretBarrel[] Barrels = null!;
+
+        public ref TurretBarrel NextBarrel => ref Barrels[NextShoot];
+
         [SerializeField, ReadOnly] bool HasBarrel;
         [SerializeField] public float RequiedBarrelRotationSpeed = 0f;
         [SerializeField] public float BarrelRotationAcceleration = 0f;
@@ -147,7 +158,8 @@ namespace Game.Components
         [Tooltip("Used by timer projectiles that explode in mid-air")]
         [SerializeField, ReadOnly] public float RequiredProjectileLifetime = -1f;
         [SerializeField] public List<Transform> projectileIgnoreCollision = new();
-        [SerializeField] public Transform shootPosition = null!;
+        [SerializeField] Transform shootPosition = null!;
+
         [SerializeField] public GameObject projectile = null!;
         PooledObject? PooledProjectile;
         [SerializeField] public GameObject[] Projectiles = null!;
@@ -179,7 +191,6 @@ namespace Game.Components
 
         [SerializeField, ReadOnly] public int SelectedProjectile = 0;
         [SerializeField] public GameObject[] ShootEffects = null!;
-        [SerializeField, ReadOnly] BurstParticles[] ShootEffectInstances = null!;
         [SerializeField, ReadOnly] bool IsBallisticProjectile = true;
 
         [Header("Scope")]
@@ -191,6 +202,7 @@ namespace Game.Components
         readonly NetworkVariable<Vector3> netTarget = new();
         [SerializeField, ReadOnly] Transform? targetTransform;
         [SerializeField, ReadOnly] TurretInput overriddenInput = (0f, 0f);
+        [SerializeField, ReadOnly] int NextShoot;
 
         [SerializeField, ReadOnly] public BaseObject @base = null!;
 
@@ -208,7 +220,7 @@ namespace Game.Components
 
         readonly List<(Projectile, Vector3)> shots = new();
 
-        public Vector3 ShootPosition => shootPosition.position;
+        public Vector3 ShootPosition => NextBarrel.ShootPosition.position;
 
         [SerializeField] bool ShowRadius;
 
@@ -304,7 +316,7 @@ namespace Game.Components
             }
         }
 
-        public float ShootHeight => shootPosition.position.y;
+        public float ShootHeight => NextBarrel.ShootPosition.position.y;
         public bool IsAccurateShoot => _error <= MaxError;
         public bool OutOfRange => _outOfRange;
 
@@ -321,6 +333,21 @@ namespace Game.Components
         [SerializeField] bool ResetAfterTime;
         [SerializeField, Min(0f)] float TimeToReset = 1f;
         [SerializeField, ReadOnly] float IdleTime;
+
+        void Awake()
+        {
+            if (Barrels.Length == 0)
+            {
+                Debug.Log($"Generating barrel info for {this}", this);
+
+                TurretBarrel barrel = new()
+                {
+                    Barrel = Barrel,
+                    ShootPosition = shootPosition,
+                };
+                Barrels = new TurretBarrel[] { barrel };
+            }
+        }
 
         void Start()
         {
@@ -339,43 +366,30 @@ namespace Game.Components
             }
 
             targetTransform = null;
-            if (ShootEffects != null)
-            {
-                List<BurstParticles> burstParticles = new(ShootEffects.Length);
-                for (int i = 0; i < ShootEffects.Length; i++)
-                {
-                    GameObject newParticleSystem = GameObject.Instantiate(ShootEffects[i], shootPosition.position, shootPosition.rotation, (cannon == null) ? transform : cannon);
-                    // burstParticles.Add(new BurstParticles(newParticleSystem));
-                    ParticleSystem[] all = newParticleSystem.GetComponentsInChildren<ParticleSystem>(false);
-                    for (int j = 0; j < all.Length; j++)
-                    {
-                        burstParticles.Add(new BurstParticles(all[j]));
-                    }
-                }
-                ShootEffectInstances = burstParticles.ToArray();
-            }
-            else
-            {
-                ShootEffectInstances = new BurstParticles[0];
-            }
 
             IsBallisticProjectile = CurrentProjectile != null && CurrentProjectile.TryGetComponent(out Rigidbody projectileRigidbody) && projectileRigidbody.useGravity;
 
             Range = GetRange();
 
-            HasBarrel = Barrel != null;
+            for (int i = 0; i < Barrels.Length; i++)
+            {
+                ref TurretBarrel barrel = ref Barrels[i];
+                barrel.BurstParticles = GenerateShootParticles(new List<TurretBurstParticles>(), ShootEffects, barrel.ShootPosition).ToArray();
+                barrel.KnockbackPosition = (0f, 0f, 0f);
+                barrel.KnockbackState = TurretCannonKnockbackState.Still;
+                barrel.OriginalLocalPosition = (UseBarrelInstead && Barrel != null) ? Barrel.localPosition : ((cannon != null) ? cannon.localPosition : default);
+            }
+
+            HasBarrel = Barrel != null || Barrels.Length > 0;
 
             if (CannonKnockback != 0f)
             {
-                if (KnockbackTransform == null)
+                for (int i = 0; i < Barrels.Length; i++)
                 {
-                    CannonKnockback = 0f;
-                    Debug.LogWarning($"[{nameof(Turret)}]: {nameof(CannonKnockback)} is set but {nameof(KnockbackTransform)} is null", this);
-                }
-                else
-                {
-                    CannonKnockbackPosition = (0f, 0f, 0f);
-                    CannonOriginalLocalPosition = KnockbackTransform.localPosition;
+                    Transform? knockbackTransform = UseBarrelInstead ? Barrels[i].Barrel : cannon;
+
+                    Barrels[i].KnockbackPosition = (0f, 0f, 0f);
+                    Barrels[i].OriginalLocalPosition = knockbackTransform != null ? knockbackTransform.localPosition : default;
                 }
             }
         }
@@ -387,7 +401,7 @@ namespace Game.Components
             if (HasBarrel)
             {
                 if (BarrelRotationSpeed != 0)
-                { Barrel!.localEulerAngles = new Vector3(0f, 0f, Barrel.localEulerAngles.z + (BarrelRotationSpeed * Time.deltaTime)); }
+                { NextBarrel.Barrel!.localEulerAngles = new Vector3(0f, 0f, NextBarrel.Barrel.localEulerAngles.z + (BarrelRotationSpeed * Time.deltaTime)); }
 
                 if (PrepareShooting)
                 {
@@ -405,47 +419,53 @@ namespace Game.Components
                 }
             }
 
-            if (CannonKnockback != 0f && KnockbackTransform != null)
+            if (CannonKnockback != 0f)
             {
-                switch (CannonKnockbackState)
+                for (int i = 0; i < Barrels.Length; i++)
                 {
-                    case CannonKnockbackStates.Still:
+                    ref TurretBarrel barrel = ref Barrels[i];
+                    Transform knockbackTransform = (UseBarrelInstead ? barrel.Barrel : cannon)!;
 
-                        if (CannonKnockbackPosition.current != CannonKnockbackPosition.target)
-                        {
-                            CannonKnockbackPosition.current = Maths.MoveTowards(CannonKnockbackPosition.current, CannonKnockbackPosition.target, CannonKnockbackRestoreSpeed * Time.deltaTime);
-                        }
+                    switch (barrel.KnockbackState)
+                    {
+                        case TurretCannonKnockbackState.Still:
 
-                        break;
-                    case CannonKnockbackStates.Knockback:
+                            if (barrel.KnockbackPosition.Current != barrel.KnockbackPosition.Target)
+                            {
+                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
+                            }
 
-                        if (CannonKnockbackPosition.current == CannonKnockbackPosition.target)
-                        {
-                            CannonKnockbackState = CannonKnockbackStates.Restore;
-                            CannonKnockbackPosition.target = CannonKnockbackPosition.original;
-                        }
-                        else
-                        {
-                            CannonKnockbackPosition.current = Maths.MoveTowards(CannonKnockbackPosition.current, CannonKnockbackPosition.target, CannonKnockbackSpeed * Time.deltaTime);
-                        }
+                            break;
+                        case TurretCannonKnockbackState.Knockback:
 
-                        break;
-                    case CannonKnockbackStates.Restore:
+                            if (barrel.KnockbackPosition.Current == barrel.KnockbackPosition.Target)
+                            {
+                                barrel.KnockbackState = TurretCannonKnockbackState.Restore;
+                                barrel.KnockbackPosition.Target = barrel.KnockbackPosition.Original;
+                            }
+                            else
+                            {
+                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackSpeed * Time.deltaTime);
+                            }
 
-                        if (CannonKnockbackPosition.current == CannonKnockbackPosition.target)
-                        {
-                            CannonKnockbackState = CannonKnockbackStates.Still;
-                            CannonKnockbackPosition.target = CannonKnockbackPosition.original;
-                        }
-                        else
-                        {
-                            CannonKnockbackPosition.current = Maths.MoveTowards(CannonKnockbackPosition.current, CannonKnockbackPosition.target, CannonKnockbackRestoreSpeed * Time.deltaTime);
-                        }
+                            break;
+                        case TurretCannonKnockbackState.Restore:
 
-                        break;
+                            if (barrel.KnockbackPosition.Current == barrel.KnockbackPosition.Target)
+                            {
+                                barrel.KnockbackState = TurretCannonKnockbackState.Still;
+                                barrel.KnockbackPosition.Target = barrel.KnockbackPosition.Original;
+                            }
+                            else
+                            {
+                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
+                            }
+
+                            break;
+                    }
+
+                    knockbackTransform.localPosition = barrel.OriginalLocalPosition - (Vector3.forward * barrel.KnockbackPosition.Current);
                 }
-
-                KnockbackTransform.localPosition = CannonOriginalLocalPosition - Vector3.forward * CannonKnockbackPosition.current;
             }
 
             Vector3 targetPosition = TargetPosition;
@@ -500,10 +520,25 @@ namespace Game.Components
             // Debug.DrawLine(ShootPosition, ShootPosition + cannon.forward * 150f, Color.red, Time.deltaTime);
         }
 
+        List<TurretBurstParticles> GenerateShootParticles(List<TurretBurstParticles> burstParticles, GameObject[] prefabs, Transform parent)
+        {
+            foreach (GameObject prefab in prefabs)
+            { GenerateShootParticles(burstParticles, prefab, parent); }
+            return burstParticles;
+        }
+        List<TurretBurstParticles> GenerateShootParticles(List<TurretBurstParticles> burstParticles, GameObject prefab, Transform parent)
+        {
+            GameObject newParticleSystem = GameObject.Instantiate(prefab, parent.position, parent.rotation, parent);
+            ParticleSystem[] particleSystems = newParticleSystem.GetComponentsInChildren<ParticleSystem>(false);
+            foreach (ParticleSystem particleSystem in particleSystems)
+            { burstParticles.Add(new TurretBurstParticles(particleSystem)); }
+            return burstParticles;
+        }
+
         TurretInput Aim(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration, out bool outOfRange)
         {
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Maths.Distance(selfGround, shootPosition.position.To2D());
+            float cannonLength = Maths.Distance(selfGround, NextBarrel.ShootPosition.position.To2D());
 
             targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
 
@@ -558,7 +593,7 @@ namespace Game.Components
             // cannonAngle = -(90f - cannonAngle);
 
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Maths.Distance(selfGround, shootPosition.position.To2D());
+            float cannonLength = Maths.Distance(selfGround, NextBarrel.ShootPosition.position.To2D());
 
             targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
 
@@ -569,7 +604,7 @@ namespace Game.Components
                 float? theta_;
 
                 using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { theta_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition.position, targetPosition); }
+                { theta_ = Ballistics.AngleOfReach2(projectileVelocity, NextBarrel.ShootPosition.position, targetPosition); }
 
                 if (!theta_.HasValue)
                 {
@@ -592,7 +627,7 @@ namespace Game.Components
             }
             else
             {
-                Vector3 rotationToTarget = Quaternion.LookRotation(targetPosition - shootPosition.position).eulerAngles;
+                Vector3 rotationToTarget = Quaternion.LookRotation(targetPosition - NextBarrel.ShootPosition.position).eulerAngles;
 
                 turretRotation = rotationToTarget.y;
 
@@ -625,12 +660,12 @@ namespace Game.Components
             outOfRange = false;
             if (!IsBallisticProjectile)
             {
-                return (projectileVelocity * CurrentProjectileLifetime * shootPosition.forward) + shootPosition.position;
+                return (projectileVelocity * CurrentProjectileLifetime * NextBarrel.ShootPosition.forward) + NextBarrel.ShootPosition.position;
             }
             else
             {
                 using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { return Ballistics.PredictImpact(shootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange); }
+                { return Ballistics.PredictImpact(NextBarrel.ShootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange); }
             }
         }
 
@@ -684,7 +719,7 @@ namespace Game.Components
             if (!IsBallisticProjectile)
             { return false; }
 
-            trajectory = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
+            trajectory = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position);
             return true;
         }
 
@@ -749,14 +784,14 @@ namespace Game.Components
             if (CurrentProjectile == null)
             { return false; }
 
-            if (Barrel != null &&
+            if (NextBarrel.Barrel != null &&
                 BarrelRotationSpeed < RequiedBarrelRotationSpeed)
             { return false; }
 
             bool instantiatedAnyProjectile = false;
             for (int i = 0; i < bulletCount; i++)
             {
-                GameObject? newProjectile = CurrentProjectile?.Instantiate(shootPosition.position, shootPosition.rotation, ObjectGroups.Projectiles);
+                GameObject? newProjectile = CurrentProjectile?.Instantiate(NextBarrel.ShootPosition.position, NextBarrel.ShootPosition.rotation, ObjectGroups.Projectiles);
 
                 if (newProjectile == null)
                 { continue; }
@@ -765,7 +800,7 @@ namespace Game.Components
 
                 if (newProjectile.TryGetComponent(out Rigidbody rb))
                 {
-                    Vector3 velocityResult = shootPosition.forward * projectileVelocity;
+                    Vector3 velocityResult = NextBarrel.ShootPosition.forward * projectileVelocity;
 
                     if (Randomness > 0f)
                     {
@@ -780,7 +815,7 @@ namespace Game.Components
                 {
                     _projectile.TargetPosition = TargetPosition;
 
-                    _projectile.lastPosition = shootPosition.position;
+                    _projectile.lastPosition = NextBarrel.ShootPosition.position;
 
                     _projectile.ignoreCollision = projectileIgnoreCollision.ToArray();
                     _projectile.OwnerTeamHash = @base.TeamHash;
@@ -789,7 +824,7 @@ namespace Game.Components
                     _projectile.LifeLeft = CurrentProjectileLifetime;
                     _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
 
-                    _projectile.Shot = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, shootPosition.position);
+                    _projectile.Shot = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position);
 
                     Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
 
@@ -819,8 +854,8 @@ namespace Game.Components
 
             if (CannonKnockback != 0f)
             {
-                CannonKnockbackPosition.target = CannonKnockbackPosition.original + CannonKnockback;
-                CannonKnockbackState = CannonKnockbackStates.Knockback;
+                NextBarrel.KnockbackPosition.Target = NextBarrel.KnockbackPosition.Original + CannonKnockback;
+                NextBarrel.KnockbackState = TurretCannonKnockbackState.Knockback;
             }
 
             if (@base.TryGetComponent(out Rigidbody baseRigidbody))
@@ -834,8 +869,14 @@ namespace Game.Components
 
             if (QualityHandler.EnableParticles)
             {
-                for (int i = 0; i < ShootEffectInstances.Length; i++)
-                { ShootEffectInstances[i].Emit(); }
+                foreach (TurretBurstParticles burst in Barrels[NextShoot].BurstParticles)
+                { burst.Emit(); }
+            }
+
+            if (Barrels.Length > 0)
+            {
+                NextShoot++;
+                NextShoot %= Barrels.Length;
             }
 
             return true;
@@ -878,13 +919,13 @@ namespace Game.Components
                 if (r2.HasValue)
                 {
                     Gizmos.color = CoolColors.White;
-                    Gizmos.DrawWireSphere(shootPosition.position, r2.Value);
+                    Gizmos.DrawWireSphere(NextBarrel.ShootPosition.position, r2.Value);
                 }
 
                 float maxR = GetRange();
 
                 Gizmos.color = CoolColors.Red;
-                Gizmos.DrawWireSphere(shootPosition.position, maxR);
+                Gizmos.DrawWireSphere(NextBarrel.ShootPosition.position, maxR);
             }
         }
 

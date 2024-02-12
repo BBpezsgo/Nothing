@@ -338,8 +338,8 @@ namespace Utilities.Drawers
 
             if (animation != 1f)
             {
-                Cross3Drawer.DrawCornerBoxFromCross(_rect.center + Vector2.one, _rect.size, 8f, cross + Vector2.one, innerSize, outerSize, animation, shadowColor);
-                Cross3Drawer.DrawCornerBoxFromCross(_rect.center, _rect.size, 8f, cross, innerSize, outerSize, animation, color);
+                CornerBoxDrawer.Draw(_rect.center + Vector2.one, _rect.size, 8f, shadowColor);
+                CornerBoxDrawer.Draw(_rect.center, _rect.size, 8f, color);
             }
             else
             {
@@ -347,11 +347,6 @@ namespace Utilities.Drawers
                 CornerBoxDrawer.Draw(_rect.center, _rect.size, 8f, color);
             }
             return _rect.center;
-        }
-
-        public static void DrawCornerBoxFromCross(Vector2 boxCenter, Vector2 boxSize, float boxCornerSize, Vector2 crossCenter, float crossInnerSize, float crossOuterSize, float t, Color color)
-        {
-            CornerBoxDrawer.Draw(boxCenter, boxSize, boxCornerSize, color);
         }
     }
 

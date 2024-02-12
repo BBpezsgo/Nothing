@@ -191,7 +191,7 @@ namespace Game
         {
             if (!hasTerrain)
             {
-                terrain = GameObject.FindObjectOfType<Terrain>();
+                terrain = GameObject.FindFirstObjectByType<Terrain>();
                 hasTerrain = terrain != null;
 
                 if (hasTerrain)

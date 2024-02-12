@@ -85,18 +85,18 @@ namespace Utilities
     }
 
     [System.Serializable]
-    internal class SimpleReversableAnimation : SimpleAnimation
+    internal class SimpleReversibleAnimation : SimpleAnimation
     {
         [SerializeField, ReadOnly] bool IsReversed;
         readonly PingPongAnimationController Controller;
 
         protected override float RawPercent => (IsReversed) ? (1f - base.RawPercent) : (base.RawPercent);
 
-        internal SimpleReversableAnimation(float speed) : this(speed, null, null) { }
-        internal SimpleReversableAnimation(float speed, PingPongAnimationController controller) : this(speed, controller, null) { }
-        internal SimpleReversableAnimation(float speed, AnimationFunction function) : this(speed, null, function) { }
+        internal SimpleReversibleAnimation(float speed) : this(speed, null, null) { }
+        internal SimpleReversibleAnimation(float speed, PingPongAnimationController controller) : this(speed, controller, null) { }
+        internal SimpleReversibleAnimation(float speed, AnimationFunction function) : this(speed, null, function) { }
 
-        internal SimpleReversableAnimation(float speed, PingPongAnimationController controller, AnimationFunction function) : base(speed, function)
+        internal SimpleReversibleAnimation(float speed, PingPongAnimationController controller, AnimationFunction function) : base(speed, function)
         {
             IsReversed = false;
             Controller = controller;
@@ -214,7 +214,7 @@ namespace Utilities
         internal void Refresh()
             => Refresh(conditionCallback.Invoke());
 
-        internal void Refresh(SimpleReversableAnimation animation)
+        internal void Refresh(SimpleReversibleAnimation animation)
         {
             if (this.IsChanged)
             { animation.Restart(); }

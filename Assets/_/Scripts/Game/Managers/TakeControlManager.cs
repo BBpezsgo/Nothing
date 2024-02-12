@@ -111,7 +111,7 @@ namespace Game.Managers
         bool IsUIInitialized = false;
 
         [SerializeField] SimpleAnimation ReloadIndicatorFadeoutAnimation = null!;
-        [SerializeField] SimpleReversableAnimation TargetLockingAnimation = null!;
+        [SerializeField] SimpleReversibleAnimation TargetLockingAnimation = null!;
         [SerializeField] PingPongAnimationController TargetLockingAnimationController = null!;
 
         void OnEnable()
@@ -120,7 +120,7 @@ namespace Game.Managers
             ReloadIndicatorFadeoutAnimation = new SimpleAnimation(ReloadDotsFadeoutSpeed, AnimationFunctions.Square);
 
             TargetLockingAnimationController = new PingPongAnimationController();
-            TargetLockingAnimation = new SimpleReversableAnimation(TargetLockAnimationSpeed, TargetLockingAnimationController, v => v);
+            TargetLockingAnimation = new SimpleReversibleAnimation(TargetLockAnimationSpeed, TargetLockingAnimationController, v => v);
         }
 
         void OnDisable()
@@ -146,7 +146,7 @@ namespace Game.Managers
             ControllingObjects.OnListChanged += ControllingObjectsChanged;
             ControllingObjects.Initialize(this);
 
-            CameraController = FindObjectOfType<CameraController>();
+            CameraController = FindFirstObjectByType<CameraController>();
             if (CameraController == null)
             { Debug.LogError($"[{nameof(TakeControlManager)}]: CameraController is null", this); }
         }
@@ -282,7 +282,7 @@ namespace Game.Managers
             if ((TimeToNextUnitCollecting -= Time.deltaTime) <= 0f)
             {
                 TimeToNextUnitCollecting = 1f;
-                units = GameObject.FindObjectsOfType<MonoBehaviour>(false).OfType<ICanTakeControl>().ToArray();
+                units = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<ICanTakeControl>().ToArray();
             }
 
             if (!InputCondition())
@@ -472,7 +472,7 @@ namespace Game.Managers
             }
 
             EnableMouseCooldown = 1f;
-            FindObjectOfType<SelectionManager>().ClearSelection();
+            FindFirstObjectByType<SelectionManager>().ClearSelection();
 
             if (unit is ICanTakeControlAndHasTurret hasTurret)
             {
@@ -538,7 +538,7 @@ namespace Game.Managers
             }
 
             EnableMouseCooldown = 1f;
-            FindObjectOfType<SelectionManager>().ClearSelection();
+            FindFirstObjectByType<SelectionManager>().ClearSelection();
 
             if (unit is ICanTakeControlAndHasTurret hasTurret)
             {
@@ -645,7 +645,7 @@ namespace Game.Managers
             UI.gameObject.SetActive(false);
 
             EnableMouseCooldown = 1f;
-            FindObjectOfType<SelectionManager>().ClearSelection();
+            FindFirstObjectByType<SelectionManager>().ClearSelection();
 
             if ((Object?)ControllingObject == null) return;
 
@@ -670,7 +670,7 @@ namespace Game.Managers
             UI.gameObject.SetActive(false);
 
             EnableMouseCooldown = 1f;
-            FindObjectOfType<SelectionManager>().ClearSelection();
+            FindFirstObjectByType<SelectionManager>().ClearSelection();
 
             CurrentCrossStyle = CrossStyle.None;
             CurrentReloadIndicatorStyle = ReloadIndicatorStyle.None;
@@ -1117,7 +1117,7 @@ namespace Game.Managers
             GUIStyle shadowStyle = new(GUI.skin.label) { normal = new GUIStyleState() { textColor = Color.black } };
             GUIStyle normalStyle = new(GUI.skin.label) { normal = new GUIStyleState() { textColor = color } };
             GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadowStyle);
-            GUI.Label(rect, text, new GUIStyle(GUI.skin.label) { normal = new GUIStyleState() { textColor = color } });
+            GUI.Label(rect, text, normalStyle);
         }
 
         void DrawTrajectory(Vector3[] trajectoryPath)

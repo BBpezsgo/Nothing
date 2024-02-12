@@ -38,7 +38,7 @@ namespace Game.UI
         {
             PlayersScrollView.contentContainer.Clear();
             NetworkManager net = NetworkManager.Singleton;
-            Dictionary<ulong, NetcodeServices.Client> clientsS = FindObjectOfType<NetcodeServices>().Clients;
+            Dictionary<ulong, NetcodeServices.Client> clientsS = FindFirstObjectByType<NetcodeServices>().Clients;
 
             foreach (KeyValuePair<ulong, NetcodeServices.Client> client in clientsS)
             {

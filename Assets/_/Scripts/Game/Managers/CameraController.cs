@@ -383,7 +383,7 @@ namespace Game.Managers
         {
             if ((transform.position - FollowObject.position).sqrMagnitude > 10f)
             { ActualFollowSpeed = Maths.Sqrt((transform.position - FollowObject.position).sqrMagnitude) * 3f; }
-            else if (FollowObject.gameObject.TryGetComponent<VehicleEngine>(out var vehicle))
+            else if (FollowObject.gameObject.TryGetComponent(out VehicleEngine vehicle))
             { ActualFollowSpeed = vehicle.Speed + 5f; }
 
             Vector3 displacement = FollowObject.position - (transform.position + new Vector3(0f, Maths.Clamp(ZoomValue * -0.1f, -FollowHeightDisplacement.y, -FollowHeightDisplacement.x), 0f));

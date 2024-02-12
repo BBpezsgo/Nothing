@@ -16,7 +16,7 @@ namespace Authentication.Providers
 {
     public class AnonymousManager : SingleInstance<AnonymousManager>, IModifiableAuthProvider, IFriendsProvider, IAccountMenuProvider
     {
-        const string fileName = "anonymous";
+        const string FileName = "anonymous";
 
         public bool IsAuthorized { get; private set; } = false;
         public Sprite? Avatar => null;

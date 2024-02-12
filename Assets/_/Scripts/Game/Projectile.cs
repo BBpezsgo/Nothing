@@ -22,7 +22,7 @@ namespace Game.Components
 
             [SerializeField] internal AudioClip[] Sounds;
 
-            internal AudioClip GetRandomSound()
+            internal readonly AudioClip GetRandomSound()
             {
                 if (Sounds.Length == 0) return null;
                 if (Sounds.Length == 1) return Sounds[0];
@@ -322,7 +322,7 @@ namespace Game.Components
             }
             else
             {
-                var rotation = Quaternion.FromToRotation(Vector3.forward, positionDelta.normalized);
+                Quaternion rotation = Quaternion.FromToRotation(Vector3.forward, positionDelta.normalized);
                 if (positionDelta != default) transform.rotation = rotation;
             }
 
@@ -443,7 +443,7 @@ namespace Game.Components
                     if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
                     { obj.attachedRigidbody.AddForceAtPosition(ImpactForce * impactEnergy * transform.forward, at, ForceMode.Impulse); }
 
-                    var newVelocity = Vector3.Reflect(rb.velocity * remainingEnergy, normal);
+                    Vector3 newVelocity = Vector3.Reflect(rb.velocity * remainingEnergy, normal);
                     rb.velocity = newVelocity;
 
                     if (RicochetEffect != null &&
@@ -584,7 +584,7 @@ namespace Game.Components
                         QualityHandler.EnableParticles)
                     { GameObject.Instantiate(ImpactEffects[i].Hoe, at, Quaternion.LookRotation(normal, Vector3.up), other.transform); }
 
-                    var sound = ImpactEffects[i].GetRandomSound();
+                    AudioClip sound = ImpactEffects[i].GetRandomSound();
                     if (sound != null)
                     {
                         AudioSource.PlayClipAtPoint(sound, transform.position);
@@ -675,7 +675,7 @@ namespace Game.Components
             if (trail != null)
             {
                 trail.transform.SetParent(ObjectGroups.Effects);
-                if (trail.TryGetComponent<TrailRenderer>(out var trailRenderer))
+                if (trail.TryGetComponent(out TrailRenderer trailRenderer))
                 { trailRenderer.emitting = false; }
             }
 

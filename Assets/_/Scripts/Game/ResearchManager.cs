@@ -36,7 +36,7 @@ namespace Game.Research
                 researchable.IsResearched = true;
                 researchable.IsResearching = false;
 
-                MenuResearch menu = FindObjectOfType<MenuResearch>(false);
+                MenuResearch menu = FindFirstObjectByType<MenuResearch>(FindObjectsInactive.Exclude);
                 if (menu != null)
                 { menu.RefreshResearchables(); }
 

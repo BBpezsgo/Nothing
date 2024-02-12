@@ -59,7 +59,7 @@ namespace Game.Managers
             if (TimeToNextUICollecting <= 0f)
             {
                 TimeToNextUICollecting = 10f;
-                UIDocuments = GameObject.FindObjectsOfType<UIDocument>(true);
+                UIDocuments = GameObject.FindObjectsByType<UIDocument>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             }
 
             if (MenuManager.AnyMenuVisible) return;

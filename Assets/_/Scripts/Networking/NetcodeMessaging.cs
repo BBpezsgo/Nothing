@@ -59,7 +59,7 @@ namespace Networking
 
                 try
                 {
-                    var message = DeserializeMessage(clientId, reader);
+                    BaseMessage message = DeserializeMessage(clientId, reader);
                     messages.Add(message);
                 }
                 catch (Exception ex)
@@ -167,7 +167,7 @@ namespace Networking.Messages
             Sent = new TimeSpan(ticks);
         }
 
-        public void Serialize(FastBufferWriter serializer)
+        public readonly void Serialize(FastBufferWriter serializer)
         {
             serializer.WriteValueSafe((byte)Type);
             serializer.WriteValueSafe(Sender);

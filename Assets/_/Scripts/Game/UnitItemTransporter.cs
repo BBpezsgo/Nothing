@@ -20,7 +20,7 @@ namespace Game.Components
 
         void FindItems(string itemID)
         {
-            Item[] items = FindObjectsOfType<Item>(false);
+            Item[] items = FindObjectsByType<Item>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             Targets.Clear();
             for (int i = 0; i < items.Length; i++)
             {
@@ -63,7 +63,7 @@ namespace Game.Components
                 {
                     TimeToNextItemNeederSearch = 5f;
 
-                    List<INeedItems> itemNeeders = new(GameObject.FindObjectsOfType<MonoBehaviour>(false).OfType<INeedItems>());
+                    List<INeedItems> itemNeeders = new(GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<INeedItems>());
                     for (int i = itemNeeders.Count - 1; i >= 0; i--)
                     {
                         if (itemNeeders[i].Team != this.Team)

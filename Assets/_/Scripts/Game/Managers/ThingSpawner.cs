@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-
 using Unity.Netcode;
-
 using UnityEngine;
 
 namespace Game.Components
@@ -16,6 +14,8 @@ namespace Game.Components
         [SerializeField] bool EnableAutoSpawn;
         [SerializeField] protected GameObject Thing;
         [SerializeField, Min(0)] int MinThings = 1;
+        [SerializeField, Min(0f)] float Cooldown = 1f;
+
         [SerializeField, ReadOnly] float NextSpawn = 1f;
 
         [Header("Properties")]
@@ -23,7 +23,7 @@ namespace Game.Components
 
         void Awake()
         {
-            Terrain = FindObjectOfType<Terrain>();
+            Terrain = FindFirstObjectByType<Terrain>();
         }
 
         void Update()
@@ -44,7 +44,7 @@ namespace Game.Components
                 return;
             }
 
-            NextSpawn = 1f;
+            NextSpawn = Cooldown;
 
             GameObject newThing = Spawn(Thing);
             things.Add(newThing);

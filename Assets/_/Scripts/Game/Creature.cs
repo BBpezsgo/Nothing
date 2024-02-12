@@ -67,7 +67,7 @@ namespace Game.Components
         protected Creature FindFood()
         {
             if (FoodCreatures.Length == 0) return null;
-            Creature[] creatures = FindObjectsOfType<Creature>(false);
+            Creature[] creatures = FindObjectsByType<Creature>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             List<Creature> filteredCreatures_ = new();
             foreach (Creature creature in creatures)
             {
@@ -90,7 +90,7 @@ namespace Game.Components
         protected void FindFoodAsync(System.Action<Creature> callback)
         {
             if (FoodCreatures.Length == 0) return;
-            Creature[] creatures = FindObjectsOfType<Creature>(false);
+            Creature[] creatures = FindObjectsByType<Creature>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             List<Creature> filteredCreatures_ = new();
             foreach (Creature creature in creatures)
             {
@@ -281,9 +281,9 @@ namespace Game.Components
             rb.MovePosition(rb.position + deltaPosition);
         }
 
-        public virtual void Damage(float ammount)
+        public virtual void Damage(float amount)
         {
-            HP -= ammount;
+            HP -= amount;
             if (HP <= 0f)
             {
                 Destroy();

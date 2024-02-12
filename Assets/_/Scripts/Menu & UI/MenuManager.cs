@@ -79,6 +79,7 @@ namespace Game.Managers
             [SerializeField] UIDocument uiDocument;
 
             [SerializeField, ReadOnly] internal bool Enabled = false;
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052")]
             [SerializeField, ReadOnly] bool Active = false;
 
             [Header("Debug")]
@@ -95,7 +96,7 @@ namespace Game.Managers
                 // this.startScale = transform.localScale;
             }
 
-            public void Update()//float deltaTime, float lerpAmmount, float minScale)
+            public void Update()//float deltaTime, float lerpAmount, float minScale)
             {
                 if (transform == null) SetTransform();
 
@@ -106,7 +107,7 @@ namespace Game.Managers
                         SetActive(true);
                         SetUI();
                     }
-                    // this.alpha = Maths.Lerp(this.alpha, 1f, deltaTime * lerpAmmount);
+                    // this.alpha = Maths.Lerp(this.alpha, 1f, deltaTime * lerpAmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
                 else
@@ -116,7 +117,7 @@ namespace Game.Managers
                         SetActive(false);
                         SetUI();
                     }
-                    // this.alpha = Maths.Lerp(this.alpha, 0f, deltaTime * lerpAmmount);
+                    // this.alpha = Maths.Lerp(this.alpha, 0f, deltaTime * lerpAmount);
                     // transform.localScale = startScale * (this.alpha * minScale + (1 - minScale));
                 }
             }
@@ -132,7 +133,7 @@ namespace Game.Managers
                 // if (this.group != null) this.group.alpha = this.alpha;
                 if (this.uiDocument != null) if (this.uiDocument.rootVisualElement != null)
                     {
-                        var element = this.uiDocument.rootVisualElement.Q("root");
+                        VisualElement element = this.uiDocument.rootVisualElement.Q("root");
                         if (Enabled)
                         {
                             if (!element.ClassListContains("visible"))
@@ -172,6 +173,7 @@ namespace Game.Managers
         [field: ReadOnly]
         [field: SerializeField] internal bool AnyPopupVisible { get; set; } = false;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052")]
         [SerializeField, ReadOnly] bool _anyMenuVisible = false;
         internal static bool AnyMenuVisible =>
             Instance != null &&
@@ -242,10 +244,7 @@ namespace Game.Managers
 
                 return currentStatusType;
             }
-            set
-            {
-                currentStatusType = value;
-            }
+            set => currentStatusType = value;
         }
         internal PanelType CurrentPanel
         {

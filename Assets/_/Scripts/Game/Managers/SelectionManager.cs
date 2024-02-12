@@ -46,7 +46,7 @@ namespace Game.Managers
         protected override void Awake()
         {
             base.Awake();
-            CommandManager = FindObjectOfType<UnitCommandManager>();
+            CommandManager = FindFirstObjectByType<UnitCommandManager>();
             if (CommandManager == null)
             { Debug.LogWarning($"[{nameof(SelectionManager)}]: {nameof(CommandManager)} is null"); }
         }

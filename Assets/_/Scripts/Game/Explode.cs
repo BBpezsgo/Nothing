@@ -57,6 +57,11 @@ namespace Game.Components
             obj.transform.localScale = mesh.transform.lossyScale;
             obj.transform.SetPositionAndRotation(mesh.transform.position, mesh.transform.rotation);
 
+            Vector3 colliderSign = new(
+                Maths.Sign(obj.transform.localScale.x),
+                Maths.Sign(obj.transform.localScale.y),
+                Maths.Sign(obj.transform.localScale.z));
+
             if (mesh.TryGetComponent(out SimpleMaterial selfSimpleMaterial))
             {
                 SimpleMaterial simpleMaterial = obj.AddComponent<SimpleMaterial>();
@@ -79,7 +84,10 @@ namespace Game.Components
                 if (obj.TryGetComponent(out boxCollider))
                 {
                     boxCollider.center = meshRenderer.localBounds.center;
-                    boxCollider.size = meshRenderer.localBounds.size;
+                    boxCollider.size = new Vector3(
+                        meshRenderer.localBounds.size.x * colliderSign.x,
+                        meshRenderer.localBounds.size.y * colliderSign.y,
+                        meshRenderer.localBounds.size.z * colliderSign.z);
                 }
                 else
                 { Debug.LogWarning($"Failed to add component {nameof(BoxCollider)} to {obj}", this); }
@@ -134,7 +142,10 @@ namespace Game.Components
                             child.TryGetComponent(out MeshRenderer childMeshRenderer))
                         {
                             childBoxCollider.center = childMeshRenderer.localBounds.center;
-                            childBoxCollider.size = childMeshRenderer.localBounds.size;
+                            childBoxCollider.size = new Vector3(
+                                childMeshRenderer.localBounds.size.x * colliderSign.x,
+                                childMeshRenderer.localBounds.size.y * colliderSign.y,
+                                childMeshRenderer.localBounds.size.z * colliderSign.z);
                         }
 
                         if (child.TryGetComponent(out Rigidbody childRigidbody))
@@ -174,11 +185,12 @@ namespace Game.Components
         {
             fracture.layer = LayerMask.GetMask(LayerMaskNames.IgnoreRaycast);
 
-            if (AudioClips.Length > 0)
-            {
-                AudioSource childAudio = fracture.AddComponent<AudioSource>();
-                childAudio.maxDistance = 10f;
-            }
+            // if (AudioClips.Length > 0)
+            // {
+            //     AudioSource childAudio = fracture.AddComponent<AudioSource>();
+            //     childAudio.maxDistance = 10f;
+            //     childAudio.playOnAwake = false;
+            // }
 
             FracturedObjectScript fracturedObject = fracture.AddComponent<FracturedObjectScript>();
             fracturedObject.LifeTime = Random.Range(20f, 40f);

@@ -26,7 +26,7 @@ public class PlayerData : SingleInstance<PlayerData>
             get
             {
                 if (Building == null) return default;
-                if (!Building.TryGetComponent<Game.Components.Building>(out var building)) return default;
+                if (!Building.TryGetComponent<Game.Components.Building>(out Game.Components.Building building)) return default;
                 return building.GroundOrigin;
             }
         }
@@ -70,7 +70,7 @@ public class PlayerData : SingleInstance<PlayerData>
 
     public static PlayerData? GetCurrentPlayerData()
     {
-        PlayerData[] playerDatas = GameObject.FindObjectsOfType<PlayerData>();
+        PlayerData[] playerDatas = GameObject.FindObjectsByType<PlayerData>(FindObjectsSortMode.None);
         for (int i = 0; i < playerDatas.Length; i++)
         { if (playerDatas[i].Team == instance.Team) return playerDatas[i]; }
         return null;
@@ -78,7 +78,7 @@ public class PlayerData : SingleInstance<PlayerData>
 
     public static PlayerData? GetPlayerData(string team)
     {
-        PlayerData[] playerDatas = GameObject.FindObjectsOfType<PlayerData>();
+        PlayerData[] playerDatas = GameObject.FindObjectsByType<PlayerData>(FindObjectsSortMode.None);
         for (int i = 0; i < playerDatas.Length; i++)
         { if (playerDatas[i].Team == team) return playerDatas[i]; }
         return null;

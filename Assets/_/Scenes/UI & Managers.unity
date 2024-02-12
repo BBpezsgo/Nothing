@@ -4281,11 +4281,10 @@ MonoBehaviour:
   CannonKnockbackRestoreSpeed: 1
   CannonKnockbackSpeed: 1
   UseBarrelInstead: 0
-  CannonKnockbackState: 0
-  CannonOriginalLocalPosition: {x: 0, y: 0, z: 0}
   AudioSource: {fileID: 0}
   ShootSound: {fileID: 8300000, guid: d0dd384cec9f320419f41a2792a06c8f, type: 3}
   Barrel: {fileID: 0}
+  Barrels: []
   HasBarrel: 0
   RequiedBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
@@ -4321,13 +4320,16 @@ MonoBehaviour:
   overriddenInput:
     TurretAngle: 0
     CannonAngle: 0
+  NextShoot: 0
   base: {fileID: 0}
   input:
     TurretAngle: 0
     CannonAngle: 0
   Range: 0
   ShowRadius: 0
-  currentError: 1
+  _error: 1
+  _outOfRange: 0
+  MaxError: 0.001
   ResetAfterTime: 0
   TimeToReset: 1
   IdleTime: 0
@@ -4387,7 +4389,6 @@ MonoBehaviour:
   BuildableMaterial: {fileID: 2100000, guid: b0a3eaac214f74b4bbc371446d28831e, type: 2}
   HologramMaterial: {fileID: 2100000, guid: b13ab9eb76b828c43972cdfa0045b8f8, type: 2}
   IsValidPosition: 0
-  CheckValidity: 0
   ValidHologramColor: {r: 1, g: 1, b: 1, a: 0.19607843}
   InvalidHologramColor: {r: 1, g: 0, b: 0, a: 0.39215687}
   HologramEmission: 1.1

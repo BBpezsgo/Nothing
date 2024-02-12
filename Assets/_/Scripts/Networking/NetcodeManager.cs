@@ -338,14 +338,14 @@ namespace Networking.Managers
         void Singleton_OnClientDisconnectCallback(ulong clientId)
         {
             Debug.Log($"[{nameof(NetcodeManager)}]: Client {clientId} disconnected", this);
-            Game.UI.MenuRoom v = FindObjectOfType<Game.UI.MenuRoom>();
+            Game.UI.MenuRoom v = FindFirstObjectByType<Game.UI.MenuRoom>();
             if (v != null) v.RefreshPlayerList();
         }
 
         void Singleton_OnClientConnectedCallback(ulong clientId)
         {
             Debug.Log($"[{nameof(NetcodeManager)}]: Client #{clientId} connected", this);
-            Game.UI.MenuRoom v = FindObjectOfType<Game.UI.MenuRoom>();
+            Game.UI.MenuRoom v = FindFirstObjectByType<Game.UI.MenuRoom>();
             if (v != null) v.RefreshPlayerList();
         }
     }

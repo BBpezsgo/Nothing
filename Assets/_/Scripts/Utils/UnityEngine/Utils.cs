@@ -413,7 +413,7 @@ public readonly struct GUIUtils
         {
             if (GUIUtility.hotControl != 0) return true;
 
-            UnityEngine.UIElements.UIDocument[] uiDocuments = GameObject.FindObjectsOfType<UnityEngine.UIElements.UIDocument>(false);
+            UnityEngine.UIElements.UIDocument[] uiDocuments = GameObject.FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 
             for (int i = 0; i < uiDocuments.Length; i++)
             {

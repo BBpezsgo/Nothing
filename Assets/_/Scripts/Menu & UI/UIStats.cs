@@ -16,16 +16,16 @@ namespace Game.UI
 
         [SerializeField] GUISkin Skin;
 
+        /*
         void Start()
         {
-            /*
             mat = new Material(Shader.Find("Hidden/Internal-Colored"));
             Window = IMGUIManager.Instance.CreateWindow(new Rect(Screen.width - 150 - 5, 5, 150, 100));
             Window.Title = "Perfomance";
             Window.Visible = true;
             Window.DrawContent = OnDrawWindow;
-            */
         }
+        */
 
         void Update()
         {

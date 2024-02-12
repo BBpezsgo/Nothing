@@ -90,7 +90,7 @@ namespace Authentication
                 return null;
             }
         }
-        public static IRemoteAccountProvider[] RemoteAccountProviders => GameObject.FindObjectsOfType<MonoBehaviour>(false).OfType<IRemoteAccountProvider>().ToArray();
+        public static IRemoteAccountProvider[] RemoteAccountProviders => GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<IRemoteAccountProvider>().ToArray();
         public static bool IsAuthorized
         {
             get
@@ -111,8 +111,8 @@ namespace Authentication
         {
             if (Instance != this) return;
 
-            this.nullAuthProvider = FindObjectOfType<Providers.NullAuthProvider>();
-            this.AuthProviders = FindObjectsOfType<MonoBehaviour>(false).OfType<IAuthProvider>().ToArray();
+            this.nullAuthProvider = FindFirstObjectByType<Providers.NullAuthProvider>();
+            this.AuthProviders = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).OfType<IAuthProvider>().ToArray();
             this._AuthProviders = this.AuthProviders.Select(v => (MonoBehaviour)v).ToArray();
         }
 

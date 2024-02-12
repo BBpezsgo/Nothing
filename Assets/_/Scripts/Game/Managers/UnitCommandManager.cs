@@ -22,7 +22,7 @@ namespace Game.Managers
 
         void Awake()
         {
-            SelectionManager = FindObjectOfType<SelectionManager>();
+            SelectionManager = FindFirstObjectByType<SelectionManager>();
             if (SelectionManager == null)
             { Debug.LogWarning($"[{nameof(UnitCommandManager)}]: {nameof(SelectionManager)} is null"); }
         }

@@ -19,7 +19,7 @@ namespace Game.Components
             }
         }
 
-        [SerializeField, ReadOnly, NonReorderable] List<IncomingBullet> incomingBullets = new List<IncomingBullet>();
+        [SerializeField, ReadOnly, NonReorderable] List<IncomingBullet> incomingBullets = new();
         [SuppressMessage("", "IDE0052")]
         [SerializeField, ReadOnly] float estimatedHP;
 
