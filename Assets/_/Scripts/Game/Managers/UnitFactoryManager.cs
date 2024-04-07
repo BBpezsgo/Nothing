@@ -30,7 +30,7 @@ namespace Game.Managers
             [SerializeField, ReadOnly] public float ProgressRequied;
             [SerializeField, ReadOnly] public string ThumbnailID;
 
-            public ProducableUnit(PlayerData.ProducableUnit other)
+            public ProducableUnit(StaticPlayerData.ProducableUnit other)
             {
                 PrefabID = other.Unit.name;
                 ProgressRequied = other.ProgressRequied;
@@ -98,9 +98,9 @@ namespace Game.Managers
 
             if (playerData != null)
             {
-                for (int i = 0; i < playerData.ProducableUnits.Count; i++)
+                for (int i = 0; i < playerData.Data.ProducableUnits.Count; i++)
                 {
-                    units.Add(new ProducableUnit(playerData.ProducableUnits[i]));
+                    units.Add(new ProducableUnit(playerData.Data.ProducableUnits[i]));
                 }
             }
 

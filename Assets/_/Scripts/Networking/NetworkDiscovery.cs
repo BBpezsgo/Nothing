@@ -110,7 +110,8 @@ namespace Networking
 
             if (!HasStartedWithServer &&
                 !IsRunning &&
-                NetworkManager.IsServer)
+                NetworkManager.IsServer &&
+                !OfflineManager.IsActiveOffline)
             {
                 StartServer();
                 HasStartedWithServer = true;

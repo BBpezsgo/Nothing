@@ -61,46 +61,49 @@ namespace Game.UI
 
             public void Toggle()
             {
-                var menu = MenuManager.Instance;
                 switch (Kind)
                 {
                     case MenuKind.MainMenu:
-                        if (menu.CurrentStatus != MenuManager.StatusType.None)
+                    {
+                        if (MenuManager.Instance.CurrentStatus != MenuManager.StatusType.None)
                         { break; }
 
-                        if (menu.CurrentPanel != MenuManager.PanelType.None)
+                        if (MenuManager.Instance.CurrentPanel != MenuManager.PanelType.None)
                         { break; }
 
-                        if (menu.CurrentIntermediateMenu != MenuManager.IntermediateMenuType.None)
+                        if (MenuManager.Instance.CurrentIntermediateMenu != MenuManager.IntermediateMenuType.None)
                         { break; }
 
-                        if (menu.CurrentMenu == MenuManager.MainMenuType.None)
-                        { menu.CurrentMenu = MainMenuType; }
+                        if (MenuManager.Instance.CurrentMenu == MenuManager.MainMenuType.None)
+                        { MenuManager.Instance.CurrentMenu = MainMenuType; }
                         else
-                        { menu.CurrentMenu = MenuManager.MainMenuType.None; }
+                        { MenuManager.Instance.CurrentMenu = MenuManager.MainMenuType.None; }
 
                         break;
+                    }
+
                     case MenuKind.IntermediateMenu:
-                        if (menu.CurrentStatus != MenuManager.StatusType.None)
+                    {
+                        if (MenuManager.Instance.CurrentStatus != MenuManager.StatusType.None)
                         { break; }
 
-                        if (menu.CurrentPanel != MenuManager.PanelType.None)
+                        if (MenuManager.Instance.CurrentPanel != MenuManager.PanelType.None)
                         { break; }
 
-                        if (menu.CurrentIntermediateMenu == MenuManager.IntermediateMenuType.None)
-                        { menu.CurrentIntermediateMenu = IntermediateMenuType; }
+                        if (MenuManager.Instance.CurrentIntermediateMenu == MenuManager.IntermediateMenuType.None)
+                        { MenuManager.Instance.CurrentIntermediateMenu = IntermediateMenuType; }
                         else
-                        { menu.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.None; }
+                        { MenuManager.Instance.CurrentIntermediateMenu = MenuManager.IntermediateMenuType.None; }
                         break;
-                    default:
-                        break;
+                    }
+
+                    default: break;
                 }
             }
         }
 
         readonly Hotkey[] Hotkeys = new[]
         {
-            new Hotkey(KeyCode.Alpha1, MenuManager.MainMenuType.Game_BlueprintManager),
             new Hotkey(KeyCode.Alpha2, MenuManager.IntermediateMenuType.Scenes),
         };
 

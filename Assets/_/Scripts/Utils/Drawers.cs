@@ -262,9 +262,9 @@ namespace Utilities.Drawers
 
     internal readonly struct Cross3Drawer
     {
-        static readonly Vector2 Direction1 = new(Maths.Cos((float)(Maths.Deg2Rad * (120 * 0 + 30))), Maths.Sin((float)(Maths.Deg2Rad * (120 * 0 + 30))));
-        static readonly Vector2 Direction2 = new(Maths.Cos((float)(Maths.Deg2Rad * (120 * 1 + 30))), Maths.Sin((float)(Maths.Deg2Rad * (120 * 1 + 30))));
-        static readonly Vector2 Direction3 = new(Maths.Cos((float)(Maths.Deg2Rad * (120 * 2 + 30))), Maths.Sin((float)(Maths.Deg2Rad * (120 * 2 + 30))));
+        static readonly Vector2 Direction1 = new(Maths.Cos(Maths.Deg2Rad * (120 * 0 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 0 + 30)));
+        static readonly Vector2 Direction2 = new(Maths.Cos(Maths.Deg2Rad * (120 * 1 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 1 + 30)));
+        static readonly Vector2 Direction3 = new(Maths.Cos(Maths.Deg2Rad * (120 * 2 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 2 + 30)));
 
         static (Line Line1, Line Line2, Line Line3) GetLines(Vector2 center, float innerSize, float outerSize)
         {
@@ -361,7 +361,7 @@ namespace Utilities.Drawers
 
             float cornerSizeWidth = Maths.Min(halfSize.x, cornerSize);
             float cornerSizeHeight = Maths.Min(halfSize.y, cornerSize);
-
+            
             Vector2 topLeft = new(-halfSize.x, -halfSize.y);
             Vector2 topRight = new(halfSize.x, -halfSize.y);
             Vector2 bottomLeft = new(-halfSize.x, halfSize.y);
@@ -407,11 +407,9 @@ namespace Utilities.Drawers
 
     internal readonly struct DiagonalVectors
     {
-        internal static readonly float Sqrt2 = Maths.Sqrt(2);
-
-        internal static Vector2 TopLeft => new(-Sqrt2, Sqrt2);
-        internal static Vector2 TopRight => new(Sqrt2, Sqrt2);
-        internal static Vector2 BottomLeft => new(-Sqrt2, -Sqrt2);
-        internal static Vector2 BottomRight => new(Sqrt2, -Sqrt2);
+        internal static Vector2 TopLeft => new(-Maths.Sqrt2, Maths.Sqrt2);
+        internal static Vector2 TopRight => new(Maths.Sqrt2, Maths.Sqrt2);
+        internal static Vector2 BottomLeft => new(-Maths.Sqrt2, -Maths.Sqrt2);
+        internal static Vector2 BottomRight => new(Maths.Sqrt2, -Maths.Sqrt2);
     }
 }

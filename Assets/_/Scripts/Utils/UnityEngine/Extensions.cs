@@ -533,6 +533,10 @@ public static class MeshEx
 
 public static class VectorEx
 {
+    public static bool IsOk(this Vector3 v) =>
+        v.x != float.PositiveInfinity && v.x != float.NegativeInfinity && v.x != float.NaN &&
+        v.y != float.PositiveInfinity && v.y != float.NegativeInfinity && v.y != float.NaN;
+
     public static Vector3 Clamp(this Vector3 v, Vector3 limit) => new(
         Math.Clamp(v.x, -limit.x, limit.x),
         Math.Clamp(v.y, -limit.y, limit.y),

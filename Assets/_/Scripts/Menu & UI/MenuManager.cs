@@ -131,7 +131,9 @@ namespace Game.Managers
             void SetUI()
             {
                 // if (this.group != null) this.group.alpha = this.alpha;
-                if (this.uiDocument != null) if (this.uiDocument.rootVisualElement != null)
+                if (this.uiDocument != null)
+                {
+                    if (this.uiDocument.rootVisualElement != null)
                     {
                         VisualElement element = this.uiDocument.rootVisualElement.Q("root");
                         if (Enabled)
@@ -145,6 +147,7 @@ namespace Game.Managers
                             { element.RemoveFromClassList("visible"); }
                         }
                     }
+                }
             }
         }
 

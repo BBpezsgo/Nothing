@@ -31,7 +31,7 @@ namespace Game.Components
             {
                 if (!string.IsNullOrWhiteSpace(Team))
                 { Debug.LogWarning($"[{nameof(BaseObject)}]: Team \"{Team}\" not found", this); }
-                
+
                 UpdateColor(Color.white);
                 return;
             }
@@ -43,7 +43,8 @@ namespace Game.Components
             for (int i = 0; i < teamRenderers.Length; i++)
             {
                 if (teamRenderers[i] != null &&
-                    teamRenderers[i].material != null) teamRenderers[i].material.color = color;
+                    teamRenderers[i].material != null)
+                { teamRenderers[i].material.color = color; }
             }
         }
 

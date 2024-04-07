@@ -16,7 +16,7 @@ namespace Game.Managers
 
         public static BuildingManager Instance => instance;
 
-        [SerializeField] PlayerData.ConstructableBuilding SelectedBuilding;
+        [SerializeField] StaticPlayerData.ConstructableBuilding SelectedBuilding;
         [SerializeField] GameObject BuildingHologramPrefab;
         [SerializeField, ReadOnly] GameObject BuildingHologram;
 
@@ -36,7 +36,7 @@ namespace Game.Managers
         AdvancedMouse LeftMouse;
 
         [Header("Buildings")]
-        [SerializeField, ReadOnly, NonReorderable] PlayerData.ConstructableBuilding[] Buildings;
+        [SerializeField, ReadOnly, NonReorderable] StaticPlayerData.ConstructableBuilding[] Buildings;
 
         [Header("UI")]
         [SerializeField] VisualTreeAsset BuildingButton;
@@ -62,7 +62,7 @@ namespace Game.Managers
             LeftMouse = new InputUtils.AdvancedMouse(0, 12, MouseCondition);
             LeftMouse.OnClick += LeftMouse_OnClick;
 
-            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 3, () => IsBuilding || BuildingUI.gameObject.activeSelf);
+            KeyEsc = new InputUtils.PriorityKey(KeyCode.Escape, 3, () => IsBuilding || (BuildingUI != null && BuildingUI.gameObject.activeSelf));
             KeyEsc.OnDown += OnKeyEsc;
         }
 
@@ -131,7 +131,7 @@ namespace Game.Managers
         void PlaceBuildingRequest_ServerRpc(Vector3 position, uint buildingHash, string team)
         {
             PlayerData? playerData = PlayerData.GetPlayerData(team);
-            Buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
+            Buildings = (playerData == null) ? new StaticPlayerData.ConstructableBuilding[0] : playerData.Data.ConstructableBuildings.ToArray();
             for (int i = 0; i < Buildings.Length; i++)
             {
                 if (Buildings[i].Hash != buildingHash) continue;
@@ -142,7 +142,7 @@ namespace Game.Managers
             Debug.LogError($"[{nameof(BuildingManager)}]: Building \"{buildingHash}\" not found", this);
         }
 
-        void PlaceBuilding(Vector3 fixedWorldPosition, PlayerData.ConstructableBuilding building)
+        void PlaceBuilding(Vector3 fixedWorldPosition, StaticPlayerData.ConstructableBuilding building)
         {
             if (NetcodeUtils.IsOfflineOrServer)
             {
@@ -163,7 +163,7 @@ namespace Game.Managers
         {
             if (e.target is not Button button) return;
             int i = int.Parse(button.name.Split('-')[1]);
-            PlayerData.ConstructableBuilding building = Buildings[i];
+            StaticPlayerData.ConstructableBuilding building = Buildings[i];
             SelectedBuilding = building;
             if (BuildingHologram != null)
             { ApplyHologram(BuildingHologram, SelectedBuilding); }
@@ -172,7 +172,7 @@ namespace Game.Managers
         void Show()
         {
             PlayerData? playerData = PlayerData.GetCurrentPlayerData();
-            Buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
+            Buildings = (playerData == null) ? new StaticPlayerData.ConstructableBuilding[0] : playerData.Data.ConstructableBuildings.ToArray();
 
             BuildingUI.gameObject.SetActive(true);
             ListBuildings();
@@ -187,7 +187,7 @@ namespace Game.Managers
             if (BuildingHologram != null)
             { BuildingHologram.SetActive(false); }
 
-            Buildings = Array.Empty<PlayerData.ConstructableBuilding>();
+            Buildings = Array.Empty<StaticPlayerData.ConstructableBuilding>();
         }
 
         void Update()
@@ -276,7 +276,7 @@ namespace Game.Managers
             }
         }
 
-        public static void ApplyBuildableHologram(BuildableBuilding hologram, string team, PlayerData.ConstructableBuilding building)
+        public static void ApplyBuildableHologram(BuildableBuilding hologram, string team, StaticPlayerData.ConstructableBuilding building)
         {
             hologram.Team = team;
             hologram.Init(building.Hash, building.ProgressRequied);
@@ -297,7 +297,7 @@ namespace Game.Managers
             hologram.SetMaterial(instance.BuildableMaterial);
         }
 
-        public static void ApplyHologram(GameObject? hologram, PlayerData.ConstructableBuilding buildingPrefab)
+        public static void ApplyHologram(GameObject? hologram, StaticPlayerData.ConstructableBuilding buildingPrefab)
         {
             if (hologram == null) return;
 

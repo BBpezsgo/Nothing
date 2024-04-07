@@ -4,6 +4,9 @@ namespace Game.Components
 {
     public class UnitDestroyer : MonoBehaviour
     {
+        const int HorizontalThreshold = 5000;
+        const int VerticalThreshold = 100;
+
         Rigidbody rb;
 
         void Awake()
@@ -13,31 +16,31 @@ namespace Game.Components
 
         void Update()
         {
-            if (transform.position.y < -100)
+            if (transform.position.y < -VerticalThreshold)
             {
                 GameObject.Destroy(gameObject);
                 return;
             }
 
-            if (transform.position.x < -5000)
+            if (transform.position.x < -HorizontalThreshold)
             {
                 GameObject.Destroy(gameObject);
                 return;
             }
 
-            if (transform.position.x > 5000)
+            if (transform.position.x > HorizontalThreshold)
             {
                 GameObject.Destroy(gameObject);
                 return;
             }
 
-            if (transform.position.y < -5000)
+            if (transform.position.z < -HorizontalThreshold)
             {
                 GameObject.Destroy(gameObject);
                 return;
             }
 
-            if (transform.position.y > 5000)
+            if (transform.position.z > HorizontalThreshold)
             {
                 GameObject.Destroy(gameObject);
                 return;

@@ -108,7 +108,6 @@ namespace Game.Components
                 else
                 { torque = 1f - Maths.Abs(steerAmount) + 0.5f; }
 
-
                 // === Reversing 2 ===
                 if (
                     // We are close to the target

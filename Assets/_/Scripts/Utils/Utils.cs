@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ using UnityEngine;
 
 namespace Utilities
 {
-    public readonly struct LayerMaskNames
+    public static class LayerMaskNames
     {
         #region Builtin
         public const string Default = "Default";
@@ -31,7 +30,7 @@ namespace Utilities
         public const string PhotographyStudio = "PhotographyStudio";
     }
 
-    public readonly struct DefaultLayerMasks
+    public static class DefaultLayerMasks
     {
         public static int JustDefault => LayerMask.GetMask(LayerMaskNames.Default);
         public static int JustGround => LayerMask.GetMask(LayerMaskNames.Ground);
@@ -44,10 +43,10 @@ namespace Utilities
         /// <summary>
         /// <see cref="LayerMaskNames.Default"/> ; <see cref="LayerMaskNames.Projectile"/>
         /// </summary>
-        public static int PossiblyDamageables => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Projectile);
+        public static int PossiblyDamageable => LayerMask.GetMask(LayerMaskNames.Default, LayerMaskNames.Projectile);
     }
 
-    public struct AI
+    public static class AI
     {
         public delegate float GetPriority<T>(T @object);
 
@@ -225,7 +224,7 @@ namespace Game
     }
 }
 
-public readonly partial struct ProfilerMarkers
+public static class ProfilerMarkers
 {
     public static readonly Unity.Profiling.ProfilerMarker Animations = new("Utilities.Animations");
     public static readonly Unity.Profiling.ProfilerMarker AI = new("Utilities.AI");
@@ -1185,7 +1184,7 @@ namespace InputUtils
     }
 }
 
-public static partial class ListUtils
+public static class ListUtils
 {
     public static string ToReadableString<T1, T2>(this NetworkList<T1> self, IReadOnlyDictionary<T1, T2> converter) where T1 : unmanaged, IEquatable<T1>
     {

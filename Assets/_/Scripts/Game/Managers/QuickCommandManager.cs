@@ -1,3 +1,4 @@
+using System;
 using Game;
 using Game.Managers;
 using InputUtils;
@@ -103,7 +104,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         if (!IsShown) return;
 
         float showTime = Time.unscaledTime - ShownAt;
-        float animationTime = Maths.Clamp(showTime * ShowSpeed, 0f, 1f);
+        float animationTime = Math.Clamp(showTime * ShowSpeed, 0f, 1f);
 
         Vector2 center = Origin;
         center.y = Screen.height - center.y;
@@ -148,7 +149,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         for (int i = 0; i < commands.Length; i++)
         {
             float normalizedIndex = (float)i / (float)commands.Length;
-            float localAnimationTime = Maths.Clamp(((showTime - (normalizedIndex / ShowSpeed)) * ShowSpeed) - .3f, 0f, 1f);
+            float localAnimationTime = Math.Clamp(((showTime - (normalizedIndex / ShowSpeed)) * ShowSpeed) - .3f, 0f, 1f);
 
             float rad = 2 * Maths.PI * normalizedIndex;
             float x = Maths.Cos(rad);

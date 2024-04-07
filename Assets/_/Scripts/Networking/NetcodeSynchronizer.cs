@@ -32,7 +32,7 @@ namespace Networking
         {
             if (Input.GetKeyUp(KeyCode.F3))
             {
-                var comp = GetComponent<RuntimeNetStatsMonitor>();
+                RuntimeNetStatsMonitor comp = GetComponent<RuntimeNetStatsMonitor>();
                 comp.Visible = !comp.Visible;
             }
         }
@@ -59,70 +59,66 @@ namespace Networking
         {
             if (Logs) Debug.Log($"[{nameof(NetcodeSynchronizer)}]: Received {reader.Length} bytes from client {clientId}");
 
-            var messages = NetcodeMessaging.ReceiveUnnamedMessage(clientId, reader);
-
-            for (int i = 0; i < messages.Length; i++)
+            foreach (BaseMessage baseMessage in NetcodeMessaging.ReceiveUnnamedMessage(clientId, reader))
             {
-                BaseMessage baseMessage = messages[i];
-
                 switch (baseMessage.Type)
                 {
-                    case MessageType.USER_DATA_REQUEST:
-                        {
-                            UserDataRequestHeader message = (UserDataRequestHeader)baseMessage;
+                    case MessageType.UserDataRequest:
+                    {
+                        UserDataRequestHeader message = (UserDataRequestHeader)baseMessage;
 
-                            if (AuthManager.AuthProvider.IsAuthorized && AuthManager.AuthProvider.ID == message.ID)
+                        if (AuthManager.AuthProvider.IsAuthorized && AuthManager.AuthProvider.ID == message.ID)
+                        {
+                            NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.UserDataResponse, NetworkManager.LocalClientId))
                             {
-                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
+                                UserName = AuthManager.AuthProvider.DisplayName ?? "null",
+                                ID = AuthManager.AuthProvider.ID,
+                            }, baseMessage.Sender);
+                            break;
+                        }
+
+                        if (AuthManager.RemoteAccountProvider != null)
+                        {
+                            IRemoteAccountProvider.RemoteAccount? result = AuthManager.RemoteAccountProvider.Get(message.ID);
+                            if (result != null)
+                            {
+                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.UserDataResponse, NetworkManager.LocalClientId))
                                 {
-                                    UserName = AuthManager.AuthProvider.DisplayName ?? "null",
-                                    ID = AuthManager.AuthProvider.ID,
+                                    UserName = result.DisplayName ?? "null",
+                                    ID = message.ID,
                                 }, baseMessage.Sender);
-                                break;
                             }
-
-                            if (AuthManager.RemoteAccountProvider != null)
-                            {
-                                var result = AuthManager.RemoteAccountProvider.Get(message.ID);
-                                if (result != null)
-                                {
-                                    NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
-                                    {
-                                        UserName = result.DisplayName ?? "null",
-                                        ID = message.ID,
-                                    }, baseMessage.Sender);
-                                }
-                            }
-
-                            break;
                         }
 
-                    case MessageType.USER_DATA:
+                        break;
+                    }
+
+                    case MessageType.UserDataResponse:
+                    {
+                        UserDataHeader message = (UserDataHeader)baseMessage;
+                        if (Services.Singleton != null)
+                        { Services.Singleton.OnUserData(message); }
+                        break;
+                    }
+
+                    case MessageType.UserDataRequestDirect:
+                    {
+                        if (AuthManager.AuthProvider.IsAuthorized)
                         {
-                            UserDataHeader message = (UserDataHeader)baseMessage;
-                            if (Services.Singleton != null)
-                            { Services.Singleton.OnUserData(message); }
-                            break;
-                        }
-
-                    case MessageType.USER_DATA_REQUEST_DIRECT:
-                        {
-                            if (AuthManager.AuthProvider.IsAuthorized)
+                            NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.UserDataResponse, NetworkManager.LocalClientId))
                             {
-                                NetcodeMessaging.SendUnnamedMessage(new UserDataHeader(new MessageHeader(MessageType.USER_DATA, NetworkManager.LocalClientId))
-                                {
-                                    UserName = AuthManager.AuthProvider.DisplayName ?? "null",
-                                    ID = AuthManager.AuthProvider.ID,
-                                }, baseMessage.Sender);
-                                break;
-                            }
-
+                                UserName = AuthManager.AuthProvider.DisplayName ?? "null",
+                                ID = AuthManager.AuthProvider.ID,
+                            }, baseMessage.Sender);
                             break;
                         }
 
-                    case MessageType.UNKNOWN:
+                        break;
+                    }
+
+                    case MessageType.Unknown:
                     default:
-                        throw new Exception($"Unknown baseMessage type {baseMessage.Type}({baseMessage.TypeRaw}) form client {baseMessage.Sender}");
+                        throw new Exception($"Unknown message type {baseMessage.Type} ({baseMessage.GetType()}) form client {baseMessage.Sender}");
                 }
             }
         }

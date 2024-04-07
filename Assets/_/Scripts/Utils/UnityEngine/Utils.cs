@@ -9,7 +9,7 @@ using UnityEditor;
 
 #nullable enable
 
-public struct CoolColors
+public static class CoolColors
 {
     public static Color White => new(1f, 1f, 1f);
     public static Color Black => new(0f, 0f, 0f);
@@ -130,7 +130,7 @@ public struct Triangle
     }
 }
 
-public readonly struct RectUtils
+public static class RectUtils
 {
     public static Rect FromCenter(Vector2 center, Vector2 size)
         => new(center - (size * .5f), size);
@@ -266,7 +266,7 @@ public static class GLUtils
             return;
         }
 
-        int segments = Maths.FloorToInt(fillAmount * segmentCount);
+        int segments = (int)(fillAmount * segmentCount);
         float step = 1f / (float)segmentCount;
 
         GL.Begin(GL.TRIANGLE_STRIP);
@@ -279,7 +279,7 @@ public static class GLUtils
                 Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
-                GL.Vertex(center + (direction * (radius)));
+                GL.Vertex(center + (direction * radius));
             }
 
             {
@@ -289,7 +289,7 @@ public static class GLUtils
                 Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
-                GL.Vertex(center + (direction * (radius)));
+                GL.Vertex(center + (direction * radius));
             }
         }
         GL.End();
@@ -317,7 +317,7 @@ public static class GLUtils
             return;
         }
 
-        int segments = Maths.FloorToInt(fillAmount * segmentCount);
+        int segments = (int)(fillAmount * segmentCount);
         float step = 1f / (float)segmentCount;
 
         GL.Begin(GL.LINE_STRIP);
@@ -345,7 +345,7 @@ public static class GLUtils
     }
 }
 
-public readonly struct GUIUtils
+public static class GUIUtils
 {
     public static Vector2 TransformPoint(Vector2 screenPosition)
         => new(screenPosition.x, Screen.height - screenPosition.y);
@@ -482,7 +482,7 @@ public readonly struct GuiContentColor : IDisposable
 
 namespace Utilities
 {
-    public static partial class UnityUtils
+    public static class UnityUtils
     {
         public static bool GetScreenCorners(Vector3[] points, out (Vector2 TopLeft, Vector2 BottomRight) corners)
         {
@@ -1104,37 +1104,6 @@ namespace Utilities
             return x;
         }
 
-        /*
-        public static float? find_shooting_angle(Vector2 target_position, float target_velocity, float shootAngle, Vector2 shooter_position, float shooter_velocity)
-        {
-            float tolerance = 0.01f;  // Tolerance for convergence
-            int max_iterations = 100;// Maximum number of iterations
-            float lower_angle = 0.0f; // Initial lower angle bound (radians)
-            float upper_angle = Maths.PI / 2; // Initial upper angle bound (radians)
-
-            for (int i = 0; i < max_iterations; i++)
-            {
-                float angle = (lower_angle + upper_angle) / 2f;
-                float time_of_flight_shooter = calculate_time_of_flight(angle, shooter_velocity, shooter_position);
-                float time_of_flight_target = calculate_time_of_flight(shootAngle, target_velocity, target_position);
-
-                if (Maths.Abs(time_of_flight_shooter - time_of_flight_target) <= tolerance)
-                { return angle; }
-                else if (time_of_flight_shooter > time_of_flight_target)
-                {
-                    upper_angle = angle;
-                }
-                else
-                {
-                    lower_angle = angle;
-                }
-            }
-
-            // Return None if convergence is not achieved within the maximum iterations
-            return null;
-        }
-        */
-
         /// <summary>
         /// The total time for which the projectile remains in the air.
         /// <seealso href="https://en.wikipedia.org/wiki/Projectile_motion#Time_of_flight_or_total_time_of_the_whole_journey"/>
@@ -1159,7 +1128,7 @@ namespace Utilities
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 GetPosition(Vector2 v, float t)
-            => (v * t) + ((t * t * GVector) / 2);
+            => (v * t) + (t * t * GVector / 2);
 
         /// <summary>
         /// <see href="https://www.toppr.com/guides/physics/motion-in-a-plane/projectile-motion/"/>
@@ -1178,7 +1147,7 @@ namespace Utilities
             float? angle_;
             float? t;
             Vector3 targetPosition;
-            int iterations = 3;
+            const int iterations = 3;
 
             using (ProfilerMarkers.TrajectoryMath.Auto())
             {
@@ -1220,7 +1189,7 @@ namespace Utilities
         public static Vector2? CalculateInterceptCourse(Vector2 projectilePosition, float projectileVelocity, Vector2 targetPosition, Vector2 targetVelocity)
         {
             float time = 0f;
-            int iterations = 3;
+            const int iterations = 3;
             Vector2 targetOriginalPosition = targetPosition;
 
             float height = projectilePosition.y - targetPosition.y;
@@ -1279,14 +1248,14 @@ namespace Utilities
             // Line AB represented as a1x + b1y = c1
             float a1 = b.y - a.y;
             float b1 = a.x - b.x;
-            float c1 = a1 * (a.x) + b1 * (a.y);
+            float c1 = (a1 * a.x) + (b1 * a.y);
 
             // Line CD represented as a2x + b2y = c2
             float a2 = d.y - c.y;
             float b2 = c.x - d.x;
-            float c2 = a2 * (c.x) + b2 * (c.y);
+            float c2 = (a2 * c.x) + (b2 * c.y);
 
-            float determinant = a1 * b2 - a2 * b1;
+            float determinant = (a1 * b2) - (a2 * b1);
 
             if (determinant == 0)
             {
@@ -1296,30 +1265,29 @@ namespace Utilities
             }
             else
             {
-                float x = (b2 * c1 - b1 * c2) / determinant;
-                float y = (a1 * c2 - a2 * c1) / determinant;
+                float x = ((b2 * c1) - (b1 * c2)) / determinant;
+                float y = ((a1 * c2) - (a2 * c1)) / determinant;
                 return new Vector2(x, y);
             }
         }
 
         public static bool IsBetween(Vector2 a, Vector2 b, Vector2 c)
         {
-            float crossProduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
+            float crossProduct = ((c.y - a.y) * (b.x - a.x)) - ((c.x - a.x) * (b.y - a.y));
 
             // compare versus epsilon for floating point values, or != 0 if using integers
             if (Maths.Abs(crossProduct) > 0.0001f)
             { return false; }
 
-            float dotProduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
+            float dotProduct = ((c.x - a.x) * (b.x - a.x)) + ((c.y - a.y) * (b.y - a.y));
             if (dotProduct < 0)
             { return false; }
 
-            float squaredLengthBA = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+            float squaredLengthBA = ((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y));
             if (dotProduct > squaredLengthBA)
             { return false; }
 
             return true;
-
         }
     }
 
@@ -1346,34 +1314,31 @@ namespace Utilities
             if (acceleration == 0f) return velocity;
             if (distance == 0f) return velocity;
 
-            float valueUnderSqr = (2 * acceleration * distance + (velocity * velocity));
+            float valueUnderSqr = (2 * acceleration * distance) + (velocity * velocity);
             if (valueUnderSqr <= 0f) return 0f;
 
             return Maths.Sqrt(valueUnderSqr);
         }
 
         /// <summary>
-        /// <b>v * t + ½ * a * t²</b> <br/><br/>
-        /// 
-        /// v: <paramref name="velocity"/> <br/>
-        /// a: <paramref name="acceleration"/> <br/>
-        /// t: <paramref name="time"/> <br/>
+        /// <b><paramref name="velocity"/> * <paramref name="time"/> + ½ * <paramref name="acceleration"/> * <paramref name="time"/>²</b>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DistanceAfterTime(float velocity, float acceleration, float time)
-            => (velocity * time) + ((acceleration / 2) * (time * time));
+            => (velocity * time) + (acceleration / 2 * (time * time));
 
         /// <summary>
-        /// <b>Δv / a</b> <br/>
-        /// or <br/>
-        /// <b>(v - vₒ) / a</b> <br/><br/>
-        /// 
-        /// If <paramref name="targetVelocity"/> can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero. <br/><br/>
-        /// 
-        /// v: <paramref name="targetVelocity"/> <br/>
-        /// vₒ: <paramref name="initialVelocity"/> <br/>
-        /// a: <paramref name="acceleration"/> <br/>
+        /// <para>
+        /// <b>Δ<paramref name="targetVelocity"/> / <paramref name="acceleration"/></b>
+        /// </para>
+        /// or
+        /// <para>
+        /// <b>(<paramref name="targetVelocity"/> - <paramref name="initialVelocity"/>) / <paramref name="acceleration"/></b>
+        /// </para>
         /// </summary>
+        /// <para>
+        /// If <paramref name="targetVelocity"/> can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero.
+        /// </para>
         public static float TimeToReachVelocity(float initialVelocity, float targetVelocity, float acceleration)
         {
             if (acceleration == 0f) return LargeNumber;
@@ -1384,13 +1349,11 @@ namespace Utilities
         }
 
         /// <summary>
-        /// <b>-vₒ / a</b> <br/><br/>
-        /// 
-        /// If 0 velocity can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero. <br/><br/>
-        /// 
-        /// vₒ: <paramref name="initialVelocity"/> <br/>
-        /// a: <paramref name="acceleration"/> <br/>
+        /// <b>-<paramref name="initialVelocity"/> / <paramref name="acceleration"/></b>
         /// </summary>
+        /// <para>
+        /// If 0 velocity can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero.
+        /// </para>
         public static float TimeToStop(float initialVelocity, float acceleration)
         {
             if (acceleration == 0f) return LargeNumber;
@@ -1401,12 +1364,12 @@ namespace Utilities
         }
 
         /// <summary>
-        /// <b>vₒ * t + ½ * a * t²</b> <br/><br/>
-        /// 
-        /// v: <paramref name="targetVelocity"/> <br/>
-        /// vₒ: <paramref name="initialVelocity"/> <br/>
-        /// a: <paramref name="acceleration"/> <br/>
-        /// t: <see cref="TimeToReachVelocity(float, float, float)"/> <br/>
+        /// <para>
+        /// <b><paramref name="initialVelocity"/> * t + ½ * <paramref name="acceleration"/> * t²</b>
+        /// </para>
+        /// <para>
+        /// t: <see cref="TimeToReachVelocity(float, float, float)"/>
+        /// </para>
         /// </summary>
         public static float DistanceToReachVelocity(float initialVelocity, float targetVelocity, float acceleration)
         {
@@ -1418,11 +1381,12 @@ namespace Utilities
         }
 
         /// <summary>
-        /// <b>vₒ * t + ½ * -a * t²</b> <br/><br/>
-        /// 
-        /// vₒ: <paramref name="velocity"/> <br/>
-        /// a: -<paramref name="braking"/> <br/>
-        /// t: <see cref="TimeToStop(float, float)"/> <br/>
+        /// <para>
+        /// <b><paramref name="velocity"/> * t + ½ * -<paramref name="braking"/> * t²</b>
+        /// </para>
+        /// <para>
+        /// t: <see cref="TimeToStop(float, float)"/>
+        /// </para>
         /// </summary>
         public static float DistanceToStop(float velocity, float braking)
         {
@@ -1434,11 +1398,7 @@ namespace Utilities
         }
 
         /// <summary>
-        /// <b>(vₒ + v)/2 * t</b> <br/><br/>
-        /// 
-        /// vₒ: <paramref name="initialVelocity"/> <br/>
-        /// vₒ: <paramref name="topVelocity"/> <br/>
-        /// t: <paramref name="time"/> <br/>
+        /// <b>(<paramref name="initialVelocity"/> + <paramref name="topVelocity"/>)/2 * <paramref name="time"/></b>
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float CalculateDistanceFromSpeed(float initialVelocity, float topVelocity, float time)
@@ -1457,7 +1417,7 @@ namespace Utilities
             float distance;
             float time = 0f;
 
-            int iterations = 3;
+            const int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
                 distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
@@ -1475,7 +1435,7 @@ namespace Utilities
             float distance;
             float time = 0f;
 
-            int iterations = 4;
+            const int iterations = 4;
             for (int i = 0; i < iterations; i++)
             {
                 distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
@@ -1494,7 +1454,7 @@ namespace Utilities
             float distance;
             float time = 0f;
 
-            int iterations = 4;
+            const int iterations = 4;
             for (int i = 0; i < iterations; i++)
             {
                 distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
@@ -1530,7 +1490,7 @@ namespace Utilities
             float distance;
             float time = 0f;
 
-            int iterations = 3;
+            const int iterations = 3;
             for (int i = 0; i < iterations; i++)
             {
                 distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
@@ -1569,12 +1529,12 @@ namespace Utilities
             {
                 if (i + 1 < vertices.Length)
                 {
-                    UnityEngine.Debug.DrawLine(vertices[i], vertices[i + 1], color, duration);
+                    Debug.DrawLine(vertices[i], vertices[i + 1], color, duration);
 
                     if (i + 2 < vertices.Length)
                     {
-                        UnityEngine.Debug.DrawLine(vertices[i + 1], vertices[i + 2], color, duration);
-                        UnityEngine.Debug.DrawLine(vertices[i + 2], vertices[i], color, duration);
+                        Debug.DrawLine(vertices[i + 1], vertices[i + 2], color, duration);
+                        Debug.DrawLine(vertices[i + 2], vertices[i], color, duration);
                     }
                 }
             }
@@ -1591,7 +1551,6 @@ namespace Utilities
             Handles.Label(position, content);
 #endif
         }
-
 
         /// <summary>
         /// Square with edge of length 1
@@ -1631,9 +1590,9 @@ namespace Utilities
                 float f = i / (float)len;
                 float c = Maths.Cos(f * Maths.PI * 2f);
                 float s = Maths.Sin(f * Maths.PI * 2f);
-                v[0 * len + i] = new Vector4(c, s, 0, 1);
-                v[1 * len + i] = new Vector4(0, c, s, 1);
-                v[2 * len + i] = new Vector4(s, 0, c, 1);
+                v[(0 * len) + i] = new Vector4(c, s, 0, 1);
+                v[(1 * len) + i] = new Vector4(0, c, s, 1);
+                v[(2 * len) + i] = new Vector4(s, 0, c, 1);
             }
             return v;
         }
@@ -1644,16 +1603,16 @@ namespace Utilities
             int len = v.Length / 3;
             for (int i = 0; i < len; i++)
             {
-                Vector4 sX = pos + radius * v[0 * len + i];
-                Vector4 eX = pos + radius * v[0 * len + (i + 1) % len];
+                Vector4 sX = pos + (radius * v[(0 * len) + i]);
+                Vector4 eX = pos + (radius * v[(0 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sX, eX, color);
 
-                Vector4 sY = pos + radius * v[1 * len + i];
-                Vector4 eY = pos + radius * v[1 * len + (i + 1) % len];
+                Vector4 sY = pos + (radius * v[(1 * len) + i]);
+                Vector4 eY = pos + (radius * v[(1 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sY, eY, color);
 
-                Vector4 sZ = pos + radius * v[2 * len + i];
-                Vector4 eZ = pos + radius * v[2 * len + (i + 1) % len];
+                Vector4 sZ = pos + (radius * v[(2 * len) + i]);
+                Vector4 eZ = pos + (radius * v[(2 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sZ, eZ, color);
             }
         }
@@ -1664,16 +1623,16 @@ namespace Utilities
             int len = v.Length / 3;
             for (int i = 0; i < len; i++)
             {
-                Vector4 sX = pos + radius * v[0 * len + i];
-                Vector4 eX = pos + radius * v[0 * len + (i + 1) % len];
+                Vector4 sX = pos + (radius * v[(0 * len) + i]);
+                Vector4 eX = pos + (radius * v[(0 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sX, eX, color, duration);
 
-                Vector4 sY = pos + radius * v[1 * len + i];
-                Vector4 eY = pos + radius * v[1 * len + (i + 1) % len];
+                Vector4 sY = pos + (radius * v[(1 * len) + i]);
+                Vector4 eY = pos + (radius * v[(1 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sY, eY, color, duration);
 
-                Vector4 sZ = pos + radius * v[2 * len + i];
-                Vector4 eZ = pos + radius * v[2 * len + (i + 1) % len];
+                Vector4 sZ = pos + (radius * v[(2 * len) + i]);
+                Vector4 eZ = pos + (radius * v[(2 * len) + ((i + 1) % len)]);
                 Debug.DrawLine(sZ, eZ, color, duration);
             }
         }
@@ -2009,7 +1968,7 @@ public class AnySearcherCoroutine<T>
     }
 }
 
-public readonly struct EditorUtils
+public static class EditorUtils
 {
     public static string ProjectPath => System.IO.Path.GetDirectoryName(Application.dataPath);
     public static string ResourcesPath => System.IO.Path.Combine(Application.dataPath, "Resources");
@@ -2130,7 +2089,7 @@ public static class Intervals
 
         public float Interval;
 
-        public UnityBaseInterval(MonoBehaviour context, Action action, float interval)
+        protected UnityBaseInterval(MonoBehaviour context, Action action, float interval)
         {
             Context = context;
             Action = action;
@@ -2175,7 +2134,7 @@ public static class Intervals
     }
 }
 
-public struct MetricUtils
+public static class MetricUtils
 {
     const float Multiplier = 0.001f;
 
@@ -2187,7 +2146,7 @@ public struct MetricUtils
     public static Vector3 GetMeters(Vector3 value) => value * Multiplier;
 }
 
-public struct Mouse
+public static class Mouse
 {
     public const int Left = 0;
     public const int Right = 1;
@@ -2209,7 +2168,7 @@ public struct Mouse
     public static float ScrollDelta => Input.mouseScrollDelta.y;
 }
 
-public struct MouseAlt
+public static class MouseAlt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDown(int button) => button switch

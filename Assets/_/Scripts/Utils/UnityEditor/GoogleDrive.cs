@@ -299,29 +299,38 @@ namespace Utilities.Editor
             {
                 bool canStart = true;
 
-                if (canStart) foreach (var _task in Tasks)
+                if (canStart)
+                {
+                    foreach (Task _task in Tasks)
                     {
                         if (!_task.IsRunning)
                         { continue; }
                         canStart = false;
                         break;
                     }
+                }
 
-                if (canStart) foreach (var _task in LocalFileTasks)
+                if (canStart)
+                {
+                    foreach ((string, Task) _task in LocalFileTasks)
                     {
                         if (!_task.Item2.IsRunning)
                         { continue; }
                         canStart = false;
                         break;
                     }
+                }
 
-                if (canStart) foreach (var _task in CloudFileTasks)
+                if (canStart)
+                {
+                    foreach ((string, Task) _task in CloudFileTasks)
                     {
                         if (!_task.Item2.IsRunning)
                         { continue; }
                         canStart = false;
                         break;
                     }
+                }
 
                 if (canStart)
                 {
@@ -539,7 +548,7 @@ namespace Utilities.Editor
                                 if (GUI.Button(subrect, content, EditorStyles.iconButton) && !IsLoading && fileTask is null)
                                 {
                                     LastError = null;
-                                    var task = GetCloudFileByName(file.Name);
+                                    System.Threading.Tasks.Task task = GetCloudFileByName(file.Name);
                                     LocalFileTasks.Add((file.Name, new Task("Get File", TaskVisibility.VisibleInContext, task)));
                                 }
                             }
@@ -841,7 +850,7 @@ namespace Utilities.Editor
         {
             ShouldRefreshCloudFiles = false;
 
-            var task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(OnDriveListSimple);
+            System.Threading.Tasks.Task task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(OnDriveListSimple);
             Tasks.Add(new Task("Get Files", TaskVisibility.Visible, task));
             return task;
         }
@@ -851,14 +860,14 @@ namespace Utilities.Editor
             ShouldRefreshCloudFiles = false;
             ShouldFullyRefreshCloudFiles = false;
 
-            var task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(OnDriveList);
+            System.Threading.Tasks.Task task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(OnDriveList);
             Tasks.Add(new Task("Get Files", TaskVisibility.Visible, task));
             return task;
         }
 
         GoogleDriveFiles.GetRequest GetCloudFile(string fileId)
         {
-            var req = GoogleDriveFiles.Get(fileId);
+            GoogleDriveFiles.GetRequest req = GoogleDriveFiles.Get(fileId);
             req.OnDone += OnCloudFileGet;
             CloudFileTasks.Add((fileId, new Task("Get File", TaskVisibility.VisibleInContext, req)));
 
@@ -868,7 +877,7 @@ namespace Utilities.Editor
 
         System.Threading.Tasks.Task GetCloudFileByName(string name)
         {
-            var task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(_task =>
+            System.Threading.Tasks.Task task = Helpers.FindFilesByPathAsync(DriveBuildFolderPath).ContinueWith(_task =>
             {
                 File result = _task.Result.Find(_file => _file.Name == name);
                 OnCloudFileGet(result);
@@ -879,7 +888,7 @@ namespace Utilities.Editor
 
         GoogleDriveFiles.DeleteRequest DeleteCloudFile(string fileId)
         {
-            var req = GoogleDriveFiles.Delete(fileId);
+            GoogleDriveFiles.DeleteRequest req = GoogleDriveFiles.Delete(fileId);
             req.OnDone += OnCloudFileDelete;
             CloudFileTasks.Add((fileId, new Task("Delete File", TaskVisibility.VisibleInContext, req)));
 

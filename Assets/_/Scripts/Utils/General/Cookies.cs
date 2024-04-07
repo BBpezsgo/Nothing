@@ -18,8 +18,7 @@ static class CookiesLib
     [DllImport("__Internal")]
     public static extern string GetCookies();
 #else
-    [SuppressMessage("Style", "IDE0060")]
-    public static void SetCookies(string cookies) { }
+    public static void SetCookies(string _) { }
 
     public static string GetCookies() => string.Empty;
 #endif
@@ -122,7 +121,7 @@ public static class Cookies
             { builder.Append($" max-age={MaxAge};"); }
 
             if (Partitioned)
-            { builder.Append($" partitioned;"); }
+            { builder.Append(" partitioned;"); }
 
             if (!string.IsNullOrWhiteSpace(Path))
             { builder.Append($" path={Path};"); }
@@ -139,10 +138,7 @@ public static class Cookies
     {
         Dictionary<string, string> cookies = GetCookies().ToDictionary();
 
-        if (cookies.ContainsKey(cookie.Key))
-        { cookies[cookie.Key] = cookie.Value; }
-        else
-        { cookies.Add(cookie.Key, cookie.Value); }
+        cookies[cookie.Key] = cookie.Value;
 
         Cookie[] convertedCookies = cookies.Select(v => (Cookie)v).ToArray();
         SetCookies(convertedCookies);
@@ -173,7 +169,7 @@ public static class Cookies
         return CookieParser.Parse(data);
     }
 
-    public class CookieParser
+    public static class CookieParser
     {
         public class CookieClass
         {

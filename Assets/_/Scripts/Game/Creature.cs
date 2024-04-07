@@ -304,8 +304,6 @@ namespace Game.Components
         void Destroy()
         {
             if (!NetcodeUtils.IsOfflineOrServer) return;
-
-
             GameObject.Destroy(gameObject);
         }
 

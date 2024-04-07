@@ -1,8 +1,6 @@
 using System.Collections;
 using Game.Managers;
-
 using UnityEngine;
-
 using Utilities;
 
 namespace Game.Components
@@ -254,62 +252,10 @@ namespace Game.Components
                 rb.velocity += Acceleration * Time.fixedDeltaTime * rb.velocity.normalized;
             }
 
-            Debug3D.DrawPoint(lastPosition, .5f, Color.gray);
-            Debug3D.DrawPoint(transform.position, .5f, Color.white);
+            CheckImpact(lastPosition);
 
             positionDelta = transform.position - lastPosition;
-
-            Debug.DrawRay(lastPosition, positionDelta, Color.white, Time.fixedDeltaTime);
-
-            int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude, HitLayerMask);
-
             lastPosition = transform.position;
-
-            if (hitCount > 0)
-            {
-                int closestI = -1;
-                float closestD = float.MaxValue;
-
-                for (int i = 0; i < hitCount; i++)
-                {
-                    if (!hits[i].collider.gameObject.HasComponent<Projectile>())
-                    {
-                        if (hits[i].collider.isTrigger &&
-                            (hits[i].collider.gameObject.name != "Water" || !DieInWater))
-                        { continue; }
-                    }
-                    else if (PropabilityOfProjectileIntersection <= 0f)
-                    { continue; }
-
-                    if (hits[i].transform == transform)
-                    { continue; }
-
-                    if (ignoreCollision.Contains(hits[i].transform))
-                    { continue; }
-
-                    if (closestI == -1)
-                    {
-                        closestI = i;
-                    }
-                    else
-                    {
-                        float d = (lastPosition - hits[i].point).sqrMagnitude;
-                        if (d < closestD)
-                        {
-                            closestD = d;
-                            closestI = i;
-                        }
-                    }
-                }
-
-                if (closestI != -1)
-                {
-                    if (Impact(hits[closestI].point, hits[closestI].normal, hits[closestI].collider))
-                    {
-                        return;
-                    }
-                }
-            }
 
             if (rotationSpeedX != 0f ||
                 rotationSpeedY != 0f ||
@@ -400,6 +346,67 @@ namespace Game.Components
                 normal = Vector3.up;
             }
             Impact(point, normal, collision.collider);
+        }
+
+        bool CheckImpact(Vector3 lastPosition)
+        {
+            Debug3D.DrawPoint(lastPosition, .5f, Color.gray);
+            Debug3D.DrawPoint(transform.position, .5f, Color.white);
+
+            Debug.DrawRay(lastPosition, positionDelta, Color.white, Time.fixedDeltaTime);
+
+            int hitCount = Physics.RaycastNonAlloc(lastPosition, positionDelta, hits, positionDelta.magnitude, HitLayerMask);
+
+            if (hitCount <= 0)
+            { return false; }
+
+            int closestI = -1;
+            float closestD = float.MaxValue;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                ref RaycastHit hit = ref hits[i];
+
+                if (hit.collider.gameObject.HasComponent<Projectile>())
+                {
+                    if (PropabilityOfProjectileIntersection <= 0f)
+                    { continue; }
+                }
+                else
+                {
+                    if (hit.collider.isTrigger &&
+                        (hit.collider.gameObject.name != "Water" || !DieInWater))
+                    { continue; }
+                }
+
+                if (hit.transform == transform)
+                { continue; }
+
+                if (ignoreCollision.Contains(hit.transform))
+                { continue; }
+
+                if (closestI == -1)
+                {
+                    closestI = i;
+                }
+                else
+                {
+                    float d = (lastPosition - hit.point).sqrMagnitude;
+                    if (d < closestD)
+                    {
+                        closestD = d;
+                        closestI = i;
+                    }
+                }
+            }
+
+            if (closestI == -1)
+            { return false; }
+
+            if (!Impact(hits[closestI].point, hits[closestI].normal, hits[closestI].collider))
+            { return false; }
+
+            return true;
         }
 
         bool Impact(Vector3 at, Vector3 normal, Collider obj, bool force = false)
@@ -608,8 +615,8 @@ namespace Game.Components
 
         bool Explode(Vector3 origin, float absorbed)
         {
-            if (ExploisonRadius <= 0f ||
-                destroyed) return false;
+            if (ExploisonRadius <= 0f || destroyed)
+            { return false; }
 
             destroyed = true;
 
@@ -626,7 +633,7 @@ namespace Game.Components
                     if (objectCollider.isTrigger)
                     {
                         if (objectCollider.gameObject.TryGetComponent(out Projectile otherProjectile))
-                        { otherProjectile.OnOtherExplosion(this); }
+                        { otherProjectile.OnOtherExplosion(); }
                         else
                         { continue; }
                     }
@@ -665,7 +672,7 @@ namespace Game.Components
             return false;
         }
 
-        private void OnOtherExplosion(Projectile explosionSource)
+        private void OnOtherExplosion()
         {
             if (!DestroyInExploisons) return;
             if (destroyed) return;
@@ -705,7 +712,7 @@ namespace Game.Components
             if (Owner == null) return;
             if (Owner is not UnitAttacker owner) return;
 
-            owner.Turret.NotifyDamage(this, damages);
+            owner.Turret.NotifyDamage(damages);
         }
     }
 }

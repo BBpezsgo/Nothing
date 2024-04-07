@@ -262,7 +262,6 @@ namespace Game.Components
                 HasDustParticles = false;
             }
 
-
             if (waterParticles)
             {
                 waterParticlesEmission = waterParticles.emission;
@@ -531,7 +530,7 @@ namespace Game.Components
 
             Vector3 rayOrigin = Collider.bounds.center;
             Vector3 raySize = Collider.bounds.size;
-            var rayLength = 0.1f;
+            float rayLength = 0.1f;
 
             Gizmos.DrawWireCube(rayOrigin, raySize);
             Gizmos.DrawWireCube(rayOrigin - (transform.up * rayLength), raySize);

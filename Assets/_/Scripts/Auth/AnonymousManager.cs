@@ -1,14 +1,15 @@
 using DataUtilities.ReadableFileFormat;
-using DataUtilities.Serializer;
 
 using Game.Components;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utilities;
 
 #nullable enable
 
@@ -131,7 +132,7 @@ namespace Authentication.Providers
         }
 
         [Serializable]
-        class AnonymousUser : ISerializable<AnonymousUser>, ISerializableText, IDeserializableText
+        class AnonymousUser : ISerializable, ISerializableText, IDeserializableText
         {
             [ReadOnly] public string ID;
             [ReadOnly] public string? DisplayName;
@@ -144,33 +145,33 @@ namespace Authentication.Providers
                 Friends = new List<string>();
             }
 
-            public void Deserialize(Deserializer deserializer)
+            public void Deserialize(BinaryReader deserializer)
             {
-                ID = deserializer.DeserializeString() ?? string.Empty;
-                DisplayName = deserializer.DeserializeString()!;
-                Friends = deserializer.DeserializeArray<string>().ToList();
+                ID = deserializer.ReadString() ?? string.Empty;
+                DisplayName = deserializer.ReadString()!;
+                Friends = deserializer.ReadArray(deserializer.ReadString).ToList();
+            }
+
+            public void Serialize(BinaryWriter serializer)
+            {
+                serializer.Write(ID);
+                serializer.Write(DisplayName);
+                serializer.Write(Friends.ToArray(), serializer.Write);
             }
 
             public void DeserializeText(Value data)
             {
-                ID = data["ID"].String ?? throw new System.Exception($"Field ID not found");
+                ID = data["ID"].String ?? throw new Exception("Field ID not found");
                 DisplayName = data["DisplayName"].String ?? string.Empty;
                 Friends = data["Friends"].Array!.ConvertPrimitive<string>().ToList();
-            }
-
-            public void Serialize(Serializer serializer)
-            {
-                serializer.Serialize(ID);
-                serializer.Serialize(DisplayName);
-                serializer.Serialize(Friends.ToArray());
             }
 
             public Value SerializeText()
             {
                 Value result = Value.Object();
 
-                result["ID"] = Value.Literal(ID);
-                result["DisplayName"] = Value.Literal(DisplayName);
+                result["ID"] = ID;
+                result["DisplayName"] = DisplayName;
                 result["Array"] = Value.Object(Friends.ToArray());
 
                 return result;

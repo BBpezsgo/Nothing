@@ -17,14 +17,10 @@ namespace Game.UI
         void Start()
         {
             UI = GetComponent<UIDocument>();
-        }
-
-        void OnEnable()
-        {
             LabelStatus = UI.rootVisualElement.Q<Label>("label-status");
             UI.rootVisualElement.Q<Button>("button-cancel").clicked += OnButtonCancel;
         }
-
+ 
         void OnButtonCancel()
         {
             NetworkManager.Singleton.Shutdown();

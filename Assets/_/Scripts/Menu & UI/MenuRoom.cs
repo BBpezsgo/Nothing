@@ -1,3 +1,4 @@
+using Netcode.Transports.Offline;
 using Netcode.Transports.WebSocket;
 
 using Networking;
@@ -124,6 +125,8 @@ namespace Game.UI
             { LabelRoomName.text = $"{unityTransport.ConnectionData.Address}:{unityTransport.ConnectionData.Port}"; }
             else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is WebSocketTransport webSocketTransport)
             { LabelRoomName.text = $"{(webSocketTransport.SecureConnection ? "wss" : "ws")}://{webSocketTransport.ConnectAddress}:{webSocketTransport.Port}{webSocketTransport.Path}"; }
+            else if (NetworkManager.Singleton.NetworkConfig.NetworkTransport is OfflineTransport)
+            { LabelRoomName.text = "Offline"; }
             else
             { LabelRoomName.text = "?"; }
 

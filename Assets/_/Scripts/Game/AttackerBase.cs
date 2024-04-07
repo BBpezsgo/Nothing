@@ -234,7 +234,7 @@ namespace Game.Components
 
                 Vector3 newRotation = turret.ScopeHolder.localRotation.eulerAngles + new Vector3(Mouse.DeltaY * (-scopeSensitivity), Mouse.DeltaX * scopeSensitivity, 0f);
 
-                newRotation.x = GeneralUtils.NormalizeAngle(newRotation.x);
+                newRotation.x = Maths.NormalizeAngle(newRotation.x);
 
                 float minAngle = -Maths.Abs(turret.cannonHighestAngle);
                 float maxAngle = Maths.Abs(turret.cannonLowestAngle);

@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+#nullable enable
 
 public class SceneManager : SingleInstance<SceneManager>
 {
@@ -12,15 +12,15 @@ public class SceneManager : SingleInstance<SceneManager>
 
     const int BaseScene = 0;
 
-    public static IReadOnlyList<string> Scenes => instance.scenes;
-    public static string LoadedScene
+    public static IReadOnlyList<string> Scenes => Instance.scenes;
+    public static string? LoadedScene
     {
         get
         {
-            for (int i = 0; i < instance.scenes.Count; i++)
+            foreach (Scene scene in AllScenes)
             {
-                if (UnityEngine.SceneManagement.SceneManager.GetSceneByName(instance.scenes[i]).isLoaded)
-                { return instance.scenes[i]; }
+                if (scene.isLoaded && Instance.scenes.Contains(scene.name))
+                { return scene.name; }
             }
             return null;
         }
@@ -40,6 +40,16 @@ public class SceneManager : SingleInstance<SceneManager>
         {
             if (instance == null) return new List<AsyncOperation>();
             return instance.sceneUnloadings;
+        }
+    }
+    public static IEnumerable<Scene> AllScenes
+    {
+        get
+        {
+
+            int n = UnityEngine.SceneManagement.SceneManager.sceneCount;
+            for (int i = 0; i < n; i++)
+            { yield return UnityEngine.SceneManagement.SceneManager.GetSceneAt(i); }
         }
     }
 
@@ -110,7 +120,7 @@ public class SceneManager : SingleInstance<SceneManager>
         }
     }
 
-    internal static void UnloadAllScenes()
+    public static void UnloadAllScenes()
     {
         int n = UnityEngine.SceneManagement.SceneManager.sceneCount;
         for (int i = 0; i < n; i++)
@@ -138,5 +148,15 @@ public class SceneManager : SingleInstance<SceneManager>
                 Debug.Log($"[{nameof(SceneManager)}]: Scene unloading status: {status}");
             }
         }
+    }
+
+    public static bool IsLoaded(string scene)
+    {
+        foreach (Scene _scene in AllScenes)
+        {
+            if (_scene.isLoaded && Instance.scenes.Contains(_scene.name))
+            { return true; }
+        }
+        return false;
     }
 }

@@ -6,8 +6,8 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using DataUtilities.ReadableFileFormat;
-using DataUtilities.Serializer;
 using UnityEngine;
+using Utilities;
 
 public static class Settings
 {
@@ -15,19 +15,19 @@ public static class Settings
 
     public static string Path => Application.persistentDataPath + "/settings.bin";
 
-    public class Data : ISerializable<Data>, IFullySerializableText
+    public class Data : Utilities.ISerializable, IFullySerializableText
     {
-        public class DataVolume : ISerializable<DataVolume>, IFullySerializableText
+        public class DataVolume : Utilities.ISerializable, IFullySerializableText
         {
             public float Master = 0f;
             public float VFX = 0f;
             public float UI = 0f;
 
-            public void Deserialize(Deserializer deserializer)
+            public void Deserialize(BinaryReader reader)
             {
-                Master = deserializer.DeserializeFloat();
-                VFX = deserializer.DeserializeFloat();
-                UI = deserializer.DeserializeFloat();
+                Master = reader.ReadSingle();
+                VFX = reader.ReadSingle();
+                UI = reader.ReadSingle();
             }
 
             public void DeserializeText(Value data)
@@ -37,11 +37,11 @@ public static class Settings
                 UI = data["UI"].Float ?? 0f;
             }
 
-            public void Serialize(Serializer serializer)
+            public void Serialize(BinaryWriter writer)
             {
-                serializer.Serialize(Master);
-                serializer.Serialize(VFX);
-                serializer.Serialize(UI);
+                writer.Write(Master);
+                writer.Write(VFX);
+                writer.Write(UI);
             }
 
             public Value SerializeText()
@@ -76,14 +76,14 @@ public static class Settings
             };
         }
 
-        public void Serialize(Serializer serializer)
+        public void Serialize(BinaryWriter writer)
         {
-            serializer.Serialize(Volume);
+            writer.Write(Volume);
         }
 
-        public void Deserialize(Deserializer deserializer)
+        public void Deserialize(BinaryReader reader)
         {
-            Volume = deserializer.DeserializeObject<DataVolume>();
+            Volume = reader.ReadObj<DataVolume>();
         }
 
         public Value SerializeText()
@@ -116,7 +116,7 @@ public static class Settings
     {
         if (Logs) Debug.Log("[Settings]: Saving to file ...");
 
-        byte[] serialized = SerializerStatic.Serialize(data);
+        byte[] serialized = Serializing.Serialize(data);
         File.WriteAllBytes(Path, serialized);
 
         if (Logs) Debug.Log("[Settings]: Saved to file");
@@ -127,8 +127,7 @@ public static class Settings
 
         if (!File.Exists(Path)) return Data.Default;
 
-        Deserializer deserializer = new(File.ReadAllBytes(Path));
-        return deserializer.DeserializeObject<Data>();
+        return Serializing.Deserialize<Data>(File.ReadAllBytes(Path));
     }
 }
 
@@ -212,7 +211,7 @@ public static class GameConfigManager
     }
 
     [Serializable]
-    public struct GameConfig : ISerializable, ISerializable<GameConfig>, IFullySerializableText
+    public struct GameConfig : Utilities.ISerializable, System.Runtime.Serialization.ISerializable, IFullySerializableText
     {
         public ushort netcode_tcpServer_port;
 
@@ -231,14 +230,14 @@ public static class GameConfigManager
             info.AddValue("netcode_tcpServer_port", netcode_tcpServer_port);
         }
 
-        public readonly void Serialize(Serializer serializer)
+        public readonly void Serialize(BinaryWriter serializer)
         {
-            serializer.Serialize(netcode_tcpServer_port);
+            serializer.Write(netcode_tcpServer_port);
         }
 
-        public void Deserialize(Deserializer deserializer)
+        public void Deserialize(BinaryReader deserializer)
         {
-            netcode_tcpServer_port = deserializer.DeserializeUInt16();
+            netcode_tcpServer_port = deserializer.ReadUInt16();
         }
 
         public readonly Value SerializeText()

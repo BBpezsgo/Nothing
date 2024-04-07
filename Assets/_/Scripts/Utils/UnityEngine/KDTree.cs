@@ -113,7 +113,6 @@ public class KDTree
         }
     }
 
-
     /// <summary>
     /// Find a new pivot index from the range by splitting the points that fall either side
     /// of its plane.

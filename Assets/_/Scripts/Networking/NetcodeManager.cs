@@ -69,6 +69,7 @@ namespace Networking.Managers
             Window = IMGUIManager.Instance.CreateWindow(new Rect(5f, 5f, 250f, 150f));
             Window.Title = "Netcode Scenes";
             Window.Visible = true;
+            Window.Skin = IMGUIManager.Instance.Skin;
             Window.DrawContent = OnWindowGUI;
         }
 
@@ -76,7 +77,7 @@ namespace Networking.Managers
         {
             foreach (KeyValuePair<ulong, SceneLoadInfo> info in sceneLoadings)
             {
-                GUILayout.BeginVertical(GUI.skin.box, GUILayout.MinWidth(200f));
+                GUILayout.BeginVertical(GUI.skin.box);
                 GUILayout.Label(info.Key == NetworkManager.ServerClientId ? "Server" : $"Client #{info.Key}");
 
                 if (info.Value.IsDone)
@@ -116,7 +117,7 @@ namespace Networking.Managers
 
             foreach (KeyValuePair<ulong, SceneUnloadInfo> info in sceneUnloadings)
             {
-                GUILayout.BeginVertical(GUI.skin.box, GUILayout.MinWidth(200f));
+                GUILayout.BeginVertical(GUI.skin.box);
                 GUILayout.Label(info.Key == NetworkManager.ServerClientId ? "Server" : $"Client #{info.Key}");
 
                 if (info.Value.IsDone)
@@ -154,12 +155,21 @@ namespace Networking.Managers
                 GUILayout.EndVertical();
             }
 
+            foreach (ulong info in sceneSynchronizations)
+            {
+                GUILayout.BeginVertical(GUI.skin.box);
+
+                GUILayout.Label($"{info}");
+
+                GUILayout.EndVertical();
+            }
+
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
         void Update()
         {
-            Window.Visible = sceneLoadings.Count != 0 && sceneUnloadings.Count != 0;
+            Window.Visible = sceneLoadings.Count != 0 || sceneUnloadings.Count != 0 || sceneSynchronizations.Count != 0;
 
             if (!BaseEventsRegistered && NetworkManager.Singleton != null)
             {

@@ -132,7 +132,7 @@ namespace Networking
             if (IsServer)
             {
                 Debug.Log($"[{nameof(NetcodeServices)}]: Client #{id} connected, sending USER_DATA_REQUEST_DIRECT ...");
-                NetcodeMessaging.SendUnnamedMessage(new EmptyHeader(new MessageHeader(MessageType.USER_DATA_REQUEST_DIRECT, NetworkManager.LocalClientId)), id, NetworkDelivery.Reliable);
+                NetcodeMessaging.SendUnnamedMessage(new EmptyHeader(new MessageHeader(MessageType.UserDataRequestDirect, NetworkManager.LocalClientId)), id, NetworkDelivery.Reliable);
             }
 
             if (Clients.ContainsKey(id))
@@ -268,14 +268,14 @@ namespace Networking
 
             if (IsServer)
             {
-                NetcodeMessaging.BroadcastUnnamedMessage(new UserDataRequestHeader(new MessageHeader(MessageType.USER_DATA_REQUEST, NetworkManager.LocalClientId))
+                NetcodeMessaging.BroadcastUnnamedMessage(new UserDataRequestHeader(new MessageHeader(MessageType.UserDataRequest, NetworkManager.LocalClientId))
                 {
                     ID = userId,
                 });
             }
             else
             {
-                NetcodeMessaging.SendUnnamedMessage(new UserDataRequestHeader(new MessageHeader(MessageType.USER_DATA_REQUEST, NetworkManager.LocalClientId))
+                NetcodeMessaging.SendUnnamedMessage(new UserDataRequestHeader(new MessageHeader(MessageType.UserDataRequest, NetworkManager.LocalClientId))
                 {
                     ID = userId,
                 }, NetworkManager.ServerClientId);

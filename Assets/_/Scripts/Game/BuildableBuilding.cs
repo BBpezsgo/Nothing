@@ -31,7 +31,7 @@ namespace Game.Components
             BuildingProcessRequied = processRequied;
 
             PlayerData playerData = PlayerData.GetPlayerData(Team);
-            var buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
+            var buildings = (playerData == null) ? new StaticPlayerData.ConstructableBuilding[0] : playerData.Data.ConstructableBuildings.ToArray();
             for (int i = 0; i < buildings.Length; i++)
             {
                 if (buildings[i].Hash != buildingHash) continue;
@@ -122,7 +122,7 @@ namespace Game.Components
             if (serializer.IsReader)
             {
                 PlayerData playerData = PlayerData.GetPlayerData(Team);
-                var buildings = (playerData == null) ? new PlayerData.ConstructableBuilding[0] : playerData.ConstructableBuildings.ToArray();
+                var buildings = (playerData == null) ? new StaticPlayerData.ConstructableBuilding[0] : playerData.Data.ConstructableBuildings.ToArray();
                 for (int i = 0; i < buildings.Length; i++)
                 {
                     if (buildings[i].Hash != BuildingHash) continue;

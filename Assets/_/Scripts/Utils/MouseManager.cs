@@ -15,7 +15,12 @@ namespace Game.Managers
         [SerializeField, ReadOnly] float TimeToNextUICollecting = 1f;
         [SerializeField, ReadOnly, NonReorderable] UIDocument[] UIDocuments;
 
+        [SerializeField, ReadOnly] bool IsFocused;
+        [SerializeField, ReadOnly] bool isFocusing;
+
         [SerializeField] bool ShowDebugStuff;
+
+        public static bool IsFocusing => Instance.isFocusing;
 
         public static bool MouseOnWindow
         {
@@ -69,6 +74,10 @@ namespace Game.Managers
 
             for (int i = 0; i < Touches.Count; i++)
             { Touches[i].Update(); }
+
+            bool isFocused = Application.isFocused;
+            isFocusing = isFocused && !IsFocused;
+            IsFocused = isFocused;
         }
 
         internal static bool IsOverUI(Vector2 screenPosition)

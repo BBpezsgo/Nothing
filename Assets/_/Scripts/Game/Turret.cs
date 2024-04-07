@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Utilities;
+using UnityEngine.Serialization;
 
 #nullable enable
 
@@ -130,7 +131,8 @@ namespace Game.Components
         public ref TurretBarrel NextBarrel => ref Barrels[NextShoot];
 
         [SerializeField, ReadOnly] bool HasBarrel;
-        [SerializeField] public float RequiedBarrelRotationSpeed = 0f;
+        [FormerlySerializedAs("RequiedBarrelRotationSpeed")]
+        [SerializeField] public float RequiredBarrelRotationSpeed = 0f;
         [SerializeField] public float BarrelRotationAcceleration = 0f;
         [SerializeField, ReadOnly] float BarrelRotationSpeed = 0f;
         [SerializeField, ReadOnly] public bool PrepareShooting = false;
@@ -161,9 +163,9 @@ namespace Game.Components
         [SerializeField] Transform shootPosition = null!;
 
         [SerializeField] public GameObject projectile = null!;
-        PooledObject? PooledProjectile;
+        PooledPrefab PooledProjectile;
         [SerializeField] public GameObject[] Projectiles = null!;
-        PooledObject[] PooledProjectiles = null!;
+        PooledPrefab[] PooledProjectiles = null!;
         [SerializeField] float Randomness = 0f;
         [SerializeField] Vector2Int BulletCount = Vector2Int.one;
 
@@ -179,12 +181,12 @@ namespace Game.Components
             }
         }
 
-        public PooledObject? CurrentProjectile
+        public PooledPrefab CurrentProjectile
         {
             get
             {
                 if (PooledProjectile != null) return PooledProjectile;
-                if (SelectedProjectile < 0 || SelectedProjectile >= PooledProjectiles.Length) return null;
+                if (SelectedProjectile < 0 || SelectedProjectile >= PooledProjectiles.Length) return default;
                 return PooledProjectiles[SelectedProjectile];
             }
         }
@@ -218,7 +220,7 @@ namespace Game.Components
 
         [SerializeField, ReadOnly] public float Range;
 
-        readonly List<(Projectile, Vector3)> shots = new();
+        readonly List<(Projectile Projectile, Vector3 PredictedImpact)> shots = new();
 
         public Vector3 ShootPosition => NextBarrel.ShootPosition.position;
 
@@ -358,7 +360,7 @@ namespace Game.Components
 
             if (Projectiles.Length > 0)
             {
-                PooledProjectiles = new PooledObject[Projectiles.Length];
+                PooledProjectiles = new PooledPrefab[Projectiles.Length];
                 for (int i = 0; i < Projectiles.Length; i++)
                 {
                     PooledProjectiles[i] = ObjectPool.Instance.GeneratePool(Projectiles[i]);
@@ -405,9 +407,9 @@ namespace Game.Components
 
                 if (PrepareShooting)
                 {
-                    if (BarrelRotationSpeed < RequiedBarrelRotationSpeed)
+                    if (BarrelRotationSpeed < RequiredBarrelRotationSpeed)
                     {
-                        BarrelRotationSpeed = Maths.Min(BarrelRotationSpeed + (BarrelRotationAcceleration * Time.deltaTime), RequiedBarrelRotationSpeed);
+                        BarrelRotationSpeed = Maths.Min(BarrelRotationSpeed + (BarrelRotationAcceleration * Time.deltaTime), RequiredBarrelRotationSpeed);
                     }
                 }
                 else
@@ -645,9 +647,9 @@ namespace Game.Components
         {
             float error = 0f;
             error += Maths.Abs(input.x - transform.rotation.eulerAngles.y);
-            error = GeneralUtils.NormalizeAngle360(error);
+            error = Maths.NormalizeAngle360(error);
             error += Maths.Abs(input.y - CannonLocalRotation);
-            error = GeneralUtils.NormalizeAngle360(error);
+            error = Maths.NormalizeAngle360(error);
             error *= .5f;
             error /= 360f;
             return error;
@@ -785,16 +787,19 @@ namespace Game.Components
             { return false; }
 
             if (NextBarrel.Barrel != null &&
-                BarrelRotationSpeed < RequiedBarrelRotationSpeed)
+                BarrelRotationSpeed < RequiredBarrelRotationSpeed)
             { return false; }
 
             bool instantiatedAnyProjectile = false;
             for (int i = 0; i < bulletCount; i++)
             {
-                GameObject? newProjectile = CurrentProjectile?.Instantiate(NextBarrel.ShootPosition.position, NextBarrel.ShootPosition.rotation, ObjectGroups.Projectiles);
+                GameObject? newProjectile = CurrentProjectile.Instantiate(NextBarrel.ShootPosition.position, NextBarrel.ShootPosition.rotation, ObjectGroups.Projectiles);
 
                 if (newProjectile == null)
-                { continue; }
+                {
+                    Debug.LogWarning($"Failed to instantiate projectile", this);
+                    continue;
+                }
 
                 instantiatedAnyProjectile = true;
 
@@ -886,13 +891,13 @@ namespace Game.Components
         {
             for (int i = shots.Count - 1; i >= 0; i--)
             {
-                if (shots[i].Item1 != projectile) continue;
-                // Vector3 error = at - shots[i].Item2;
+                if (shots[i].Projectile != projectile) continue;
+                Vector3 error = at - shots[i].PredictedImpact;
                 shots.RemoveAt(i);
             }
         }
 
-        public void NotifyDamage(Projectile projectile, (Vector3 Position, float Amount, DamageKind Kind)[] damages)
+        public void NotifyDamage((Vector3 Position, float Amount, DamageKind Kind)[] damages)
         {
             if (@base is ICanTakeControl canTakeControl)
             { canTakeControl.OnDamagedSomebody?.Invoke(damages); }

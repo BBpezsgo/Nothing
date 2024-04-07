@@ -5531,7 +5531,7 @@ MonoBehaviour:
     OriginalLocalPosition: {x: 0, y: 0, z: 0}
     KnockbackState: 0
   HasBarrel: 0
-  RequiedBarrelRotationSpeed: 0
+  RequiredBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
   PrepareShooting: 0
@@ -5551,7 +5551,7 @@ MonoBehaviour:
   projectile: {fileID: 4399164710629436118, guid: fb0ffcdcd67310b418a89528270621a0,
     type: 3}
   Projectiles: []
-  Randomness: 0
+  Randomness: 5
   BulletCount: {x: 1, y: 1}
   Shells: {fileID: 0}
   SelectedProjectile: 0
@@ -6038,7 +6038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4232526036
+  GlobalObjectIdHash: 4283352884
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

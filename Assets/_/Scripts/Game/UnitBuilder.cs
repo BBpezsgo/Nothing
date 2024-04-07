@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using AssetManager;
 using UnityEngine;
 
 namespace Game.Components

@@ -73,8 +73,7 @@ namespace UI
         [ReadOnly] public GUISkin Skin;
         [ReadOnly] public Draw DrawContent;
         [ReadOnly] public string Title;
-
-        [SerializeField, ReadOnly] Rect Rect;
+        [ReadOnly, SerializeField] Rect Rect;
 
         readonly int id;
 

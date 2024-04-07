@@ -184,14 +184,22 @@ namespace Game.UI
         {
             LabelSocketError.text = string.Empty;
             NetworkDiscovery.Instance.StopDiscovery();
-            StartCoroutine(NetcodeUtils.HostAsync(InputSocket.value, error => { if (error != null) LabelSocketError.text = error; }, this));
+            GlobalCoroutines.Run(NetcodeUtils.HostAsync(InputSocket.value, error =>
+            {
+                if (error != null)
+                { LabelSocketError.text = error; }
+            }, this));
         }
 
         void ButtonConnect()
         {
             LabelSocketError.text = string.Empty;
             NetworkDiscovery.Instance.StopDiscovery();
-            StartCoroutine(NetcodeUtils.ConnectAsync(InputSocket.value, error => { if (error != null) LabelSocketError.text = error; }, this));
+            GlobalCoroutines.Run(NetcodeUtils.ConnectAsync(InputSocket.value, error =>
+            {
+                if (error != null)
+                { LabelSocketError.text = error; }
+            }, this));
         }
     }
 }

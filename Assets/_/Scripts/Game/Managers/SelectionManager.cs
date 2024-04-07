@@ -111,8 +111,9 @@ namespace Game.Managers
             ClearAlmostSelection();
             Vector3 mousePosition = Input.mousePosition;
 
-            if (mousePosition.x == int.MinValue ||
-                mousePosition.y == int.MinValue)
+            if (mousePosition.x < 0f ||
+                mousePosition.y < 0f ||
+                !mousePosition.IsOk())
             { return; }
 
             Ray ray = MainCamera.Camera.ScreenPointToRay(mousePosition);
@@ -121,7 +122,7 @@ namespace Game.Managers
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].collider.isTrigger) continue;
-                if (hits[i].transform.gameObject.TryGetComponent<Selectable>(out var unit))
+                if (hits[i].transform.gameObject.TryGetComponent(out Selectable unit))
                 {
                     AddAlmostSelection(unit);
                     return;
@@ -155,7 +156,7 @@ namespace Game.Managers
             Selectable[] allUnits = FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             for (int i = 0; i < allUnits.Length; i++)
             {
-                var screenPoint = Camera.main.WorldToScreenPoint(allUnits[i].transform.position);
+                Vector3 screenPoint = Camera.main.WorldToScreenPoint(allUnits[i].transform.position);
                 if (screenPoint.x < min.x) continue;
                 if (screenPoint.y < min.y) continue;
                 if (screenPoint.x > max.x) continue;
@@ -204,7 +205,7 @@ namespace Game.Managers
             Selectable[] allUnits = FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             for (int i = 0; i < allUnits.Length; i++)
             {
-                var screenPoint = MainCamera.Camera.WorldToScreenPoint(allUnits[i].transform.position);
+                Vector3 screenPoint = MainCamera.Camera.WorldToScreenPoint(allUnits[i].transform.position);
                 if (screenPoint.x < min.x) continue;
                 if (screenPoint.y < min.y) continue;
                 if (screenPoint.x > max.x) continue;
@@ -423,7 +424,8 @@ namespace Game.Managers
             Vector3 mousePosition = Input.mousePosition;
 
             if (mousePosition.x == int.MinValue ||
-                mousePosition.y == int.MinValue)
+                mousePosition.y == int.MinValue ||
+                !mousePosition.IsOk())
             { return false; }
 
             Ray ray = MainCamera.Camera.ScreenPointToRay(mousePosition);

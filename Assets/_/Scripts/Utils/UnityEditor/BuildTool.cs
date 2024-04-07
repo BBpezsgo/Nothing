@@ -5,15 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-
 using Unity.EditorCoroutines.Editor;
-
 using UnityEditor;
 using UnityEditor.Build.Reporting;
-
 using UnityEngine;
-
 using Debug = UnityEngine.Debug;
+
+#nullable enable
 
 namespace Utilities.Editor
 {
@@ -50,11 +48,8 @@ namespace Utilities.Editor
         {
             AvailableTargets.Clear();
 
-            var buildTargets = System.Enum.GetValues(typeof(BuildTarget));
-            foreach (var buildTargetValue in buildTargets)
+            foreach (BuildTarget buildTarget in Enum.GetValues(typeof(BuildTarget)))
             {
-                BuildTarget buildTarget = (BuildTarget)buildTargetValue;
-
                 if (!BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(buildTarget), buildTarget)) continue;
                 if (!TargetsToBuild.ContainsKey(buildTarget))
                 { TargetsToBuild.Add(buildTarget, new TargetSettings()); }
@@ -65,20 +60,20 @@ namespace Utilities.Editor
             if (TargetsToBuild.Count > AvailableTargets.Count)
             {
                 List<BuildTarget> targetsToRemove = new();
-                foreach (var target in TargetsToBuild.Keys)
+                foreach (BuildTarget target in TargetsToBuild.Keys)
                 {
                     if (!AvailableTargets.Contains(target))
                     { targetsToRemove.Add(target); }
                 }
 
-                foreach (var target in targetsToRemove)
+                foreach (BuildTarget target in targetsToRemove)
                 { TargetsToBuild.Remove(target); }
             }
         }
 
         void OnGUI()
         {
-            GUILayout.Label($"Platforms to Build", EditorStyles.boldLabel);
+            GUILayout.Label("Platforms to Build", EditorStyles.boldLabel);
 
             int numEnabled = 0;
             foreach (BuildTarget target in AvailableTargets)
@@ -100,7 +95,7 @@ namespace Utilities.Editor
             if (GUILayout.Button($"Build Selected Platforms ({numEnabled})"))
             {
                 List<BuildTarget> selectedPlatforms = new();
-                foreach (var target in TargetsToBuild.Keys)
+                foreach (BuildTarget target in TargetsToBuild.Keys)
                 {
                     if (!BuildPipeline.IsBuildTargetSupported(BuildPipeline.GetBuildTargetGroup(target), target)) continue;
                     if (!TargetsToBuild[target].IsAnySelected) continue;
@@ -111,13 +106,13 @@ namespace Utilities.Editor
             }
             GUI.enabled = true;
 
-            if (GUILayout.Button($"Open Folder"))
+            if (GUILayout.Button("Open Folder"))
             {
                 Process.Start("explorer.exe", BaseOutputPath.Replace('/', '\\'));
             }
 
             GUI.enabled = !IsCompressing;
-            if (GUILayout.Button($"Compress All"))
+            if (GUILayout.Button("Compress All"))
             {
                 List<string> folders = new();
 
@@ -134,19 +129,19 @@ namespace Utilities.Editor
             GUI.enabled = true;
         }
 
-        static void Compress(ValueTuple<string, string> p)
+        static void Compress((string SourceDirectory, string DestinationZip) p)
         {
-            if (!Directory.Exists(p.Item1)) return;
-            if (File.Exists(p.Item2))
-            { File.Delete(p.Item2); }
-            ZipFile.CreateFromDirectory(p.Item1, p.Item2, System.IO.Compression.CompressionLevel.Optimal, false);
+            if (!Directory.Exists(p.SourceDirectory)) return;
+            if (File.Exists(p.DestinationZip))
+            { File.Delete(p.DestinationZip); }
+            ZipFile.CreateFromDirectory(p.SourceDirectory, p.DestinationZip, System.IO.Compression.CompressionLevel.Optimal, false);
         }
 
         IEnumerator PerformCompress(string[] folders)
         {
             IsCompressing = true;
 
-            int progressId = Progress.Start("Compress", $"Compressing all build output folders", Progress.Options.Sticky);
+            int progressId = Progress.Start("Compress", "Compressing all build output folders", Progress.Options.Sticky);
             Progress.ShowDetails();
             Progress.SetTimeDisplayMode(progressId, Progress.TimeDisplayMode.NoTimeShown);
             yield return null;
@@ -206,25 +201,32 @@ namespace Utilities.Editor
                     Progress.SetStepLabel(buildAllProgressID, $"Build {target}");
                     yield return new EditorWaitForSeconds(1f);
 
-                    BuildReport buildResult = BuildIndividualTarget(target, false);
+                    BuildReport? buildResult = BuildIndividualTarget(target, false);
 
-                    switch (buildResult.summary.result)
+                    if (buildResult != null)
                     {
-                        case BuildResult.Succeeded:
-                            Progress.Finish(buildProgressID, Progress.Status.Succeeded);
-                            break;
-                        case BuildResult.Failed:
-                            Progress.Finish(buildProgressID, Progress.Status.Failed);
-                            anyBuildFailed = true;
-                            break;
-                        case BuildResult.Cancelled:
-                            Progress.Finish(buildProgressID, Progress.Status.Canceled);
-                            break;
-                        case BuildResult.Unknown:
-                        default:
-                            Progress.Finish(buildProgressID, Progress.Status.Failed);
-                            anyBuildFailed = true;
-                            break;
+                        switch (buildResult.summary.result)
+                        {
+                            case BuildResult.Succeeded:
+                                Progress.Finish(buildProgressID, Progress.Status.Succeeded);
+                                break;
+                            case BuildResult.Failed:
+                                Progress.Finish(buildProgressID, Progress.Status.Failed);
+                                anyBuildFailed = true;
+                                break;
+                            case BuildResult.Cancelled:
+                                Progress.Finish(buildProgressID, Progress.Status.Canceled);
+                                break;
+                            default:
+                                Progress.Finish(buildProgressID, Progress.Status.Failed);
+                                anyBuildFailed = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Progress.Finish(buildProgressID, Progress.Status.Failed);
+                        anyBuildFailed = true;
                     }
                     currentStep++;
                 }
@@ -234,25 +236,32 @@ namespace Utilities.Editor
                     Progress.SetStepLabel(buildAllProgressID, $"Build Dev {target}");
                     yield return new EditorWaitForSeconds(1f);
 
-                    BuildReport buildResult = BuildIndividualTarget(target, true);
+                    BuildReport? buildResult = BuildIndividualTarget(target, true);
 
-                    switch (buildResult.summary.result)
+                    if (buildResult != null)
                     {
-                        case BuildResult.Succeeded:
-                            Progress.Finish(buildProgressID, Progress.Status.Succeeded);
-                            break;
-                        case BuildResult.Failed:
-                            Progress.Finish(buildProgressID, Progress.Status.Failed);
-                            anyBuildFailed = true;
-                            break;
-                        case BuildResult.Cancelled:
-                            Progress.Finish(buildProgressID, Progress.Status.Canceled);
-                            break;
-                        case BuildResult.Unknown:
-                        default:
-                            Progress.Finish(buildProgressID, Progress.Status.Failed);
-                            anyBuildFailed = true;
-                            break;
+                        switch (buildResult.summary.result)
+                        {
+                            case BuildResult.Succeeded:
+                                Progress.Finish(buildProgressID, Progress.Status.Succeeded);
+                                break;
+                            case BuildResult.Failed:
+                                Progress.Finish(buildProgressID, Progress.Status.Failed);
+                                anyBuildFailed = true;
+                                break;
+                            case BuildResult.Cancelled:
+                                Progress.Finish(buildProgressID, Progress.Status.Canceled);
+                                break;
+                            default:
+                                Progress.Finish(buildProgressID, Progress.Status.Failed);
+                                anyBuildFailed = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Progress.Finish(buildProgressID, Progress.Status.Failed);
+                        anyBuildFailed = true;
                     }
                     currentStep++;
                 }
@@ -267,13 +276,13 @@ namespace Utilities.Editor
             yield return null;
         }
 
-        BuildReport BuildIndividualTarget(BuildTarget target, bool developmentBuild)
+        BuildReport? BuildIndividualTarget(BuildTarget target, bool developmentBuild)
         {
-            var userSettings = TargetsToBuild[target];
+            TargetSettings userSettings = TargetsToBuild[target];
 
             BuildPlayerOptions options = new();
 
-            var scenes = EditorBuildSettings.scenes.Select(scene => scene.path);
+            IEnumerable<string> scenes = EditorBuildSettings.scenes.Select(scene => scene.path);
             options.scenes = scenes.ToArray();
 
             options.target = target;
@@ -304,7 +313,7 @@ namespace Utilities.Editor
             {
                 report = BuildPipeline.BuildPlayer(options);
             }
-            catch (System.Exception exception)
+            catch (Exception exception)
             {
                 Debug.LogException(exception);
                 return null;
@@ -313,7 +322,7 @@ namespace Utilities.Editor
             return report;
         }
 
-        static DirectoryInfo SearchFolder(DirectoryInfo folder)
+        static DirectoryInfo? SearchFolder(DirectoryInfo folder)
         {
             DirectoryInfo[] folders = folder.GetDirectories();
             FileInfo[] files = folder.GetFiles();

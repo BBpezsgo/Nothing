@@ -351,14 +351,15 @@ namespace Game.Managers
             }
         }
 
-        ICanTakeControl? GetControllableAt(Vector3 worldPosition)
+        static readonly RaycastHit[] ControllableCastHits = new RaycastHit[5];
+        ICanTakeControl? GetControllableAt(Ray ray)
         {
-            System.ValueTuple<int, float> closest = units.Closest(worldPosition);
+            int n = Physics.RaycastNonAlloc(ray, ControllableCastHits, 500f, CursorHitLayer);
 
-            if (closest.Item2 < 5f)
+            for (int i = 0; i < n; i++)
             {
-                if (closest.Item1 < 0 || closest.Item1 >= units.Length) return null;
-                return units[closest.Item1];
+                if (ControllableCastHits[i].collider.gameObject.TryGetComponentInParent(out ICanTakeControl? canTakeControl))
+                { return canTakeControl; }
             }
 
             return null;
@@ -369,15 +370,13 @@ namespace Game.Managers
             if (!Input.GetKey(KeyCode.LeftControl)) return;
             if (!MouseManager.MouseOnWindow) return;
 
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
-
-            ICanTakeControl? controllable = GetControllableAt(worldPosition);
+            // Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
+            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position));
 
             if ((Object?)controllable != null)
             {
                 EnableMouseCooldown = .3f;
-                TakeControlResult result = TakeControl(controllable);
-                switch (result)
+                switch (TakeControl(controllable))
                 {
                     case TakeControlResult.SomebodyElseControllingThis:
                         PopupLabelManager.ShowLabel("Somebody else controlling this", controllable.Object().transform.position, Color.red, 2f);
@@ -385,7 +384,6 @@ namespace Game.Managers
                     case TakeControlResult.InternalError:
                         PopupLabelManager.ShowLabel("Internal Error", controllable.Object().transform.position, Color.red, 2f);
                         break;
-                    default: break;
                 }
             }
         }
@@ -726,9 +724,7 @@ namespace Game.Managers
             }
             if (!Input.GetKey(KeyCode.LeftControl)) return false;
 
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition, CursorHitLayer);
-
-            ICanTakeControl? controllable = GetControllableAt(worldPosition);
+            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(Input.mousePosition));
 
             if ((Object?)controllable == null) return false;
 
@@ -741,6 +737,7 @@ namespace Game.Managers
         {
             if (!NetcodeUtils.FindGameObject(objectID, out GameObject controllable))
             {
+                PopupLabelManager.ShowLabel($"Network object {objectID} not found", controllable.transform.position, Color.red, 2f); ;
                 Debug.LogWarning($"[{nameof(TakeControlManager)}]: Network object {objectID} not found", this);
                 return;
             }

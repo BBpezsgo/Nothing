@@ -20,37 +20,7 @@ public struct Pair<TKey, TValue>
     public static implicit operator Pair<TKey, TValue>(KeyValuePair<TKey, TValue> pair) => new(pair.Key, pair.Value);
 }
 
-namespace Utilities
-{
-    public static partial class GeneralUtils
-    {
-        /// <summary>
-        /// Normalizes the angle <paramref name="angle"/> between <c>[-180,180[</c>
-        /// </summary>
-        public static float NormalizeAngle(float angle)
-        {
-            angle %= 360;
-            if (angle > 180)
-            { return angle - 360; }
-            else
-            { return angle; }
-        }
-
-        /// <summary>
-        /// Normalizes the angle <paramref name="angle"/> between <c>[0,360[</c>
-        /// </summary>
-        public static float NormalizeAngle360(float angle)
-        {
-            angle %= 360;
-            if (angle < 0f)
-            { return angle + 360f; }
-            else
-            { return angle; }
-        }
-    }
-}
-
-public static partial class ListUtils
+public static class ListExtensions
 {
     public static string ToReadableString<T>(this T[] self)
     {
@@ -160,28 +130,28 @@ public static partial class ListUtils
     }
 }
 
-public class WindowsAPI
+public static class WindowsAPI
 {
     public enum Cursor : int
     {
-        StandardArrowAndSmallHourglass = 32650,
         StandardArrow = 32512,
-        Crosshair = 32515,
-        Hand = 32649,
-        ArrowAndQuestionMark = 32651,
         IBeam = 32513,
-        [Obsolete("Obsolete for applications marked version 4.0 or later.")]
-        Icon = 32641,
-        SlashedCircle = 32648,
+        Hourglass = 32514,
+        Crosshair = 32515,
+        VerticalArrow = 32516,
         [Obsolete(" Obsolete for applications marked version 4.0 or later. Use FourPointedArrowPointingNorthSouthEastAndWest")]
         Size = 32640,
-        FourPointedArrowPointingNorthSouthEastAndWest = 32646,
-        DoublePointedArrowPointingNortheastAndSouthwest = 32643,
-        DoublePointedArrowPointingNorthAndSouth = 32645,
+        [Obsolete("Obsolete for applications marked version 4.0 or later.")]
+        Icon = 32641,
         DoublePointedArrowPointingNorthwestAndSoutheast = 32642,
+        DoublePointedArrowPointingNortheastAndSouthwest = 32643,
         DoublePointedArrowPointingWestAndEast = 32644,
-        VerticalArrow = 32516,
-        Hourglass = 32514
+        DoublePointedArrowPointingNorthAndSouth = 32645,
+        FourPointedArrowPointingNorthSouthEastAndWest = 32646,
+        SlashedCircle = 32648,
+        Hand = 32649,
+        StandardArrowAndSmallHourglass = 32650,
+        ArrowAndQuestionMark = 32651
     }
 
 #if (PLATFORM_STANDALONE_WIN || UNITY_EDITOR_WIN)
@@ -205,7 +175,8 @@ public class WindowsAPI
     public static readonly bool IsSupported = false;
 
     /// <exception cref="PlatformNotSupportedException"/>
-    public static void SetCursor(Cursor cursor) => throw new PlatformNotSupportedException($"Win32 APIs not supported on the current platform");
+    [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+    public static void SetCursor(Cursor cursor) => throw new PlatformNotSupportedException("Win32 APIs not supported on the current platform");
 
 #endif
 }

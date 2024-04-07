@@ -282,7 +282,7 @@ namespace Game.Managers
             {
                 case CameraMode.Normal:
                     {
-                        if (!MenuManager.AnyMenuVisible)
+                        if (!MenuManager.AnyMenuVisible && !MouseManager.IsFocusing)
                         {
                             if (MouseAlt.HasDelta)
                             {
@@ -300,7 +300,7 @@ namespace Game.Managers
                     }
                 case CameraMode.TopDown:
                     {
-                        if (!MenuManager.AnyMenuVisible)
+                        if (!MenuManager.AnyMenuVisible && !MouseManager.IsFocusing)
                         {
                             if (MouseAlt.HasDelta)
                             { TargetRotation += Mouse.DeltaX; }
@@ -313,7 +313,7 @@ namespace Game.Managers
                     }
                 case CameraMode.ZoomBased:
                     {
-                        if (!MenuManager.AnyMenuVisible)
+                        if (!MenuManager.AnyMenuVisible && !MouseManager.IsFocusing)
                         {
                             if (MouseAlt.HasDelta)
                             { TargetRotation += MouseAlt.DeltaX; }
