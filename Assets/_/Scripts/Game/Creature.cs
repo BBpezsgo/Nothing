@@ -197,9 +197,9 @@ namespace Game.Components
         {
             if (collision.gameObject.TryGetComponent(out VehicleEngine vehicle))
             {
-                if (vehicle.rb.velocity.sqrMagnitude > .1f)
+                if (vehicle.rb.linearVelocity.sqrMagnitude > .1f)
                 {
-                    float speedDiffSqr = (vehicle.rb.velocity - rb.velocity).sqrMagnitude;
+                    float speedDiffSqr = (vehicle.rb.linearVelocity - rb.linearVelocity).sqrMagnitude;
                     if (speedDiffSqr > .5f)
                     {
                         Damage(speedDiffSqr);

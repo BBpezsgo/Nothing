@@ -48,6 +48,8 @@ namespace Game.Managers
         [Header("Angle")]
         [SerializeField] float AngleSpeed = 2f;
         [SerializeField] float inputAngleMultiplier = 1f;
+        [SerializeField] float MinAngle = 10f;
+        [SerializeField] float MaxAngle = 80f;
         [SerializeField, ReadOnly] float TargetAngle;
 
         [Header("Zoom")]
@@ -80,7 +82,7 @@ namespace Game.Managers
         [SerializeField, ReadOnly] bool IsTotallyLocked = false;
 
         // [Header("Other")]
-        internal float ZoomValue => Maths.Max(0f, -theCamera.transform.localPosition.z);
+        internal float ZoomValue => Math.Max(0f, -theCamera.transform.localPosition.z);
         internal Vector3 CameraPosition => theCamera.transform.position;
         internal event OnCameraModeChanged OnCameraModeChanged;
 
@@ -91,7 +93,7 @@ namespace Game.Managers
             Zoom = -theCamera.transform.localPosition.z;
             TargetZoom = Zoom;
 
-            TargetAngle = Maths.Clamp(cameraRotation.transform.localRotation.eulerAngles.x, 10f, 80f);
+            TargetAngle = Math.Clamp(cameraRotation.transform.localRotation.eulerAngles.x, MinAngle, MaxAngle);
 
             Rotation = transform.rotation.eulerAngles.y;
             TargetRotation = Rotation;
@@ -123,7 +125,7 @@ namespace Game.Managers
                 case CameraMode.Normal:
                     {
                         TargetRotation += delta.x * inputAngleMultiplier;
-                        TargetAngle = Maths.Clamp(TargetAngle - (delta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                        TargetAngle = Math.Clamp(TargetAngle - (delta.y * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80f : MinAngle, MaxAngle);
                         break;
                     }
                 case CameraMode.TopDown:
@@ -135,7 +137,7 @@ namespace Game.Managers
                 case CameraMode.ZoomBased:
                     {
                         TargetRotation += delta.x * inputAngleMultiplier;
-                        TargetAngle = Maths.Clamp(Zoom * .5f, 10f, 80f);
+                        TargetAngle = Math.Clamp(Zoom * .5f, MinAngle, MaxAngle);
                         break;
                     }
                 case CameraMode.OrthographicTopDown:
@@ -287,12 +289,12 @@ namespace Game.Managers
                             if (MouseAlt.HasDelta)
                             {
                                 TargetRotation += MouseAlt.DeltaX;
-                                TargetAngle = Maths.Clamp(TargetAngle - (MouseAlt.DeltaY), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                                TargetAngle = Maths.Clamp(TargetAngle - MouseAlt.DeltaY, (IsFollowing && !JustFollow) ? -80f : MinAngle, MaxAngle);
                             }
                             else if ((IsFollowing && !JustFollow) || Input.GetMouseButton(Mouse.Middle))
                             {
                                 TargetRotation += Mouse.DeltaX * inputAngleMultiplier;
-                                TargetAngle = Maths.Clamp(TargetAngle - (Mouse.DeltaY * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80 : 10f, 80f);
+                                TargetAngle = Maths.Clamp(TargetAngle - (Mouse.DeltaY * inputAngleMultiplier), (IsFollowing && !JustFollow) ? -80f : MinAngle, MaxAngle);
                             }
                         }
 
@@ -321,7 +323,7 @@ namespace Game.Managers
                             { TargetRotation += Mouse.DeltaX * inputAngleMultiplier; }
                         }
 
-                        TargetAngle = Maths.Clamp(Zoom * .5f, 10f, 80f);
+                        TargetAngle = Maths.Clamp(Zoom * .5f, MinAngle, MaxAngle);
                         break;
                     }
 

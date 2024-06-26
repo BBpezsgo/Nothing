@@ -125,7 +125,7 @@ MonoBehaviour:
     OriginalLocalPosition: {x: 0, y: 0, z: 0}
     KnockbackState: 0
   HasBarrel: 0
-  RequiedBarrelRotationSpeed: 0
+  RequiredBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
   PrepareShooting: 0
@@ -136,7 +136,7 @@ MonoBehaviour:
   rotationSpeed: 180
   reloadTime: 0.8
   reload: 0
-  projectileVelocity: 50
+  projectileVelocity: 120
   ProjectileLifetime: 20
   RequiredProjectileLifetime: -1
   projectileIgnoreCollision:

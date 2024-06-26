@@ -93,7 +93,7 @@ namespace Game.Components
 
         internal Rigidbody Rigidbody => rb;
 
-        internal Vector3 Position => rb == null ? transform.position : rb.position + (rb.velocity * Time.fixedDeltaTime);
+        internal Vector3 Position => rb == null ? transform.position : rb.position + (rb.linearVelocity * Time.fixedDeltaTime);
 
         internal Ballistics.Trajectory Shot;
 
@@ -249,7 +249,7 @@ namespace Game.Components
 
             if (Acceleration != 0f && rb != null)
             {
-                rb.velocity += Acceleration * Time.fixedDeltaTime * rb.velocity.normalized;
+                rb.linearVelocity += Acceleration * Time.fixedDeltaTime * rb.linearVelocity.normalized;
             }
 
             CheckImpact(lastPosition);
@@ -435,7 +435,7 @@ namespace Game.Components
             }
             else if (CanBounce && (!hasMaterial || material.Hardness > float.Epsilon))
             {
-                float normalAngle = Vector3.Angle(rb.velocity, -normal);
+                float normalAngle = Vector3.Angle(rb.linearVelocity, -normal);
                 float impactAngle = 90f - Maths.Clamp(normalAngle, 0f, 90f);
 
                 float modifiedImpactAngle = impactAngle;
@@ -450,8 +450,8 @@ namespace Game.Components
                     if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
                     { obj.attachedRigidbody.AddForceAtPosition(ImpactForce * impactEnergy * transform.forward, at, ForceMode.Impulse); }
 
-                    Vector3 newVelocity = Vector3.Reflect(rb.velocity * remainingEnergy, normal);
-                    rb.velocity = newVelocity;
+                    Vector3 newVelocity = Vector3.Reflect(rb.linearVelocity * remainingEnergy, normal);
+                    rb.linearVelocity = newVelocity;
 
                     if (RicochetEffect != null &&
                         QualityHandler.EnableParticles)

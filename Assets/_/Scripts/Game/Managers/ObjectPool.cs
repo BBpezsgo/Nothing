@@ -83,7 +83,7 @@ public readonly struct PooledPrefab : IEquatable<PooledPrefab>, IEquatable<Poole
         {
             rigidbody.angularVelocity = Vector3.zero;
             rigidbody.position = position;
-            rigidbody.velocity = Vector3.zero;
+            rigidbody.linearVelocity = Vector3.zero;
             rigidbody.rotation = rotation;
             rigidbody.PublishTransform();
         }

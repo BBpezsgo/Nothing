@@ -71,12 +71,12 @@ namespace Game.Components
         /// <summary>
         /// Absolute value of the speed.
         /// </summary>
-        public float Speed => rb.velocity.sqrMagnitude < .5f ? 0f : (transform.forward * Vector3.Dot(transform.forward, rb.velocity)).magnitude;
+        public float Speed => rb.linearVelocity.sqrMagnitude < .5f ? 0f : (transform.forward * Vector3.Dot(transform.forward, rb.linearVelocity)).magnitude;
 
         /// <summary>
         /// Absolute value of the speed in sideways.
         /// </summary>
-        public float SidewaysSpeed => rb.velocity.sqrMagnitude < .5f ? 0f : (transform.right * Vector3.Dot(transform.right, rb.velocity)).magnitude;
+        public float SidewaysSpeed => rb.linearVelocity.sqrMagnitude < .5f ? 0f : (transform.right * Vector3.Dot(transform.right, rb.linearVelocity)).magnitude;
 
         /// <summary>
         /// Value of the speed. Can be negative or positive.
@@ -85,8 +85,8 @@ namespace Game.Components
         {
             get
             {
-                if (rb.velocity.sqrMagnitude < .5f) return 0f;
-                float dot = Vector3.Dot(transform.forward, rb.velocity);
+                if (rb.linearVelocity.sqrMagnitude < .5f) return 0f;
+                float dot = Vector3.Dot(transform.forward, rb.linearVelocity);
                 return (transform.forward * dot).magnitude * ((dot < 0f) ? -1f : 1f);
             }
         }
@@ -98,13 +98,13 @@ namespace Game.Components
         {
             get
             {
-                if (rb.velocity.sqrMagnitude < .5f) return 0f;
-                float dot = Vector3.Dot(transform.right, rb.velocity);
+                if (rb.linearVelocity.sqrMagnitude < .5f) return 0f;
+                float dot = Vector3.Dot(transform.right, rb.linearVelocity);
                 return (transform.right * dot).magnitude * ((dot < 0f) ? -1f : 1f);
             }
         }
 
-        public float LaterialVelocity => Vector3.Dot(transform.right, rb.velocity);
+        public float LaterialVelocity => Vector3.Dot(transform.right, rb.linearVelocity);
 
         public bool IsBraking => Maths.Abs(TorqueInput) <= .0069f && Maths.Abs(SidewaysInput) <= .0069f;
 
@@ -173,24 +173,24 @@ namespace Game.Components
             float offset = terrainHeight - transform.position.y + HoveringHeight;
 
             Vector3 springDirection = transform.up;
-            float springVelocity = Vector3.Dot(springDirection, rb.velocity);
+            float springVelocity = Vector3.Dot(springDirection, rb.linearVelocity);
             float springForce = (offset * SpringStrength) - (springVelocity * SpringDamper);
 
             Vector3 force = default;
 
             force += springDirection * springForce;
 
-            force += (-rb.velocity.Flatten() * .1f);
+            force += (-rb.linearVelocity.Flatten() * .1f);
 
             rb.AddForce(force);
 
             if (InputVector != default)
             {
-                rb.drag = 0f;
+                rb.linearDamping = 0f;
             }
             else
             {
-                rb.drag = 2f;
+                rb.linearDamping = 2f;
             }
         }
 

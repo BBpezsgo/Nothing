@@ -83,3 +83,4 @@ crashlytics-build.properties
 /Assets/_/Scenes/Computer.unity
 /assets/UnityGoogleDrive
 /Assets/DinoFracture
+Assets/_/Scripts/Utils/UnityEditor/GitHubCredentials.cs

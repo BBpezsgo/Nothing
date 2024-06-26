@@ -153,7 +153,7 @@ namespace Game.Components
         /// <summary>
         /// Absolute value of the speed.
         /// </summary>
-        public float Speed => rb.velocity.sqrMagnitude < .5f ? 0f : (transform.forward * Vector3.Dot(transform.forward, rb.velocity)).magnitude;
+        public float Speed => rb.linearVelocity.sqrMagnitude < .5f ? 0f : (transform.forward * Vector3.Dot(transform.forward, rb.linearVelocity)).magnitude;
 
         /// <summary>
         /// Value of the speed. Can be negative or positive.
@@ -162,13 +162,13 @@ namespace Game.Components
         {
             get
             {
-                if (rb.velocity.sqrMagnitude < .5f) return 0f;
-                float dot = Vector3.Dot(transform.forward, rb.velocity);
+                if (rb.linearVelocity.sqrMagnitude < .5f) return 0f;
+                float dot = Vector3.Dot(transform.forward, rb.linearVelocity);
                 return (transform.forward * dot).magnitude * ((dot < 0f) ? -1f : 1f);
             }
         }
 
-        public float LateralVelocity => Vector3.Dot(transform.right, rb.velocity);
+        public float LateralVelocity => Vector3.Dot(transform.right, rb.linearVelocity);
 
         public bool IsBraking
         {
@@ -312,7 +312,7 @@ namespace Game.Components
             InWater = Collider.bounds.min.y <= WaterManager.WaterLevel;
 
             if (InWater)
-            { rb.AddForce(rb.velocity * -0.2f); }
+            { rb.AddForce(rb.linearVelocity * -0.2f); }
 
             if (AudioSource != null)
             {
@@ -562,13 +562,13 @@ namespace Game.Components
         {
             if (IsBraking)
             {
-                rb.AddForce(rb.velocity.normalized * -BrakeValue);
+                rb.AddForce(rb.linearVelocity.normalized * -BrakeValue);
                 return;
             }
 
             if (isHandbraking)
             {
-                rb.AddForce(rb.velocity.normalized * -HandbrakeValue);
+                rb.AddForce(rb.linearVelocity.normalized * -HandbrakeValue);
                 return;
             }
         }
@@ -618,7 +618,7 @@ namespace Game.Components
             rb.velocity = transform.InverseTransformDirection(localVelocity);
             */
 
-            Vector3 velocity = rb.velocity;
+            Vector3 velocity = rb.linearVelocity;
             Vector3 forward = transform.forward;
             Vector3 right = transform.right;
 
@@ -626,7 +626,7 @@ namespace Game.Components
             Vector3 rightVelocity = (isHandbraking ? driftFactorWithHandbrake : driftFactor) * Vector3.Dot(velocity, right) * right;
             Vector3 finalVelocity = forwardVelocity + rightVelocity;
 
-            rb.velocity = new Vector3(finalVelocity.x, velocity.y, finalVelocity.z);
+            rb.linearVelocity = new Vector3(finalVelocity.x, velocity.y, finalVelocity.z);
         }
 
         bool IsTireScreeching => isHandbraking || Maths.Abs(LateralVelocity) > 15f;

@@ -1,5 +1,3 @@
-using DataUtilities.ReadableFileFormat;
-
 using Game.Components;
 
 using System;
@@ -132,7 +130,7 @@ namespace Authentication.Providers
         }
 
         [Serializable]
-        class AnonymousUser : ISerializable, ISerializableText, IDeserializableText
+        class AnonymousUser : ISerializable
         {
             [ReadOnly] public string ID;
             [ReadOnly] public string? DisplayName;
@@ -157,24 +155,6 @@ namespace Authentication.Providers
                 serializer.Write(ID);
                 serializer.Write(DisplayName);
                 serializer.Write(Friends.ToArray(), serializer.Write);
-            }
-
-            public void DeserializeText(Value data)
-            {
-                ID = data["ID"].String ?? throw new Exception("Field ID not found");
-                DisplayName = data["DisplayName"].String ?? string.Empty;
-                Friends = data["Friends"].Array!.ConvertPrimitive<string>().ToList();
-            }
-
-            public Value SerializeText()
-            {
-                Value result = Value.Object();
-
-                result["ID"] = ID;
-                result["DisplayName"] = DisplayName;
-                result["Array"] = Value.Object(Friends.ToArray());
-
-                return result;
             }
         }
     }

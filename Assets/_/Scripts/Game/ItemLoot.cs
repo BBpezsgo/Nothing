@@ -50,7 +50,7 @@ namespace Game.Components
                     if (this.TryGetComponent(out Rigidbody rigidbody1) &&
                         instance.TryGetComponent(out Rigidbody rigidbody2))
                     {
-                        rigidbody2.velocity = rigidbody1.velocity;
+                        rigidbody2.linearVelocity = rigidbody1.linearVelocity;
                         rigidbody2.angularVelocity = rigidbody1.angularVelocity;
                     }
                 }

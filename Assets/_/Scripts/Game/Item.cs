@@ -41,7 +41,7 @@ namespace Game.Components
             if (TryGetComponent(out Rigidbody itemRigidbody))
             {
                 itemRigidbody.isKinematic = false;
-                itemRigidbody.velocity = velocity;
+                itemRigidbody.linearVelocity = velocity;
             }
 
             if (TryGetComponent(out Collider itemCollider))

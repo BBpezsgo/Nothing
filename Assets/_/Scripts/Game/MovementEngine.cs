@@ -14,17 +14,17 @@ namespace Game.Components
         /// <summary>
         /// Returns <see langword="true"/> if the dot product of <see cref="Transform.forward"/> and <see cref="Rigidbody2D.velocity"/> is less than 0
         /// </summary>
-        public bool IsReverse => rb.velocity.sqrMagnitude > .001f && Vector3.Dot(transform.forward, rb.velocity) < 0f;
+        public bool IsReverse => rb.linearVelocity.sqrMagnitude > .001f && Vector3.Dot(transform.forward, rb.linearVelocity) < 0f;
 
         /// <summary>
         /// Coefficient of drag
         /// </summary>
-        public float Drag => rb.drag;
+        public float Drag => rb.linearDamping;
 
         /// <summary>
         /// Linear velocity in units per second
         /// </summary>
-        public Vector3 Velocity => rb.velocity;
+        public Vector3 Velocity => rb.linearVelocity;
 
         /// <summary>
         /// Angular velocity in degrees per second

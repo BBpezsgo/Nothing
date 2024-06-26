@@ -18,7 +18,7 @@ public class FracturedObjectScript : MonoBehaviour
             (
                 Rigidbody != null &&
                 collision.gameObject.TryGetComponent(out Rigidbody otherRigidbody) &&
-                (Rigidbody.velocity - otherRigidbody.velocity).sqrMagnitude <= 1f
+                (Rigidbody.linearVelocity - otherRigidbody.linearVelocity).sqrMagnitude <= 1f
             ))
         { return; }
 

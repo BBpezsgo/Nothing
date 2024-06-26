@@ -122,7 +122,7 @@ namespace Game.Managers
             worldPosition.y = TheTerrain.Height(worldPosition);
 
             if (Input.GetKey(KeyCode.LeftControl))
-            { worldPosition = new Vector3(Maths.Round(worldPosition.x), worldPosition.y, Maths.Round(worldPosition.z)); }
+            { worldPosition = new Vector3(MathF.Round(worldPosition.x), worldPosition.y, MathF.Round(worldPosition.z)); }
 
             PlaceBuilding(worldPosition - SelectedBuilding.GroundOrigin, SelectedBuilding);
         }
@@ -244,7 +244,7 @@ namespace Game.Managers
                     position.y = TheTerrain.Height(position);
 
                     if (Input.GetKey(KeyCode.LeftControl))
-                    { position = new Vector3(Maths.Round(position.x), position.y, Maths.Round(position.z)); }
+                    { position = new Vector3(MathF.Round(position.x), position.y, MathF.Round(position.z)); }
 
                     BuildingHologram.transform.position = position - SelectedBuilding.GroundOrigin;
 

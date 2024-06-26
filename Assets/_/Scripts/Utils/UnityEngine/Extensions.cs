@@ -658,7 +658,7 @@ public static class RigidbodyEx
 
     public static void Drag(this Rigidbody rb, float value)
     {
-        rb.AddForce(-rb.velocity.normalized.Flatten() * value, ForceMode.VelocityChange);
+        rb.AddForce(-rb.linearVelocity.normalized.Flatten() * value, ForceMode.VelocityChange);
     }
 }
 

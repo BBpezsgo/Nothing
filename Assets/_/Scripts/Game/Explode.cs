@@ -103,9 +103,9 @@ namespace Game.Components
 
                 if (TryGetComponent(out selfRigidbody))
                 {
-                    rigidbody.velocity = selfRigidbody.velocity;
-                    rigidbody.angularDrag = selfRigidbody.angularDrag;
-                    rigidbody.drag = selfRigidbody.drag;
+                    rigidbody.linearVelocity = selfRigidbody.linearVelocity;
+                    rigidbody.angularDamping = selfRigidbody.angularDamping;
+                    rigidbody.linearDamping = selfRigidbody.linearDamping;
                 }
             }
             else

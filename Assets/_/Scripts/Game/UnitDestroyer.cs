@@ -49,7 +49,7 @@ namespace Game.Components
             if (rb == null)
             { return; }
 
-            if (rb.velocity.sqrMagnitude > 150 * 150)
+            if (rb.linearVelocity.sqrMagnitude > 150 * 150)
             {
                 GameObject.Destroy(gameObject);
                 return;

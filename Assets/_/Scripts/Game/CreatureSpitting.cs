@@ -82,7 +82,7 @@ namespace Game.Components
 
             Vector3 targetVelocity = default;
             if (target.TryGetComponent(out Rigidbody targetRigidbody))
-            { targetVelocity = targetRigidbody.velocity; }
+            { targetVelocity = targetRigidbody.linearVelocity; }
             if (targetVelocity.To2D().sqrMagnitude > .1f)
             {
                 Vector2 offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, SpitVelocity);

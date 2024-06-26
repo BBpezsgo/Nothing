@@ -180,7 +180,7 @@ namespace Game.Components
             if (TransportingItem != null)
             {
                 if (TryGetComponent(out Rigidbody rb))
-                { TransportingItem.Drop(rb.velocity); }
+                { TransportingItem.Drop(rb.linearVelocity); }
                 else
                 { TransportingItem.Drop(); }
             }

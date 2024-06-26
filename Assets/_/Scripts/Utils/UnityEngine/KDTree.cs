@@ -22,11 +22,10 @@ using UnityEngine;
 
 public class KDTree
 {
-
-    public KDTree[] lr;
-    public Vector3 pivot;
-    public int pivotIndex;
-    public int axis;
+    KDTree[] lr;
+    Vector3 pivot;
+    int pivotIndex;
+    int axis;
 
     /// <summary>
     /// Change this value to 2 if you only need two-dimensional X,Y points.

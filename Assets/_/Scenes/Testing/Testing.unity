@@ -1703,7 +1703,7 @@ PrefabInstance:
     - target: {fileID: 2619412345505571580, guid: f3eb8de6ca84409448c3357a9943d4cd,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.48
+      value: -22.97
       objectReference: {fileID: 0}
     - target: {fileID: 2619412345505571580, guid: f3eb8de6ca84409448c3357a9943d4cd,
         type: 3}
@@ -3435,16 +3435,6 @@ PrefabInstance:
         type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 3831859641
-      objectReference: {fileID: 0}
-    - target: {fileID: 3456874584538751400, guid: 80b9a410abf34d343ab0cba1b319c811,
-        type: 3}
-      propertyPath: reloadTime
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 3456874584538751400, guid: 80b9a410abf34d343ab0cba1b319c811,
-        type: 3}
-      propertyPath: ProjectileLifetime
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3456874585969057156, guid: 80b9a410abf34d343ab0cba1b319c811,
         type: 3}

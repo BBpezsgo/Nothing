@@ -18,7 +18,7 @@ namespace Game.Components
             if (collision.gameObject.HasComponent<Projectile>())
             { return; }
 
-            float amount = rigidbody.velocity.sqrMagnitude * CollisionDamageMultiplier;
+            float amount = rigidbody.linearVelocity.sqrMagnitude * CollisionDamageMultiplier;
 
             if (amount <= .1f)
             { return; }

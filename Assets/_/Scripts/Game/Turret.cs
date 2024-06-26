@@ -21,7 +21,7 @@ public class TurretInputDrawer : PropertyDrawer
         float turretAngle = Maths.Round(property.FindPropertyRelative("TurretAngle").floatValue);
         float cannonAngle = Maths.Round(property.FindPropertyRelative("CannonAngle").floatValue);
 
-        EditorGUI.SelectableLabel(position, $"Turret: {turretAngle}° Cannon: {cannonAngle}°");
+        EditorGUI.SelectableLabel(position, $"Turret: {turretAngle}Â° Cannon: {cannonAngle}Â°");
 
         EditorGUI.EndProperty();
     }
@@ -59,7 +59,7 @@ namespace Game.Components
         public static implicit operator TurretInput(ValueTuple<float, float> v) => new(v.Item1, v.Item2);
         public static implicit operator TurretInput(Vector2 v) => new(v.x, v.y);
 
-        public override readonly string ToString() => $"(Turret: {TurretAngle}° Cannon: {CannonAngle}°)";
+        public override readonly string ToString() => $"(Turret: {TurretAngle}Â° Cannon: {CannonAngle}Â°)";
     }
 
     [Serializable]
@@ -505,7 +505,7 @@ namespace Game.Components
                     Vector3 targetAcceleration = default;
                     if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out Rigidbody targetRigidbody))
                     {
-                        targetVelocity = targetRigidbody.velocity;
+                        targetVelocity = targetRigidbody.linearVelocity;
                         if (targetTransform != null && targetTransform.gameObject.TryGetComponent(out MovementEngine movementEngine))
                         { targetAcceleration = movementEngine.Acceleration; }
                     }
@@ -813,7 +813,7 @@ namespace Game.Components
                         velocityResult += randomRotation;
                     }
 
-                    rb.velocity = velocityResult;
+                    rb.linearVelocity = velocityResult;
                 }
 
                 if (newProjectile.TryGetComponent(out Projectile _projectile))

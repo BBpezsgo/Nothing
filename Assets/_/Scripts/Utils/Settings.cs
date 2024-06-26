@@ -4,8 +4,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.Serialization;
-using DataUtilities.ReadableFileFormat;
 using UnityEngine;
 using Utilities;
 
@@ -15,9 +13,9 @@ public static class Settings
 
     public static string Path => Application.persistentDataPath + "/settings.bin";
 
-    public class Data : Utilities.ISerializable, IFullySerializableText
+    public class Data : ISerializable
     {
-        public class DataVolume : Utilities.ISerializable, IFullySerializableText
+        public class DataVolume : ISerializable
         {
             public float Master = 0f;
             public float VFX = 0f;
@@ -30,27 +28,11 @@ public static class Settings
                 UI = reader.ReadSingle();
             }
 
-            public void DeserializeText(Value data)
-            {
-                Master = data["Master"].Float ?? 0f;
-                VFX = data["VFX"].Float ?? 0f;
-                UI = data["UI"].Float ?? 0f;
-            }
-
             public void Serialize(BinaryWriter writer)
             {
                 writer.Write(Master);
                 writer.Write(VFX);
                 writer.Write(UI);
-            }
-
-            public Value SerializeText()
-            {
-                Value result = Value.Object();
-                result["Master"] = Master;
-                result["VFX"] = VFX;
-                result["UI"] = UI;
-                return result;
             }
         }
 
@@ -58,23 +40,6 @@ public static class Settings
 
         public void Save() => Settings.Save(this);
         public static void Load() => Current = Settings.Load();
-
-        internal void SerializeGet(SerializationInfo info)
-        {
-            info.AddValue("volume.master", this.Volume.Master);
-            info.AddValue("volume.vfx", this.Volume.VFX);
-            info.AddValue("volume.ui", this.Volume.UI);
-        }
-
-        internal void SerializeSet(SerializationInfo info)
-        {
-            this.Volume = new()
-            {
-                Master = (float)info.GetValue("volume.master", typeof(float)),
-                VFX = (float)info.GetValue("volume.vfx", typeof(float)),
-                UI = (float)info.GetValue("volume.ui", typeof(float)),
-            };
-        }
 
         public void Serialize(BinaryWriter writer)
         {
@@ -84,19 +49,6 @@ public static class Settings
         public void Deserialize(BinaryReader reader)
         {
             Volume = reader.ReadObj<DataVolume>();
-        }
-
-        public Value SerializeText()
-        {
-            Value result = Value.Object();
-            result["Volume"] = Volume.SerializeText();
-            return result;
-        }
-
-        public void DeserializeText(Value data)
-        {
-            Volume = new();
-            Volume.DeserializeText(data["Volume"]);
         }
 
         public static Data Default => new()
@@ -211,7 +163,7 @@ public static class GameConfigManager
     }
 
     [Serializable]
-    public struct GameConfig : Utilities.ISerializable, System.Runtime.Serialization.ISerializable, IFullySerializableText
+    public struct GameConfig : ISerializable
     {
         public ushort netcode_tcpServer_port;
 
@@ -219,16 +171,6 @@ public static class GameConfigManager
         {
             netcode_tcpServer_port = 7779,
         };
-
-        public GameConfig(SerializationInfo info, StreamingContext context)
-        {
-            netcode_tcpServer_port = info.GetUInt16("netcode_tcpServer_port");
-        }
-
-        public readonly void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("netcode_tcpServer_port", netcode_tcpServer_port);
-        }
 
         public readonly void Serialize(BinaryWriter serializer)
         {
@@ -238,18 +180,6 @@ public static class GameConfigManager
         public void Deserialize(BinaryReader deserializer)
         {
             netcode_tcpServer_port = deserializer.ReadUInt16();
-        }
-
-        public readonly Value SerializeText()
-        {
-            Value value = Value.Object();
-            value["netcode_tcpServer_port"] = Value.Literal(netcode_tcpServer_port);
-            return value;
-        }
-
-        public void DeserializeText(Value data)
-        {
-            netcode_tcpServer_port = (ushort)(data["netcode_tcpServer_port"].Int ?? Default.netcode_tcpServer_port);
         }
     }
 }
