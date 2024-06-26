@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Game.Components
@@ -13,7 +14,7 @@ namespace Game.Components
 
             internal int Evaluate()
             {
-                float evaulatedPropability = Random.value;
+                float evaulatedPropability = UnityEngine.Random.value;
 
                 if (evaulatedPropability < Propability)
                 { return 0; }
@@ -21,7 +22,7 @@ namespace Game.Components
                 if (Ammount.x == Ammount.y)
                 { return Ammount.x; }
 
-                int evaulatedAmmount = Random.Range(Maths.Min(Ammount.x, Ammount.y), Maths.Max(Ammount.x, Ammount.y));
+                int evaulatedAmmount = UnityEngine.Random.Range(Math.Min(Ammount.x, Ammount.y), Math.Max(Ammount.x, Ammount.y));
 
                 return evaulatedAmmount;
             }

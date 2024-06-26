@@ -31,7 +31,7 @@ public class ProceduralTerrain : MonoBehaviour
         {
             for (int x = 0; x < w; x++)
             {
-                heights[x, y] = Maths.PerlinNoise(x * NoiseScale, y * NoiseScale) * HeightScale;
+                heights[x, y] = Mathf.PerlinNoise(x * NoiseScale, y * NoiseScale) * HeightScale;
             }
         }
         Data.SetHeights(0, 0, heights);

@@ -511,7 +511,7 @@ namespace InputUtils
 
     public class AdvancedInput : IComparable<AdvancedInput>
     {
-        public static float ScreenSize => Maths.Sqrt((Screen.width * Screen.width) + (Screen.height * Screen.height));
+        public static float ScreenSize => MathF.Sqrt((Screen.width * Screen.width) + (Screen.height * Screen.height));
 
         protected readonly InputConditionEnabler ConditionEnabler;
         public readonly int Priority;
@@ -566,7 +566,7 @@ namespace InputUtils
         public bool IsDragging => Drag && !ClickedOnUI;
         [SerializeField, ReadOnly] bool Drag;
         public const float DragThreshold = 25f;
-        public static readonly float DragThresholdSqr = Maths.Sqrt(DragThreshold);
+        public static readonly float DragThresholdSqr = MathF.Sqrt(DragThreshold);
 
         float PressedAt;
         readonly float UpTimeout;
@@ -823,7 +823,7 @@ namespace InputUtils
 
                 Touch = touches[i];
 
-                if (ValidScreenRect.size == Vector2Int.zero || ValidScreenRect.Contains(new Vector2Int(Maths.RoundToInt(Position.x), Maths.RoundToInt(Position.y))))
+                if (ValidScreenRect.size == Vector2Int.zero || ValidScreenRect.Contains(new Vector2Int((int)MathF.Round(Position.x), (int)MathF.Round(Position.y))))
                 {
                     FingerID = Touch.fingerId;
                     UpdateInternal();
@@ -1034,7 +1034,7 @@ namespace InputUtils
 
         float StartDistance;
         float LastDistanceDiff;
-        float Distance => Maths.Distance(Touch1Position.Current, Touch2Position.Current);
+        float Distance => Vector2.Distance(Touch1Position.Current, Touch2Position.Current);
 
         public bool BothTouchActive => Touch1.IsActive && Touch2.IsActive;
         public bool BothTouchActiveAndCaptured => Touch1.IsActiveAndCaptured && Touch2.IsActiveAndCaptured;
@@ -1079,7 +1079,7 @@ namespace InputUtils
 
         void StartZooming()
         {
-            StartDistance = Maths.Distance(Touch1Position.Start, Touch2Position.Start);
+            StartDistance = Vector2.Distance(Touch1Position.Start, Touch2Position.Start);
             LastDistanceDiff = Distance - StartDistance;
         }
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Utilities;
 
@@ -27,7 +28,7 @@ namespace Game.Components
             if (!TryGetComponent(out Rigidbody rigidbody)) return default;
 
             float mass = rigidbody.mass;
-            float volume = Maths.TotalMeshVolume(gameObject, true);
+            float volume = Maths.General.TotalMeshVolume(gameObject, true);
 
             return mass / volume;
         }
@@ -58,9 +59,9 @@ namespace Game.Components
             obj.transform.SetPositionAndRotation(mesh.transform.position, mesh.transform.rotation);
 
             Vector3 colliderSign = new(
-                Maths.Sign(obj.transform.localScale.x),
-                Maths.Sign(obj.transform.localScale.y),
-                Maths.Sign(obj.transform.localScale.z));
+                Math.Sign(obj.transform.localScale.x),
+                Math.Sign(obj.transform.localScale.y),
+                Math.Sign(obj.transform.localScale.z));
 
             if (mesh.TryGetComponent(out SimpleMaterial selfSimpleMaterial))
             {
@@ -153,7 +154,7 @@ namespace Game.Components
                             if (ExplodeForce > float.Epsilon)
                             { childRigidbody.AddExplosionForce(ExplodeForce, position, 0f, 5f); }
 
-                            float childVolume = Maths.Volume(child.GetComponent<MeshFilter>(), childBoxCollider);
+                            float childVolume = Maths.General.Volume(child.GetComponent<MeshFilter>(), childBoxCollider);
 
                             if (Density > float.Epsilon && childVolume > float.Epsilon)
                             { childRigidbody.mass = childVolume * Density; }
@@ -170,7 +171,7 @@ namespace Game.Components
                 if (ExplodeForce > float.Epsilon && rigidbody != null)
                 { rigidbody.AddExplosionForce(ExplodeForce, transform.position, 20f, 5f); }
 
-                float childVolume = Maths.Volume(meshFilter, boxCollider);
+                float childVolume = Maths.General.Volume(meshFilter, boxCollider);
 
                 if (Density > float.Epsilon && childVolume > float.Epsilon)
                 { rigidbody.mass = childVolume * Density; }
@@ -193,16 +194,16 @@ namespace Game.Components
             // }
 
             FracturedObjectScript fracturedObject = fracture.AddComponent<FracturedObjectScript>();
-            fracturedObject.LifeTime = Random.Range(20f, 40f);
+            fracturedObject.LifeTime = UnityEngine.Random.Range(20f, 40f);
             fracturedObject.AudioClips = AudioClips;
 
             if (FragmentSmokePrefab != null &&
-                Random.value >= FragmentSmokeProbability &&
+                UnityEngine.Random.value >= FragmentSmokeProbability &&
                 QualityHandler.EnableParticles)
             {
                 GameObject smoke = Instantiate(FragmentSmokePrefab, fracture.transform);
                 smoke.transform.SetLocalPositionAndRotation(default, Quaternion.identity);
-                smoke.transform.localScale = Vector3.one * Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
+                smoke.transform.localScale = Vector3.one * UnityEngine.Random.Range(FragmentSmokeScale.x, FragmentSmokeScale.y);
             }
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace Game.Managers
         public void OnGUI()
         {
             if (IsDestroyed) return;
-            float t = Maths.Clamp01((Time.unscaledTime - MadeAt) / LifeTime);
+            float t = Math.Clamp((Time.unscaledTime - MadeAt) / LifeTime, 0, 1);
 
             Vector3 worldPosition = WorldPosition;
             worldPosition.y += t * Offset;
@@ -45,11 +46,11 @@ namespace Game.Managers
 
             Color color = Color;
 
-            color.a = Maths.Clamp01((1f - t) * (1f / FadeOutTime));
+            color.a = Math.Clamp((1f - t) * (1f / FadeOutTime), 0, 1);
 
             GUIStyle labelStyle = new(GUI.skin.label)
             {
-                fontSize = Maths.RoundToInt(Maths.Clamp(t * (FontSize / GrowTime), 1f, FontSize))
+                fontSize = (int)Math.Round(Math.Clamp(t * (FontSize / GrowTime), 1f, FontSize))
             };
 
             Vector2 size = labelStyle.CalcSize(Content);

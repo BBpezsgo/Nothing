@@ -50,7 +50,7 @@ namespace Game.Components
         }
 
         internal virtual float CalculateBrakingDistance()
-            => Utilities.Acceleration.DistanceToStop(Velocity.magnitude, Drag);
+            => Maths.Acceleration.DistanceToStop(Velocity.magnitude, Drag);
 
         internal abstract void DoUserInput();
     }

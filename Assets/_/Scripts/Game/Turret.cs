@@ -4,6 +4,8 @@ using Unity.Netcode;
 using UnityEngine;
 using Utilities;
 using UnityEngine.Serialization;
+using Maths;
+
 
 #nullable enable
 
@@ -18,8 +20,8 @@ public class TurretInputDrawer : PropertyDrawer
 
         position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-        float turretAngle = Maths.Round(property.FindPropertyRelative("TurretAngle").floatValue);
-        float cannonAngle = Maths.Round(property.FindPropertyRelative("CannonAngle").floatValue);
+        float turretAngle = MathF.Round(property.FindPropertyRelative("TurretAngle").floatValue);
+        float cannonAngle = MathF.Round(property.FindPropertyRelative("CannonAngle").floatValue);
 
         EditorGUI.SelectableLabel(position, $"Turret: {turretAngle}° Cannon: {cannonAngle}°");
 
@@ -91,8 +93,8 @@ namespace Game.Components
             ParticleSystem.MinMaxCurve count = burst.count;
             BurstCount = count.mode switch
             {
-                ParticleSystemCurveMode.Constant => Maths.RoundToInt(count.constant),
-                ParticleSystemCurveMode.TwoConstants => Maths.RoundToInt((count.constantMin + count.constantMax) / 2f),
+                ParticleSystemCurveMode.Constant => (int)MathF.Round(count.constant),
+                ParticleSystemCurveMode.TwoConstants => (int)MathF.Round((count.constantMin + count.constantMax) / 2f),
                 _ => 0,
             };
             Probability = particleSystem.emission.GetBurst(0).probability;
@@ -151,7 +153,7 @@ namespace Game.Components
         [SerializeField, ReadOnly] float reload;
 
         public float CurrentReload => reload;
-        public float ReloadPercent => (reloadTime <= 0f) ? 1f : (1f - Maths.Clamp01(reload / reloadTime));
+        public float ReloadPercent => (reloadTime <= 0f) ? 1f : (1f - Math.Clamp(reload / reloadTime, 0, 1));
 
         [Header("Projectile")]
         [SerializeField] public float projectileVelocity = 100f;
@@ -167,7 +169,7 @@ namespace Game.Components
         [SerializeField] public GameObject[] Projectiles = null!;
         PooledPrefab[] PooledProjectiles = null!;
         [SerializeField] float Randomness = 0f;
-        [SerializeField] Vector2Int BulletCount = Vector2Int.one;
+        [SerializeField] UnityEngine.Vector2Int BulletCount = UnityEngine.Vector2Int.one;
 
         [SerializeField] ParticleSystem? Shells;
 
@@ -177,7 +179,7 @@ namespace Game.Components
             {
                 if (RequiredProjectileLifetime == -1f) return ProjectileLifetime;
                 if (ProjectileLifetime == -1f) return RequiredProjectileLifetime;
-                return Maths.Min(ProjectileLifetime, RequiredProjectileLifetime);
+                return Math.Min(ProjectileLifetime, RequiredProjectileLifetime);
             }
         }
 
@@ -409,14 +411,14 @@ namespace Game.Components
                 {
                     if (BarrelRotationSpeed < RequiredBarrelRotationSpeed)
                     {
-                        BarrelRotationSpeed = Maths.Min(BarrelRotationSpeed + (BarrelRotationAcceleration * Time.deltaTime), RequiredBarrelRotationSpeed);
+                        BarrelRotationSpeed = Math.Min(BarrelRotationSpeed + (BarrelRotationAcceleration * Time.deltaTime), RequiredBarrelRotationSpeed);
                     }
                 }
                 else
                 {
                     if (BarrelRotationSpeed > 0)
                     {
-                        BarrelRotationSpeed = Maths.Max(BarrelRotationSpeed - (BarrelRotationAcceleration * Time.deltaTime), 0);
+                        BarrelRotationSpeed = Math.Max(BarrelRotationSpeed - (BarrelRotationAcceleration * Time.deltaTime), 0);
                     }
                 }
             }
@@ -434,7 +436,7 @@ namespace Game.Components
 
                             if (barrel.KnockbackPosition.Current != barrel.KnockbackPosition.Target)
                             {
-                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
+                                barrel.KnockbackPosition.Current = Mathf.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
                             }
 
                             break;
@@ -447,7 +449,7 @@ namespace Game.Components
                             }
                             else
                             {
-                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackSpeed * Time.deltaTime);
+                                barrel.KnockbackPosition.Current = Mathf.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackSpeed * Time.deltaTime);
                             }
 
                             break;
@@ -460,7 +462,7 @@ namespace Game.Components
                             }
                             else
                             {
-                                barrel.KnockbackPosition.Current = Maths.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
+                                barrel.KnockbackPosition.Current = Mathf.MoveTowards(barrel.KnockbackPosition.Current, barrel.KnockbackPosition.Target, CannonKnockbackRestoreSpeed * Time.deltaTime);
                             }
 
                             break;
@@ -540,7 +542,7 @@ namespace Game.Components
         TurretInput Aim(Vector3 targetPosition, Vector3 targetVelocity, Vector3 targetAcceleration, out bool outOfRange)
         {
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Maths.Distance(selfGround, NextBarrel.ShootPosition.position.To2D());
+            float cannonLength = Vector2.Distance(selfGround, NextBarrel.ShootPosition.position.To2D());
 
             targetPosition += Vector2.ClampMagnitude(selfGround - targetPosition.To2D(), cannonLength).To3D();
 
@@ -555,7 +557,7 @@ namespace Game.Components
                     if (ballisticOffset.HasValue)
                     { offset = ballisticOffset.Value; }
                     else*/
-                    { offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity); }
+                    { offset = Maths.Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity); }
 
                     Vector3 offset3 = offset.To3D();
                     predictedOffset = offset3;
@@ -571,7 +573,7 @@ namespace Game.Components
             {
                 if (targetVelocity.To2D().sqrMagnitude > .1f)
                 {
-                    Vector2 offset = Acceleration.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity, projectile.GetComponent<Projectile>().Acceleration);
+                    Vector2 offset = Maths.Acceleration.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, projectileVelocity, projectile.GetComponent<Projectile>().Acceleration);
                     predictedOffset = offset.To3D();
 
                     targetPosition += offset.To3D();
@@ -603,7 +605,7 @@ namespace Game.Components
             {
                 float targetAngle;
 
-                float? theta_;
+                using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
 
                 using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
                 { theta_ = Ballistics.AngleOfReach2(projectileVelocity, NextBarrel.ShootPosition.position, targetPosition); }
@@ -646,10 +648,10 @@ namespace Game.Components
         float CalculateError(Vector2 input)
         {
             float error = 0f;
-            error += Maths.Abs(input.x - transform.rotation.eulerAngles.y);
-            error = Maths.NormalizeAngle360(error);
-            error += Maths.Abs(input.y - CannonLocalRotation);
-            error = Maths.NormalizeAngle360(error);
+            error += Math.Abs(input.x - transform.rotation.eulerAngles.y);
+            error = General.NormalizeAngle360(error);
+            error += Math.Abs(input.y - CannonLocalRotation);
+            error = General.NormalizeAngle360(error);
             error *= .5f;
             error /= 360f;
             return error;
@@ -666,8 +668,8 @@ namespace Game.Components
             }
             else
             {
-                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { return Ballistics.PredictImpact(NextBarrel.ShootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange); }
+                using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+                { return Maths.Ballistics.PredictImpact(NextBarrel.ShootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange)?.To(); }
             }
         }
 
@@ -686,14 +688,14 @@ namespace Game.Components
 
             Vector3 impact = _impact.Value;
 
-            float d = Maths.Distance(ShootPosition, impact);
+            float d = Vector3.Distance(ShootPosition, impact);
 
             float? t;
 
             if (IsBallisticProjectile)
             {
-                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { t = Ballistics.TimeToReachDistance(v, CannonLocalRotation * Maths.Deg2Rad, d); }
+                using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+                { t = Maths.Ballistics.TimeToReachDistance(v, CannonLocalRotation * Rotation.Deg2Rad, d); }
             }
             else
             {
@@ -701,27 +703,27 @@ namespace Game.Components
 
                 if (a == 0f)
                 {
-                    t = Velocity.CalculateTime(d, v);
+                    t = Maths.Velocity.CalculateTime(d, v);
                 }
                 else
                 {
-                    float maxV = Acceleration.SpeedAfterDistance(v, a, d);
-                    t = Acceleration.TimeToReachVelocity(v, maxV, a);
+                    float maxV = Maths.Acceleration.SpeedAfterDistance(v, a, d);
+                    t = Maths.Acceleration.TimeToReachVelocity(v, maxV, a);
                 }
             }
 
             if (!t.HasValue) return null;
-            else if (projectile.Lifetime > 0f) return Maths.Min(t.Value, projectile.Lifetime);
+            else if (projectile.Lifetime > 0f) return Math.Min(t.Value, projectile.Lifetime);
             else return t.Value;
         }
-        internal bool TryGetTrajectory(out Ballistics.Trajectory trajectory)
+        internal bool TryGetTrajectory(out Maths.Ballistics.Trajectory trajectory)
         {
             trajectory = default;
 
             if (!IsBallisticProjectile)
             { return false; }
 
-            trajectory = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position);
+            trajectory = new Maths.Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position.To());
             return true;
         }
 
@@ -756,7 +758,7 @@ namespace Game.Components
         }
         void RotateCannon()
         {
-            CannonLocalRotation = Maths.MoveTowardsAngle(CannonLocalRotation, 0f, cannonRotationSpeed * Time.deltaTime);
+            CannonLocalRotation = Mathf.MoveTowardsAngle(CannonLocalRotation, 0f, cannonRotationSpeed * Time.deltaTime);
         }
 
         public bool Shoot()
@@ -797,7 +799,7 @@ namespace Game.Components
 
                 if (newProjectile == null)
                 {
-                    Debug.LogWarning($"Failed to instantiate projectile", this);
+                    Debug.LogWarning("Failed to instantiate projectile", this);
                     continue;
                 }
 
@@ -829,7 +831,7 @@ namespace Game.Components
                     _projectile.LifeLeft = CurrentProjectileLifetime;
                     _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
 
-                    _projectile.Shot = new Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position);
+                    _projectile.Shot = new Maths.Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position.To());
 
                     Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
 
@@ -906,11 +908,11 @@ namespace Game.Components
         public float GetRange()
         {
             float range;
-            using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+            using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
             {
-                range = Ballistics.MaxRadius(projectileVelocity, ShootHeight);
+                range = Maths.Ballistics.MaxRadius(projectileVelocity, ShootHeight);
                 if (ProjectileLifetime > 0f)
-                { range = Maths.Min(range, Ballistics.DisplacementX(45f * Maths.Deg2Rad, projectileVelocity, ProjectileLifetime)); }
+                { range = Math.Min(range, Maths.Ballistics.DisplacementX(45f * Rotation.Deg2Rad, projectileVelocity, ProjectileLifetime)); }
             }
             this.Range = range;
             return range;
@@ -920,16 +922,16 @@ namespace Game.Components
         {
             if (ShowRadius)
             {
-                float? r2 = Ballistics.CalculateX(CannonLocalRotation * Maths.Deg2Rad, projectileVelocity, ShootHeight);
+                float? r2 = Maths.Ballistics.CalculateX(CannonLocalRotation * Rotation.Deg2Rad, projectileVelocity, ShootHeight);
                 if (r2.HasValue)
                 {
-                    Gizmos.color = CoolColors.White;
+                    Gizmos.color = Maths.CoolColors.White;
                     Gizmos.DrawWireSphere(NextBarrel.ShootPosition.position, r2.Value);
                 }
 
                 float maxR = GetRange();
 
-                Gizmos.color = CoolColors.Red;
+                Gizmos.color = Maths.CoolColors.Red;
                 Gizmos.DrawWireSphere(NextBarrel.ShootPosition.position, maxR);
             }
         }
@@ -938,7 +940,7 @@ namespace Game.Components
         {
             if (TargetPosition != default)
             {
-                Gizmos.color = CoolColors.Red;
+                Gizmos.color = Maths.CoolColors.Red;
                 GizmosPlus.DrawPoint(TargetPosition, 1f);
                 Debug3D.Label(TargetPosition, "Target");
             }

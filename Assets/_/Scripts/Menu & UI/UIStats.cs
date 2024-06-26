@@ -1,3 +1,4 @@
+using System;
 using UI;
 
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace Game.UI
             {
                 GUIStyle style = Skin.GetStyle("label-stats");
 
-                string label = $"FPS: {Maths.CeilToInt(LastFramerate)}";
+                string label = $"FPS: {(int)MathF.Ceiling(LastFramerate)}";
                 Vector2 size = style.CalcSize(new GUIContent(label));
                 Vector2 position = new Vector2(Screen.width - size.x, 0) + new Vector2(-4, 4);
                 GUI.Label(new Rect(position, size), label, style);

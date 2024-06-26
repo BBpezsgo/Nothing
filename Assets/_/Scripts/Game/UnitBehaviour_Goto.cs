@@ -65,7 +65,7 @@ namespace Game.Components
 
             Gizmos.color = new Color(1f, 1f, 1f, .5f);
             Gizmos.DrawLine(transform.position, Target);
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             GizmosPlus.DrawPoint(Target, 1f);
             Debug3D.Label(Target, "Goto Target");
         }

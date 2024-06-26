@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.bb.math": "file:C:/Users/bazsi/Projects/Math",
     "com.bb.netcode.transport.offline": "file:C:/Users/bazsi/Projects/Netcode for GameObjects - Offline Transport",
     "com.community.netcode.extensions": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/com.community.netcode.extensions",
     "com.community.netcode.transport.websocket": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.websocket",

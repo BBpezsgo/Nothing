@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Maths;
 using UnityEngine;
 
 #nullable enable
 
-public static partial class UnclassifiedExtensions
+public static class UnclassifiedExtensions
 {
     public static bool TryGetRendererBounds(this GameObject @object, out Bounds bounds)
     {
@@ -449,16 +450,16 @@ public static class MeshEx
     {
         VertTriList vt = new(mesh);
         Vector3[] vertices = mesh.vertices;
-        KDTree kd = KDTree.MakeFromPoints(vertices);
+        Maths.KDTree kd = Maths.KDTree.MakeFromPoints(vertices);
         Vector3 closestPoint = NearestPointOnMesh(point, vertices, kd, mesh.triangles, vt);
         return closestPoint;
     }
 
-    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] verts, KDTree vertProx, int[] tri, VertTriList vt)
+    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] verts, Maths.KDTree vertProx, int[] tri, VertTriList vt)
     {
         // First, find the nearest vertex (the nearest point must be on one of the triangles
         // that uses this vertex if the mesh is convex).
-        (int nearest, _) = vertProx.FindNearest(pt);
+        (int nearest, _) = vertProx.FindNearest(Maths.Vector.To(pt));
 
         // Get the list of triangles in which the nearest vert "participates".
         int[] nearTris = vt[nearest];
@@ -473,7 +474,7 @@ public static class MeshEx
             Vector3 b = verts[tri[triOff + 1]];
             Vector3 c = verts[tri[triOff + 2]];
 
-            Vector3 posNearestPt = Triangle.NearestPoint(pt, a, b, c);
+            Vector3 posNearestPt = new Triangle3(a, b, c).NearestPoint(pt.To()).To();
             float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;
 
             if (posNearestSqDist < nearestSqDist)
@@ -517,7 +518,7 @@ public static class MeshEx
             Vector3 b = verts[tri[triOff + 1]];
             Vector3 c = verts[tri[triOff + 2]];
 
-            Vector3 posNearestPt = Triangle.NearestPoint(pt, a, b, c);
+            Vector3 posNearestPt = new Triangle3(a, b, c).NearestPoint(pt.To()).To();
             float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;
 
             if (posNearestSqDist < nearestSqDist)
@@ -537,76 +538,23 @@ public static class VectorEx
         v.x != float.PositiveInfinity && v.x != float.NegativeInfinity && v.x != float.NaN &&
         v.y != float.PositiveInfinity && v.y != float.NegativeInfinity && v.y != float.NaN;
 
-    public static Vector3 Clamp(this Vector3 v, Vector3 limit) => new(
-        Math.Clamp(v.x, -limit.x, limit.x),
-        Math.Clamp(v.y, -limit.y, limit.y),
-        Math.Clamp(v.z, -limit.z, limit.z));
-
-    public static Vector3 Clamp01(this Vector3 v) => new(
-        Math.Clamp(v.x, 0, 1),
-        Math.Clamp(v.y, 0, 1),
-        Math.Clamp(v.z, 0, 1));
-
-    public static Vector2 Clamp(this Vector2 v, Vector2 limit) => new(
-        Math.Clamp(v.x, -limit.x, limit.x),
-        Math.Clamp(v.y, -limit.y, limit.y));
-
-    public static Vector2 Clamp01(this Vector2 v) => new(
-        Math.Clamp(v.x, 0, 1),
-        Math.Clamp(v.y, 0, 1));
-
     public static Vector2 To2D(this Vector3 v) => new(v.x, v.z);
     public static Vector3 To3D(this Vector2 v) => new(v.x, 0f, v.y);
-    public static Vector3 To3D(this Vector2 v, float yRotation) => new(v.x * Maths.Sin(yRotation), v.y, v.x * Maths.Cos(yRotation));
-
-    public static Vector2Int ToInt(this Vector2 vector2) => new(Maths.RoundToInt(vector2.x), Maths.RoundToInt(vector2.y));
-    public static Vector2 ToFloat(this Vector2Int vector2) => new(vector2.x, vector2.y);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2 Rotate(this Vector2 v, float degrees) => v.RotateRadians(degrees * Maths.Deg2Rad);
+    public static Vector2 Rotate(this Vector2 v, float degrees) => v.RotateRadians(degrees * Mathf.Deg2Rad);
     public static Vector2 RotateRadians(this Vector2 v, float radians)
     {
-        float ca = Maths.Cos(radians);
-        float sa = Maths.Sin(radians);
+        float ca = MathF.Cos(radians);
+        float sa = MathF.Sin(radians);
         return new Vector2(ca * v.x - sa * v.y, sa * v.x + ca * v.y);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3 Rotate(this Vector3 v, float degrees) => v.RotateRadians(degrees * Maths.Deg2Rad);
-    public static Vector3 RotateRadians(this Vector3 v, float radians)
-    {
-        float ca = Maths.Cos(radians);
-        float sa = Maths.Sin(radians);
-        return new Vector3(ca * v.x - sa * v.y, sa * v.x + ca * v.y);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3 Flatten(this Vector3 v) => new(v.x, 0f, v.z);
-
-    public static bool AreEquals(this Vector2 vectorA, Vector2 vectorB, double tolerance)
-    {
-        float absX = Maths.Pow(vectorB.x - vectorA.x, 2);
-        float absY = Maths.Pow(vectorB.y - vectorA.y, 2);
-
-        return Maths.Abs(absX + absY) < tolerance;
-    }
-
-    public static bool IsUnitVector(this Vector2 vector) =>
-        vector.x >= 0 &&
-        vector.x <= 1 &&
-        vector.y >= 0 &&
-        vector.y <= 1;
-
-    public static bool IsUnitVector(this Vector3 vector) =>
-        vector.x >= 0 &&
-        vector.x <= 1 &&
-        vector.y >= 0 &&
-        vector.y <= 1 &&
-        vector.z >= 0 &&
-        vector.z <= 1;
 }
 
-public static partial class ListEx
+public static class ListEx
 {
     public static T[] PurgeObjects<T>(this T[] v) where T : UnityEngine.Object
     {
@@ -769,7 +717,7 @@ public static class RectEx
 
 public static class RectIntEx
 {
-    public static RectInt Padding(this RectInt rect, int padding)
+    public static UnityEngine.RectInt Padding(this UnityEngine.RectInt rect, int padding)
     {
         int halfPadding = padding / 2;
         rect.x -= halfPadding;
@@ -779,13 +727,13 @@ public static class RectIntEx
         return rect;
     }
 
-    public static Rect ToFloat(this RectInt rect) => new(rect.x, rect.y, rect.width, rect.height);
+    public static Rect ToFloat(this UnityEngine.RectInt rect) => new(rect.x, rect.y, rect.width, rect.height);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2Int TopLeft(this RectInt rect) => rect.position;
-    public static Vector2Int TopRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
-    public static Vector2Int BottomLeft(this RectInt rect) => new(rect.position.x, rect.position.y + rect.height);
-    public static Vector2Int BottomRight(this RectInt rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
+    public static UnityEngine.Vector2Int TopLeft(this UnityEngine.RectInt rect) => rect.position;
+    public static UnityEngine.Vector2Int TopRight(this UnityEngine.RectInt rect) => new(rect.position.x + rect.width, rect.position.y);
+    public static UnityEngine.Vector2Int BottomLeft(this UnityEngine.RectInt rect) => new(rect.position.x, rect.position.y + rect.height);
+    public static UnityEngine.Vector2Int BottomRight(this UnityEngine.RectInt rect) => new(rect.position.x + rect.width, rect.position.y + rect.height);
 }
 
 public static class TransformEx

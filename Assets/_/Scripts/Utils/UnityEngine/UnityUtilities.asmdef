@@ -2,7 +2,8 @@
     "name": "UnityUtilities",
     "rootNamespace": "",
     "references": [
-        "GUID:96424ca1d1e0bc649bce10279a53ff07"
+        "GUID:96424ca1d1e0bc649bce10279a53ff07",
+        "GUID:ba4f5b29e21c53b4fb62f5380e5ec7ec"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

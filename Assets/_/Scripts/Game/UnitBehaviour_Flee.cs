@@ -57,10 +57,10 @@ namespace Game.Components
                 if (allUnit[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allUnit[i].TeamHash) <= 0f)
                 { continue; }
-                float distance = Maths.Distance(transform.position, allUnit[i].transform.position);
+                float distance = Vector3.Distance(transform.position, allUnit[i].transform.position);
                 if (distance > FleeDistance)
                 { continue; }
-                if (FleeFrom != null && Maths.Distance(transform.position, FleeFrom.position) < distance)
+                if (FleeFrom != null && Vector3.Distance(transform.position, FleeFrom.position) < distance)
                 { continue; }
 
                 FleeFrom = allUnit[i].transform;
@@ -71,10 +71,10 @@ namespace Game.Components
                 if (allBuilding[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allBuilding[i].TeamHash) <= 0f)
                 { continue; }
-                float distance = Maths.Distance(transform.position, allBuilding[i].transform.position);
+                float distance = Vector3.Distance(transform.position, allBuilding[i].transform.position);
                 if (distance > FleeDistance)
                 { continue; }
-                if (FleeFrom != null && Maths.Distance(transform.position, FleeFrom.position) < distance)
+                if (FleeFrom != null && Vector3.Distance(transform.position, FleeFrom.position) < distance)
                 { continue; }
 
                 FleeFrom = allBuilding[i].transform;
@@ -86,14 +86,14 @@ namespace Game.Components
             base.DrawGizmos();
             if (FleeFrom == null) return;
 
-            Gizmos.color = CoolColors.Red;
+            Gizmos.color = Maths.CoolColors.Red;
             Gizmos.DrawLine(transform.position, FleeFrom.position);
             GizmosPlus.DrawPoint(FleeFrom.position, 1f);
             Debug3D.Label(FleeFrom.position, "Flee From");
 
             Gizmos.color = new Color(1f, 1f, 1f, .5f);
             Gizmos.DrawLine(transform.position, Target);
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             GizmosPlus.DrawPoint(Target, 1f);
 
             Debug3D.Label(Target, "Flee Target");

@@ -1,6 +1,7 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using Game.Managers;
+using Maths;
 using Unity.Netcode;
 using UnityEngine;
 using Utilities;
@@ -120,7 +121,7 @@ namespace Game.Components
         protected virtual void Start()
         {
             _maxHp = HP == 0f ? 1f : HP;
-            IdleSoundTimer = Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
+            IdleSoundTimer = UnityEngine.Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
         }
 
         public override void OnDestroy()
@@ -147,10 +148,10 @@ namespace Game.Components
             }
             else
             {
-                IdleSoundTimer = Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
+                IdleSoundTimer = UnityEngine.Random.Range(IdleSoundInterval.x, IdleSoundInterval.y);
                 if (IdleSounds.Length > 0)
                 {
-                    int i = Random.Range(0, IdleSounds.Length - 1);
+                    int i = UnityEngine.Random.Range(0, IdleSounds.Length - 1);
                     AudioSource.PlayOneShot(IdleSounds[i]);
                 }
             }
@@ -174,8 +175,8 @@ namespace Game.Components
         protected virtual Vector3 FindNewDestination()
         {
             Vector3 result = transform.position;
-            result.x += Random.Range(-20, 20);
-            result.z += Random.Range(-20, 20);
+            result.x += UnityEngine.Random.Range(-20, 20);
+            result.z += UnityEngine.Random.Range(-20, 20);
 
             result.z = TheTerrain.Height(result);
 
@@ -185,8 +186,8 @@ namespace Game.Components
         protected virtual Vector3 FindFleeDestination()
         {
             Vector3 result = transform.position;
-            result.x += Random.Range(-40, 40);
-            result.z += Random.Range(-40, 40);
+            result.x += UnityEngine.Random.Range(-40, 40);
+            result.z += UnityEngine.Random.Range(-40, 40);
 
             result.z = TheTerrain.Height(result);
 
@@ -252,7 +253,7 @@ namespace Game.Components
 
         void Movement(Vector3 destination)
         {
-            float distanceToDestination = Maths.Distance(transform.position.To2D(), destination.To2D());
+            float distanceToDestination = Vector2.Distance(transform.position.To2D(), destination.To2D());
 
             if (distanceToDestination < 1f)
             {
@@ -262,7 +263,7 @@ namespace Game.Components
 
             Vector3 localTarget = transform.InverseTransformPoint(destination);
 
-            float deltaAngle = Maths.Atan2(localTarget.x, localTarget.z) * Maths.Rad2Deg;
+            float deltaAngle = MathF.Atan2(localTarget.x, localTarget.z) * Rotation.Rad2Deg;
 
             Vector3 deltaPosition = Speed * Time.deltaTime * transform.forward;
 
@@ -292,7 +293,7 @@ namespace Game.Components
             {
                 if (DamageSounds.Length > 0)
                 {
-                    int i = Random.Range(0, DamageSounds.Length - 1);
+                    int i = UnityEngine.Random.Range(0, DamageSounds.Length - 1);
                     AudioSource.PlayOneShot(DamageSounds[i]);
                 }
 
@@ -311,7 +312,7 @@ namespace Game.Components
         {
             Gizmos.color = new Color(1f, 1f, 1f, .5f);
             Gizmos.DrawLine(transform.position, Destination);
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             GizmosPlus.DrawPoint(Destination, 1f);
             Debug3D.Label(Destination, "Target");
         }

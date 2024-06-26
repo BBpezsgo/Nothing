@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Game.Managers;
 using Unity.Netcode;
@@ -74,7 +75,7 @@ namespace Game.Components
 
         internal bool Repair(float v)
         {
-            HP = Maths.Min(MaxHP, HP + v);
+            HP = Math.Min(MaxHP, HP + v);
             return HP >= MaxHP;
         }
     }

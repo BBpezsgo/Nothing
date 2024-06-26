@@ -1,3 +1,4 @@
+using System;
 using Game.Managers;
 using UnityEngine;
 using Utilities;
@@ -230,16 +231,16 @@ namespace Game.Components
 
             if (TakeControlManager.Instance.IsScoping && turret.ScopeHolder != null && !MenuManager.AnyMenuVisible)
             {
-                float scopeSensitivity = ScopeSensitivity * Maths.Clamp((40f - CameraController.Instance.ScopeZoom) / 40f, .5f, 1f);
+                float scopeSensitivity = ScopeSensitivity * Math.Clamp((40f - CameraController.Instance.ScopeZoom) / 40f, .5f, 1f);
 
                 Vector3 newRotation = turret.ScopeHolder.localRotation.eulerAngles + new Vector3(Mouse.DeltaY * (-scopeSensitivity), Mouse.DeltaX * scopeSensitivity, 0f);
 
-                newRotation.x = Maths.NormalizeAngle(newRotation.x);
+                newRotation.x = Maths.General.NormalizeAngle(newRotation.x);
 
-                float minAngle = -Maths.Abs(turret.cannonHighestAngle);
-                float maxAngle = Maths.Abs(turret.cannonLowestAngle);
+                float minAngle = -Math.Abs(turret.cannonHighestAngle);
+                float maxAngle = Math.Abs(turret.cannonLowestAngle);
 
-                newRotation.x = Maths.Clamp(newRotation.x, minAngle, maxAngle);
+                newRotation.x = Math.Clamp(newRotation.x, minAngle, maxAngle);
 
                 turret.ScopeHolder.localRotation = Quaternion.Euler(newRotation);
             }

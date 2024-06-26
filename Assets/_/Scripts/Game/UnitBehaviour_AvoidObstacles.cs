@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
@@ -18,7 +19,7 @@ namespace Game.Components
 
         protected virtual void Start()
         {
-            TimeToCheck = Random.value + 1f;
+            TimeToCheck = UnityEngine.Random.value + 1f;
         }
 
         void Update()
@@ -37,7 +38,7 @@ namespace Game.Components
                 }
                 else
                 {
-                    TimeToCheck = Maths.Clamp((DetectionRange * DetectionRange) / MovementEngine.Velocity.sqrMagnitude, .1f, MaxDetectionCooldown);
+                    TimeToCheck = Math.Clamp((DetectionRange * DetectionRange) / MovementEngine.Velocity.sqrMagnitude, .1f, MaxDetectionCooldown);
                 }
             }
 
@@ -117,7 +118,7 @@ namespace Game.Components
 
             float lr = Vector2.SignedAngle(transform.forward, offset) / 180;
 
-            float steering = 1f - Maths.Abs(lr);
+            float steering = 1f - Math.Abs(lr);
             if (lr < 0) steering = -steering;
 
             steering *= 1f - dot;
@@ -172,12 +173,12 @@ namespace Game.Components
                 if (IgnoreCollision != null &&
                     obstacle.transform.IsChildOf(IgnoreCollision))
                 {
-                    Gizmos.color = CoolColors.Orange;
+                    Gizmos.color = Maths.CoolColors.Orange;
                     Gizmos.DrawWireCube(obstacle.bounds.center, obstacle.bounds.size);
                     continue;
                 }
 
-                Gizmos.color = CoolColors.Red;
+                Gizmos.color = Maths.CoolColors.Red;
                 Gizmos.DrawWireCube(obstacle.bounds.center, obstacle.bounds.size);
             }
         }

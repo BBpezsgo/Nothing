@@ -127,15 +127,15 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
         int selected = -1;
 
-        if (Maths.Distance(mousePosition, center) >= InnerRadius)
+        if (Vector2.Distance(mousePosition, center) >= InnerRadius)
         {
             Vector2 mouseDirection = mouseOffset.normalized;
             float smallestDot = float.MaxValue;
             for (int i = 0; i < commands.Length; i++)
             {
-                float rad = 2f * Maths.PI * (((float)i) / ((float)commands.Length));
-                float x = Maths.Cos(rad);
-                float y = Maths.Sin(rad);
+                float rad = 2f * MathF.PI * (((float)i) / ((float)commands.Length));
+                float x = MathF.Cos(rad);
+                float y = MathF.Sin(rad);
                 Vector2 direction = new(x, y);
                 float dot = Vector2.Dot(direction, mouseDirection);
                 if (dot < smallestDot)
@@ -151,9 +151,9 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             float normalizedIndex = (float)i / (float)commands.Length;
             float localAnimationTime = Math.Clamp(((showTime - (normalizedIndex / ShowSpeed)) * ShowSpeed) - .3f, 0f, 1f);
 
-            float rad = 2 * Maths.PI * normalizedIndex;
-            float x = Maths.Cos(rad);
-            float y = Maths.Sin(rad);
+            float rad = 2 * MathF.PI * normalizedIndex;
+            float x = MathF.Cos(rad);
+            float y = MathF.Sin(rad);
             Vector2 direction = new(x, y);
             Vector2 point = MiddleRadius * localAnimationTime * direction;
 
@@ -229,7 +229,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             Vector2 diff = (Vector2)projectedWorldPosition - center;
             float diffD = diff.sqrMagnitude;
 
-            if (diffD > Maths.Pow(OuterRadius, 2))
+            if (diffD > MathF.Pow(OuterRadius, 2))
             {
                 Vector2 startP = center + (diff.normalized * OuterRadius);
 

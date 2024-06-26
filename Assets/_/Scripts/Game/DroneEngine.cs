@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -48,8 +49,8 @@ namespace Game.Components
             {
                 if (value.x == float.NegativeInfinity || value.x == float.PositiveInfinity || value.x == float.NaN) return;
                 if (value.y == float.NegativeInfinity || value.y == float.PositiveInfinity || value.y == float.NaN) return;
-                SteeringInput = Maths.Clamp(value.x, -1f, 1f);
-                TorqueInput = Maths.Clamp(value.y, -1f, 1f);
+                SteeringInput = Math.Clamp(value.x, -1f, 1f);
+                TorqueInput = Math.Clamp(value.y, -1f, 1f);
             }
             get => new(SteeringInput, TorqueInput);
         }
@@ -61,9 +62,9 @@ namespace Game.Components
                 if (value.x == float.NegativeInfinity || value.x == float.PositiveInfinity || value.x == float.NaN) return;
                 if (value.y == float.NegativeInfinity || value.y == float.PositiveInfinity || value.y == float.NaN) return;
                 if (value.z == float.NegativeInfinity || value.z == float.PositiveInfinity || value.z == float.NaN) return;
-                SteeringInput = Maths.Clamp(value.x, -1f, 1f);
-                TorqueInput = Maths.Clamp(value.y, -1f, 1f);
-                SidewaysInput = Maths.Clamp(value.z, -1f, 1f);
+                SteeringInput = Math.Clamp(value.x, -1f, 1f);
+                TorqueInput = Math.Clamp(value.y, -1f, 1f);
+                SidewaysInput = Math.Clamp(value.z, -1f, 1f);
             }
             get => new(SteeringInput, TorqueInput, SidewaysInput);
         }
@@ -106,7 +107,7 @@ namespace Game.Components
 
         public float LaterialVelocity => Vector3.Dot(transform.right, rb.linearVelocity);
 
-        public bool IsBraking => Maths.Abs(TorqueInput) <= .0069f && Maths.Abs(SidewaysInput) <= .0069f;
+        public bool IsBraking => Math.Abs(TorqueInput) <= .0069f && Math.Abs(SidewaysInput) <= .0069f;
 
         public float Braking
         {
@@ -141,7 +142,7 @@ namespace Game.Components
         /// <summary>
         /// <b>Check if it's really handbrakeing!!!</b> <see cref="IsHandbraking"/>
         /// </summary>
-        public float HandbrakeValue => handbrake * (1 - Maths.Abs(Maths.Min(1, LaterialVelocity)));
+        public float HandbrakeValue => handbrake * (1 - Math.Abs(Math.Min(1, LaterialVelocity)));
 
         #region Mono Callbacks
 
@@ -157,7 +158,7 @@ namespace Game.Components
             base.FixedUpdate();
             DoBasicPhysics();
 
-            SmoothSteeringInput = Maths.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);
+            SmoothSteeringInput = Mathf.MoveTowards(SmoothSteeringInput, SteeringInput, Time.fixedDeltaTime * steeringSpeed);
 
             ApplySteering();
         }
@@ -202,14 +203,14 @@ namespace Game.Components
         {
             if (TorqueInput != 0f)
             {
-                float engineForce = TorqueInput * moveAccelerationFactor * Maths.Max(0f, 1 - (Speed / moveSpeedMax));
+                float engineForce = TorqueInput * moveAccelerationFactor * Math.Max(0f, 1 - (Speed / moveSpeedMax));
                 Vector3 engineForceVector = transform.forward * engineForce;
                 rb.AddForce(engineForceVector, ForceMode.Force);
             }
 
             if (SidewaysInput != 0f)
             {
-                float engineForce = SidewaysInput * moveAccelerationFactor * Maths.Max(0f, 1 - (SidewaysSpeed / moveSpeedMax));
+                float engineForce = SidewaysInput * moveAccelerationFactor * Math.Max(0f, 1 - (SidewaysSpeed / moveSpeedMax));
                 Vector3 engineForceVector = transform.right * engineForce;
                 rb.AddForce(engineForceVector, ForceMode.Force);
             }

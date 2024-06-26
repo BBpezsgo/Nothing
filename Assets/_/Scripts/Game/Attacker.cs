@@ -50,7 +50,7 @@ namespace Game.Components
                 if (allUnit[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allUnit[i].TeamHash) <= 0f)
                 { continue; }
-                if (Maths.Distance(transform.position, allUnit[i].transform.position) > DetectionRadius)
+                if (Vector3.Distance(transform.position, allUnit[i].transform.position) > DetectionRadius)
                 { continue; }
 
                 targets[j++] = allUnit[i];
@@ -62,7 +62,7 @@ namespace Game.Components
                 if (allBuilding[i] == null) continue;
                 if (TeamManager.Instance.GetFuckYou(TeamHash, allBuilding[i].TeamHash) <= 0f)
                 { continue; }
-                if (Maths.Distance(transform.position, allBuilding[i].transform.position) > DetectionRadius)
+                if (Vector3.Distance(transform.position, allBuilding[i].transform.position) > DetectionRadius)
                 { continue; }
 
                 targets[j++] = allBuilding[i];
@@ -147,7 +147,7 @@ namespace Game.Components
                 turret.IsAccurateShoot &&
                 !turret.OutOfRange &&
                 NetcodeUtils.IsOfflineOrServer &&
-                Maths.Distance(turret.ShootPosition, target.transform.position) <= turret.GetRange())
+                Vector3.Distance(turret.ShootPosition, target.transform.position) <= turret.GetRange())
             {
                 if (target.TryGetComponent(out requiredShoots))
                 { turret.Shoot(requiredShoots); }
@@ -179,12 +179,12 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(transform.position, DetectionRadius);
 
             if (targets != null)
             {
-                Gizmos.color = CoolColors.Blue;
+                Gizmos.color = Maths.CoolColors.Blue;
                 for (int i = 0; i < targets.Length; i++)
                 {
                     if (targets[i] == null) continue;
@@ -195,7 +195,7 @@ namespace Game.Components
 
             if (priorityTargets != null)
             {
-                Gizmos.color = CoolColors.Blue;
+                Gizmos.color = Maths.CoolColors.Blue;
                 for (int i = 0; i < priorityTargets.Count; i++)
                 {
                     if (priorityTargets[i] == null) continue;

@@ -6,11 +6,14 @@ using Game.Managers;
 using Game.UI;
 using Game.UI.Components;
 using InputUtils;
+using Maths;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Utilities;
 using Utilities.Drawers;
+using Math = System.Math;
+using MathF = System.MathF;
 
 #nullable enable
 
@@ -140,7 +143,7 @@ namespace Game.Managers
 
             if (SphereFilled != null)
             { Texture2D.Destroy(SphereFilled); }
-            SphereFilled = GUIUtils.GenerateCircleFilled(Vector2Int.one * 32);
+            SphereFilled = GUIUtils.GenerateCircleFilled(UnityEngine.Vector2Int.one * 32);
 
             ControllingObjects = new NetworkList<ulong>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
             ControllingObjects.OnListChanged += ControllingObjectsChanged;
@@ -931,9 +934,9 @@ namespace Game.Managers
             {
                 if (ShouldDrawTrajectory)
                 {
-                    using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+                    using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
                     {
-                        if (hasTurret.Turret.TryGetTrajectory(out Ballistics.Trajectory trajectory))
+                        if (hasTurret.Turret.TryGetTrajectory(out Maths.Ballistics.Trajectory trajectory))
                         {
                             const int iterations = 5;
                             const float step = .2f;
@@ -943,7 +946,7 @@ namespace Game.Managers
                             float t = 0f;
                             for (int i = 0; i < iterations; i++)
                             {
-                                Vector3 point = trajectory.Position(t);
+                                Vector3 point = trajectory.Position(t).To();
                                 t += step;
 
                                 Vector3 screenPoint = MainCamera.Camera.WorldToScreenPoint(point);
@@ -987,7 +990,7 @@ namespace Game.Managers
                 { ReloadIndicatorFadeoutAnimation.Start(); }
 
                 if (hasTurret.Turret.reloadTime > 0.01f)
-                { reloadPercent = 1f - Maths.Clamp01(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime); }
+                { reloadPercent = 1f - Math.Clamp(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime, 0, 1); }
 
                 isAccurate = hasTurret.Turret.IsAccurateShoot;
 
@@ -1033,10 +1036,10 @@ namespace Game.Managers
                 }
                 else
                 {
-                    this.targetRect.x = Maths.MoveTowards(this.targetRect.x, targetRect.x, 1f);
-                    this.targetRect.y = Maths.MoveTowards(this.targetRect.y, targetRect.y, 1f);
-                    this.targetRect.width = Maths.MoveTowards(this.targetRect.width, targetRect.width, 1f);
-                    this.targetRect.height = Maths.MoveTowards(this.targetRect.height, targetRect.height, 1f);
+                    this.targetRect.x = Mathf.MoveTowards(this.targetRect.x, targetRect.x, 1f);
+                    this.targetRect.y = Mathf.MoveTowards(this.targetRect.y, targetRect.y, 1f);
+                    this.targetRect.width = Mathf.MoveTowards(this.targetRect.width, targetRect.width, 1f);
+                    this.targetRect.height = Mathf.MoveTowards(this.targetRect.height, targetRect.height, 1f);
                 }
             }
 
@@ -1100,12 +1103,12 @@ namespace Game.Managers
 
             Rect labelRect = new(new Vector2(point.x, point.y - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize));
 
-            DrawLabelShadowed(labelRect, $"{Maths.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m", Color.white);
+            DrawLabelShadowed(labelRect, $"{MathF.Round(MetricUtils.GetMeters((ControllingObject.Object().transform.position - targetObject.position).sqrMagnitude))} m", Color.white);
 
             if (targetObject.TryGetComponent(out RequiredShoots requiredShoots))
             {
                 labelRect = new Rect(labelRect.x, labelRect.y - labelRect.height, labelRect.width, labelRect.height);
-                DrawLabelShadowed(labelRect, $"eHP: {Maths.Round(requiredShoots.EstimatedHP)}", Color.white);
+                DrawLabelShadowed(labelRect, $"eHP: {MathF.Round(requiredShoots.EstimatedHP)}", Color.white);
             }
         }
 
@@ -1147,10 +1150,10 @@ namespace Game.Managers
                     {
                         float normalizedIndex = (float)i / (float)ReloadDots;
 
-                        float rad = 2 * Maths.PI * normalizedIndex;
-                        Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                        float rad = 2 * MathF.PI * normalizedIndex;
+                        Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
-                        float multiplier = Maths.Clamp01((value - normalizedIndex) / step);
+                        float multiplier = Math.Clamp((value - normalizedIndex) / step, 0, 1);
 
                         if (multiplier <= .01f)
                         { continue; }
@@ -1178,8 +1181,8 @@ namespace Game.Managers
                         {
                             float normalizedIndex = (float)i / (float)ReloadDots;
 
-                            float rad = 2 * Maths.PI * normalizedIndex;
-                            Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                            float rad = 2 * MathF.PI * normalizedIndex;
+                            Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                             float size = ReloadDotsSize;
 

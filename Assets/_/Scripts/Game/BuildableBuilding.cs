@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Game.Managers;
 using Unity.Netcode;
@@ -78,7 +79,7 @@ namespace Game.Components
             { return true; }
 
             if (Particles != null && QualityHandler.EnableParticles)
-            { Particles.Emit(Maths.RoundToInt(ParticlesAmmount * progress)); }
+            { Particles.Emit((int)MathF.Round(ParticlesAmmount * progress)); }
 
             BuildingProcess += progress;
 

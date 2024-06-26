@@ -1,3 +1,4 @@
+using System;
 using Game.Managers;
 using UnityEngine;
 using Utilities;
@@ -52,14 +53,14 @@ namespace Game.Components
             // No destination?
             if (destinationPosition == default) return default;
 
-            float distanceToDestination = Maths.Distance(transform.position, destinationPosition);
+            float distanceToDestination = Vector3.Distance(transform.position, destinationPosition);
 
             // === Braking ===
             if (distanceToDestination <= DISTANCE_TO_STOP_BRUH)
             { return default; }
             else if (brakingDistance.HasValue)
             {
-                if (distanceToDestination <= Maths.Abs(brakingDistance.Value) + BRAKING_DISTANCE_ERROR)
+                if (distanceToDestination <= Math.Abs(brakingDistance.Value) + BRAKING_DISTANCE_ERROR)
                 { return default; }
             }
             else if (distanceToDestination <= DISTANCE_TO_STOP)
@@ -92,7 +93,7 @@ namespace Game.Components
                 // ===  ===
                 */
 
-                float steerAmount = Maths.Clamp(angleToTarget / 90f, -1f, 1f);
+                float steerAmount = Math.Clamp(angleToTarget / 90f, -1f, 1f);
 
                 // ===  ===
 
@@ -102,11 +103,11 @@ namespace Game.Components
                 { torque = 1f; }
                 else if (transform.TryGetComponent(out VehicleEngine vehicleEngine) && vehicleEngine.isHaveTracks)
                 {
-                    steerAmount = Maths.Clamp(steerAmount * 16, -1, 1);
-                    torque = Maths.Abs(steerAmount) < .01f ? 1f : 0f;
+                    steerAmount = Math.Clamp(steerAmount * 16, -1, 1);
+                    torque = Math.Abs(steerAmount) < .01f ? 1f : 0f;
                 }
                 else
-                { torque = 1f - Maths.Abs(steerAmount) + 0.5f; }
+                { torque = 1f - Math.Abs(steerAmount) + 0.5f; }
 
                 // === Reversing 2 ===
                 if (
@@ -135,7 +136,7 @@ namespace Game.Components
 
             Gizmos.color = new Color(1f, 1f, 1f, .5f);
             Gizmos.DrawLine(transform.position, Target);
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             GizmosPlus.DrawPoint(Target, 1f);
 
             Debug3D.Label(Target, "Seek Target");

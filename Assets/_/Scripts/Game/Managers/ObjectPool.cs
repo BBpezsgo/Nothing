@@ -8,8 +8,8 @@ using UnityEngine;
 public readonly struct PooledPrefab : IEquatable<PooledPrefab>, IEquatable<PooledPrefab?>
 {
     readonly int PoolIndex;
-    readonly bool IsNotNull;
-    readonly bool IsNull => !IsNotNull;
+    public readonly bool IsNotNull;
+    public readonly bool IsNull => !IsNotNull;
 
     public PooledPrefab(int index)
     {

@@ -40,7 +40,7 @@ namespace Game.Managers
 
         void Update()
         {
-            FocusDistance.value = Maths.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.unscaledDeltaTime);
+            FocusDistance.value = Mathf.Lerp(FocusDistance.value, TargetFocusDistance, focusSpeed * Time.unscaledDeltaTime);
 
             if (NextRefresh > 0f)
             {

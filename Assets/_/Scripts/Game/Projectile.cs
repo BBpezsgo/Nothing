@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using Game.Managers;
+using Maths;
 using UnityEngine;
 using Utilities;
 
@@ -24,7 +26,7 @@ namespace Game.Components
             {
                 if (Sounds.Length == 0) return null;
                 if (Sounds.Length == 1) return Sounds[0];
-                return Sounds[Random.Range(0, Sounds.Length - 1)];
+                return Sounds[UnityEngine.Random.Range(0, Sounds.Length - 1)];
             }
 
             [Header("Particles")]
@@ -95,7 +97,7 @@ namespace Game.Components
 
         internal Vector3 Position => rb == null ? transform.position : rb.position + (rb.linearVelocity * Time.fixedDeltaTime);
 
-        internal Ballistics.Trajectory Shot;
+        internal Maths.Ballistics.Trajectory Shot;
 
         [SerializeField, ReadOnly] bool destroyed = false;
 
@@ -115,7 +117,7 @@ namespace Game.Components
 
             if (RandomRotation)
             {
-                Quaternion randomRotation = Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)));
+                Quaternion randomRotation = Quaternion.Euler(new Vector3(UnityEngine.Random.Range(0f, 360f), UnityEngine.Random.Range(0f, 360f), UnityEngine.Random.Range(0f, 360f)));
                 if (RotateThis != null)
                 { RotateThis.rotation = randomRotation; }
                 else
@@ -426,7 +428,7 @@ namespace Game.Components
                     if (PropabilityOfProjectileIntersection == 0f)
                     { return false; }
 
-                    if (PropabilityOfProjectileIntersection != 1f && Random.value > PropabilityOfProjectileIntersection)
+                    if (PropabilityOfProjectileIntersection != 1f && UnityEngine.Random.value > PropabilityOfProjectileIntersection)
                     { return false; }
                 }
 
@@ -436,7 +438,7 @@ namespace Game.Components
             else if (CanBounce && (!hasMaterial || material.Hardness > float.Epsilon))
             {
                 float normalAngle = Vector3.Angle(rb.linearVelocity, -normal);
-                float impactAngle = 90f - Maths.Clamp(normalAngle, 0f, 90f);
+                float impactAngle = 90f - Math.Clamp(normalAngle, 0f, 90f);
 
                 float modifiedImpactAngle = impactAngle;
                 if (hasMaterial)
@@ -444,7 +446,7 @@ namespace Game.Components
 
                 if (modifiedImpactAngle < BounceAngle && rb != null)
                 {
-                    float impactEnergy = Maths.Sin(impactAngle * Maths.Deg2Rad);
+                    float impactEnergy = MathF.Sin(impactAngle * Rotation.Deg2Rad);
                     float remainingEnergy = 1f - impactEnergy;
 
                     if ((DamageAllies || fuckYouValue >= 0f) && ImpactForce != 0f && obj.attachedRigidbody != null)
@@ -647,7 +649,7 @@ namespace Game.Components
 
                     GameObject @object = objectCollider.gameObject;
 
-                    float distance = Maths.Max(1f, Maths.Distance(@object.transform.position, origin));
+                    float distance = Math.Max(1f, Vector3.Distance(@object.transform.position, origin));
                     float amount = (ExploisonDamage * (1f - absorbed)) / distance;
 
                     if (@object.TryGetComponent(out IDetailedDamageable detailedDamageable))

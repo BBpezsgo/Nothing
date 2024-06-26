@@ -1,3 +1,5 @@
+using System;
+using Maths;
 using UnityEngine;
 
 namespace Utilities.Drawers
@@ -55,8 +57,8 @@ namespace Utilities.Drawers
         {
             Vector2 halfSize = boxSize / 2;
 
-            float boxCornerSizeWidth = Maths.Min(halfSize.x, boxCornerSize);
-            float boxCornerSizeHeight = Maths.Min(halfSize.y, boxCornerSize);
+            float boxCornerSizeWidth = Math.Min(halfSize.x, boxCornerSize);
+            float boxCornerSizeHeight = Math.Min(halfSize.y, boxCornerSize);
 
             Vector2 innerPointV = Vector2.up * crossInnerSize;
             Vector2 outerPointV = Vector2.up * crossOuterSize;
@@ -74,8 +76,8 @@ namespace Utilities.Drawers
                 GL.Begin(GL.LINES);
                 GL.Color(color);
 
-                Vector2 crossLeftOuter = new(Maths.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
-                Vector2 crossRightOuter = new(Maths.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
+                Vector2 crossLeftOuter = new(Mathf.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
+                Vector2 crossRightOuter = new(Mathf.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
 
                 GL.Vertex(center + Vector2.Lerp(crossLeft.Inner, crossLeftOuter, t));
                 GL.Vertex(center + crossLeftOuter);
@@ -184,8 +186,8 @@ namespace Utilities.Drawers
         {
             Vector2 halfSize = boxSize / 2;
 
-            float boxCornerSizeWidth = Maths.Min(halfSize.x, boxCornerSize);
-            float boxCornerSizeHeight = Maths.Min(halfSize.y, boxCornerSize);
+            float boxCornerSizeWidth = Math.Min(halfSize.x, boxCornerSize);
+            float boxCornerSizeHeight = Math.Min(halfSize.y, boxCornerSize);
 
             Vector2 innerPointV = DiagonalVectors.TopRight * crossInnerSize;
             Vector2 outerPointV = DiagonalVectors.TopRight * crossOuterSize;
@@ -203,8 +205,8 @@ namespace Utilities.Drawers
                 GL.Begin(GL.LINES);
                 GL.Color(color);
 
-                Vector2 crossLeftOuter = new(Maths.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
-                Vector2 crossRightOuter = new(Maths.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
+                Vector2 crossLeftOuter = new(Mathf.Lerp(crossLeft.Outer.x, halfSize.x, t), crossLeft.Outer.y);
+                Vector2 crossRightOuter = new(Mathf.Lerp(crossRight.Outer.x, -halfSize.x, t), crossRight.Outer.y);
 
                 GL.Vertex(center + Vector2.Lerp(crossLeft.Inner, crossLeftOuter, t));
                 GL.Vertex(center + crossLeftOuter);
@@ -262,9 +264,9 @@ namespace Utilities.Drawers
 
     internal readonly struct Cross3Drawer
     {
-        static readonly Vector2 Direction1 = new(Maths.Cos(Maths.Deg2Rad * (120 * 0 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 0 + 30)));
-        static readonly Vector2 Direction2 = new(Maths.Cos(Maths.Deg2Rad * (120 * 1 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 1 + 30)));
-        static readonly Vector2 Direction3 = new(Maths.Cos(Maths.Deg2Rad * (120 * 2 + 30)), Maths.Sin(Maths.Deg2Rad * (120 * 2 + 30)));
+        static readonly Vector2 Direction1 = new(MathF.Cos(Rotation.Deg2Rad * (120 * 0 + 30)), MathF.Sin(Rotation.Deg2Rad * (120 * 0 + 30)));
+        static readonly Vector2 Direction2 = new(MathF.Cos(Rotation.Deg2Rad * (120 * 1 + 30)), MathF.Sin(Rotation.Deg2Rad * (120 * 1 + 30)));
+        static readonly Vector2 Direction3 = new(MathF.Cos(Rotation.Deg2Rad * (120 * 2 + 30)), MathF.Sin(Rotation.Deg2Rad * (120 * 2 + 30)));
 
         static (Line Line1, Line Line2, Line Line3) GetLines(Vector2 center, float innerSize, float outerSize)
         {
@@ -359,8 +361,8 @@ namespace Utilities.Drawers
 
             Vector2 halfSize = size / 2;
 
-            float cornerSizeWidth = Maths.Min(halfSize.x, cornerSize);
-            float cornerSizeHeight = Maths.Min(halfSize.y, cornerSize);
+            float cornerSizeWidth = Math.Min(halfSize.x, cornerSize);
+            float cornerSizeHeight = Math.Min(halfSize.y, cornerSize);
             
             Vector2 topLeft = new(-halfSize.x, -halfSize.y);
             Vector2 topRight = new(halfSize.x, -halfSize.y);
@@ -407,9 +409,9 @@ namespace Utilities.Drawers
 
     internal readonly struct DiagonalVectors
     {
-        internal static Vector2 TopLeft => new(-Maths.Sqrt2, Maths.Sqrt2);
-        internal static Vector2 TopRight => new(Maths.Sqrt2, Maths.Sqrt2);
-        internal static Vector2 BottomLeft => new(-Maths.Sqrt2, -Maths.Sqrt2);
-        internal static Vector2 BottomRight => new(Maths.Sqrt2, -Maths.Sqrt2);
+        internal static Vector2 TopLeft => new(-General.Sqrt2, General.Sqrt2);
+        internal static Vector2 TopRight => new(General.Sqrt2, General.Sqrt2);
+        internal static Vector2 BottomLeft => new(-General.Sqrt2, -General.Sqrt2);
+        internal static Vector2 BottomRight => new(General.Sqrt2, -General.Sqrt2);
     }
 }

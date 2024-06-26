@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using Maths;
 using UnityEngine;
 
 using Utilities;
@@ -63,7 +63,7 @@ namespace Game.Components
                 { return false; }
             }
 
-            (Vector3 PredictedPosition, float TimeToReach)? predictedAim = Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition, projectile.Shot);
+            (System.Numerics.Vector3 PredictedPosition, float TimeToReach)? predictedAim = Maths.Ballistics.CalculateInterceptCourse(turret.projectileVelocity, projectile.Lifetime, Turret.ShootPosition.To(), projectile.Shot);
 
             /*
             float? angle_;
@@ -121,7 +121,7 @@ namespace Game.Components
 
                 // turret.Input = new Vector2(0f, angle_.Value * Maths.Rad2Deg); // (turret.ShootPosition + (Quaternion.Euler(-angle_.Value * Maths.Rad2Deg, 0f, 0f) * Vector3.forward) * 5f);
                 turret.RequiredProjectileLifetime = predictedAim.Value.TimeToReach - Time.deltaTime;
-                turret.SetTarget(predictedAim.Value.PredictedPosition);
+                turret.SetTarget(predictedAim.Value.PredictedPosition.To());
             }
             else
             {

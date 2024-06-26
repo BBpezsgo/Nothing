@@ -9,127 +9,6 @@ using UnityEditor;
 
 #nullable enable
 
-public static class CoolColors
-{
-    public static Color White => new(1f, 1f, 1f);
-    public static Color Black => new(0f, 0f, 0f);
-
-    public static Color Red => new(0.921568632f, 0.137254909f, 0.08235294f);
-    public static Color BrightRed => new(0.8588235f, 0.3607843f, 0.282353f);
-    public static Color DarkRed => new(0.4313726f, 0.05490196f, 0.1176471f);
-
-    public static Color Green => new(0.06666667f, 0.7411765f, 0.235294119f);
-    public static Color BrightGreen => new(0.4941176f, 0.8392157f, 0.3176471f);
-    public static Color DarkGreen => new(0.09411765f, 0.3803922f, 0.2f);
-
-    public static Color Blue => new(0.117647059f, 0.254901975f, 0.921568632f);
-    public static Color BrightBlue => new(0.1098039f, 0.4352941f, 1f);
-    public static Color DarkBlue => new(0.05490196f, 0.0627451f, 0.549019635f);
-
-    public static Color Yellow => new(0.8862745f, 0.9294118f, 0.09411765f);
-    public static Color Magenta => new(0.6980392f, 0.01960784f, 0.7098039f);
-    public static Color Cyan => new(0.1647059f, 0.8313726f, 0.9215686f);
-
-    public static Color Orange => new(0.9215686f, 0.5450981f, 0.01960784f);
-    public static Color Pink => new(0.9490196f, 0.3647059f, 0.9607843f);
-    public static Color Purple => new(0.5568628f, 0.06666667f, 0.9607843f);
-}
-
-public struct Triangle
-{
-    public Vector3 A;
-    public Vector3 B;
-    public Vector3 C;
-
-    public Triangle(Vector3 a, Vector3 b, Vector3 c)
-    {
-        A = a;
-        B = b;
-        C = c;
-    }
-
-    public static implicit operator (Vector3 a, Vector3 b, Vector3 c)(Triangle triangle)
-        => (triangle.A, triangle.B, triangle.C);
-
-    /// <summary>
-    /// Thank you <see href="https://forum.unity.com/threads/closest-point-on-mesh-collider.34660/"/>
-    /// </summary>
-    public static Vector3 NearestPoint(Vector3 pt, Triangle triangle)
-        => NearestPoint(pt, triangle.A, triangle.B, triangle.C);
-
-    /// <summary>
-    /// Thank you <see href="https://forum.unity.com/threads/closest-point-on-mesh-collider.34660/"/>
-    /// </summary>
-    public static Vector3 NearestPoint(Vector3 pt, Vector3 a, Vector3 b, Vector3 c)
-    {
-        Vector3 edge1 = b - a;
-        Vector3 edge2 = c - a;
-        Vector3 edge3 = c - b;
-        float edge1Len = edge1.magnitude;
-        float edge2Len = edge2.magnitude;
-        float edge3Len = edge3.magnitude;
-
-        Vector3 ptLineA = pt - a;
-        Vector3 ptLineB = pt - b;
-        Vector3 ptLineC = pt - c;
-        Vector3 xAxis = edge1 / edge1Len;
-        Vector3 zAxis = Vector3.Cross(edge1, edge2).normalized;
-        Vector3 yAxis = Vector3.Cross(zAxis, xAxis);
-
-        Vector3 edge1Cross = Vector3.Cross(edge1, ptLineA);
-        Vector3 edge2Cross = Vector3.Cross(edge2, -ptLineC);
-        Vector3 edge3Cross = Vector3.Cross(edge3, ptLineB);
-        bool edge1On = Vector3.Dot(edge1Cross, zAxis) > 0f;
-        bool edge2On = Vector3.Dot(edge2Cross, zAxis) > 0f;
-        bool edge3On = Vector3.Dot(edge3Cross, zAxis) > 0f;
-
-        //	If the point is inside the triangle then return its coordinate.
-        if (edge1On && edge2On && edge3On)
-        {
-            float xExtent = Vector3.Dot(ptLineA, xAxis);
-            float yExtent = Vector3.Dot(ptLineA, yAxis);
-            return a + xAxis * xExtent + yAxis * yExtent;
-        }
-
-        //	Otherwise, the nearest point is somewhere along one of the edges.
-        Vector3 edge1Norm = xAxis;
-        Vector3 edge2Norm = edge2.normalized;
-        Vector3 edge3Norm = edge3.normalized;
-
-        float edge1Ext = Math.Clamp(Vector3.Dot(edge1Norm, ptLineA), 0f, edge1Len);
-        float edge2Ext = Math.Clamp(Vector3.Dot(edge2Norm, ptLineA), 0f, edge2Len);
-        float edge3Ext = Math.Clamp(Vector3.Dot(edge3Norm, ptLineB), 0f, edge3Len);
-
-        Vector3 edge1Pt = a + edge1Ext * edge1Norm;
-        Vector3 edge2Pt = a + edge2Ext * edge2Norm;
-        Vector3 edge3Pt = b + edge3Ext * edge3Norm;
-
-        float sqDist1 = (pt - edge1Pt).sqrMagnitude;
-        float sqDist2 = (pt - edge2Pt).sqrMagnitude;
-        float sqDist3 = (pt - edge3Pt).sqrMagnitude;
-
-        if (sqDist1 < sqDist2)
-        {
-            if (sqDist1 < sqDist3)
-            {
-                return edge1Pt;
-            }
-            else
-            {
-                return edge3Pt;
-            }
-        }
-        else if (sqDist2 < sqDist3)
-        {
-            return edge2Pt;
-        }
-        else
-        {
-            return edge3Pt;
-        }
-    }
-}
-
 public static class RectUtils
 {
     public static Rect FromCenter(Vector2 center, Vector2 size)
@@ -235,16 +114,16 @@ public static class GLUtils
         for (int i = 0; i < segmentCount; i++)
         {
             {
-                float rad = 2 * Maths.PI * ((float)i / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
                 GL.Vertex(center + (direction * (radius)));
             }
 
             {
-                float rad = 2 * Maths.PI * ((float)(i + 1) / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)(i + 1) / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
                 GL.Vertex(center + (direction * (radius)));
@@ -275,18 +154,18 @@ public static class GLUtils
         for (int i = 0; i < segments; i++)
         {
             {
-                float rad = 2 * Maths.PI * ((float)i / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
                 GL.Vertex(center + (direction * radius));
             }
 
             {
-                float next = 1 + Maths.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
+                float next = 1 + Math.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
 
-                float rad = 2 * Maths.PI * ((float)(i + next) / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)(i + next) / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * (radius + thickness)));
                 GL.Vertex(center + (direction * radius));
@@ -302,8 +181,8 @@ public static class GLUtils
 
         for (int i = 0; i < segmentCount; i++)
         {
-            float rad = 2 * Maths.PI * ((float)i / (float)segmentCount);
-            Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+            float rad = 2 * MathF.PI * ((float)i / (float)segmentCount);
+            Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
             GL.Vertex(center + (direction * radius));
         }
@@ -326,17 +205,17 @@ public static class GLUtils
         for (int i = 0; i < segments; i++)
         {
             {
-                float rad = 2 * Maths.PI * ((float)i / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)i / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * radius));
             }
 
             {
-                float next = 1 + Maths.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
+                float next = 1 + Math.Clamp((fillAmount - ((float)(i + 1) / (float)segmentCount)) / step, 0f, 1f);
 
-                float rad = 2 * Maths.PI * ((float)(i + next) / (float)segmentCount);
-                Vector2 direction = new(Maths.Cos(rad), Maths.Sin(rad));
+                float rad = 2 * MathF.PI * ((float)(i + next) / (float)segmentCount);
+                Vector2 direction = new(MathF.Cos(rad), MathF.Sin(rad));
 
                 GL.Vertex(center + (direction * radius));
             }
@@ -359,7 +238,7 @@ public static class GUIUtils
             for (int y = 0; y < result.height; y++)
             {
                 Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Maths.Distance(p, center);
+                float d = Vector2.Distance(p, center);
                 if (d < .5f)
                 {
                     result.SetPixel(x, y, Color.white);
@@ -384,7 +263,7 @@ public static class GUIUtils
             for (int y = 0; y < result.height; y++)
             {
                 Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
-                float d = Maths.Distance(p, center);
+                float d = Vector2.Distance(p, center);
                 if (d < .5f && d >= (.5f - thickness))
                 {
                     result.SetPixel(x, y, Color.white);
@@ -574,9 +453,9 @@ namespace Utilities
 
         public static float ModularClamp(float val, float min, float max, float rangeMin = -180f, float rangeMax = 180f)
         {
-            float modulus = Maths.Abs(rangeMax - rangeMin);
+            float modulus = Math.Abs(rangeMax - rangeMin);
             if ((val %= modulus) < 0f) val += modulus;
-            return System.Math.Clamp(val + Maths.Min(rangeMin, rangeMax), min, max);
+            return System.Math.Clamp(val + Math.Min(rangeMin, rangeMax), min, max);
         }
 
         static Texture2D? _whiteTexture;
@@ -684,540 +563,6 @@ namespace Utilities
         }
     }
 
-    public static class Ballistics
-    {
-        public readonly struct ProfilerMarkers
-        {
-            public static readonly Unity.Profiling.ProfilerMarker TrajectoryMath = new("Game.Math.Trajectory");
-        }
-
-        /// <summary>
-        /// This is positive
-        /// </summary>
-        public static float G => Maths.Abs(Physics.gravity.y);
-        /// <summary>
-        /// This points downwards
-        /// </summary>
-        public static Vector2 GVector => new(0f, -G);
-
-        public readonly struct Trajectory
-        {
-            /// <summary>
-            /// In degrees
-            /// </summary>
-            public readonly float Angle;
-            /// <summary>
-            /// In degrees
-            /// </summary>
-            public readonly float Direction;
-            public readonly float Velocity;
-            public readonly Vector3 StartPosition;
-
-            public Trajectory(float angle, float direction, float velocity, Vector3 startPosition)
-            {
-                Angle = angle;
-                Direction = direction;
-                Velocity = velocity;
-                StartPosition = startPosition;
-            }
-
-            public Vector2 Velocity2D()
-                => new(Velocity * Maths.Cos(Angle * Maths.Deg2Rad), Velocity * Maths.Sin(Angle * Maths.Deg2Rad));
-
-            public Vector3 Velocity3D()
-            {
-                Vector3 result = default;
-                result.x = Maths.Sin(Direction * Maths.Deg2Rad);
-                result.y = Maths.Sin(Angle * Maths.Deg2Rad);
-                result.z = Maths.Cos(Direction * Maths.Deg2Rad);
-                return result;
-            }
-
-            public Vector3 Position(float t)
-            {
-                Vector2 displacement = Utilities.Ballistics.Displacement(Angle * Maths.Deg2Rad, Velocity, t);
-                Vector3 displacement3D = default;
-
-                displacement3D.x = displacement.x * Maths.Sin(Direction * Maths.Deg2Rad);
-                displacement3D.y = displacement.y;
-                displacement3D.z = displacement.x * Maths.Cos(Direction * Maths.Deg2Rad);
-
-                displacement3D += StartPosition;
-
-                return displacement3D;
-            }
-
-            public static Vector2 TransformPositionToPlane(Vector3 position, float directionRad) => new()
-            {
-                y = position.y,
-                x = position.x * Maths.Cos(directionRad) + position.y * Maths.Sin(directionRad),
-            };
-        }
-
-        public static Vector3? PredictImpact(Transform shootPosition, float projectileVelocity, float projectileLifetime, out bool outOfRange)
-        {
-            outOfRange = false;
-            float? _relativeHitDistance;
-            float angle = -shootPosition.eulerAngles.x;
-
-            using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-            { _relativeHitDistance = Ballistics.CalculateX(angle * Maths.Deg2Rad, projectileVelocity, shootPosition.position.y); }
-            if (!_relativeHitDistance.HasValue) return null;
-            float relativeHitDistance = _relativeHitDistance.Value;
-
-            Vector3 turretRotation = shootPosition.forward.Flatten();
-            Vector3 point = shootPosition.position + (relativeHitDistance * turretRotation);
-            point.y = 0f;
-
-            if (projectileLifetime > 0f)
-            {
-                Vector2 maxHitDistance;
-                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { maxHitDistance = Ballistics.Displacement(angle * Maths.Deg2Rad, projectileVelocity, projectileLifetime); }
-
-                if (maxHitDistance.x < relativeHitDistance)
-                {
-                    outOfRange = true;
-                    point = shootPosition.position + (maxHitDistance.x * turretRotation);
-                    point.y = maxHitDistance.y;
-                }
-            }
-
-            // point.y = Maths.Max(point.y, TheTerrain.Height(point));
-
-            return point;
-        }
-
-        /// <param name="v">
-        /// Projectile's initial velocity
-        /// </param>
-        public static float? CalculateTime(float v, float angle, float heightDisplacement)
-        {
-            float a = v * Maths.Sin(angle);
-            float b = 2 * G * heightDisplacement;
-
-            float discriminant = (a * a) + b;
-            if (discriminant < 0)
-            {
-                return null;
-            }
-
-            float sqrt = Maths.Sqrt(discriminant);
-
-            return (a + sqrt) / G;
-        }
-
-        /*
-        public static float CalculateAngle(float v, float x)
-        {
-            // v0y = v0 * Maths.Sin(theta)
-            // v0x = v0 * Maths.Cos(theta)
-
-            // y = y0 + v0y * t + 0.5 * G * t * t
-            // 0 = 0 + v0y * t + 0.5 * G * t * t
-
-            // x = v0x * t
-
-
-
-            // 0 = 0 + v0 * Maths.Sin(theta) * t + 0.5 * G * t * t
-
-            // x = v0 * Maths.Cos(theta) * t
-            // t = x / ( v0 * Maths.Cos(theta) )
-
-            // 0 = 0 + v0 * Maths.Sin(theta) * (x / ( v0 * Maths.Cos(theta) )) + 0.5 * G * Maths.Pow((x / ( v0 * Maths.Cos(theta) )), 2)
-
-            // 0 = Maths.Sin(theta) * Maths.Cos(theta) - ( (G * x) / (2 * v0 * v0) )
-
-            // 0 = 0.5 * Maths.Sin(2 * theta) - ( ... )
-
-            // Maths.Sin(2 * theta) = ( ... )
-
-            float theta = 0.5f * Maths.Asin((G * x) / (v * v));
-
-            return theta;
-        }
-        */
-
-        /// <param name="v">Initial velocity</param>
-        /// <param name="target">Position of the target</param>
-        /// <returns>
-        /// The required <b>angle in radians</b> to hit a <paramref name="target"/>
-        /// fired <paramref name="from"/> initial projectile speed <paramref name="v"/>
-        /// </returns>
-        public static (float, float)? AngleOfReach(float v, Vector3 from, Vector3 target)
-        {
-            Vector3 diff = target - from;
-            float y = diff.y;
-            float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
-            return Ballistics.AngleOfReach(v, new Vector2(x, y));
-        }
-
-        /// <param name="v">
-        /// Projectile's initial velocity
-        /// </param>
-        /// <param name="target">
-        /// Position of the target in <b>world space</b>
-        /// </param>
-        /// <returns>
-        /// The required <b>angle in radians</b> to hit a <paramref name="target"/>
-        /// fired <paramref name="from"/> initial projectile speed <paramref name="v"/>
-        /// </returns>
-        public static float? AngleOfReach1(float v, Vector3 from, Vector3 target)
-        {
-            Vector3 diff = target - from;
-            float y = diff.y;
-            float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
-            return Ballistics.AngleOfReach1(v, new Vector2(x, y));
-        }
-
-        /// <param name="v">
-        /// Projectile's initial velocity
-        /// </param>
-        /// <param name="target">
-        /// Position of the target in <b>world space</b>
-        /// </param>
-        /// <returns>
-        /// The required <b>angle in radians</b> to hit a <paramref name="target"/>
-        /// fired <paramref name="from"/> initial projectile speed <paramref name="v"/>
-        /// </returns>
-        public static float? AngleOfReach2(float v, Vector3 from, Vector3 target)
-        {
-            Vector3 diff = target - from;
-            float y = diff.y;
-            float x = Maths.Sqrt((diff.x * diff.x) + (diff.z * diff.z));
-            return Ballistics.AngleOfReach2(v, new Vector2(x, y));
-        }
-
-        /*
-        /// <param name="v">
-        /// Projectile's initial velocity
-        /// </param>
-        /// <param name="x">
-        /// Range / Distance to the target
-        /// </param>
-        /// <param name="y">
-        /// Altitude of the target
-        /// </param>
-        /// <summary>
-        /// <seealso href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_%CE%B8_required_to_hit_coordinate_(x,_y)"/>
-        /// </summary>
-        /// <returns>
-        /// The required <b>angle in radians</b> to hit a target at range <paramref name="x"/> and altitude <paramref name="y"/> when
-        /// fired from (0,0) and with initial projectile speed <paramref name="v"/>
-        /// </returns>
-        public static float CalculateAngle(float v, float x, float y)
-        {
-            float g = G;
-
-            float v2 = v * v;
-            float v4 = v2 * v2;
-            float x2 = x * x;
-
-            float theta = Maths.Atan2(v2 - Maths.Sqrt(v4 - g * (g * x2 + 2 * y * v2)), g * x);
-
-            return theta;
-        }
-        */
-
-        public static float? CalculateX(float angle, float v, float heightDisplacement)
-        {
-            float? t = CalculateTime(v, angle, heightDisplacement);
-
-            if (t.HasValue)
-            { return DisplacementX(angle, t.Value, v); }
-
-            return null;
-        }
-
-        public static float CalculateY(float angleRad, float t, float v)
-            => (v * Maths.Sin(angleRad) * t) - ((G * t * t) / 2f);
-
-        public static float CalculateTimeToMaxHeight(float angleRad, float v)
-            => (v * Maths.Sin(angleRad)) / G;
-
-        /// <summary>
-        /// To hit a target at range x and altitude y when fired from (0,0) and with initial speed v.
-        /// </summary>
-        public static (float, float)? AngleOfReach(float v, Vector2 target)
-        {
-            float v2 = v * v;
-
-            float x = target.x;
-            float y = target.y;
-
-            float discriminant = (v2 * v2) - (G * ((G * x * x) + (2 * y * v2)));
-
-            if (discriminant < 0f)
-            { return null; }
-
-            float dSqrt = Maths.Sqrt(discriminant);
-
-            float a = (v2 + dSqrt) / (G * x);
-            float b = (v2 - dSqrt) / (G * x);
-
-            float a_ = Maths.Atan(a);
-            float b_ = Maths.Atan(b);
-
-            return (a_, b_);
-        }
-
-        /// <summary>
-        /// To hit a <paramref name="target"/> at range <c>x</c> and altitude <c>y</c> when fired from <c>(0,0)</c> and with initial speed <paramref name="v"/>.
-        /// </summary>
-        public static float? AngleOfReach1(float v, Vector2 target)
-        {
-            float v2 = v * v;
-
-            float x = target.x;
-            float y = target.y;
-
-            float discriminant = (v2 * v2) - (G * ((G * x * x) + (2 * y * v2)));
-
-            if (discriminant < 0f)
-            { return null; }
-
-            float dSqrt = Maths.Sqrt(discriminant);
-
-            float a = (v2 + dSqrt) / (G * x);
-
-            float a_ = Maths.Atan(a);
-
-            return a_;
-        }
-
-        /// <summary>
-        /// To hit a <paramref name="target"/> at range <c>x</c> and altitude <c>y</c> when fired from <c>(0,0)</c> and with initial speed <paramref name="v"/>.
-        /// </summary>
-        public static float? AngleOfReach2(float v, Vector2 target)
-        {
-            float v2 = v * v;
-
-            float x = target.x;
-            float y = target.y;
-
-            float discriminant = (v2 * v2) - (G * ((G * x * x) + (2 * y * v2)));
-
-            if (discriminant < 0f)
-            { return null; }
-
-            float dSqrt = Maths.Sqrt(discriminant);
-
-            float b = (v2 - dSqrt) / (G * x);
-
-            float b_ = Maths.Atan(b);
-
-            return b_;
-        }
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="v">Initial velocity</param>
-        /// <returns>The greatest height that the object will reach</returns>
-        public static float MaxHeight(float angleRad, float v)
-            => (v * v * Maths.Pow(Maths.Sin(angleRad), 2f)) / (2f * G);
-
-        /// <summary>
-        /// The "angle of reach" is the angle at which a projectile must be launched in order to go a distance <paramref name="d"/>, given the initial velocity <paramref name="v"/>.
-        /// <seealso href="https://en.wikipedia.org/wiki/Projectile_motion#Angle_of_reach"/>
-        /// </summary>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="d">Target distance</param>
-        /// <returns><c>(shallow, steep)</c> in radians or <c><see langword="null"/></c> if there is no solution</returns>
-        public static (float, float)? AngleOfReach(float v, float d)
-        {
-            float a = (G * d) / v * v;
-
-            if (a < -1f || a > 1f) return null;
-
-            float shallow = 0.5f * Maths.Asin(a);
-            float steep = 0.5f * Maths.Acos(a);
-
-            return (shallow, steep);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Radius(float v, float angleRad)
-            => ((v * v) / G) * Maths.Sin(angleRad * 2f);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float MaxRadius(float v)
-            => (v * v) / G;
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="t">Time</param>
-        /// <returns>The velocity after time <paramref name="t"/> or <c><see langword="null"/></c> if there is no solution</returns>
-        public static float? Velocity(float angleRad, float v, float t)
-        {
-            float vx = v * Maths.Cos(angleRad);
-            float vy = (v * Maths.Sin(angleRad)) - (G * t);
-            float a = (vx * vx) + (vy * vy);
-            if (a < 0f)
-            { return null; }
-            return Maths.Sqrt(a);
-        }
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="t">Time</param>
-        public static Vector2 Displacement(float angleRad, float v, float t)
-        {
-            float x = v * t * Maths.Cos(angleRad);
-            float y = (v * t * Maths.Sin(angleRad)) - (0.5f * G * t * t);
-            return new Vector2(x, y);
-        }
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="t">Time</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float DisplacementX(float angleRad, float v, float t)
-            => v * t * Maths.Cos(angleRad);
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="t">Time</param>
-        public static float DisplacementY(float angleRad, float v, float t)
-            => (v * t * Maths.Sin(angleRad)) - (0.5f * G * t * t);
-
-        /// <param name="angleRad">Launch angle</param>
-        /// <param name="displacement">Displacement</param>
-        /// <returns>The initial velocity or <c><see langword="null"/></c> if there is no solution</returns>
-        public static float? InitialVelocity(float angleRad, Vector2 displacement)
-        {
-            float x = displacement.x;
-            float y = displacement.y;
-
-            float a = x * x * G;
-            float b = x * Maths.Sin(angleRad * 2f);
-            float c = 2f * y * Maths.Pow(Maths.Cos(angleRad), 2f);
-            float d = a / (b - c);
-            if (d < 0f)
-            { return null; }
-            return Maths.Sqrt(d);
-        }
-
-        public static float MaxRadius(float v, float heightDisplacement)
-        {
-            float t = CalculateTime(v, 45f * Maths.Deg2Rad, heightDisplacement) ?? throw new Exception();
-            float x = DisplacementX(45f * Maths.Deg2Rad, t, v);
-            return x;
-        }
-
-        /// <summary>
-        /// The total time for which the projectile remains in the air.
-        /// <seealso href="https://en.wikipedia.org/wiki/Projectile_motion#Time_of_flight_or_total_time_of_the_whole_journey"/>
-        /// </summary>
-        /// <param name="v">Initial velocity</param>
-        /// <param name="angleRad">Launch angle</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float TimeOfFlight(float v, float angleRad)
-            => (2f * v * Maths.Sin(angleRad)) / G;
-
-        public static float? TimeToReachDistance(float v, float angleRad, float d)
-        {
-            float a = v * Maths.Cos(angleRad);
-            if (a <= 0f)
-            { return null; }
-            return d / a;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float MaxHeight2(float d, float angleRad)
-            => (d * Maths.Tan(angleRad)) / 4;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector2 GetPosition(Vector2 v, float t)
-            => (v * t) + (t * t * GVector / 2);
-
-        /// <summary>
-        /// <see href="https://www.toppr.com/guides/physics/motion-in-a-plane/projectile-motion/"/>
-        /// <c>y = (tan θ) * x – g (x ^ 2) / 2 * (v * cos θ) ^ 2</c>
-        /// </summary>
-        public static float GetHeight(float d, float angleRad, float v)
-        {
-            float a = Maths.Tan(angleRad) * d;
-            float b = G * d * d;
-            float c = Maths.Pow(v * Maths.Cos(angleRad), 2) * 2f;
-            return a - (b / c);
-        }
-
-        public static (Vector3 PredictedPosition, float TimeToReach)? CalculateInterceptCourse(float projectileVelocity, float projectileLifetime, Vector3 shootPosition, Trajectory targetTrajectory)
-        {
-            float? angle_;
-            float? t;
-            Vector3 targetPosition;
-            const int iterations = 3;
-
-            using (ProfilerMarkers.TrajectoryMath.Auto())
-            {
-                // projectileVelocity *= .95f;
-
-                float lifetime = projectileLifetime + Time.fixedDeltaTime;
-
-                float? projectileTimeOfFlight = Ballistics.CalculateTime(targetTrajectory.Velocity, targetTrajectory.Angle * Maths.Deg2Rad, targetTrajectory.StartPosition.y);
-
-                if (projectileTimeOfFlight.HasValue && (projectileTimeOfFlight - lifetime) < .5f)
-                { return null; }
-
-                targetPosition = targetTrajectory.Position(lifetime);
-
-                float distance = Maths.Distance(shootPosition.To2D(), targetPosition.To2D());
-
-                angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
-
-                t = angle_.HasValue ? Ballistics.TimeToReachDistance(projectileVelocity, angle_.Value, distance) : null;
-
-                for (int i = 0; i < iterations; i++)
-                {
-                    if (!angle_.HasValue) break;
-                    if (!t.HasValue) break;
-
-                    targetPosition = targetTrajectory.Position(lifetime + t.Value);
-
-                    distance = Maths.Distance(shootPosition.To2D(), targetPosition.To2D());
-
-                    angle_ = Ballistics.AngleOfReach2(projectileVelocity, shootPosition, targetPosition);
-
-                    t = angle_.HasValue ? Ballistics.TimeToReachDistance(projectileVelocity, angle_.Value, distance) : null;
-                }
-            }
-
-            return (targetPosition, t!.Value);
-        }
-
-        public static Vector2? CalculateInterceptCourse(Vector2 projectilePosition, float projectileVelocity, Vector2 targetPosition, Vector2 targetVelocity)
-        {
-            float time = 0f;
-            const int iterations = 3;
-            Vector2 targetOriginalPosition = targetPosition;
-
-            float height = projectilePosition.y - targetPosition.y;
-
-            using (ProfilerMarkers.TrajectoryMath.Auto())
-            {
-                // projectileVelocity *= .95f;
-
-                for (int i = 0; i < iterations; i++)
-                {
-                    float? _angle = Ballistics.AngleOfReach2(projectileVelocity, projectilePosition, targetPosition);
-                    if (!_angle.HasValue)
-                    { return null; }
-                    float angle = _angle.Value;
-
-                    float? _time = Ballistics.CalculateTime(projectileVelocity, angle, height);
-                    if (!_time.HasValue)
-                    { return null; }
-                    time = _time.Value;
-
-                    targetPosition = targetOriginalPosition + (targetVelocity * time);
-                }
-            }
-
-            return targetVelocity * time;
-        }
-    }
-
     public struct Line
     {
         public Vector2 PointA;
@@ -1233,289 +578,6 @@ namespace Utilities
             => (v.PointA, v.PointB);
         public static implicit operator Line((Vector2, Vector2) v)
             => (v.Item1, v.Item2);
-
-        public static Line operator +(Line a, Vector2 b)
-            => new(a.PointA + b, a.PointB + b);
-        public static Line operator -(Line a, Vector2 b)
-            => new(a.PointA - b, a.PointB - b);
-        public static Line operator *(Line a, Vector2 b)
-            => new(a.PointA * b, a.PointB * b);
-        public static Line operator *(Line a, float b)
-            => new(a.PointA * b, a.PointB * b);
-
-        public static Vector2? Line2LineIntersection(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
-        {
-            // Line AB represented as a1x + b1y = c1
-            float a1 = b.y - a.y;
-            float b1 = a.x - b.x;
-            float c1 = (a1 * a.x) + (b1 * a.y);
-
-            // Line CD represented as a2x + b2y = c2
-            float a2 = d.y - c.y;
-            float b2 = c.x - d.x;
-            float c2 = (a2 * c.x) + (b2 * c.y);
-
-            float determinant = (a1 * b2) - (a2 * b1);
-
-            if (determinant == 0)
-            {
-                // The lines are parallel. This is simplified
-                // by returning a pair of FLT_MAX
-                return null;
-            }
-            else
-            {
-                float x = ((b2 * c1) - (b1 * c2)) / determinant;
-                float y = ((a1 * c2) - (a2 * c1)) / determinant;
-                return new Vector2(x, y);
-            }
-        }
-
-        public static bool IsBetween(Vector2 a, Vector2 b, Vector2 c)
-        {
-            float crossProduct = ((c.y - a.y) * (b.x - a.x)) - ((c.x - a.x) * (b.y - a.y));
-
-            // compare versus epsilon for floating point values, or != 0 if using integers
-            if (Maths.Abs(crossProduct) > 0.0001f)
-            { return false; }
-
-            float dotProduct = ((c.x - a.x) * (b.x - a.x)) + ((c.y - a.y) * (b.y - a.y));
-            if (dotProduct < 0)
-            { return false; }
-
-            float squaredLengthBA = ((b.x - a.x) * (b.x - a.x)) + ((b.y - a.y) * (b.y - a.y));
-            if (dotProduct > squaredLengthBA)
-            { return false; }
-
-            return true;
-        }
-    }
-
-    public static class Acceleration
-    {
-        public const float LargeNumber = 69420f;
-
-        /// <summary>
-        /// If <paramref name="time"/> is 0 it returns <see cref="LargeNumber"/> to avoid division by zero
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateAcceleration(float initialVelocity, float topVelocity, float time)
-        {
-            if (time == 0f) return LargeNumber;
-            return (topVelocity - initialVelocity) / time;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float SpeedAfterTime(float velocity, float acceleration, float time)
-            => velocity + (acceleration * time);
-
-        public static float SpeedAfterDistance(float velocity, float acceleration, float distance)
-        {
-            if (acceleration == 0f) return velocity;
-            if (distance == 0f) return velocity;
-
-            float valueUnderSqr = (2 * acceleration * distance) + (velocity * velocity);
-            if (valueUnderSqr <= 0f) return 0f;
-
-            return Maths.Sqrt(valueUnderSqr);
-        }
-
-        /// <summary>
-        /// <b><paramref name="velocity"/> * <paramref name="time"/> + ½ * <paramref name="acceleration"/> * <paramref name="time"/>²</b>
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float DistanceAfterTime(float velocity, float acceleration, float time)
-            => (velocity * time) + (acceleration / 2 * (time * time));
-
-        /// <summary>
-        /// <para>
-        /// <b>Δ<paramref name="targetVelocity"/> / <paramref name="acceleration"/></b>
-        /// </para>
-        /// or
-        /// <para>
-        /// <b>(<paramref name="targetVelocity"/> - <paramref name="initialVelocity"/>) / <paramref name="acceleration"/></b>
-        /// </para>
-        /// </summary>
-        /// <para>
-        /// If <paramref name="targetVelocity"/> can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero.
-        /// </para>
-        public static float TimeToReachVelocity(float initialVelocity, float targetVelocity, float acceleration)
-        {
-            if (acceleration == 0f) return LargeNumber;
-            if (initialVelocity < targetVelocity && acceleration < 0f) return LargeNumber;
-            if (initialVelocity > targetVelocity && acceleration > 0f) return LargeNumber;
-
-            return (targetVelocity - initialVelocity) / acceleration;
-        }
-
-        /// <summary>
-        /// <b>-<paramref name="initialVelocity"/> / <paramref name="acceleration"/></b>
-        /// </summary>
-        /// <para>
-        /// If 0 velocity can't be reached, it returns <see cref="LargeNumber"/> to avoid division by zero.
-        /// </para>
-        public static float TimeToStop(float initialVelocity, float acceleration)
-        {
-            if (acceleration == 0f) return LargeNumber;
-            if (initialVelocity < 0f && acceleration < 0f) return LargeNumber;
-            if (initialVelocity > 0f && acceleration > 0f) return LargeNumber;
-
-            return (-initialVelocity) / acceleration;
-        }
-
-        /// <summary>
-        /// <para>
-        /// <b><paramref name="initialVelocity"/> * t + ½ * <paramref name="acceleration"/> * t²</b>
-        /// </para>
-        /// <para>
-        /// t: <see cref="TimeToReachVelocity(float, float, float)"/>
-        /// </para>
-        /// </summary>
-        public static float DistanceToReachVelocity(float initialVelocity, float targetVelocity, float acceleration)
-        {
-            float time = TimeToReachVelocity(initialVelocity, targetVelocity, acceleration);
-
-            if (time == 0f) return 0f;
-
-            return DistanceAfterTime(initialVelocity, acceleration, time);
-        }
-
-        /// <summary>
-        /// <para>
-        /// <b><paramref name="velocity"/> * t + ½ * -<paramref name="braking"/> * t²</b>
-        /// </para>
-        /// <para>
-        /// t: <see cref="TimeToStop(float, float)"/>
-        /// </para>
-        /// </summary>
-        public static float DistanceToStop(float velocity, float braking)
-        {
-            float time = TimeToStop(velocity, -braking);
-
-            if (time == 0f) return 0f;
-
-            return DistanceAfterTime(velocity, -braking, time);
-        }
-
-        /// <summary>
-        /// <b>(<paramref name="initialVelocity"/> + <paramref name="topVelocity"/>)/2 * <paramref name="time"/></b>
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateDistanceFromSpeed(float initialVelocity, float topVelocity, float time)
-            => Maths.Average(initialVelocity, topVelocity) * time;
-
-        public static float CalculateTime(float initialVelocity, float topVelocity, float timeToSpeedUp, float distance, float acceleration)
-        {
-            float distanceTravelledUntilMaxSpeed = DistanceAfterTime(initialVelocity, acceleration, timeToSpeedUp);
-            float timeWithMaxVelocity = Velocity.CalculateTime(distance - distanceTravelledUntilMaxSpeed, topVelocity);
-            return timeToSpeedUp + timeWithMaxVelocity;
-        }
-
-        /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, float projectileAcceleration)
-        {
-            float distance;
-            float time = 0f;
-
-            const int iterations = 3;
-            for (int i = 0; i < iterations; i++)
-            {
-                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
-                float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
-                time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
-            }
-
-            return targetVelocity * time;
-        }
-
-        /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 targetAcceleration, Vector2 projectilePosition, float projectileVelocity, float projectileAcceleration)
-        {
-            Vector2 targetOriginalVelocity = targetVelocity;
-            float distance;
-            float time = 0f;
-
-            const int iterations = 4;
-            for (int i = 0; i < iterations; i++)
-            {
-                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
-                float speedAfterThis = SpeedAfterDistance(projectileVelocity, projectileAcceleration, distance);
-                time = TimeToReachVelocity(projectileVelocity, speedAfterThis, projectileAcceleration);
-                targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
-            }
-
-            return targetVelocity * time;
-        }
-
-        /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 targetAcceleration, Vector2 projectilePosition, float projectileVelocity)
-        {
-            Vector2 targetOriginalVelocity = targetVelocity;
-            float distance;
-            float time = 0f;
-
-            const int iterations = 4;
-            for (int i = 0; i < iterations; i++)
-            {
-                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
-                time = Velocity.CalculateTime(distance, projectileVelocity);
-                targetVelocity = targetOriginalVelocity.normalized * SpeedAfterTime(targetOriginalVelocity.magnitude, targetAcceleration.magnitude, time);
-            }
-
-            return targetVelocity * time;
-        }
-    }
-
-    public static class Velocity
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateTime(Vector2 pointA, Vector2 pointB, float speed)
-            => CalculateTime(Maths.Distance(pointA, pointB), speed);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateSpeed(float distance, float time)
-            => time == 0f ? 0f : distance / time;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateDistance(float velocity, float time)
-            => velocity * time;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float CalculateTime(float distance, float velocity)
-            => velocity == 0f ? 0f : distance / velocity;
-
-        /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity)
-        {
-            float distance;
-            float time = 0f;
-
-            const int iterations = 3;
-            for (int i = 0; i < iterations; i++)
-            {
-                distance = Maths.Distance(projectilePosition, targetPosition + (targetVelocity * time));
-                time = CalculateTime(distance, projectileVelocity);
-            }
-
-            return targetVelocity * time;
-        }
-        /// <returns>Aim offset</returns>
-        public static Vector2 CalculateInterceptCourse(Vector2 targetPosition, Vector2 targetVelocity, Vector2 projectilePosition, float projectileVelocity, Maths.Circle circle)
-        {
-            float p = 1 / projectileVelocity;
-
-            float distance = Maths.Distance(projectilePosition, targetPosition);
-            float time = distance * p;
-
-            distance = Maths.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
-            time = distance * p;
-
-            distance = Maths.Distance(projectilePosition, circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition)));
-            time = distance * p;
-
-            Vector2 aim = circle.GetPointAfterTime(targetVelocity.magnitude, time, circle.GetAngle(targetPosition));
-            return targetPosition - aim;
-        }
     }
 
     public static class Debug3D
@@ -1588,8 +650,8 @@ namespace Utilities
             for (int i = 0; i < len; i++)
             {
                 float f = i / (float)len;
-                float c = Maths.Cos(f * Maths.PI * 2f);
-                float s = Maths.Sin(f * Maths.PI * 2f);
+                float c = MathF.Cos(f * MathF.PI * 2f);
+                float s = MathF.Sin(f * MathF.PI * 2f);
                 v[(0 * len) + i] = new Vector4(c, s, 0, 1);
                 v[(1 * len) + i] = new Vector4(0, c, s, 1);
                 v[(2 * len) + i] = new Vector4(s, 0, c, 1);
@@ -1787,8 +849,8 @@ namespace Utilities
             for (int i = 0; i < len; i++)
             {
                 float f = i / (float)len;
-                float c = Maths.Cos(f * Maths.PI * 2f);
-                float s = Maths.Sin(f * Maths.PI * 2f);
+                float c = MathF.Cos(f * MathF.PI * 2f);
+                float s = MathF.Sin(f * MathF.PI * 2f);
                 v[0 * len + i] = new Vector4(c, s, 0, 1);
                 v[1 * len + i] = new Vector4(0, c, s, 1);
                 v[2 * len + i] = new Vector4(s, 0, c, 1);

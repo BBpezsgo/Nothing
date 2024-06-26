@@ -48,7 +48,7 @@ namespace Game.Managers
 
                 Bounds bounds = placedObject.GetRendererBounds();
 
-                float scale = _photographySize / Maths.Max(bounds.size.x, bounds.size.y, bounds.size.z);
+                float scale = _photographySize / Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
 
                 placedObject.transform.localScale = scale * Vector3.one;
 
@@ -131,15 +131,15 @@ namespace Game.Managers
                     {
                         Vector3 a = new(pixel.r, pixel.g, pixel.b);
                         Vector3 b = new(transparentColor.r, transparentColor.g, transparentColor.b);
-                        d = Maths.Distance(a, b);
+                        d = Vector3.Distance(a, b);
                     }
 
                     if (d < tolerance)
                     {
-                        float invertedD = 1f - Maths.Clamp01(d);
+                        float invertedD = 1f - Math.Clamp(d, 0, 1);
 
                         Color newPixel = pixel; //Color.Lerp(pixel, new Color(1f, 0f, 1f, 0f), invertedD);
-                        newPixel.a = Maths.Lerp(pixel.a, 0f, invertedD);
+                        newPixel.a = Mathf.Lerp(pixel.a, 0f, invertedD);
                         texture.SetPixel(x, y, newPixel);
                     }
                 }

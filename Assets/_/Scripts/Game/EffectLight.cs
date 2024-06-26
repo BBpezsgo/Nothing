@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class EffectLight : MonoBehaviour
@@ -13,7 +14,7 @@ public class EffectLight : MonoBehaviour
 
     [SerializeField, ReadOnly] float Lifetime;
 
-    float LifetimePercent => Maths.Clamp01(Lifetime / MaxAge);
+    float LifetimePercent => Math.Clamp(Lifetime / MaxAge, 0, 1);
 
     [SerializeField, ReadOnly] float OriginalIntensity;
 

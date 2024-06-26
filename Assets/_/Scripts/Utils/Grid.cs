@@ -62,11 +62,11 @@ namespace Grid
         internal virtual Vector3 GetWorldPosition(int x, int y) => new Vector3(x, 0f, y) * this.CellSize;
         internal virtual ValueTuple<int, int> GetGridPosition(Vector3 worldPosition)
         {
-            int x = Maths.FloorToInt(worldPosition.x / CellSize);
-            int y = Maths.FloorToInt(worldPosition.z / CellSize);
+            int x = (int)(worldPosition.x / CellSize);
+            int y = (int)(worldPosition.z / CellSize);
 
-            x = Maths.Clamp(x, 0, width);
-            y = Maths.Clamp(y, 0, height);
+            x = Math.Clamp(x, 0, width);
+            y = Math.Clamp(y, 0, height);
 
             return (x, y);
         }

@@ -186,7 +186,7 @@ namespace Game.Components
 
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = CoolColors.White;
+            Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(transform.position, DistanceToBuild);
         }
     }

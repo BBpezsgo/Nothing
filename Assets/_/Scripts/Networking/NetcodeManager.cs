@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UI;
 using Unity.Netcode;
@@ -106,7 +107,7 @@ namespace Networking.Managers
                     GUI.Box(progressBarRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-bg"));
 
                     Rect progressBarFgRect = progressBarRect;
-                    progressBarFgRect.width *= Maths.Clamp01(info.Value.AsyncOperation.progress);
+                    progressBarFgRect.width *= Math.Clamp(info.Value.AsyncOperation.progress, 0, 1);
                     GUI.Box(progressBarFgRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-fg"));
 
                     GUI.Label(progressBarRect, $"Loading \"{info.Value.SceneName}\" {info.Value.AsyncOperation.progress:P}");
@@ -146,7 +147,7 @@ namespace Networking.Managers
                     GUI.Box(progressBarRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-bg"));
 
                     Rect progressBarFgRect = progressBarRect;
-                    progressBarFgRect.width *= Maths.Clamp01(info.Value.AsyncOperation.progress);
+                    progressBarFgRect.width *= Math.Clamp(info.Value.AsyncOperation.progress, 0, 1);
                     GUI.Box(progressBarFgRect, GUIContent.none, GUI.skin.GetStyle("progress-bar-fg"));
 
                     GUI.Label(progressBarRect, $"Unloading \"{info.Value.SceneName}\" {info.Value.AsyncOperation.progress:P}");

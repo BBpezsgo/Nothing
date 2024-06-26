@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using Maths;
 using Unity.Netcode;
 using UnityEngine;
 using Utilities;
@@ -76,7 +78,7 @@ namespace Game.Components
             currentSpitCooldown = SpitCooldown;
 
             Vector2 selfGround = transform.position.To2D();
-            float cannonLength = Maths.Distance(selfGround, SpitPosition.position.To2D());
+            float cannonLength = Vector2.Distance(selfGround, SpitPosition.position.To2D());
 
             Vector3 targetPosition = target.transform.position;
 
@@ -85,7 +87,7 @@ namespace Game.Components
             { targetVelocity = targetRigidbody.linearVelocity; }
             if (targetVelocity.To2D().sqrMagnitude > .1f)
             {
-                Vector2 offset = Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, SpitVelocity);
+                Vector2 offset = Maths.Velocity.CalculateInterceptCourse(targetPosition.To2D(), targetVelocity.To2D(), selfGround, SpitVelocity);
                 targetPosition += offset.To3D() * 1.01f;
             }
 
@@ -103,13 +105,13 @@ namespace Game.Components
         }
         void SpitTo(Vector3 targetPosition)
         {
-            float? theta_ = Ballistics.AngleOfReach2(SpitVelocity, SpitPosition.position, targetPosition);
+            float? theta_ = Maths.Ballistics.AngleOfReach2(SpitVelocity, SpitPosition.position.To(), targetPosition.To());
 
             float angle;
             if (!theta_.HasValue)
             { angle = 45f; }
             else
-            { angle = theta_.Value * Maths.Rad2Deg; }
+            { angle = theta_.Value * Rotation.Rad2Deg; }
 
             float rotation = Quaternion.LookRotation(targetPosition - transform.position).eulerAngles.y;
 
@@ -140,7 +142,7 @@ namespace Game.Components
 
         void Movement(Vector3 destination)
         {
-            float distanceToDestination = Maths.Distance(transform.position.To2D(), destination.To2D());
+            float distanceToDestination = Vector2.Distance(transform.position.To2D(), destination.To2D());
 
             if (distanceToDestination < 1f)
             {
@@ -150,7 +152,7 @@ namespace Game.Components
 
             Vector3 localTarget = transform.InverseTransformPoint(destination);
 
-            float deltaAngle = Maths.Atan2(localTarget.x, localTarget.z) * Maths.Rad2Deg;
+            float deltaAngle = MathF.Atan2(localTarget.x, localTarget.z) * Rotation.Rad2Deg;
 
             if (InWater)
             {
