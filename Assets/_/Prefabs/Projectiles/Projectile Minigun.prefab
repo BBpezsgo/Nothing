@@ -24,17 +24,17 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3367495707484266341}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4399164710629436113}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &3109257927311402179
 TrailRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -50,6 +50,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -75,6 +78,7 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Time: 0.5
+  m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -129,17 +133,21 @@ TrailRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
+  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
+  m_ApplyActiveColorSpace: 0
 --- !u!1 &4399164710451258742
 GameObject:
   m_ObjectHideFlags: 0
@@ -165,13 +173,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4399164710451258742}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4399164710629436113}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &4399164710451258739
 MeshFilter:
@@ -198,6 +206,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -249,6 +260,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4399164710629436118}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -257,7 +269,6 @@ Transform:
   - {fileID: 4399164710451258738}
   - {fileID: 3124523960655801211}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &955769873918390004
 MonoBehaviour:
@@ -275,10 +286,10 @@ MonoBehaviour:
   AudioSource: {fileID: 0}
   Instant: 0
   Acceleration: 0
-  ImpactForce: 0.5
-  ImpactDamage: 0.5
+  ImpactForce: 1
+  ImpactDamage: 1
   CanBounce: 1
-  BounceAngle: 45
+  BounceAngle: 50
   ExploisonForce: 0
   ExploisonRadius: 0
   ExploisonDamage: 0
@@ -286,60 +297,10 @@ MonoBehaviour:
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
   ImpactSound: {fileID: 0}
-  impactEffect: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
-    type: 3}
-  ImpactEffects:
-  - MaterialID: Dirt
-    Sounds:
-    - {fileID: 8300000, guid: 24e54d7ed8ab9914ebcf1b8a6577b636, type: 3}
-    - {fileID: 8300000, guid: 8d3a7cc049f68f7409d7290f4c53cf21, type: 3}
-    - {fileID: 8300000, guid: 02043ebe69912d54fb6fe205eb726529, type: 3}
-    - {fileID: 8300000, guid: 1caa0768e8de3bb468dbb52eca642184, type: 3}
-    - {fileID: 8300000, guid: e19f3caef37784a44b340f5766250997, type: 3}
-    - {fileID: 8300000, guid: d2cbc927f6223fd449c785ae59b76247, type: 3}
-    - {fileID: 8300000, guid: 417aeb90718e8a94d8c4b170979a1301, type: 3}
-    - {fileID: 8300000, guid: 140b8c29e907a1a449bf55fd282b3c01, type: 3}
-    - {fileID: 8300000, guid: 98b85750f95e57844999b68ff57ce962, type: 3}
-    Particles: {fileID: 5220818771854075135, guid: 17c513c42962f19469b78a03345229fc,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Metal
-    Sounds: []
-    Particles: {fileID: 3366955980197198301, guid: 5a2d63950d505b84abd05b24ffc852c4,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Concrete
-    Sounds: []
-    Particles: {fileID: 7690606633279578764, guid: 333214152a1848c4288d56d05285f6f5,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Water
-    Sounds:
-    - {fileID: 8300000, guid: 3108903f820b8fe48aeeb80917ba6f02, type: 3}
-    - {fileID: 8300000, guid: 61beece1b1490e54dad6d3c1aab370c6, type: 3}
-    - {fileID: 8300000, guid: 51157112ea5d4b44da44b7b84e15b3b2, type: 3}
-    Particles: {fileID: 7944883426860124920, guid: 783eb12d07beaac488a5207cfff12cf1,
-      type: 3}
-    UseNormal: 0
-    Hoe: {fileID: 0}
-  - MaterialID: Creature
-    Sounds: []
-    Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Rubber
-    Sounds: []
-    Particles: {fileID: 5842737370272888045, guid: 4160146705659e0408a17ef485a48dec,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  trail: {fileID: 3367495707484266341}
-  RicochetEffect: {fileID: 812897034027791835, guid: 806d8af19112baf4fa37b28f3ec0290a,
-    type: 3}
+  impactEffect: {fileID: 0}
+  ImpactEffects: []
+  trail: {fileID: 0}
+  RicochetEffect: {fileID: 0}
   rotationSpeedX: 0
   rotationSpeedY: 0
   rotationSpeedZ: 0
@@ -347,7 +308,7 @@ MonoBehaviour:
   RotateThis: {fileID: 0}
   HitLayerMask:
     serializedVersion: 2
-    m_Bits: 209
+    m_Bits: 65
   DieInWater: 1
   DestroyInExploisons: 0
   ignoreCollision: []
@@ -357,7 +318,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   OwnerTeamHash: 0
   Owner: {fileID: 0}
-  PropabilityOfProjectileIntersection: 0.1
+  PropabilityOfProjectileIntersection: 0.5
   DamageAllies: 0
   destroyed: 0
   lastPosition: {x: 0, y: 0, z: 0}
@@ -371,8 +332,17 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4399164710629436118}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 0.05
   m_Height: 2
   m_Direction: 2
@@ -384,10 +354,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4399164710629436118}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1

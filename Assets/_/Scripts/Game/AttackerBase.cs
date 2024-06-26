@@ -65,10 +65,7 @@ namespace Game.Components
             for (int i = Input.touchCount - 1; i >= 0; i--)
             {
                 Touch touch = Input.touches[i];
-                if (MouseManager.IsTouchCaptured(touch.fingerId))
-                { anyTouchCaptured = true; }
-                else
-                { anyTouchCaptured = false; }
+                anyTouchCaptured = MouseManager.IsTouchCaptured(touch.fingerId);
             }
 
             if (anyTouchCaptured) return;
@@ -235,12 +232,9 @@ namespace Game.Components
 
                 Vector3 newRotation = turret.ScopeHolder.localRotation.eulerAngles + new Vector3(Mouse.DeltaY * (-scopeSensitivity), Mouse.DeltaX * scopeSensitivity, 0f);
 
-                newRotation.x = Maths.General.NormalizeAngle(newRotation.x);
+                newRotation.x = Maths.Rotation.NormalizeAngle(newRotation.x);
 
-                float minAngle = -Math.Abs(turret.cannonHighestAngle);
-                float maxAngle = Math.Abs(turret.cannonLowestAngle);
-
-                newRotation.x = Math.Clamp(newRotation.x, minAngle, maxAngle);
+                newRotation.x = Math.Clamp(newRotation.x, turret.CannonAngleRange.x, turret.CannonAngleRange.y);
 
                 turret.ScopeHolder.localRotation = Quaternion.Euler(newRotation);
             }

@@ -23,6 +23,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792477867702255104}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,7 +32,6 @@ Transform:
   - {fileID: 5034372190439024246}
   - {fileID: 5034372190212571698}
   m_Father: {fileID: 5034372190024659269}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &5034372190024659274
 GameObject:
@@ -60,6 +60,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034372190024659274}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -67,7 +68,6 @@ Transform:
   m_Children:
   - {fileID: 7215789039614954410}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5034372190024659268
 MonoBehaviour:
@@ -81,36 +81,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c0992729e9ca2247900e930546e2e64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Register: 1
+  Register: 0
   AudioSource: {fileID: 0}
+  Instant: 0
   Acceleration: 0
-  ImpactForce: 0
-  ImpactDamage: 60
-  CanBounce: 0
-  BounceAngle: 0
-  ExploisonForce: 30
-  ExploisonRadius: 50
-  ExploisonDamage: 130
-  ExplodeOnImpact: 1
+  ImpactForce: 1
+  ImpactDamage: 1
+  CanBounce: 1
+  BounceAngle: 50
+  ExploisonForce: 0
+  ExploisonRadius: 0
+  ExploisonDamage: 0
+  ExplodeOnImpact: 0
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
   ImpactSound: {fileID: 0}
-  impactEffect: {fileID: 9033517131993547254, guid: 26dde45b2e36d7b4bbd23da11fa09712,
-    type: 3}
-  ImpactEffects:
-  - MaterialID: Dirt
-    Sounds: []
-    Particles: {fileID: 9033517131993547254, guid: e9257a0eae21d4e46be9e5e874e261c0,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 5117192577485989853, guid: 3a1db7ce8d51853408d58d3d91ef391b, type: 3}
-  - MaterialID: Water
-    Sounds: []
-    Particles: {fileID: 3714180705142066515, guid: 3653051462f469d45b7215e286b62f26,
-      type: 3}
-    UseNormal: 0
-    Hoe: {fileID: 0}
-  trail: {fileID: 5034372190212571699}
+  impactEffect: {fileID: 0}
+  ImpactEffects: []
+  trail: {fileID: 0}
   RicochetEffect: {fileID: 0}
   rotationSpeedX: 0
   rotationSpeedY: 0
@@ -119,7 +107,7 @@ MonoBehaviour:
   RotateThis: {fileID: 0}
   HitLayerMask:
     serializedVersion: 2
-    m_Bits: 209
+    m_Bits: 193
   DieInWater: 1
   DestroyInExploisons: 0
   ignoreCollision: []
@@ -129,7 +117,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   OwnerTeamHash: 0
   Owner: {fileID: 0}
-  PropabilityOfProjectileIntersection: 0.01
+  PropabilityOfProjectileIntersection: 0.5
   DamageAllies: 0
   destroyed: 0
   lastPosition: {x: 0, y: 0, z: 0}
@@ -142,10 +130,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034372190024659274}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -159,9 +158,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034372190024659274}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1070908209338037506
@@ -202,17 +209,17 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034372190212571699}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7215789039614954410}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &5034372190212571661
 TrailRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -228,6 +235,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -253,6 +263,7 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Time: 5
+  m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -307,17 +318,21 @@ TrailRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
+  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
+  m_ApplyActiveColorSpace: 0
 --- !u!1 &5034372190439024247
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,13 +358,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5034372190439024247}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.5, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7215789039614954410}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5034372190439024243
 MeshFilter:
@@ -376,6 +391,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

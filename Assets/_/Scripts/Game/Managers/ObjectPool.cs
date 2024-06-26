@@ -135,6 +135,12 @@ public class ObjectPool : SingleInstance<ObjectPool>
                 if (!Instances[i].activeInHierarchy)
                 {
                     GameObject instance = Instances[i];
+
+                    foreach (TrailRenderer trail in instance.GetComponentsInChildren<TrailRenderer>())
+                    {
+                        trail.Clear();
+                    }
+
                     instance.SetActive(true);
                     return instance;
                 }

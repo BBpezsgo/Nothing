@@ -27,6 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893550291513682336}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -34,7 +35,6 @@ Transform:
   m_Children:
   - {fileID: 4303526748670972736}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1893550291513682350
 MonoBehaviour:
@@ -50,45 +50,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Register: 1
   AudioSource: {fileID: 0}
+  Instant: 0
   Acceleration: 0
-  ImpactForce: 0
-  ImpactDamage: 0
+  ImpactForce: 1
+  ImpactDamage: 1
   CanBounce: 0
-  BounceAngle: 0
-  ExploisonForce: 2
+  BounceAngle: 50
+  ExploisonForce: 5
   ExploisonRadius: 5
-  ExploisonDamage: 20
+  ExploisonDamage: 5
   ExplodeOnImpact: 1
-  ExplodeWhenExpires: 0
+  ExplodeWhenExpires: 1
   ExploisonEffect: {fileID: 0}
   ImpactSound: {fileID: 0}
   impactEffect: {fileID: 8001222445431678015, guid: 40b44b88567bb6047a1b47046d03b041,
     type: 3}
   ImpactEffects:
-  - MaterialID: Dirt
-    Sound: {fileID: 0}
+  - MaterialID: dirt
+    Sounds: []
     Particles: {fileID: 461348867837444258, guid: 8ea27ab944a2a2c4983c59626cea2bb2,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 3169069149930557525, guid: 2c5132bfb71e4364ab218ddb1a58981c, type: 3}
-  - MaterialID: Water
-    Sound: {fileID: 0}
-    Particles: {fileID: 3714180705142066515, guid: 3653051462f469d45b7215e286b62f26,
       type: 3}
     UseNormal: 0
     Hoe: {fileID: 0}
   trail: {fileID: 1893550291869833945}
   RicochetEffect: {fileID: 0}
-  rotationSpeedX: 500
-  rotationSpeedY: 0
-  rotationSpeedZ: 700
+  rotationSpeedX: 20
+  rotationSpeedY: 20
+  rotationSpeedZ: 20
   RandomRotation: 1
   RotateThis: {fileID: 4303526748670972736}
   HitLayerMask:
     serializedVersion: 2
     m_Bits: 209
   DieInWater: 1
-  DestroyInExploisons: 1
+  DestroyInExploisons: 0
   ignoreCollision: []
   LifeLeft: 0
   Lifetime: 0
@@ -96,7 +91,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   OwnerTeamHash: 0
   Owner: {fileID: 0}
-  PropabilityOfProjectileIntersection: 0.01
+  PropabilityOfProjectileIntersection: 0.5
   DamageAllies: 0
   destroyed: 0
   lastPosition: {x: 0, y: 0, z: 0}
@@ -109,10 +104,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893550291513682336}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -126,9 +132,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893550291513682336}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &5856423855934959080
@@ -170,13 +184,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893550291643399837}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.5, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4303526748670972736}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1893550291643399833
 MeshFilter:
@@ -203,6 +217,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -252,17 +269,17 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893550291869833945}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4303526748670972736}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &1893550291869833959
 TrailRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -278,6 +295,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -303,6 +323,7 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Time: 5
+  m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -357,17 +378,21 @@ TrailRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
+  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
+  m_ApplyActiveColorSpace: 0
 --- !u!1 &5150633907416245994
 GameObject:
   m_ObjectHideFlags: 0
@@ -391,6 +416,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5150633907416245994}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -399,5 +425,4 @@ Transform:
   - {fileID: 1893550291643399836}
   - {fileID: 1893550291869833944}
   m_Father: {fileID: 1893550291513682351}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

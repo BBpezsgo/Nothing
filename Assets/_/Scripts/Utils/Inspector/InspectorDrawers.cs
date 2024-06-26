@@ -364,65 +364,65 @@ namespace InspectorDrawers
             switch (progressBarAttribute.LabelPosition)
             {
                 case ProgressBarAttribute.PropertyLabelPosition.Left:
+                {
+                    Rect labelRect = new(topPosition.x, topPosition.y, EditorGUIUtility.labelWidth + 1f, topPosition.height);
+                    if (progressBarAttribute.CanEdit)
                     {
-                        Rect labelRect = new(topPosition.x, topPosition.y, EditorGUIUtility.labelWidth + 1f, topPosition.height);
-                        if (progressBarAttribute.CanEdit)
-                        {
-                            foldout = EditorGUI.Foldout(labelRect, foldout, labelText, true);
-                        }
-                        else
-                        {
-                            EditorGUI.LabelField(labelRect, labelText);
-                        }
-
-                        labelDrawn = true;
-
-                        if (topPosition.width - labelRect.width - barLabelWidth > 1f)
-                        {
-                            Rect barRect = new(labelRect.width + topPosition.x, topPosition.y, topPosition.width - labelRect.width, topPosition.height);
-                            EditorGUI.ProgressBar(barRect, value, barText);
-                        }
-                        else if (topPosition.width - labelRect.width - barEmptyLabelWidth > 1f)
-                        {
-                            Rect barRect = new(labelRect.width + topPosition.x, topPosition.y, topPosition.width - labelRect.width, topPosition.height);
-                            EditorGUI.ProgressBar(barRect, value, string.Empty);
-                        }
-                        break;
+                        foldout = EditorGUI.Foldout(labelRect, foldout, labelText, true);
                     }
+                    else
+                    {
+                        EditorGUI.LabelField(labelRect, labelText);
+                    }
+
+                    labelDrawn = true;
+
+                    if (topPosition.width - labelRect.width - barLabelWidth > 1f)
+                    {
+                        Rect barRect = new(labelRect.width + topPosition.x, topPosition.y, topPosition.width - labelRect.width, topPosition.height);
+                        EditorGUI.ProgressBar(barRect, value, barText);
+                    }
+                    else if (topPosition.width - labelRect.width - barEmptyLabelWidth > 1f)
+                    {
+                        Rect barRect = new(labelRect.width + topPosition.x, topPosition.y, topPosition.width - labelRect.width, topPosition.height);
+                        EditorGUI.ProgressBar(barRect, value, string.Empty);
+                    }
+                    break;
+                }
                 case ProgressBarAttribute.PropertyLabelPosition.Inside:
+                {
+                    topPosition = EditorGUI.IndentedRect(topPosition);
+
+                    if (progressBarAttribute.CanEdit)
                     {
-                        topPosition = EditorGUI.IndentedRect(topPosition);
-
-                        if (progressBarAttribute.CanEdit)
-                        {
-                            foldout = EditorGUI.Foldout(topPosition, foldout, GUIContent.none);
-                        }
-
-                        if (topPosition.width - barLabelWidth > 1f)
-                        {
-                            EditorGUI.ProgressBar(topPosition, value, labelText + ": " + barText);
-                        }
-                        else if (topPosition.width - barEmptyLabelWidth > 1f)
-                        {
-                            EditorGUI.ProgressBar(topPosition, value, string.Empty);
-                        }
-                        break;
+                        foldout = EditorGUI.Foldout(topPosition, foldout, GUIContent.none);
                     }
+
+                    if (topPosition.width - barLabelWidth > 1f)
+                    {
+                        EditorGUI.ProgressBar(topPosition, value, labelText + ": " + barText);
+                    }
+                    else if (topPosition.width - barEmptyLabelWidth > 1f)
+                    {
+                        EditorGUI.ProgressBar(topPosition, value, string.Empty);
+                    }
+                    break;
+                }
                 case ProgressBarAttribute.PropertyLabelPosition.None:
                 default:
-                    {
-                        topPosition = EditorGUI.IndentedRect(topPosition);
+                {
+                    topPosition = EditorGUI.IndentedRect(topPosition);
 
-                        if (topPosition.width - barLabelWidth > 1f)
-                        {
-                            EditorGUI.ProgressBar(topPosition, value, barText);
-                        }
-                        else if (topPosition.width - barEmptyLabelWidth > 1f)
-                        {
-                            EditorGUI.ProgressBar(topPosition, value, string.Empty);
-                        }
-                        break;
+                    if (topPosition.width - barLabelWidth > 1f)
+                    {
+                        EditorGUI.ProgressBar(topPosition, value, barText);
                     }
+                    else if (topPosition.width - barEmptyLabelWidth > 1f)
+                    {
+                        EditorGUI.ProgressBar(topPosition, value, string.Empty);
+                    }
+                    break;
+                }
             }
 
             if (foldout && progressBarAttribute.CanEdit)
@@ -536,7 +536,7 @@ namespace InspectorDrawers
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (!foldout) return EditorGUIUtility.singleLineHeight;
-            return EditorGUIUtility.singleLineHeight * 3f;
+            return EditorGUIUtility.singleLineHeight * 4f;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -553,11 +553,11 @@ namespace InspectorDrawers
             foldout = EditorGUI.Foldout(foldoutPosition, foldout, GUIContent.none, true);
 
             Rect topPosition = new(foldoutPosition.xMax, position.y, position.width - foldoutPosition.width, EditorGUIUtility.singleLineHeight);
-            var v = property.vector2Value;
+            Vector2 v = property.vector2Value;
             float minValue = Math.Clamp(Math.Min(v.x, v.y), attribute.Minimum, attribute.Maximum);
             float maxValue = Math.Clamp(Math.Max(v.x, v.y), attribute.Minimum, attribute.Maximum);
             EditorGUI.MinMaxSlider(topPosition, ref minValue, ref maxValue, attribute.Minimum, attribute.Maximum);
-            property.vector2Value = new Vector2(minValue, maxValue);
+            v = new Vector2(minValue, maxValue);
 
             /*
             string minText = Math.Round(minValue, 2).ToString();
@@ -577,7 +577,17 @@ namespace InspectorDrawers
             */
 
             if (foldout)
-            { EditorGUI.PropertyField(new Rect(position.x, position.y + 2f + EditorGUIUtility.singleLineHeight, position.width, EditorGUIUtility.singleLineHeight), property, label, true); }
+            {
+                EditorGUI.PropertyField(new Rect(position.x, position.y + 2f + EditorGUIUtility.singleLineHeight * 1, position.width, EditorGUIUtility.singleLineHeight), property, label, true);
+                if (GUI.Button(new Rect(position.x, position.y + 2f + EditorGUIUtility.singleLineHeight * 3, position.width, EditorGUIUtility.singleLineHeight), "Center"))
+                {
+                    float size = Math.Abs(v.x - v.y);
+                    v.x = -(size / 2f);
+                    v.y = +(size / 2f);
+                }
+            }
+
+            property.vector2Value = v;
         }
     }
 

@@ -60,6 +60,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -137,78 +138,21 @@ MonoBehaviour:
   AudioSource: {fileID: 0}
   Instant: 0
   Acceleration: 0
-  ImpactForce: 2
-  ImpactDamage: 3
-  CanBounce: 0
-  BounceAngle: 45
-  ExploisonForce: 1
-  ExploisonRadius: 4
-  ExploisonDamage: 5
-  ExplodeOnImpact: 1
+  ImpactForce: 1
+  ImpactDamage: 1
+  CanBounce: 1
+  BounceAngle: 50
+  ExploisonForce: 0
+  ExploisonRadius: 0
+  ExploisonDamage: 0
+  ExplodeOnImpact: 0
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}
   ImpactSound: {fileID: 0}
-  impactEffect: {fileID: 3366955980197198301, guid: a9ed9a2c2d4e80a4a847ac46de38b9e6,
-    type: 3}
-  ImpactEffects:
-  - MaterialID: Dirt
-    Sounds:
-    - {fileID: 8300000, guid: 24e54d7ed8ab9914ebcf1b8a6577b636, type: 3}
-    - {fileID: 8300000, guid: 8d3a7cc049f68f7409d7290f4c53cf21, type: 3}
-    - {fileID: 8300000, guid: 02043ebe69912d54fb6fe205eb726529, type: 3}
-    - {fileID: 8300000, guid: 1caa0768e8de3bb468dbb52eca642184, type: 3}
-    - {fileID: 8300000, guid: e19f3caef37784a44b340f5766250997, type: 3}
-    - {fileID: 8300000, guid: d2cbc927f6223fd449c785ae59b76247, type: 3}
-    - {fileID: 8300000, guid: 417aeb90718e8a94d8c4b170979a1301, type: 3}
-    - {fileID: 8300000, guid: 140b8c29e907a1a449bf55fd282b3c01, type: 3}
-    - {fileID: 8300000, guid: 98b85750f95e57844999b68ff57ce962, type: 3}
-    Particles: {fileID: 5220818771854075135, guid: b53a9d9128c83554880403b289bced90,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Metal
-    Sounds:
-    - {fileID: 8300000, guid: 405f2dbe63742b247b659da4828eea4f, type: 3}
-    - {fileID: 8300000, guid: 4ad0a500e0bdd9f4abaf8b40b9b66e8f, type: 3}
-    - {fileID: 8300000, guid: 33f27deef9c93fa4898299e19169f265, type: 3}
-    - {fileID: 8300000, guid: d1a03b61b7a0c5c43b90dde2344936ba, type: 3}
-    Particles: {fileID: 3366955980197198301, guid: a9ed9a2c2d4e80a4a847ac46de38b9e6,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Concrete
-    Sounds:
-    - {fileID: 8300000, guid: df5da14a8a8280246bc1dbf2dc8a56e1, type: 3}
-    - {fileID: 8300000, guid: 79ccf4d2b3863e741a0a8f353f99f14e, type: 3}
-    - {fileID: 8300000, guid: 4a0b30bbf9927db45988edc937debce1, type: 3}
-    Particles: {fileID: 6353618440777652988, guid: 91d91dcad66d3d34baf5dc41ec1317da,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Water
-    Sounds:
-    - {fileID: 8300000, guid: 3108903f820b8fe48aeeb80917ba6f02, type: 3}
-    - {fileID: 8300000, guid: 61beece1b1490e54dad6d3c1aab370c6, type: 3}
-    - {fileID: 8300000, guid: 51157112ea5d4b44da44b7b84e15b3b2, type: 3}
-    Particles: {fileID: 6917058538467329693, guid: 6df60bdd51805624bbf98b11c048de5a,
-      type: 3}
-    UseNormal: 0
-    Hoe: {fileID: 0}
-  - MaterialID: Creature
-    Sounds: []
-    Particles: {fileID: 5613886100017410712, guid: b751e4e3df090434c911760104a2ac9b,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  - MaterialID: Rubber
-    Sounds: []
-    Particles: {fileID: 5842737370272888045, guid: 4160146705659e0408a17ef485a48dec,
-      type: 3}
-    UseNormal: 1
-    Hoe: {fileID: 0}
-  trail: {fileID: 9217451066177500920}
-  RicochetEffect: {fileID: 812897034027791835, guid: 806d8af19112baf4fa37b28f3ec0290a,
-    type: 3}
+  impactEffect: {fileID: 0}
+  ImpactEffects: []
+  trail: {fileID: 0}
+  RicochetEffect: {fileID: 0}
   rotationSpeedX: 0
   rotationSpeedY: 0
   rotationSpeedZ: 0
@@ -216,7 +160,7 @@ MonoBehaviour:
   RotateThis: {fileID: 0}
   HitLayerMask:
     serializedVersion: 2
-    m_Bits: 209
+    m_Bits: 65
   DieInWater: 1
   DestroyInExploisons: 0
   ignoreCollision: []
@@ -226,7 +170,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   OwnerTeamHash: 0
   Owner: {fileID: 0}
-  PropabilityOfProjectileIntersection: 0.1
+  PropabilityOfProjectileIntersection: 0.5
   DamageAllies: 0
   destroyed: 0
   lastPosition: {x: 0, y: 0, z: 0}
@@ -334,6 +278,7 @@ TrailRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

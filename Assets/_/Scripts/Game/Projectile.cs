@@ -15,7 +15,7 @@ namespace Game.Components
             internal Vector3 LocalPosition;
         }
 
-        [System.Serializable]
+        [Serializable]
         struct ImpactEffect
         {
             [SerializeField] internal string MaterialID;
@@ -506,15 +506,14 @@ namespace Game.Components
         void AttachTrail()
         {
             if (trail == null) return;
-            if (trailData.Parent == null) return;
             ticksUntilTrailClear = 1;
 
             trail.SetActive(true);
 
             if (trail.TryGetComponent(out TrailRenderer trailRenderer))
             {
-                trailRenderer.emitting = false;
                 trailRenderer.Clear();
+                trailRenderer.emitting = false;
             }
 
             if (trail.TryGetComponent(out LineRenderer lineRenderer))
@@ -522,7 +521,8 @@ namespace Game.Components
                 lineRenderer.SetPositions(new Vector3[0]);
             }
 
-            if (trail.transform.parent.gameObject != trailData.Parent.gameObject)
+            if (trailData.Parent == null ||
+                trail.transform.parent.gameObject != trailData.Parent.gameObject)
             { trail.transform.SetParent(transform); }
 
             trail.transform.localPosition = trailData.LocalPosition;

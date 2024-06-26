@@ -23,13 +23,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4099921435323764227}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.455, z: 0.975}
+  m_LocalPosition: {x: 0, y: 0.163, z: 0.756}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8461085159954064378}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8461085159954064377
 GameObject:
@@ -61,6 +61,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8461085159954064377}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -7.9095917, y: 1, z: -14.79}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -72,7 +73,6 @@ Transform:
   - {fileID: 4570979555031076822}
   - {fileID: 4099921435323764226}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!136 &8461085159954064380
 CapsuleCollider:
@@ -82,8 +82,17 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8461085159954064377}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 0.39
   m_Height: 1.25
   m_Direction: 2
@@ -102,6 +111,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Material>k__BackingField: Creature
   <Hardness>k__BackingField: 0
+  <BlastAbsorptionCapacity>k__BackingField: 0
 --- !u!114 &8461085159954064382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +124,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 3420582779
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -134,6 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -159,10 +171,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8461085159954064377}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -183,11 +206,11 @@ MonoBehaviour:
   CreatureName: Kopkodo
   Collider: {fileID: 0}
   rb: {fileID: 0}
-  Terrain: {fileID: 0}
   Destination: {x: 0, y: 0, z: 0}
   ExplodeEffect: {fileID: 4399748688371032265, guid: 5f76d57be73d18a43a66fe042ad3dc3f,
     type: 3}
   HP: 5
+  IsSearchingForFood: 0
   IsGrounded: 0
   FlippedOverValue: 0
   InWater: 0
@@ -226,6 +249,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -316,6 +340,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 8461085159954064378}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -395,7 +420,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7635826562936255635, guid: 0031fe6ad72d0e7419872149c15d1a47,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 5a30c538b03765f449390b98ae7ad689, type: 2}
     - target: {fileID: 919132149155446097, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -404,6 +429,9 @@ PrefabInstance:
       value: creature_eyeball (4)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0031fe6ad72d0e7419872149c15d1a47, type: 3}
 --- !u!4 &4570979555031076822 stripped
 Transform:
@@ -416,6 +444,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 8461085159954064378}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -495,7 +524,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7635826562936255635, guid: 0031fe6ad72d0e7419872149c15d1a47,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 5a30c538b03765f449390b98ae7ad689, type: 2}
     - target: {fileID: 919132149155446097, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -504,6 +533,9 @@ PrefabInstance:
       value: creature_eyeball (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0031fe6ad72d0e7419872149c15d1a47, type: 3}
 --- !u!4 &4570979554657184862 stripped
 Transform:
@@ -516,6 +548,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 8461085159954064378}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: b5e9cfa2b0bd3714a8e6e4423787bca2,
@@ -595,7 +628,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7635826562936255635, guid: b5e9cfa2b0bd3714a8e6e4423787bca2,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: a0d521325b9676f45b414669ac853d93, type: 2}
     - target: {fileID: 919132149155446097, guid: b5e9cfa2b0bd3714a8e6e4423787bca2,
@@ -604,6 +637,9 @@ PrefabInstance:
       value: creature_2_body
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b5e9cfa2b0bd3714a8e6e4423787bca2, type: 3}
 --- !u!4 &4570979554187387114 stripped
 Transform:
@@ -616,6 +652,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 8461085159954064378}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -695,7 +732,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7635826562936255635, guid: 0031fe6ad72d0e7419872149c15d1a47,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 5a30c538b03765f449390b98ae7ad689, type: 2}
     - target: {fileID: 919132149155446097, guid: 0031fe6ad72d0e7419872149c15d1a47,
@@ -704,6 +741,9 @@ PrefabInstance:
       value: creature_eyeball (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0031fe6ad72d0e7419872149c15d1a47, type: 3}
 --- !u!4 &4570979553776490756 stripped
 Transform:

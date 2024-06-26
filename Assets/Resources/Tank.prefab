@@ -4776,6 +4776,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9705,6 +9706,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -9887,14 +9889,14 @@ MonoBehaviour:
     OriginalLocalPosition: {x: 0, y: 0, z: 0}
     KnockbackState: 0
   HasBarrel: 0
-  RequiedBarrelRotationSpeed: 0
+  RequiredBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
   PrepareShooting: 0
   cannon: {fileID: 2619412345589989142}
   cannonRotationSpeed: 10
-  cannonLowestAngle: -10
-  cannonHighestAngle: 30
+  CannonAngleRange: {x: -28.604652, y: 9.069767}
+  HighAngleFallback: 0
   rotationSpeed: 50
   reloadTime: 2
   reload: 0
@@ -10057,7 +10059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 727815273
+  GlobalObjectIdHash: 3419784383
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

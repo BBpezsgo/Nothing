@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.46251827, g: 0.51327306, b: 0.59022903, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -239,6 +238,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -462,6 +462,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -598,6 +599,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: 2f54680ebd4884c4c82ae2f21e78c75b,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!4 &219895027
 Transform:
   m_ObjectHideFlags: 0
@@ -788,6 +792,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1368,8 +1373,12 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1 &574902045
 GameObject:
   m_ObjectHideFlags: 0
@@ -1420,6 +1429,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: 07d23843e64716c49af05536d3247360,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &574902048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1486,6 +1498,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: aaf4f9276d611a34b81ca44aabfd2fb9,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &590286354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1553,6 +1568,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1784,6 +1800,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: b0ed411812ccee741adfb89bed9ce1ae,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &741332491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1829,6 +1848,9 @@ MonoBehaviour:
   - ID: a
     Color: {r: 0.32809716, g: 0.74144596, b: 0.9528302, a: 0}
     Hash: 0
+  - ID: b
+    Color: {r: 0.9056604, g: 0.15806337, b: 0.22390203, a: 0}
+    Hash: 0
   - ID: scav
     Color: {r: 0.5660378, g: 0.40980512, b: 0.11480955, a: 0}
     Hash: 0
@@ -1843,9 +1865,19 @@ MonoBehaviour:
     Team2: a
     Team2Hash: 0
     FuckYouValue: -1
+  - Team1: b
+    Team1Hash: 0
+    Team2: b
+    Team2Hash: 0
+    FuckYouValue: -1
   - Team1: a
     Team1Hash: 0
     Team2: scav
+    Team2Hash: 0
+    FuckYouValue: 1
+  - Team1: a
+    Team1Hash: 0
+    Team2: b
     Team2Hash: 0
     FuckYouValue: 1
   btnAutoFriends: 
@@ -1962,6 +1994,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: a72873e29841999438077045c5dee895,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &862599746
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,6 +2046,9 @@ MonoBehaviour:
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 0}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &862599749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2073,6 +2111,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: 906a20567f11aaf45bd90836c0c85de1,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &884744341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2138,6 +2179,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2236,6 +2278,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: 69ec1c6a1e8fd3047b6ad1ce1a0a2cd9,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &930337497
 GameObject:
   m_ObjectHideFlags: 0
@@ -2403,6 +2448,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -2678,6 +2724,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: 91eee5fd2c6aa9345af59453b73b784b,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &1146926337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2814,6 +2863,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -3167,6 +3217,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: dc6fb64044977f146af6e97539008754,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &1356665771
 GameObject:
   m_ObjectHideFlags: 0
@@ -3780,6 +3833,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: f62c0e719330efa4db4193b57fedc307,
     type: 3}
   m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &1604100310
 GameObject:
   m_ObjectHideFlags: 0
@@ -4000,6 +4056,9 @@ MonoBehaviour:
   sourceAsset: {fileID: 9197481963319205126, guid: b878c3e658ea61645b9f909a491c1562,
     type: 3}
   m_SortingOrder: 1
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &1652353918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4185,8 +4244,12 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 90
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1 &2014832343
 GameObject:
   m_ObjectHideFlags: 0
@@ -4327,8 +4390,8 @@ MonoBehaviour:
   PrepareShooting: 0
   cannon: {fileID: 1642061746}
   cannonRotationSpeed: 20
-  cannonLowestAngle: -10
-  cannonHighestAngle: 80
+  CannonAngleRange: {x: 0, y: 0}
+  HighAngleFallback: 0
   rotationSpeed: 180
   reloadTime: 0.8
   reload: 0
