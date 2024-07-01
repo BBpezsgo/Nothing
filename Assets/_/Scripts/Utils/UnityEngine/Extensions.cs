@@ -535,8 +535,8 @@ public static class MeshEx
 public static class VectorEx
 {
     public static bool IsOk(this Vector3 v) =>
-        v.x != float.PositiveInfinity && v.x != float.NegativeInfinity && v.x != float.NaN &&
-        v.y != float.PositiveInfinity && v.y != float.NegativeInfinity && v.y != float.NaN;
+        v.x != float.PositiveInfinity && v.x != float.NegativeInfinity && !float.IsNaN(v.x) &&
+        v.y != float.PositiveInfinity && v.y != float.NegativeInfinity && !float.IsNaN(v.y);
 
     public static Vector2 To2D(this Vector3 v) => new(v.x, v.z);
     public static Vector3 To3D(this Vector2 v) => new(v.x, 0f, v.y);

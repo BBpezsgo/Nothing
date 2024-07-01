@@ -286,10 +286,10 @@ MonoBehaviour:
   AudioSource: {fileID: 0}
   Instant: 0
   Acceleration: 0
-  ImpactForce: 1
-  ImpactDamage: 1
+  ImpactForce: 5
+  ImpactDamage: 10
   CanBounce: 1
-  BounceAngle: 50
+  BounceAngle: 10
   ExploisonForce: 0
   ExploisonRadius: 0
   ExploisonDamage: 0
@@ -298,8 +298,26 @@ MonoBehaviour:
   ExploisonEffect: {fileID: 0}
   ImpactSound: {fileID: 0}
   impactEffect: {fileID: 0}
-  ImpactEffects: []
-  trail: {fileID: 0}
+  ImpactEffects:
+  - MaterialID: Dirt
+    Sounds: []
+    Particles: {fileID: 5220818771854075135, guid: b53a9d9128c83554880403b289bced90,
+      type: 3}
+    UseNormal: 1
+    Hoe: {fileID: 3169069149930557525, guid: 2c5132bfb71e4364ab218ddb1a58981c, type: 3}
+  - MaterialID: Metal
+    Sounds: []
+    Particles: {fileID: 3366955980197198301, guid: a9ed9a2c2d4e80a4a847ac46de38b9e6,
+      type: 3}
+    UseNormal: 1
+    Hoe: {fileID: 0}
+  - MaterialID: Concrete
+    Sounds: []
+    Particles: {fileID: 6353618440777652988, guid: 91d91dcad66d3d34baf5dc41ec1317da,
+      type: 3}
+    UseNormal: 1
+    Hoe: {fileID: 0}
+  trail: {fileID: 3367495707484266341}
   RicochetEffect: {fileID: 0}
   rotationSpeedX: 0
   rotationSpeedY: 0

@@ -61,6 +61,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -162,6 +163,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -263,6 +265,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -364,6 +367,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5372,6 +5376,7 @@ ParticleSystemRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5489,14 +5494,14 @@ MonoBehaviour:
     OriginalLocalPosition: {x: 0, y: 0, z: 0}
     KnockbackState: 0
   HasBarrel: 0
-  RequiedBarrelRotationSpeed: 0
+  RequiredBarrelRotationSpeed: 0
   BarrelRotationAcceleration: 0
   BarrelRotationSpeed: 0
   PrepareShooting: 0
   cannon: {fileID: 8289170899011404161}
   cannonRotationSpeed: 180
-  cannonLowestAngle: -10
-  cannonHighestAngle: 40
+  CannonAngleRange: {x: -71.860466, y: 40.46512}
+  HighAngleFallback: 0
   rotationSpeed: 360
   reloadTime: 2
   reload: 0
@@ -5536,7 +5541,7 @@ MonoBehaviour:
   ShowRadius: 0
   _error: 1
   _outOfRange: 0
-  MaxError: 0.001
+  MaxError: 0.01
   ResetAfterTime: 1
   TimeToReset: 1
   IdleTime: 0

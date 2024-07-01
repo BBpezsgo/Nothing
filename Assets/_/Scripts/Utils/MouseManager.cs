@@ -37,6 +37,9 @@ namespace Game.Managers
                     mousePosition.y > Screen.height)
                 { return false; }
 
+                if (!mousePosition.IsOk())
+                { return false; }
+
                 Vector3 view = MainCamera.Camera.ScreenToViewportPoint(mousePosition);
                 return !(view.x < 0 || view.x > 1 || view.y < 0 || view.y > 1);
             }
