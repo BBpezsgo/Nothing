@@ -19,26 +19,27 @@ namespace Game.Components
             [SerializeField] public Transform Transform;
             [SerializeField, Range(0f, 90f)] public float MaxSteerAngle;
             [SerializeField, Min(0f)] public float Radius;
+            [SerializeField] public ParticleSystem Particles;
 
             [SerializeField, ReadOnly] Transform _subtransform;
             [SerializeField, ReadOnly] bool _hasSubtransform;
 
             public float Rotation
             {
-                get => Transform.localEulerAngles.y;
-                set => Transform.localEulerAngles = new Vector3(0f, value, 0f);
+                get => Transform!.localEulerAngles.y;
+                set => Transform!.localEulerAngles = new Vector3(0f, value, 0f);
             }
 
             public float DistanceFromGround
             {
                 get
                 {
-                    Vector3 position = Transform.position;
+                    Vector3 position = Transform!.position;
                     return position.y - TheTerrain.Height(position);
                 }
             }
 
-            public Transform Subtransform => _subtransform;
+            public Transform Subtransform => _subtransform!;
             public bool HasSubtransform => _hasSubtransform;
 
             public void OnDrawGizmos()
@@ -53,8 +54,13 @@ namespace Game.Components
 
             public void Init()
             {
-                _subtransform = (Transform.childCount == 1) ? Transform.GetChild(0) : null;
+                _subtransform = (Transform!.childCount == 1) ? Transform.GetChild(0) : null;
                 _hasSubtransform = _subtransform != null;
+                if (Particles != null)
+                {
+                    ParticleSystem.EmissionModule emission = Particles.emission;
+                    emission.rateOverTime = 0f;
+                }
             }
         }
 
@@ -74,7 +80,7 @@ namespace Game.Components
         [Header("Engine")]
         public float moveAccelerationFactor = 30.0f;
         /// <summary>
-        /// <code>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</code>
+        /// <c>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</c>
         /// </summary>
         [SerializeField, ReadOnly] float TorqueInput = 0f;
         [SerializeField] internal float moveSpeedMax = 50f;
@@ -96,7 +102,7 @@ namespace Game.Components
         [SerializeField] internal float turnFactor = 3.5f;
         [SerializeField, Min(0f)] internal float steeringSpeed = 1f;
         /// <summary>
-        /// <code>-1f (Left) ... 0f (None) ... 1f (Right)</code>
+        /// <c>-1f (Left) ... 0f (None) ... 1f (Right)</c>
         /// </summary>
         [SerializeField, ReadOnly] float SteeringInput = 0f;
         [SerializeField, ReadOnly] internal float SmoothSteeringInput = 0f;
@@ -133,16 +139,16 @@ namespace Game.Components
 
         /// <summary>
         /// <b>Steering (X):</b> <br/>
-        /// <code>-1f (Left) ... 0f (None) ... 1f (Right)</code> <br/>
+        /// <c>-1f (Left) ... 0f (None) ... 1f (Right)</c> <br/>
         /// <b>Acceleration (Y):</b> <br/>
-        /// <code>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</code> <br/>
+        /// <c>-1f (Reverse) ... 0f (Stop) ... 1f (Accelerate)</c> <br/>
         /// </summary>
         public override Vector2 InputVector
         {
             set
             {
-                if (value.x == float.NegativeInfinity || value.x == float.PositiveInfinity || value.x == float.NaN) return;
-                if (value.y == float.NegativeInfinity || value.y == float.PositiveInfinity || value.y == float.NaN) return;
+                if (value.x == float.NegativeInfinity || value.x == float.PositiveInfinity || float.IsNaN(value.x)) return;
+                if (value.y == float.NegativeInfinity || value.y == float.PositiveInfinity || float.IsNaN(value.y)) return;
                 SteeringInput = Math.Clamp(value.x, -1f, 1f);
                 TorqueInput = Math.Clamp(value.y, -1f, 1f);
                 input = new Vector2(SteeringInput, TorqueInput);
@@ -389,22 +395,11 @@ namespace Game.Components
 
                     if (distanceFromGround > wheel.Radius) continue;
 
-                    Vector3 wheelPosition = wheel.Transform.position;
+                    Vector3 wheelPosition = wheel.Transform!.position;
 
                     Vector3 tireWorldVelocity = rb.GetPointVelocity(wheelPosition);
 
                     Vector3 force = default;
-
-                    // Spring
-                    {
-                        up ??= transform.up;
-
-                        Vector3 springDirection = up.Value;
-                        float springVelocity = Vector3.Dot(springDirection, tireWorldVelocity);
-                        float springForce = (springOffset * SpringStrength) - (springVelocity * SpringDamper);
-
-                        force += springDirection * springForce;
-                    }
 
                     // Steering
                     {
@@ -467,6 +462,27 @@ namespace Game.Components
                         force += availableTorque * TorqueInput * _forward;
                     }
 
+                    if (wheel.Particles != null)
+                    {
+                        wheel.Particles.transform.rotation = Quaternion.LookRotation(force.normalized);
+
+                        ParticleSystem.EmissionModule emission = wheel.Particles.emission;
+                        emission.rateOverTime = MathF.Min(force.sqrMagnitude, 10f);
+                    }
+
+                    Debug.DrawLine(wheelPosition, wheelPosition + force, Color.white, Time.fixedDeltaTime);
+
+                    // Spring
+                    {
+                        up ??= transform.up;
+
+                        Vector3 springDirection = up.Value;
+                        float springVelocity = Vector3.Dot(springDirection, tireWorldVelocity);
+                        float springForce = (springOffset * SpringStrength) - (springVelocity * SpringDamper);
+
+                        force += springDirection * springForce;
+                    }
+
                     rb.AddForceAtPosition(force, wheelPosition);
                 }
             }
@@ -521,7 +537,9 @@ namespace Game.Components
             if (EnableWheels)
             {
                 for (int i = 0; i < Wheels.Length; i++)
-                { Wheels[i].OnDrawGizmos(); }
+                {
+                    Wheels[i].OnDrawGizmos();
+                }
             }
 
             if (Collider == null) return;
@@ -530,7 +548,7 @@ namespace Game.Components
 
             Vector3 rayOrigin = Collider.bounds.center;
             Vector3 raySize = Collider.bounds.size;
-            float rayLength = 0.1f;
+            const float rayLength = 0.1f;
 
             Gizmos.DrawWireCube(rayOrigin, raySize);
             Gizmos.DrawWireCube(rayOrigin - (transform.up * rayLength), raySize);

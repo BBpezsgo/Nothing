@@ -178,12 +178,12 @@ namespace Game.Managers
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052")]
         [SerializeField, ReadOnly] bool _anyMenuVisible = false;
-        internal static bool AnyMenuVisible =>
-            Instance != null &&
+        internal static bool AnyMenuVisible => Instance != null && (
             Instance.CurrentPanel != PanelType.None ||
             Instance.CurrentStatus != StatusType.None ||
             Instance.CurrentIntermediateMenu != IntermediateMenuType.None ||
-            Instance.CurrentMenu != MainMenuType.None;
+            Instance.CurrentMenu != MainMenuType.None
+        );
 
         internal MainMenuType CurrentMenu
         {
