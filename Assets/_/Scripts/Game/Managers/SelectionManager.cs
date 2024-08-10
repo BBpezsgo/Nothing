@@ -27,7 +27,6 @@ namespace Game.Managers
         [Header("UI - Game")]
         [SerializeField] internal Color SelectedColor;
         [SerializeField] internal Color AlmostSelectedColor;
-        // MeshCollider SelectionMeshCollider;
 
         [Header("Cursors")]
         [SerializeField] CursorConfig CursorSelect;
@@ -43,6 +42,8 @@ namespace Game.Managers
 
         public int CursorPriority => 4;
 
+        Vector3 DragStartWorldPosition;
+
         protected override void Awake()
         {
             base.Awake();
@@ -56,6 +57,7 @@ namespace Game.Managers
             MouseLeftButton = new AdvancedMouse(Mouse.Left, 10, MouseCondition);
             MouseLeftButton.OnDragged += OnLeftDragged;
             MouseLeftButton.OnClick += OnLeftClicked;
+            MouseLeftButton.OnDown += OnLeftDown;
 
             MouseRightButton = new AdvancedMouse(Mouse.Right, 10, MouseCondition);
             MouseRightButton.OnClick += OnRightClicked;
@@ -85,31 +87,37 @@ namespace Game.Managers
                 OnSelectionChanged?.Invoke();
             }
 
-            if (!MouseCondition()) return;
-
-            if (AlmostSelectTimer <= 0f)
+            if (!MouseCondition())
             {
-                AlmostSelectTimer = .5f;
-                if (MouseLeftButton.IsDragging)
+                DragStartWorldPosition = default;
+                return;
+            }
+
+            if (AlmostSelectTimer > 0f)
+            {
+                AlmostSelectTimer -= Time.deltaTime;
+                return;
+            }
+
+            AlmostSelectTimer = .5f;
+            if (MouseLeftButton.IsDragging)
+            {
+                if (DragStartWorldPosition == default)
                 {
-                    // if (SelectionMeshCollider == null)
-                    OnDrag(MouseLeftButton.DragStart, Input.mousePosition);
+                    DragStartWorldPosition = MainCamera.Camera.ScreenToWorldPosition(MouseLeftButton.DragStart);
                 }
-                else
-                {
-                    OnMouseMove();
-                }
+                OnDrag(MainCamera.Camera.WorldToScreenPoint(DragStartWorldPosition), Mouse.Position);
             }
             else
             {
-                AlmostSelectTimer -= Time.deltaTime;
+                OnMouseMove();
             }
         }
 
         void OnMouseMove()
         {
             ClearAlmostSelection();
-            Vector3 mousePosition = Input.mousePosition;
+            Vector3 mousePosition = Mouse.Position;
 
             if (mousePosition.x < 0f ||
                 mousePosition.y < 0f ||
@@ -130,10 +138,15 @@ namespace Game.Managers
             }
         }
 
+        void OnLeftDown(AdvancedMouse sender)
+        {
+            DragStartWorldPosition = MainCamera.Camera.ScreenToWorldPosition(Mouse.Position);
+        }
+
         void OnLeftClicked(AdvancedMouse sender)
         {
             if (sender.HoldTime >= QuickCommandManager.HOLD_TIME_REQUIREMENT) return;
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, Utilities.DefaultLayerMasks.Solids, out RaycastHit[] hits);
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Mouse.Position, Utilities.DefaultLayerMasks.Solids, out RaycastHit[] hits);
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].transform.gameObject.TryGetComponent(out Selectable unit))
@@ -163,42 +176,12 @@ namespace Game.Managers
                 if (screenPoint.y > max.y) continue;
                 AddAlmostSelection(allUnits[i]);
             }
-            /*
-            Vector3[] worldCorners = new Vector3[4];
-            Vector3[] vectors = new Vector3[4];
-            Vector2[] screenCorners = GetSelectionBoundingBox(positionA, positionB);
-
-            for (int i = 0; i < screenCorners.Length; i++)
-            {
-                Vector2 corner = screenCorners[i];
-                Ray ray = Camera.main.ScreenPointToRay(corner);
-                Vector3 rayHit = Camera.main.ScreenToWorldPosition(corner);
-                rayHit.y = 0f;
-
-                Debug.DrawLine(ray.origin, rayHit, Color.red, .5f);
-
-                worldCorners[i] = rayHit;
-                vectors[i] = ray.origin - rayHit;
-            }
-
-            DragFinished = false;
-            ClearAlmostSelection();
-
-            Mesh SelectionMesh = GenerateSelectionMesh(worldCorners, vectors);
-
-            Utilities.Debug.DrawMesh(SelectionMesh, Color.blue, .5f);
-
-            SelectionMeshCollider = gameObject.AddComponent<MeshCollider>();
-            SelectionMeshCollider.sharedMesh = SelectionMesh;
-            SelectionMeshCollider.convex = true;
-            SelectionMeshCollider.isTrigger = true;
-
-            Destroy(SelectionMeshCollider, 0.02f);
-            */
         }
 
         void OnLeftDragged(Vector2 positionA, Vector2 positionB)
         {
+            positionA = MainCamera.Camera.WorldToScreenPoint(DragStartWorldPosition);
+            DragStartWorldPosition = default;
             if (!Input.GetKey(KeyCode.LeftShift)) ClearSelection();
             Vector2 min = Vector2.Min(positionA, positionB);
             Vector2 max = Vector2.Max(positionA, positionB);
@@ -212,52 +195,6 @@ namespace Game.Managers
                 if (screenPoint.y > max.y) continue;
                 AddSelection(allUnits[i]);
             }
-            /*
-            Vector3[] worldCorners = new Vector3[4];
-            Vector3[] vectors = new Vector3[4];
-            Vector2[] screenCorners = GetSelectionBoundingBox(positionA, positionB);
-
-            for (int i = 0; i < screenCorners.Length; i++)
-            {
-                Vector2 corner = screenCorners[i];
-                Ray ray = Camera.main.ScreenPointToRay(corner);
-                Vector3 rayHit = Camera.main.ScreenToWorldPosition(corner);
-                rayHit.y = 0f;
-
-                Debug.DrawLine(ray.origin, rayHit, Color.red, 2f);
-
-                worldCorners[i] = rayHit;
-                vectors[i] = ray.origin - rayHit;
-            }
-
-            DragFinished = true;
-            if (!Input.GetKey(KeyCode.LeftShift)) ClearSelection();
-
-            Mesh SelectionMesh = GenerateSelectionMesh(worldCorners, vectors);
-
-            Utilities.Debug.DrawMesh(SelectionMesh, Color.blue, 2f);
-
-            SelectionMeshCollider = gameObject.AddComponent<MeshCollider>();
-            SelectionMeshCollider.sharedMesh = SelectionMesh;
-            SelectionMeshCollider.convex = true;
-            SelectionMeshCollider.isTrigger = true;
-
-            Destroy(SelectionMeshCollider, 0.02f);
-            */
-        }
-
-        void OnTriggerEnter(Collider other)
-        {
-            if (!other.TryGetComponent(out Selectable unit)) return;
-
-            //if (DragFinished)
-            //{
-            //    AddSelection(unit);
-            //}
-            //else
-            //{
-            AddAlmostSelection(unit);
-            //}
         }
 
         internal void ClearAlmostSelection()
@@ -304,106 +241,9 @@ namespace Game.Managers
             if (!MouseLeftButton.IsDragging || !MouseLeftButton.IsActive)
             { return; }
 
-            Rect rect = Utilities.UnityUtils.GetScreenRect(MouseLeftButton.DragStart, Input.mousePosition);
+            Rect rect = Utilities.UnityUtils.GetScreenRect(MainCamera.Camera.WorldToScreenPoint(DragStartWorldPosition), Mouse.Position);
             Utilities.UnityUtils.DrawScreenRect(rect, SelectionBoxColor);
             Utilities.UnityUtils.DrawScreenRectBorder(rect, SelectionBoxBorderWidth, SelectionBoxBorderColor);
-        }
-
-        /// <summary>
-        /// <see href="https://github.com/pickles976/RTS_selection/blob/master/global_selection.cs"/><br/>
-        /// Generates and normalizes the screen rectangle from <paramref name="pointA"/> and <paramref name="pointB"/>.
-        /// </summary>
-        /// <returns>
-        /// The rectangle's corners as an array with length of 4.
-        /// </returns>
-        Vector2[] GetSelectionBoundingBox(Vector2 pointA, Vector2 pointB)
-        {
-            Vector2 point1;
-            Vector2 point2;
-            Vector2 point3;
-            Vector2 point4;
-
-            if (pointA.x < pointB.x)
-            {
-                if (pointA.y > pointB.y)
-                {
-                    point1 = pointA;
-                    point2 = new Vector2(pointB.x, pointA.y);
-                    point3 = new Vector2(pointA.x, pointB.y);
-                    point4 = pointB;
-                }
-                else
-                {
-                    point1 = new Vector2(pointA.x, pointB.y);
-                    point2 = pointB;
-                    point3 = pointA;
-                    point4 = new Vector2(pointB.x, pointA.y);
-                }
-            }
-            else
-            {
-                if (pointA.y > pointB.y)
-                {
-                    point1 = new Vector2(pointB.x, pointA.y);
-                    point2 = pointA;
-                    point3 = pointB;
-                    point4 = new Vector2(pointA.x, pointB.y);
-                }
-                else
-                {
-                    point1 = pointB;
-                    point2 = new Vector2(pointA.x, pointB.y);
-                    point3 = new Vector2(pointB.x, pointA.y);
-                    point4 = pointA;
-                }
-            }
-
-            return new Vector2[4] { point1, point2, point3, point4, };
-        }
-
-        /// <summary>
-        /// <see href="https://github.com/pickles976/RTS_selection/blob/master/global_selection.cs"/><br/>
-        /// Generates the selection mesh.
-        /// </summary>
-        /// <param name="corners">
-        /// The corners on the ground. These will be the <b>bottom part</b> of the bounding box.
-        /// </param>
-        /// <param name="vectors">
-        /// The vectors of the box. These will be the <b>top part</b> of the bounding box.
-        /// </param>
-        Mesh GenerateSelectionMesh(Vector3[] corners, Vector3[] vectors)
-        {
-            Vector3[] vertices = new Vector3[8];
-            int[] triangles = {
-                0, 1, 2,
-                2, 1, 3,
-                4, 6, 0,
-                0, 6, 2,
-                6, 7, 2,
-                2, 7, 3,
-                7, 5, 3,
-                3, 5, 1,
-                5, 0, 1,
-                1, 4, 0,
-                4, 5, 6,
-                6, 5, 7,
-            };
-
-            for (int i = 0; i < 4; i++)
-            {
-                vertices[i] = corners[i];
-            }
-
-            for (int i = 4; i < 8; i++)
-            {
-                vertices[i] = corners[i - 4] + vectors[i - 4];
-            }
-
-            return new Mesh()
-            {
-                vertices = vertices,
-                triangles = triangles,
-            };
         }
 
         public bool HandleCursorLock(out CursorLockMode locked)
@@ -421,7 +261,7 @@ namespace Game.Managers
                 return true;
             }
 
-            Vector3 mousePosition = Input.mousePosition;
+            Vector3 mousePosition = Mouse.Position;
 
             if (mousePosition.x == int.MinValue ||
                 mousePosition.y == int.MinValue ||

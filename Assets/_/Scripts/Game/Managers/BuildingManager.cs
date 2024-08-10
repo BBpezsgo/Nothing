@@ -117,7 +117,7 @@ namespace Game.Managers
             if (MenuManager.AnyMenuVisible) return;
             if (!IsValidPosition) return;
 
-            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position);
+            Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Mouse.Position);
 
             worldPosition.y = TheTerrain.Height(worldPosition);
 
@@ -239,7 +239,7 @@ namespace Game.Managers
             {
                 if (MouseManager.MouseOnWindow)
                 {
-                    Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
+                    Vector3 position = MainCamera.Camera.ScreenToWorldPosition(Mouse.Position);
 
                     position.y = TheTerrain.Height(position);
 

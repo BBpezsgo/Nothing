@@ -45,9 +45,7 @@ namespace Game.Managers
             Cross3,
         }
 
-        static TakeControlManager? instance;
-
-        internal static TakeControlManager? Instance => instance;
+        internal static TakeControlManager? Instance { get; private set; }
 
         internal bool IsControlling =>
             ((Object?)ControllingObject) != null &&
@@ -133,13 +131,13 @@ namespace Game.Managers
 
         void Awake()
         {
-            if (instance != null)
+            if (Instance != null)
             {
                 Debug.LogWarning($"[{nameof(TakeControlManager)}]: Instance already registered, destroying self");
                 Object.Destroy(this);
                 return;
             }
-            instance = this;
+            Instance = this;
 
             if (SphereFilled != null)
             { Texture2D.Destroy(SphereFilled); }
@@ -373,8 +371,8 @@ namespace Game.Managers
             if (!Input.GetKey(KeyCode.LeftControl)) return;
             if (!MouseManager.MouseOnWindow) return;
 
-            // Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position, CursorHitLayer);
-            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position));
+            // Vector3 worldPosition = MainCamera.Camera.ScreenToWorldPosition(Mouse.LockedPosition, CursorHitLayer);
+            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(Mouse.LockedPosition));
 
             if ((Object?)controllable != null)
             {
@@ -727,7 +725,7 @@ namespace Game.Managers
             }
             if (!Input.GetKey(KeyCode.LeftControl)) return false;
 
-            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(Input.mousePosition));
+            ICanTakeControl? controllable = GetControllableAt(MainCamera.Camera.ScreenPointToRay(Mouse.LockedPosition));
 
             if ((Object?)controllable == null) return false;
 
@@ -740,7 +738,7 @@ namespace Game.Managers
         {
             if (!NetcodeUtils.FindGameObject(objectID, out GameObject controllable))
             {
-                PopupLabelManager.ShowLabel($"Network object {objectID} not found", controllable.transform.position, Color.red, 2f); ;
+                PopupLabelManager.ShowLabel($"Network object {objectID} not found", controllable.transform.position, Color.red, 2f);
                 Debug.LogWarning($"[{nameof(TakeControlManager)}]: Network object {objectID} not found", this);
                 return;
             }
@@ -916,6 +914,7 @@ namespace Game.Managers
 
             float reloadPercent = 1f;
             bool isAccurate = true;
+            float turretError = 1f;
 
             bool hasTargetRect = false;
             Rect targetRect = default;
@@ -934,32 +933,13 @@ namespace Game.Managers
             {
                 if (ShouldDrawTrajectory)
                 {
-                    using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                    {
-                        if (hasTurret.Turret.TryGetTrajectory(out Maths.Ballistics.Trajectory trajectory))
-                        {
-                            const int iterations = 5;
-                            const float step = .2f;
-
-                            trajectoryPath = new Vector3[iterations];
-
-                            float t = 0f;
-                            for (int i = 0; i < iterations; i++)
-                            {
-                                Vector3 point = trajectory.Position(t).To();
-                                t += step;
-
-                                Vector3 screenPoint = MainCamera.Camera.WorldToScreenPoint(point);
-                                if (screenPoint.z <= 0f)
-                                {
-                                    trajectoryPath = null;
-                                    break;
-                                }
-
-                                trajectoryPath[i] = GUIUtils.TransformPoint(screenPoint);
-                            }
-                        }
-                    }
+                    trajectoryPath = new Vector3[5];
+                    Ballistics.GetTrajectory(
+                        hasTurret.Turret.NextBarrel.ShootPosition.position,
+                        hasTurret.Turret.NextBarrel.ShootPosition.forward * hasTurret.Turret.projectileVelocity,
+                        trajectoryPath,
+                        .2f
+                    );
                 }
 
                 targetObject = hasTurret.Turret.TargetTransform;
@@ -993,6 +973,7 @@ namespace Game.Managers
                 { reloadPercent = 1f - Math.Clamp(hasTurret.Turret.CurrentReload / hasTurret.Turret.reloadTime, 0, 1); }
 
                 isAccurate = hasTurret.Turret.IsAccurateShoot;
+                turretError = hasTurret.Turret.Error;
 
                 if (targetObject != null &&
                     targetObject.TryGetComponent(out Hitbox hitbox))
@@ -1044,7 +1025,7 @@ namespace Game.Managers
             }
 
             if (MouseManager.MouseOnWindow)
-            { mousePosition = GUIUtils.TransformPoint(Input.mousePosition); }
+            { mousePosition = GUIUtils.TransformPoint(Mouse.LockedPosition); }
 
             if (predictedHitPosition == default &&
                 mousePosition == default &&
@@ -1080,9 +1061,16 @@ namespace Game.Managers
                         }
                     }
 
+                    Color crossColor = default;
+                    {
+                        // crossColor = ColorF.CoolLerp(Color.green, Color.red, turretError);
+                        crossColor = ColorF.Sqrt(Color.Lerp(CrosshairColorInaccurate, CrosshairColorAccurate, turretError));
+                        // crossColor = ((CrosshairColorInaccurate * turretError) + (CrosshairColorAccurate * (1f - turretError)));
+                    }
+
                     if (predictedHitPosition != default && (predictedHitPosition - mousePosition).sqrMagnitude > MeltDistance)
                     {
-                        DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, isAccurate ? CrosshairColorAccurate : CrosshairColorInaccurate);
+                        DrawCross(predictedHitPosition, CrossSize.Inner, CrossSize.Outer, 1f, crossColor);
                     }
 
                     if (showReload)
@@ -1098,7 +1086,7 @@ namespace Game.Managers
 
         void DrawLabels(Vector2 point, Transform targetObject)
         {
-            if (ControllingObject as Object == null)
+            if ((ControllingObject as Object) == null)
             { return; }
 
             Rect labelRect = new(new Vector2(point.x, point.y - GUISkin.label.fontSize), new Vector2(100f, GUISkin.label.fontSize));
@@ -1125,8 +1113,14 @@ namespace Game.Managers
             GL.Begin(GL.LINE_STRIP);
             for (int i = 0; i < trajectoryPath.Length; i++)
             {
+                Vector3 screenPoint = MainCamera.Camera.WorldToScreenPoint(trajectoryPath[i]);
+                if (screenPoint.z <= 0f)
+                { continue; }
+
+                screenPoint = GUIUtils.TransformPoint(screenPoint);
+
                 GL.Color(new Color(1f, 1f, 1f, 1f - ((float)(i + 1) / (float)trajectoryPath.Length)));
-                GL.Vertex(trajectoryPath[i]);
+                GL.Vertex(screenPoint);
             }
             GL.End();
         }

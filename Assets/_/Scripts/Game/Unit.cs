@@ -63,7 +63,7 @@ namespace Game.Components
 
             if (!Input.GetKey(KeyCode.LeftAlt))
             {
-                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = MainCamera.Camera.ScreenPointToRay(Mouse.LockedPosition);
                 RaycastHit[] hits = Physics.RaycastAll(ray, 500f, DefaultLayerMasks.Solids).ExcludeTransforms(transform);
                 Vector3 point = hits.Length == 0 ? ray.GetPoint(500f) : hits[hits.Closest(transform.position).Index].point;
 

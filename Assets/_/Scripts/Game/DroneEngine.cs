@@ -256,7 +256,7 @@ namespace Game.Components
             input.z = Input.GetAxis("Horizontal");
             input.y = Input.GetAxis("Vertical");
 
-            var ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            var ray = MainCamera.Camera.ScreenPointToRay(Mouse.Position);
             float a = Vector2.SignedAngle(transform.forward.To2D(), ray.GetPoint(150f).To2D() - transform.position.To2D());
             input.x = -(a / 90f);
 

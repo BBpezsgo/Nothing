@@ -1,0 +1,94 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Math"
+		},
+		{
+			"path": "../NetcodeForGameObjects-OfflineTransport"
+		}
+	],
+	"settings": {
+		"omnisharp.useModernNet": false,
+		"files.exclude": {
+			// General
+			"**/*.meta": true,
+			"**/*.csproj": true,
+			"**/*.sln": true,
+			"Library": true,
+			"Temp": true,
+			"ProjectSettings": true,
+			"UserSettings": true,
+			"Packages/packages-lock.json": true,
+			// Project
+			"Assets/ProBuilder Data": true,
+			"Assets/UnityGoogleDrive": true,
+			"Assets/DinoFracture": true,
+			"Assets/UI Toolkit": true,
+			"Assets/Packages": true,
+		},
+		"material-icon-theme.files.associations": {
+        	"*.asset": "../../icons/unity",
+        	"*.unity": "../../icons/unity",
+        	"*.terrainlayer": "../../icons/unity",
+        	"*.renderTexture": "../../icons/unity",
+        	"*.guiskin": "../../icons/unity",
+        	"*.vfx": "shader",
+        	"*.mat": "shader",
+        	"*.mtl": "shader",
+        	"*.shadergraph": "shader",
+		},
+		"material-icon-theme.files.customClones": [
+			{
+				"name": "asmdef",
+				"base": "json",
+				"fileExtensions": [
+					"asmdef"
+				],
+				"color": "#42a5f5"
+			},
+			{
+				"name": "prefab",
+				"base": "3d",
+				"fileExtensions": [
+					"prefab"
+				],
+				"color": "#aaaaaa"
+			},
+			{
+				"name": "unity-settings",
+				"base": "settings",
+				"fileExtensions": [
+					"lighting",
+					"curves",
+				],
+				"color": "#aaaaaa"
+			},
+		],
+		"material-icon-theme.folders.associations": {
+        	"Editor": "../../../../icons/folder-unity",
+        	"Runtime": "../../../../icons/folder-unity",
+		},
+		"files.associations": {
+			"*.jslib": "javascript",
+			"*.shadergraph": "json",
+			"*.device": "json",
+			"*.tss": "css",
+			"*.uxml": "xml",
+			"*.uss": "css",
+		},
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Unity Debugger",
+				"type": "vstuc",
+				"request": "attach",
+				"projectPath": "${workspaceFolder}"
+			}
+		]
+	},
+}

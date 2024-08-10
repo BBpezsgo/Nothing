@@ -81,6 +81,7 @@ crashlytics-build.properties
 /Assets/ProBuilder Data
 /Assets/Computer
 /Assets/_/Scenes/Computer.unity
-/assets/UnityGoogleDrive
+/Assets/UnityGoogleDrive
 /Assets/DinoFracture
-Assets/_/Scripts/Utils/UnityEditor/GitHubCredentials.cs
+/Assets/_/Scripts/Utils/UnityEditor/GitHubCredentials.cs
+/.vscode

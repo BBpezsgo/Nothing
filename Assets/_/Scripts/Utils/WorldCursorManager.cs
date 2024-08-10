@@ -87,7 +87,7 @@ namespace Game.Managers
         {
             if (!MouseManager.MouseOnWindow) return;
 
-            Ray ray = MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Mouse.Position);
             float maxDistance = 500f;
 
             int hitCount = Physics.RaycastNonAlloc(ray, RayHits, maxDistance, Utilities.DefaultLayerMasks.Solids, QueryTriggerInteraction.Collide);
@@ -131,7 +131,7 @@ namespace Game.Managers
             if (!MouseManager.MouseOnWindow) return false;
             if (!MouseCondition()) return false;
 
-            Ray ray = MainCamera.Camera.ScreenPointToRay(AdvancedMouse.Position);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Mouse.Position);
             float maxDistance = 500f;
 
             int hitCount = Physics.RaycastNonAlloc(ray, RayHits, maxDistance, Utilities.DefaultLayerMasks.Solids, QueryTriggerInteraction.Collide);

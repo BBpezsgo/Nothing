@@ -557,8 +557,6 @@ namespace InputUtils
 
         public readonly int ButtonID;
 
-        public static Vector2 Position => Input.mousePosition;
-
         [SerializeField, ReadOnly] bool ClickedOnUI;
 
         public Vector2 DragStart { get; private set; }
@@ -625,11 +623,11 @@ namespace InputUtils
         void Down()
         {
             DownInvoked = true;
-            DragStart = Position;
+            DragStart = Mouse.Position;
             Drag = false;
             PressedAt = Time.unscaledTime;
             UpInvoked = false;
-            ClickedOnUI = MouseManager.IsOverUI(Position);
+            ClickedOnUI = MouseManager.IsOverUI(Mouse.Position);
 
             if (!ClickedOnUI)
             {
@@ -645,7 +643,7 @@ namespace InputUtils
             if (!DownInvoked)
             { return; }
 
-            if (!Drag && (Position - DragStart).sqrMagnitude > DragThresholdSqr)
+            if (!Drag && (Mouse.Position - DragStart).sqrMagnitude > DragThresholdSqr)
             { Drag = true; }
 
             if (Drag)
@@ -653,7 +651,7 @@ namespace InputUtils
                 if (!ClickedOnUI)
                 {
                     try
-                    { OnDrag?.Invoke(DragStart, Position); }
+                    { OnDrag?.Invoke(DragStart, Mouse.Position); }
                     catch (Exception exception)
                     { Debug.LogException(exception); }
                 }
@@ -675,7 +673,7 @@ namespace InputUtils
                     if (!ClickedOnUI)
                     {
                         try
-                        { OnDragged?.Invoke(DragStart, Position); }
+                        { OnDragged?.Invoke(DragStart, Mouse.Position); }
                         catch (Exception exception)
                         { Debug.LogException(exception); }
                     }
@@ -704,7 +702,7 @@ namespace InputUtils
             Vector2 outerPointV = Vector2.up * 10;
             Vector2 outerPointH = Vector2.left * 10;
 
-            Vector2 position = AdvancedMouse.Position;
+            Vector2 position = Mouse.Position;
             position = GUIUtils.TransformPoint(position);
 
             Color color = Color.white;

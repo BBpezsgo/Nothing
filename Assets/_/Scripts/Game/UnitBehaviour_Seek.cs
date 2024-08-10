@@ -27,7 +27,7 @@ namespace Game.Components
             if (FollowCursor)
             {
                 if (!MenuManager.AnyMenuVisible && MouseManager.MouseOnWindow)
-                { Target = MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition); }
+                { Target = MainCamera.Camera.ScreenToWorldPosition(Mouse.LockedPosition); }
             }
 
             if (Target == default) return null;

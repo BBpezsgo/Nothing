@@ -105,7 +105,7 @@ namespace Game.Components
         }
         void SpitTo(Vector3 targetPosition)
         {
-            float? theta_ = Maths.Ballistics.AngleOfReach2(SpitVelocity, SpitPosition.position.To(), targetPosition.To());
+            float? theta_ = Maths.Ballistics.AngleOfReachLow(SpitVelocity, SpitPosition.position.To(), targetPosition.To());
 
             float angle;
             if (!theta_.HasValue)

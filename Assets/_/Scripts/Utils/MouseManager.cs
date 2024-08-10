@@ -29,7 +29,7 @@ namespace Game.Managers
                 if (MainCamera.Camera == null)
                 { return false; }
 
-                Vector3 mousePosition = Input.mousePosition;
+                Vector3 mousePosition = Mouse.Position;
 
                 if (mousePosition.x < 0 ||
                     mousePosition.y < 0 ||
@@ -115,7 +115,7 @@ namespace Game.Managers
         }
 
         internal static bool IsPointerOverUI()
-            => MouseManager.IsOverUI(Input.mousePosition);
+            => MouseManager.IsOverUI(Mouse.Position);
 
         internal static void RegisterInput(AdvancedMouse mouse)
         {

@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.bb.math": "file:C:/Users/bazsi/Projects/Math",
-    "com.bb.netcode.transport.offline": "file:C:/Users/bazsi/Projects/Netcode for GameObjects - Offline Transport",
+    "com.bb.math": "file:../../Math",
+    "com.bb.netcode.transport.offline": "file:../../NetcodeForGameObjects-OfflineTransport",
     "com.community.netcode.extensions": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/com.community.netcode.extensions",
     "com.community.netcode.transport.websocket": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.websocket",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
@@ -14,11 +14,10 @@
     "com.unity.netcode.gameobjects": "https://github.com/Unity-Technologies/com.unity.netcode.gameobjects.git?path=/com.unity.netcode.gameobjects",
     "com.unity.probuilder": "6.0.1",
     "com.unity.profiling.core": "1.0.2",
-    "com.unity.recorder": "5.1.1",
     "com.unity.render-pipelines.universal": "17.0.3",
     "com.unity.services.analytics": "5.1.1",
-    "com.unity.test-framework": "1.4.4",
-    "com.unity.transport": "2.2.1",
+    "com.unity.test-framework": "1.4.5",
+    "com.unity.transport": "2.3.0",
     "com.unity.ugui": "2.0.0",
     "com.unity.vfx-toolbox": "https://github.com/Unity-Technologies/VFXToolbox.git",
     "com.unity.visualeffectgraph": "17.0.3",

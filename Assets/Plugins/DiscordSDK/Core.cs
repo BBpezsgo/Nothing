@@ -847,7 +847,7 @@ namespace Discord
             internal UInt32 AchievementVersion;
         }
 
-        [DllImport(Constants.DllName, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("discord_game_sdk", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
         private static extern Result DiscordCreate(UInt32 version, ref FFICreateParams createParams, out IntPtr manager);
 
         public delegate void SetLogHookHandler(LogLevel level, string message);

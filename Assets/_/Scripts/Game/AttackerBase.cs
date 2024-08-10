@@ -137,7 +137,7 @@ namespace Game.Components
 
                 if (!MenuManager.AnyMenuVisible && !Input.GetKey(KeyCode.LeftAlt))
                 {
-                    Vector2 mousePosition = Input.mousePosition;
+                    Vector2 mousePosition = Mouse.LockedPosition;
 
                     if (NetcodeUtils.IsOfflineOrServer)
                     {

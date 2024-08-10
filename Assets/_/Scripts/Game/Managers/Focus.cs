@@ -52,7 +52,7 @@ namespace Game.Managers
             if (MenuManager.AnyMenuVisible) return;
             if (!MouseManager.MouseOnWindow) return;
 
-            Vector3 mousePosition = Input.mousePosition;
+            Vector3 mousePosition = Mouse.LockedPosition;
 
             if (mousePosition.x == int.MinValue ||
                 mousePosition.y == int.MinValue)

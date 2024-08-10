@@ -3,6 +3,8 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.TextCore.Text;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -1210,6 +1212,20 @@ public static class MetricUtils
 
 public static class Mouse
 {
+    public static Vector2 Position => Input.mousePosition;
+    public static Vector2 LockedPosition => Cursor.lockState switch
+    {
+        CursorLockMode.None => Input.mousePosition,
+        CursorLockMode.Locked => Game.MainCamera.Camera.ViewportToScreenPoint(new Vector2(0.5f, 0.5f)),
+        CursorLockMode.Confined => Input.mousePosition,
+        _ => Input.mousePosition,
+    };
+    public static float DeltaX => Input.GetAxisRaw("Mouse X");
+    public static float DeltaY => Input.GetAxisRaw("Mouse Y");
+    public static Vector2 Delta => new(DeltaX, DeltaY);
+    public static float ScrollDelta => Input.mouseScrollDelta.y;
+    public static bool IsPresent => Input.mousePresent;
+
     public const int Left = 0;
     public const int Right = 1;
     public const int Middle = 2;
@@ -1222,12 +1238,6 @@ public static class Mouse
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsHold(int button) => Input.GetMouseButton(button);
-
-    public static float DeltaX => Input.GetAxisRaw("Mouse X");
-    public static float DeltaY => Input.GetAxisRaw("Mouse Y");
-    public static Vector2 Delta => new(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-
-    public static float ScrollDelta => Input.mouseScrollDelta.y;
 }
 
 public static class MouseAlt
@@ -1301,19 +1311,29 @@ public static class MouseAlt
 
     public static bool HasScrollDelta =>
         Input.GetKey(KeyCode.KeypadPlus) ||
-        Input.GetKey(KeyCode.KeypadMinus);
+        Input.GetKey(KeyCode.KeypadMinus) ||
+        Input.GetKey(KeyCode.Period) ||
+        Input.GetKey(KeyCode.Minus);
 
     public static float ScrollDelta
     {
         get
         {
+            float result = 0f;
+
             if (Input.GetKey(KeyCode.KeypadPlus))
-            { return -1f; }
+            { result += -1f; }
 
             if (Input.GetKey(KeyCode.KeypadMinus))
-            { return 1f; }
+            { result += 1f; }
 
-            return 0f;
+            if (Input.GetKey(KeyCode.Period))
+            { result += -1f; }
+
+            if (Input.GetKey(KeyCode.Minus))
+            { result += 1f; }
+
+            return Math.Clamp(result, -1f, 1f);
         }
     }
 }

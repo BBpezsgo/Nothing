@@ -22,7 +22,7 @@ namespace Grid
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Vector3 mousePosition = Game.MainCamera.Camera.ScreenToWorldPosition(Input.mousePosition);
+                Vector3 mousePosition = Game.MainCamera.Camera.ScreenToWorldPosition(Mouse.Position);
                 Grid[mousePosition]++;
             }
         }

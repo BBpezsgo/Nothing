@@ -205,12 +205,14 @@ namespace Game.Components
 
             if (trail != null)
             {
-                if (trail.TryGetComponent(out TrailRenderer trailRenderer))
+                if (trail.TryGetComponent(out TrailRenderer trailRenderer) &&
+                    QualityHandler.EnableProjectileTrails)
                 {
                     trailRenderer.SetPositions(new Vector3[] { startPosition, point });
                 }
 
-                if (trail.TryGetComponent(out LineRenderer lineRenderer))
+                if (trail.TryGetComponent(out LineRenderer lineRenderer) &&
+                    QualityHandler.EnableProjectileTrails)
                 {
                     lineRenderer.SetPositions(new Vector3[] { startPosition, point });
                 }
@@ -238,11 +240,10 @@ namespace Game.Components
                     ticksUntilTrailClear = int.MaxValue;
 
                     if (trail != null &&
-                        trail.TryGetComponent(out TrailRenderer trailRenderer) &&
-                        QualityHandler.EnableParticles)
+                        trail.TryGetComponent(out TrailRenderer trailRenderer))
                     {
                         trailRenderer.Clear();
-                        trailRenderer.emitting = true;
+                        trailRenderer.emitting = QualityHandler.EnableProjectileTrails;
                     }
                 }
             }
@@ -415,7 +416,9 @@ namespace Game.Components
         {
             if (destroyed) return true;
             Debug.DrawLine(at, at + normal, Color.red, 5f);
-            Debug3D.DrawSphere(at, .2f, Color.red, 5f);
+            Debug3D.DrawPoint(at, .2f, Color.red, 5f);
+            if (ExploisonDamage > 0f && ExploisonRadius > 0f)
+            { Debug3D.DrawSphere(at, ExploisonRadius, Color.red, 5f); }
 
             bool hasMaterial = obj.gameObject.TryGetComponent(out IObjectMaterial material);
 
@@ -530,7 +533,7 @@ namespace Game.Components
             if (trail.TryGetComponent(out ParticleSystem particleSystem))
             {
                 ParticleSystem.EmissionModule emission = particleSystem.emission;
-                emission.enabled = true;
+                emission.enabled = QualityHandler.EnableParticles;
             }
         }
 

@@ -92,9 +92,9 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
     void LeftMouse_OnClick(AdvancedMouse sender)
     {
         if (sender.HoldTime < HOLD_TIME_REQUIREMENT) return;
-        Origin = AdvancedMouse.Position;
+        Origin = Mouse.LockedPosition;
         ShownAt = Time.unscaledTime;
-        WorldPosition = MainCamera.Camera.ScreenToWorldPosition(AdvancedMouse.Position);
+        WorldPosition = MainCamera.Camera.ScreenToWorldPosition(Origin);
 
         IsShown = true;
     }
@@ -120,7 +120,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
             GUI.DrawTexture(RectUtils.FromCenter(center, size), Sphere, ScaleMode.StretchToFill, true, 0f, CircleBackground.Opacity(animationTime), 0f, 0f);
         }
 
-        Vector2 mousePosition = (Vector2)Input.mousePosition;
+        Vector2 mousePosition = Mouse.LockedPosition;
         mousePosition.y = Screen.height - mousePosition.y;
 
         Vector2 mouseOffset = center - mousePosition;

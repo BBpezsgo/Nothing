@@ -307,6 +307,7 @@ namespace Game.Components
         public float ShootHeight => NextBarrel.ShootPosition.position.y;
         public bool IsAccurateShoot => _error <= MaxError;
         public bool OutOfRange => _outOfRange;
+        public float Error => _error;
 
         [SerializeField, ReadOnly] float _error = 1f;
         [SerializeField, ReadOnly] bool _outOfRange;
@@ -581,14 +582,14 @@ namespace Game.Components
 
                 using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
                 {
-                    float? theta = Ballistics.AngleOfReach2(projectileVelocity, transform.InverseTransformPoint(ShootPosition).To(), transform.InverseTransformPoint(targetPosition).To());
+                    float? theta = Ballistics.AngleOfReachLow(projectileVelocity, transform.InverseTransformPoint(ShootPosition).To(), transform.InverseTransformPoint(targetPosition).To());
 
                     outOfRange = !theta.HasValue;
                     targetAngle = theta.HasValue ? -theta.Value * Rotation.Rad2Deg : 45f;
 
                     if (HighAngleFallback && (targetAngle < CannonAngleRange.x || targetAngle > CannonAngleRange.y))
                     {
-                        theta = Ballistics.AngleOfReach1(projectileVelocity, transform.InverseTransformPoint(ShootPosition).To(), transform.InverseTransformPoint(targetPosition).To());
+                        theta = Ballistics.AngleOfReachHigh(projectileVelocity, transform.InverseTransformPoint(ShootPosition).To(), transform.InverseTransformPoint(targetPosition).To());
 
                         outOfRange = !theta.HasValue;
                         targetAngle = theta.HasValue ? -theta.Value * Rotation.Rad2Deg : 45f;
@@ -602,7 +603,7 @@ namespace Game.Components
             }
             else
             {
-                Vector3 directionToTarget = Vector3.Normalize(targetPosition - transform.position);
+                Vector3 directionToTarget = Vector3.Normalize(targetPosition - ShootPosition);
                 float turretRotation2 = Vector3AngleOnPlane(directionToTarget, -transform.up, transform.parent.forward);
                 float upAngle = Vector3.Angle(transform.up, directionToTarget);
 
@@ -636,8 +637,8 @@ namespace Game.Components
             }
             else
             {
-                using (Maths.Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
-                { return Maths.Ballistics.PredictImpact(NextBarrel.ShootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange)?.To(); }
+                using (Ballistics.ProfilerMarkers.TrajectoryMath.Auto())
+                { return Ballistics.PredictImpact(NextBarrel.ShootPosition, projectileVelocity, CurrentProjectileLifetime, out outOfRange)?.To(); }
             }
         }
 
@@ -683,16 +684,6 @@ namespace Game.Components
             if (!t.HasValue) return null;
             else if (projectile.Lifetime > 0f) return Math.Min(t.Value, projectile.Lifetime);
             else return t.Value;
-        }
-        internal bool TryGetTrajectory(out Ballistics.Trajectory trajectory)
-        {
-            trajectory = default;
-
-            if (!IsBallisticProjectile)
-            { return false; }
-
-            trajectory = new Maths.Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position.To());
-            return true;
         }
 
         public bool Shoot()
@@ -765,7 +756,7 @@ namespace Game.Components
                     _projectile.LifeLeft = CurrentProjectileLifetime;
                     _projectile.InfinityLifetime = ProjectileLifetime <= 0f;
 
-                    _projectile.Shot = new Maths.Ballistics.Trajectory(CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position.To());
+                    _projectile.Shot = new Maths.Ballistics.Trajectory(-CannonLocalRotation, transform.rotation.eulerAngles.y, projectileVelocity, NextBarrel.ShootPosition.position.To());
 
                     Vector3 predictedImpactPosition = PredictImpact() ?? TargetPosition;
 
@@ -900,6 +891,23 @@ namespace Game.Components
                 GizmosPlus.DrawPoint(_calculatedTargetPosition, 1f);
 
                 // Debug3D.Label(transform.position, $"Error: {_error}");
+            }
+
+            if (IsBallisticProjectile)
+            {
+                float time = 3f;
+                float step = Time.fixedDeltaTime;
+
+                Vector3 velocity = projectileVelocity * NextBarrel.ShootPosition.forward;
+                Vector3 origin = NextBarrel.ShootPosition.position;
+                Vector3 previous = origin;
+
+                for (float t = step; t < time; t += step)
+                {
+                    Vector3 point = origin + Ballistics.Displacement(velocity, t);
+                    Debug.DrawLine(previous, point, Color.white);
+                    previous = point;
+                }
             }
         }
 
