@@ -151,7 +151,7 @@ namespace Game.Managers
             }
         }
 
-        public float lerpAmmount = 2f;
+        public float lerpAmount = 2f;
         [Range(0, 1)]
         public float minScale = .5f;
 

@@ -292,7 +292,7 @@ MonoBehaviour:
   BounceAngle: 10
   ExploisonForce: 0
   ExploisonRadius: 0
-  ExploisonDamage: 0
+  ExplosionDamage: 0
   ExplodeOnImpact: 0
   ExplodeWhenExpires: 0
   ExploisonEffect: {fileID: 0}

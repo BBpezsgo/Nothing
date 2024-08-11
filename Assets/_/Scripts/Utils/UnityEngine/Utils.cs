@@ -3,7 +3,6 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.TextCore.Text;
 
 #if UNITY_EDITOR
 using UnityEditor;

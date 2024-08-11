@@ -455,24 +455,24 @@ public static class MeshEx
         return closestPoint;
     }
 
-    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] verts, Maths.KDTree vertProx, int[] tri, VertTriList vt)
+    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] vertices, Maths.KDTree vertProx, int[] tri, VertTriList vt)
     {
         // First, find the nearest vertex (the nearest point must be on one of the triangles
         // that uses this vertex if the mesh is convex).
         (int nearest, _) = vertProx.FindNearest(Maths.Vector.To(pt));
 
         // Get the list of triangles in which the nearest vert "participates".
-        int[] nearTris = vt[nearest];
+        int[] nearTriangles = vt[nearest];
 
         Vector3 nearestPt = default;
         float nearestSqDist = float.MaxValue;
 
-        for (int i = 0; i < nearTris.Length; i++)
+        for (int i = 0; i < nearTriangles.Length; i++)
         {
-            int triOff = nearTris[i] * 3;
-            Vector3 a = verts[tri[triOff]];
-            Vector3 b = verts[tri[triOff + 1]];
-            Vector3 c = verts[tri[triOff + 2]];
+            int triOff = nearTriangles[i] * 3;
+            Vector3 a = vertices[tri[triOff]];
+            Vector3 b = vertices[tri[triOff + 1]];
+            Vector3 c = vertices[tri[triOff + 2]];
 
             Vector3 posNearestPt = new Triangle3(a, b, c).NearestPoint(pt.To()).To();
             float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;
@@ -487,16 +487,16 @@ public static class MeshEx
         return nearestPt;
     }
 
-    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] verts, int[] tri, VertTriList vt)
+    static Vector3 NearestPointOnMesh(Vector3 pt, Vector3[] vertices, int[] tri, VertTriList vt)
     {
         //	First, find the nearest vertex (the nearest point must be on one of the triangles
         //	that uses this vertex if the mesh is convex).
         int nearest = -1;
         float nearestSqDist = 100000000f;
 
-        for (int i = 0; i < verts.Length; i++)
+        for (int i = 0; i < vertices.Length; i++)
         {
-            float sqDist = (verts[i] - pt).sqrMagnitude;
+            float sqDist = (vertices[i] - pt).sqrMagnitude;
 
             if (sqDist < nearestSqDist)
             {
@@ -506,17 +506,17 @@ public static class MeshEx
         }
 
         //	Get the list of triangles in which the nearest vert "participates".
-        int[] nearTris = vt[nearest];
+        int[] nearTriangles = vt[nearest];
 
         Vector3 nearestPt = default;
         nearestSqDist = 100000000f;
 
-        for (int i = 0; i < nearTris.Length; i++)
+        for (int i = 0; i < nearTriangles.Length; i++)
         {
-            int triOff = nearTris[i] * 3;
-            Vector3 a = verts[tri[triOff]];
-            Vector3 b = verts[tri[triOff + 1]];
-            Vector3 c = verts[tri[triOff + 2]];
+            int triOff = nearTriangles[i] * 3;
+            Vector3 a = vertices[tri[triOff]];
+            Vector3 b = vertices[tri[triOff + 1]];
+            Vector3 c = vertices[tri[triOff + 2]];
 
             Vector3 posNearestPt = new Triangle3(a, b, c).NearestPoint(pt.To()).To();
             float posNearestSqDist = (pt - posNearestPt).sqrMagnitude;

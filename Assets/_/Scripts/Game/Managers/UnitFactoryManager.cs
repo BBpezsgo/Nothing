@@ -27,20 +27,20 @@ namespace Game.Managers
         public class ProducableUnit : INetworkSerializable
         {
             [SerializeField, ReadOnly] public string PrefabID;
-            [SerializeField, ReadOnly] public float ProgressRequied;
+            [SerializeField, ReadOnly] public float RequiredProgress;
             [SerializeField, ReadOnly] public string ThumbnailID;
 
             public ProducableUnit(StaticPlayerData.ProducableUnit other)
             {
                 PrefabID = other.Unit.name;
-                ProgressRequied = other.ProgressRequied;
+                RequiredProgress = other.RequiredProgress;
                 ThumbnailID = other.ThumbnailID;
             }
 
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref PrefabID);
-                serializer.SerializeValue(ref ProgressRequied);
+                serializer.SerializeValue(ref RequiredProgress);
             }
         }
 

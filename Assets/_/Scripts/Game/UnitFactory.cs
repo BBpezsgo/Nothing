@@ -12,7 +12,7 @@ namespace Game.Components
         public struct QueuedUnit : INetworkSerializable, IEquatable<QueuedUnit>
         {
             [SerializeField, ReadOnly] public FixedString32Bytes PrefabID;
-            [SerializeField, ReadOnly] public float RequiedProgress;
+            [SerializeField, ReadOnly] public float RequiredProgress;
             [SerializeField, ReadOnly] public FixedString32Bytes ThumbnailID;
 
             [SerializeField, ReadOnly] public float Progress;
@@ -22,7 +22,7 @@ namespace Game.Components
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref PrefabID);
-                serializer.SerializeValue(ref RequiedProgress);
+                serializer.SerializeValue(ref RequiredProgress);
                 serializer.SerializeValue(ref Progress);
             }
         }
@@ -40,7 +40,7 @@ namespace Game.Components
             {
                 if (Queue.Count == 0) return 0f;
                 QueuedUnit producing = Queue[0];
-                return Math.Clamp(producing.Progress / producing.RequiedProgress, 0, 1);
+                return Math.Clamp(producing.Progress / producing.RequiredProgress, 0, 1);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Game.Components
             first.Progress += Time.deltaTime;
             Queue[0] = first;
 
-            if (first.Progress < first.RequiedProgress) return;
+            if (first.Progress < first.RequiredProgress) return;
 
             OnUnitDone(Queue.Dequeue());
 
@@ -86,7 +86,8 @@ namespace Game.Components
             Vector3 spawnAt = DepotSpawn.position;
             spawnAt.y = TheTerrain.Height(spawnAt);
 
-            GameObject instance = AssetManager.AssetManager.InstantiatePrefab(unit.PrefabID.ToString(), true, spawnAt, DepotSpawn.rotation);
+            StaticPlayerData.ProducableUnit prefab = PlayerData.Instance.Data.ProducableUnits.Find(v => v.Unit.name == unit.PrefabID);
+            GameObject instance = GameObject.Instantiate(prefab.Unit, spawnAt, DepotSpawn.rotation);
 
             instance.transform.SetParent(transform.parent);
 
@@ -124,7 +125,7 @@ namespace Game.Components
             Queue.Enqueue(new QueuedUnit()
             {
                 Progress = 0f,
-                RequiedProgress = unit.ProgressRequied,
+                RequiredProgress = unit.RequiredProgress,
                 PrefabID = unit.PrefabID ?? string.Empty,
                 ThumbnailID = unit.ThumbnailID ?? string.Empty,
             });

@@ -30,9 +30,9 @@ namespace Game.Components
             UpdateTeam();
         }
 
-        public void Damage(float ammount)
+        public void Damage(float amount)
         {
-            HP -= ammount;
+            HP -= amount;
 
             if (HP <= 0f)
             { Destroy(); }

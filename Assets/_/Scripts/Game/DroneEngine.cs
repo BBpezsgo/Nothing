@@ -105,7 +105,7 @@ namespace Game.Components
             }
         }
 
-        public float LaterialVelocity => Vector3.Dot(transform.right, rb.linearVelocity);
+        public float LateralVelocity => Vector3.Dot(transform.right, rb.linearVelocity);
 
         public bool IsBraking => Math.Abs(TorqueInput) <= .0069f && Math.Abs(SidewaysInput) <= .0069f;
 
@@ -135,14 +135,14 @@ namespace Game.Components
         public bool IsAutoHandbraking => TorqueInput == 0f;
 
         /// <summary>
-        /// <b>Check if it's really brakeing!!!</b> <see cref="IsBraking"/>
+        /// <b>Check if it's really braking!!!</b> <see cref="IsBraking"/>
         /// </summary>
         public float BrakeValue => brake;
 
         /// <summary>
-        /// <b>Check if it's really handbrakeing!!!</b> <see cref="IsHandbraking"/>
+        /// <b>Check if it's really handbraking!!!</b> <see cref="IsHandbraking"/>
         /// </summary>
-        public float HandbrakeValue => handbrake * (1 - Math.Abs(Math.Min(1, LaterialVelocity)));
+        public float HandbrakeValue => handbrake * (1 - Math.Abs(Math.Min(1, LateralVelocity)));
 
         #region Mono Callbacks
 

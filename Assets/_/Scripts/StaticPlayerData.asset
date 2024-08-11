@@ -15,75 +15,75 @@ MonoBehaviour:
   ProducableUnits:
   - Hash: 1734
     Unit: {fileID: 4690245384110751948, guid: d35e67d154dc0e6468bf4096c5d64330, type: 3}
-    ProgressRequied: 3
+    RequiredProgress: 3
     ThumbnailID: builder
   - Hash: 931
     Unit: {fileID: 44472583122888728, guid: f8dbf41fb105ecd45a65da977d26f3ec, type: 3}
-    ProgressRequied: 5
+    RequiredProgress: 5
     ThumbnailID: apc-mg
   - Hash: 138
     Unit: {fileID: 4032902050812513782, guid: 19e567b948cfd9742b38382475c4cbe6, type: 3}
-    ProgressRequied: 7
+    RequiredProgress: 7
     ThumbnailID: apc-granate
   - Hash: 48
     Unit: {fileID: 2619412345505571582, guid: f3eb8de6ca84409448c3357a9943d4cd, type: 3}
-    ProgressRequied: 10
+    RequiredProgress: 10
     ThumbnailID: tank
   - Hash: 1864
     Unit: {fileID: 8062244046001752334, guid: d6cc4e5438db13d44aec59fb38f1f0a0, type: 3}
-    ProgressRequied: 5
+    RequiredProgress: 5
     ThumbnailID: drone
   - Hash: 1142
     Unit: {fileID: 6276130072880698484, guid: 25d8c1d2b945b04418bd3bda58ff16ea, type: 3}
-    ProgressRequied: 8
+    RequiredProgress: 8
     ThumbnailID: truck
   ConstructableBuildings:
   - Hash: 332
     SpaceNeed: {x: 20, y: 5, z: 20}
     Building: {fileID: 2759722349239998939, guid: bfc523d2d2500a847bf8551940258919,
       type: 3}
-    ProgressRequied: 11
+    RequiredProgress: 11
     ThumbnailID: factory
   - Hash: 1613
     SpaceNeed: {x: 2, y: 4, z: 2}
     Building: {fileID: 5949810894222826661, guid: c5057dca95ffbbb4496a743e3fda0976,
       type: 3}
-    ProgressRequied: 5
+    RequiredProgress: 5
     ThumbnailID: turret-mg
   - Hash: 54
     SpaceNeed: {x: 2, y: 4, z: 2}
     Building: {fileID: 4273319253527134430, guid: 9c15fdf5485b1844f8594fda053e798b,
       type: 3}
-    ProgressRequied: 16
+    RequiredProgress: 16
     ThumbnailID: turret-rocket
   - Hash: 696
     SpaceNeed: {x: 3.5, y: 8, z: 3.5}
     Building: {fileID: 1728721395496267737, guid: 76de461b9ea102248ac9a91c67bdd983,
       type: 3}
-    ProgressRequied: 20
+    RequiredProgress: 20
     ThumbnailID: turret-phalanx
   - Hash: 937
     SpaceNeed: {x: 9, y: 10, z: 9}
     Building: {fileID: 1891352470232770018, guid: a1ae9d1be982a5d4d97e318db36a8e98,
       type: 3}
-    ProgressRequied: 10
+    RequiredProgress: 10
     ThumbnailID: research-facility
   - Hash: 1524
     SpaceNeed: {x: 5.6, y: 5, z: 5.6}
     Building: {fileID: 6226412810010601917, guid: 1e1dd8781f09e2146bca38d4122eb17f,
       type: 3}
-    ProgressRequied: 40
+    RequiredProgress: 40
     ThumbnailID: turret-howitzer
   - Hash: 1742
     SpaceNeed: {x: 3.5, y: 10, z: 3.5}
     Building: {fileID: 1726614090810903875, guid: ffd0834e263987d41ab5450a5730fdcf,
       type: 3}
-    ProgressRequied: 30
+    RequiredProgress: 30
     ThumbnailID: turret-minigun
   - Hash: 166
     SpaceNeed: {x: 9, y: 10, z: 9}
     Building: {fileID: 1029036110833637850, guid: 1eff3bfe9bba88c418151723a2bf1e9f,
       type: 3}
-    ProgressRequied: 18
+    RequiredProgress: 18
     ThumbnailID: smelter
   btn_GenHash: 

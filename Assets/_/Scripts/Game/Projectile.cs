@@ -53,7 +53,7 @@ namespace Game.Components
         [Header("Explosion")]
         [SerializeField] float ExploisonForce = 0f;
         [SerializeField] float ExploisonRadius = 0f;
-        [SerializeField] internal float ExploisonDamage = 0f;
+        [SerializeField] internal float ExplosionDamage = 0f;
         [SerializeField] bool ExplodeOnImpact = false;
         [SerializeField] bool ExplodeWhenExpires = false;
 
@@ -417,7 +417,7 @@ namespace Game.Components
             if (destroyed) return true;
             Debug.DrawLine(at, at + normal, Color.red, 5f);
             Debug3D.DrawPoint(at, .2f, Color.red, 5f);
-            if (ExploisonDamage > 0f && ExploisonRadius > 0f)
+            if (ExplosionDamage > 0f && ExploisonRadius > 0f)
             { Debug3D.DrawSphere(at, ExploisonRadius, Color.red, 5f); }
 
             bool hasMaterial = obj.gameObject.TryGetComponent(out IObjectMaterial material);
@@ -653,7 +653,7 @@ namespace Game.Components
                     GameObject @object = objectCollider.gameObject;
 
                     float distance = Math.Max(1f, Vector3.Distance(@object.transform.position, origin));
-                    float amount = (ExploisonDamage * (1f - absorbed)) / distance;
+                    float amount = (ExplosionDamage * (1f - absorbed)) / distance;
 
                     if (@object.TryGetComponent(out IDetailedDamageable detailedDamageable))
                     {

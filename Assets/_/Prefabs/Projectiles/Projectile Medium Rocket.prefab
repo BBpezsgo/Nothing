@@ -4871,7 +4871,7 @@ MonoBehaviour:
   BounceAngle: 0
   ExploisonForce: 0.5
   ExploisonRadius: 2
-  ExploisonDamage: 30
+  ExplosionDamage: 30
   ExplodeOnImpact: 1
   ExplodeWhenExpires: 1
   ExploisonEffect: {fileID: 8001222445431678015, guid: 40b44b88567bb6047a1b47046d03b041,

@@ -10595,7 +10595,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority: 0
   FreeMode: 0
-  Zoomable: 1
+  CanZoom: 1
 --- !u!1001 &1674865958028431571
 PrefabInstance:
   m_ObjectHideFlags: 0

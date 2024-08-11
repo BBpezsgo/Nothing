@@ -20,7 +20,7 @@ namespace Utilities.Editor
         readonly Dictionary<BuildTarget, TargetSettings> TargetsToBuild = new();
         readonly List<BuildTarget> AvailableTargets = new();
 
-        public const string BaseOutputPath = "C:/Users/bazsi/Nothing 3D/Build/";
+        public static readonly string BaseOutputPath = @"C:\Users\bazsi\Projects\Nothing\Build\";
 
         bool IsCompressing;
 

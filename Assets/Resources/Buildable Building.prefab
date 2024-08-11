@@ -5011,9 +5011,9 @@ MonoBehaviour:
   Building: {fileID: 0}
   BuildingHash: 0
   IsConstructed: 0
-  BuildingProcessRequied: 1
+  RequiredBuildingProcess: 1
   BuildingProcess: 0
   Particles: {fileID: 418484033348489356}
-  ParticlesAmmount: 100
+  ParticlesAmount: 100
   materials: []
   Team: 

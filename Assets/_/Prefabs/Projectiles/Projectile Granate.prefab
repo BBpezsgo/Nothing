@@ -58,7 +58,7 @@ MonoBehaviour:
   BounceAngle: 50
   ExploisonForce: 5
   ExploisonRadius: 5
-  ExploisonDamage: 5
+  ExplosionDamage: 5
   ExplodeOnImpact: 1
   ExplodeWhenExpires: 1
   ExploisonEffect: {fileID: 0}

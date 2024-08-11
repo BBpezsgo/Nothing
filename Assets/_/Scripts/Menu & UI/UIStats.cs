@@ -22,7 +22,7 @@ namespace Game.UI
         {
             mat = new Material(Shader.Find("Hidden/Internal-Colored"));
             Window = IMGUIManager.Instance.CreateWindow(new Rect(Screen.width - 150 - 5, 5, 150, 100));
-            Window.Title = "Perfomance";
+            Window.Title = "Performance";
             Window.Visible = true;
             Window.DrawContent = OnDrawWindow;
         }

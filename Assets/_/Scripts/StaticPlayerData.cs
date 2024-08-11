@@ -10,7 +10,7 @@ public class StaticPlayerData : ScriptableObject
     {
         [SerializeField, ReadOnly] public uint Hash;
         [SerializeField] public GameObject Unit;
-        [SerializeField] public float ProgressRequied;
+        [SerializeField] public float RequiredProgress;
         [SerializeField] public string ThumbnailID;
     }
 
@@ -20,7 +20,7 @@ public class StaticPlayerData : ScriptableObject
         [SerializeField, ReadOnly] public uint Hash;
         [SerializeField] public Vector3 SpaceNeed = Vector3.one;
         [SerializeField] public GameObject Building;
-        [SerializeField] public float ProgressRequied;
+        [SerializeField] public float RequiredProgress;
         [SerializeField] public string ThumbnailID;
         public Vector3 GroundOrigin
         {

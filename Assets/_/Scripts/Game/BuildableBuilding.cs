@@ -12,11 +12,11 @@ namespace Game.Components
         [SerializeField, ReadOnly] uint BuildingHash;
         [SerializeField, ReadOnly] bool IsConstructed;
 
-        [SerializeField, ReadOnly] float BuildingProcessRequied = 1f;
+        [SerializeField, ReadOnly] float RequiredBuildingProcess = 1f;
         [SerializeField, ReadOnly] float BuildingProcess = 0f;
         readonly NetworkVariable<float> NetBuildingProcess = new();
         [SerializeField] ParticleSystem Particles;
-        [SerializeField, Min(1)] float ParticlesAmmount = 1f;
+        [SerializeField, Min(1)] float ParticlesAmount = 1f;
         ParticleSystem.EmissionModule ParticlesEmission;
         [SerializeField, ReadOnly, NonReorderable] Material[] materials;
         [SerializeField, ReadOnly] public string Team;
@@ -26,10 +26,10 @@ namespace Game.Components
         void OnDisable()
         { RegisteredObjects.BuildableBuildings.Remove(this); }
 
-        public void Init(uint buildingHash, float processRequied)
+        public void Init(uint buildingHash, float processRequired)
         {
             BuildingHash = buildingHash;
-            BuildingProcessRequied = processRequied;
+            RequiredBuildingProcess = processRequired;
 
             PlayerData playerData = PlayerData.GetPlayerData(Team);
             var buildings = (playerData == null) ? new StaticPlayerData.ConstructableBuilding[0] : playerData.Data.ConstructableBuildings.ToArray();
@@ -79,20 +79,20 @@ namespace Game.Components
             { return true; }
 
             if (Particles != null && QualityHandler.EnableParticles)
-            { Particles.Emit((int)MathF.Round(ParticlesAmmount * progress)); }
+            { Particles.Emit((int)MathF.Round(ParticlesAmount * progress)); }
 
             BuildingProcess += progress;
 
             for (int i = 0; i < materials.Length; i++)
-            { materials[i].SetFloat("_Progress", BuildingProcess / BuildingProcessRequied); }
+            { materials[i].SetFloat("_Progress", BuildingProcess / RequiredBuildingProcess); }
 
-            if (BuildingProcess >= BuildingProcessRequied)
+            if (BuildingProcess >= RequiredBuildingProcess)
             { IsConstructed = true; }
 
             if (NetcodeUtils.IsServer)
             { NetBuildingProcess.Value = BuildingProcess; }
 
-            return BuildingProcess >= BuildingProcessRequied;
+            return BuildingProcess >= RequiredBuildingProcess;
         }
 
         public void SetMaterial(Material material)
@@ -117,7 +117,7 @@ namespace Game.Components
         protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
         {
             serializer.SerializeValue(ref BuildingHash);
-            serializer.SerializeValue(ref BuildingProcessRequied);
+            serializer.SerializeValue(ref RequiredBuildingProcess);
             serializer.SerializeValue(ref Team);
 
             if (serializer.IsReader)
@@ -141,7 +141,7 @@ namespace Game.Components
 
             if (!NetcodeUtils.IsOfflineOrServer) return;
 
-            if (BuildingProcess < BuildingProcessRequied) return;
+            if (BuildingProcess < RequiredBuildingProcess) return;
 
             if (Building == null)
             { Debug.LogWarning($"[{nameof(BuildingHologram)}]: Building is null"); }

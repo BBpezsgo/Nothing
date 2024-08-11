@@ -29,9 +29,9 @@ namespace Game.Components
             { TakeControlManager.Instance.ControllableDestroyed(); }
         }
 
-        public void Damage(float ammount, Projectile source)
+        public void Damage(float amount, Projectile source)
         {
-            if (ammount > .0001f &&
+            if (amount > .0001f &&
                 source != null &&
                 source.Owner != null &&
                 TeamManager.Instance.GetFuckYou(this, source.Owner) >= 0f &&
@@ -40,7 +40,7 @@ namespace Game.Components
                 attacker.SomeoneDamagedMe(source.Owner);
             }
 
-            Damage(ammount);
+            Damage(amount);
         }
     }
 }

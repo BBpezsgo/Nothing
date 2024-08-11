@@ -11,6 +11,7 @@ namespace Utilities.Drawers
             CrossDrawer.Draw(center + Vector2.one, innerSize, outerSize, thickness, shadowColor);
             CrossDrawer.Draw(center, innerSize, outerSize, thickness, color);
         }
+
         internal static void Draw(Vector2 center, float innerSize, float outerSize, float thickness, Color color)
         {
             Vector2 innerPointV = Vector2.up * innerSize;
@@ -363,7 +364,7 @@ namespace Utilities.Drawers
 
             float cornerSizeWidth = Math.Min(halfSize.x, cornerSize);
             float cornerSizeHeight = Math.Min(halfSize.y, cornerSize);
-            
+
             Vector2 topLeft = new(-halfSize.x, -halfSize.y);
             Vector2 topRight = new(halfSize.x, -halfSize.y);
             Vector2 bottomLeft = new(-halfSize.x, halfSize.y);

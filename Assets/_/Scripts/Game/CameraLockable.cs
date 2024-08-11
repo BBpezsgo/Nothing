@@ -4,10 +4,10 @@ public class CameraLockable : MonoBehaviour
 {
     public int Priority = 0;
     public bool FreeMode = true;
-    public bool Zoomable = true;
+    public bool CanZoom = true;
 
-    public Vector3 position => transform.position;
-    public Quaternion rotation => transform.rotation;
+    public Vector3 Position => transform.position;
+    public Quaternion Rotation => transform.rotation;
 
     public readonly struct Priorities
     {

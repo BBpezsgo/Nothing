@@ -5,26 +5,26 @@ namespace Game.Components
 {
     public class ItemLoot : MonoBehaviour
     {
-        [System.Serializable]
+        [Serializable]
         internal class Loot
         {
             [SerializeField] internal string ItemID;
-            [SerializeField] internal Vector2Int Ammount = Vector2Int.one;
-            [SerializeField, Range(0.00001f, 1f)] internal float Propability = 1f;
+            [SerializeField] internal Vector2Int Amount = Vector2Int.one;
+            [SerializeField, Range(0.00001f, 1f)] internal float Probability = 1f;
 
             internal int Evaluate()
             {
-                float evaulatedPropability = UnityEngine.Random.value;
+                float evaluatedProbability = UnityEngine.Random.value;
 
-                if (evaulatedPropability < Propability)
+                if (evaluatedProbability < Probability)
                 { return 0; }
 
-                if (Ammount.x == Ammount.y)
-                { return Ammount.x; }
+                if (Amount.x == Amount.y)
+                { return Amount.x; }
 
-                int evaulatedAmmount = UnityEngine.Random.Range(Math.Min(Ammount.x, Ammount.y), Math.Max(Ammount.x, Ammount.y));
+                int evaluatedAmount = UnityEngine.Random.Range(Math.Min(Amount.x, Amount.y), Math.Max(Amount.x, Amount.y));
 
-                return evaulatedAmmount;
+                return evaluatedAmount;
             }
         }
 

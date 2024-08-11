@@ -508,8 +508,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Loots:
   - ItemID: scrap
-    Ammount: {x: 1, y: 1}
-    Propability: 0.2
+    Amount: {x: 1, y: 1}
+    Probability: 0.2
 --- !u!114 &3365947360574874409
 MonoBehaviour:
   m_ObjectHideFlags: 0

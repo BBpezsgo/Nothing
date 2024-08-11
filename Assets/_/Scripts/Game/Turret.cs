@@ -768,7 +768,7 @@ namespace Game.Components
                         float predictedDamage = 0f;
 
                         predictedDamage += _projectile.ImpactDamage;
-                        predictedDamage += _projectile.ExploisonDamage * .2f;
+                        predictedDamage += _projectile.ExplosionDamage * .2f;
 
                         requiredShoots.Shoot(impactTime, predictedDamage);
                     }

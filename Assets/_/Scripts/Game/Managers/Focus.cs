@@ -23,7 +23,7 @@ namespace Game.Managers
         [SerializeField, ReadOnly] float HitDistance;
         [SerializeField, ReadOnly] float TargetFocusDistance;
         [SerializeField] float focusSpeed = 1f;
-        [SerializeField] float Lazyness;
+        [SerializeField] float Laziness;
         [SerializeField, ReadOnly] float NextRefresh;
 
         void Awake()
@@ -35,7 +35,7 @@ namespace Game.Managers
         {
             Volume.TryGet(out DepthOfField);
             FocusDistance = DepthOfField.focusDistance;
-            NextRefresh = Lazyness;
+            NextRefresh = Laziness;
         }
 
         void Update()
@@ -47,7 +47,7 @@ namespace Game.Managers
                 NextRefresh -= Time.unscaledDeltaTime;
                 return;
             }
-            NextRefresh = Lazyness;
+            NextRefresh = Laziness;
 
             if (MenuManager.AnyMenuVisible) return;
             if (!MouseManager.MouseOnWindow) return;
@@ -69,7 +69,7 @@ namespace Game.Managers
                 /*
                 if (RayHit.collider.gameObject.TryGetComponent<MeshFilter>(out var meshFilter))
                 {
-                    Debug3D.DrawSphere(RayHit.point, .11f, Color.gray, Lazyness);
+                    Debug3D.DrawSphere(RayHit.point, .11f, Color.gray, Laziness);
                 }
                 else
                 {
@@ -97,7 +97,7 @@ namespace Game.Managers
                 { HitDistance = MinDistance; }
                 TargetFocusDistance = HitDistance;
 
-                Debug3D.DrawSphere(RayHit.point, .1f, Color.white, Lazyness);
+                Debug3D.DrawSphere(RayHit.point, .1f, Color.white, Laziness);
             }
             else
             {

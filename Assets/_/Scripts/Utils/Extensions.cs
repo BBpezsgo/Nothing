@@ -10,6 +10,7 @@ public static partial class UnclassifiedExtensions
         { return @default; }
         return v[index];
     }
+
     public static void Set<T>(this NetworkList<T> v, int index, T value, T @default) where T : unmanaged, IEquatable<T>
     {
         if (index < 0)

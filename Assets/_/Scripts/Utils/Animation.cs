@@ -6,7 +6,7 @@ namespace Utilities
     internal readonly struct AnimationFunctions
     {
         internal static float Square(float v) => v * v;
-        internal static float Squareroot(float v) => MathF.Sqrt(v);
+        internal static float SquareRoot(float v) => MathF.Sqrt(v);
     }
 
     internal delegate float AnimationFunction(float v);

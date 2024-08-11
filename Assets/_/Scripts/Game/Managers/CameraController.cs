@@ -79,7 +79,7 @@ namespace Game.Managers
         /// From 0f to 40f
         /// </summary>
         internal float ScopeZoom => 60f - theCamera.fieldOfView;
-        float LockedValue => (theCamera.transform.position - LockOn.position).sqrMagnitude;
+        float LockedValue => (theCamera.transform.position - LockOn.Position).sqrMagnitude;
         [SerializeField, ReadOnly] bool IsTotallyLocked = false;
 
         // [Header("Other")]
@@ -341,7 +341,7 @@ namespace Game.Managers
         {
             if (IsTotallyLocked)
             {
-                transform.SetPositionAndRotation(LockOn.position, LockOn.rotation);
+                transform.SetPositionAndRotation(LockOn.Position, LockOn.Rotation);
                 theCamera.transform.localPosition = default;
             }
             else
@@ -351,12 +351,12 @@ namespace Game.Managers
                 lockSpeed *= Math.Clamp(MathF.Sqrt(LockedValue) / 3, .001f, 10f);
 
                 {
-                    Vector3 displacement = LockOn.position - transform.position;
+                    Vector3 displacement = LockOn.Position - transform.position;
                     displacement *= .9f;
                     displacement = Vector3.ClampMagnitude(displacement, lockSpeed * deltaTime);
                     transform.Translate(displacement, Space.World);
 
-                    transform.rotation = Quaternion.Lerp(transform.rotation, LockOn.rotation, rotationSpeed * deltaTime);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, LockOn.Rotation, rotationSpeed * deltaTime);
                 }
 
                 {
@@ -370,11 +370,11 @@ namespace Game.Managers
 
             if (LockOn.FreeMode)
             {
-                Rotation = LockOn.rotation.eulerAngles.y;
+                Rotation = LockOn.Rotation.eulerAngles.y;
                 TargetRotation = Rotation;
             }
 
-            if (LockOn.Zoomable &&
+            if (LockOn.CanZoom &&
                 !MenuManager.AnyMenuVisible &&
                 MouseManager.MouseOnWindow)
             {

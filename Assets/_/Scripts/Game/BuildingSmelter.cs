@@ -67,6 +67,6 @@ namespace Game.Components
         public bool NeedItems { get; }
         public string ItemID { get; }
 
-        public void GiveItem(float ammount);
+        public void GiveItem(float amount);
     }
 }

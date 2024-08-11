@@ -260,9 +260,9 @@ namespace InspectorDrawers
         bool IsItBloodyArrayTho(SerializedProperty property)
         {
             string path = property.propertyPath;
-            int idot = path.IndexOf('.');
-            if (idot == -1) return false;
-            string propName = path[..idot];
+            int dotIndex = path.IndexOf('.');
+            if (dotIndex == -1) return false;
+            string propName = path[..dotIndex];
             SerializedProperty p = property.serializedObject.FindProperty(propName);
             return p.isArray;
             //CREDITS: https://answers.unity.com/questions/603882/serializedproperty-isnt-being-detected-as-an-array.html

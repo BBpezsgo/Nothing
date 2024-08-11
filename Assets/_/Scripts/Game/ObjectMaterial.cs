@@ -12,7 +12,7 @@ namespace Game.Components
         /// </summary>
         public float Hardness { get; }
         /// <summary>
-        /// Defines how much exploison damage it absorbs (percent %)
+        /// Defines how much explosion damage it absorbs (percent %)
         /// </summary>
         public float BlastAbsorptionCapacity { get; }
     }

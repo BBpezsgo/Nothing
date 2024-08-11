@@ -279,7 +279,7 @@ namespace Game.Managers
         public static void ApplyBuildableHologram(BuildableBuilding hologram, string team, StaticPlayerData.ConstructableBuilding building)
         {
             hologram.Team = team;
-            hologram.Init(building.Hash, building.ProgressRequied);
+            hologram.Init(building.Hash, building.RequiredProgress);
 
             {
                 Transform hologramColliders = hologram.transform.Find("Collider");

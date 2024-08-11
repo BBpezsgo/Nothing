@@ -1044,7 +1044,7 @@ MonoBehaviour:
   HitDistance: 0
   TargetFocusDistance: 0
   focusSpeed: 1
-  Lazyness: 0.5
+  Laziness: 0.5
   NextRefresh: 0
 --- !u!1 &345478514
 GameObject:
@@ -3832,7 +3832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7582adfe1db81694cab24a8279ab9eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lerpAmmount: 2
+  lerpAmount: 2
   minScale: 0.5
   mainMenus:
   - Type: 2
@@ -4401,7 +4401,7 @@ MonoBehaviour:
     Hash: 0
     SpaceNeed: {x: 1, y: 1, z: 1}
     Building: {fileID: 0}
-    ProgressRequied: 0
+    RequiredProgress: 0
     ThumbnailID: 
   BuildingHologramPrefab: {fileID: 1322446890448717256, guid: 04a049423b0bec541bc928a33626f59e, type: 3}
   BuildingHologram: {fileID: 0}
