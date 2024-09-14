@@ -558,8 +558,9 @@ MonoBehaviour:
   CommandSelectedBackground: {r: 0.341, g: 0.682, b: 1, a: 1}
   Size: 120
   CircleThicknessValue: 0.25
+  CrossThicknessValue: 0.25
   ActionScale: 1.5
-  ShowSpeed: 10
+  ShowSpeed: 5
   btnRegenerateTextures: 
   IsShown: 0
 --- !u!1 &219895025
@@ -1078,7 +1079,7 @@ MonoBehaviour:
   theCamera: {fileID: 330585545}
   cameraRotation: {fileID: 42618974}
   cameraMode: 0
-  Height: 1
+  Height: 0
   FollowObject: {fileID: 0}
   JustFollow: 0
   ActualFollowSpeed: 1
@@ -1374,6 +1375,57 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!1 &574024089
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 574024090}
+  - component: {fileID: 574024091}
+  m_Layer: 5
+  m_Name: Background Network
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 0
+--- !u!4 &574024090
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574024089}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1604100311}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &574024091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574024089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: d8eced316c6287b498b16f4e3c583f0b, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 91121a27be746e23681e16fd864dad45, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &574902045
 GameObject:
   m_ObjectHideFlags: 0
@@ -3230,7 +3282,6 @@ Transform:
   - {fileID: 2093730559}
   - {fileID: 1202693340}
   - {fileID: 1356665773}
-  - {fileID: 2014832345}
   - {fileID: 260706540}
   - {fileID: 1541074572}
   - {fileID: 437662610}
@@ -3297,7 +3348,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1376606806}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c5df7819c3cb5d845a8708a27d60559c, type: 3}
   m_Name: 
@@ -3556,7 +3607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ed31d0063c58c4bb4a2f3de48ee6a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enableParticles: 1
+  _enableParticles: 0
   _enableModelFragmentation: 0
   _enableProjectileTrails: 0
   _targetFps: 10
@@ -3629,6 +3680,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a6c258032272a4cad17c70d0b77e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BackroundNetworkUI: {fileID: 0}
+  BackroundNetworkItem: {fileID: 9197481963319205126, guid: 829c0c53b76f4eebf84251572ad1e2dc, type: 3}
 --- !u!114 &1541074574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3799,6 +3852,7 @@ Transform:
   - {fileID: 574902046}
   - {fileID: 1572591992}
   - {fileID: 884744339}
+  - {fileID: 574024090}
   - {fileID: 741332489}
   - {fileID: 930337498}
   - {fileID: 1652353916}
@@ -4175,67 +4229,6 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!1 &2014832343
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2014832345}
-  - component: {fileID: 2014832344}
-  m_Layer: 3
-  m_Name: AssetManager
-  m_TagString: GameController
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!114 &2014832344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2014832343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cee734e914d0dbb48af3586dd4443e90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BuiltinPrefabs:
-  - Key: unit-ui-selected
-    Value: {fileID: 5040429609296710570, guid: e07be840856b001449c6d4a40d13eae5, type: 3}
-  - Key: projectile-mg
-    Value: {fileID: 4399164710629436118, guid: fb0ffcdcd67310b418a89528270621a0, type: 3}
-  - Key: projectile-granate
-    Value: {fileID: 1893550291513682336, guid: c5f711ce38205504381cb6715961d157, type: 3}
-  - Key: effect-shoot-mg
-    Value: {fileID: 3494347763345842717, guid: b407ec4ed25e6dc43b7a74eb6cf253be, type: 3}
-  - Key: effect-shoot-granate-1
-    Value: {fileID: 8990596160454144657, guid: 2b4fd97b6a640df4ba4fdbcfcdd73908, type: 3}
-  - Key: effect-shoot-granate-2
-    Value: {fileID: 3494347763345842717, guid: 2ade466999c8e2a4daab3d0fbfb5dd40, type: 3}
-  - Key: effect-exploison
-    Value: {fileID: 3387115980509588096, guid: 93cf482d3f7974f4d90b5f45d52d5879, type: 3}
-  - Key: Simple Small Wheel
-    Value: {fileID: 8832821691510361679, guid: a3df4a572353bf848ad574e8f4b637c4, type: 3}
---- !u!4 &2014832345
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2014832343}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1358086404}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2073833684
 GameObject:
   m_ObjectHideFlags: 0

@@ -279,6 +279,34 @@ public static class GUIUtils
         return result;
     }
 
+    public static Texture2D GenerateCross(Vector2Int size, float thickness = .25f)
+    {
+        thickness = Math.Clamp(thickness, 0f, .5f);
+        Texture2D result = new(size.x, size.y);
+        for (int x = 0; x < result.width; x++)
+        {
+            for (int y = 0; y < result.height; y++)
+            {
+                Vector2 p = new((float)x / (float)result.width, (float)y / (float)result.height);
+                float d = Math.Min(
+                    (p - new Vector2(p.y, p.y)).magnitude,
+                    (p - new Vector2(1f - p.y, p.y)).magnitude
+                );
+                if (d < thickness)
+                {
+                    result.SetPixel(x, y, Color.white);
+                }
+                else
+                {
+                    result.SetPixel(x, y, new Color(1, 1, 1, 0));
+                }
+            }
+        }
+        result.Apply();
+        return result;
+    }
+
+
     public static GuiSkinUsage Skin(GUISkin skin) => new(skin);
     public static GuiEnabled Enabled(bool enabled) => new(enabled);
 

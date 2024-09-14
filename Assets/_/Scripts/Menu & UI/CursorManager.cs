@@ -142,7 +142,7 @@ namespace Game.Managers
 
         public static void SetCursor(Texture2D texture, Vector2 hotspot)
         {
-            if (instance.CurrentCursor == texture) return;
+            if (instance == null || instance.CurrentCursor == texture) return;
 
             Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
             instance.CurrentCursor = texture;
@@ -152,7 +152,7 @@ namespace Game.Managers
         {
             Cursor.visible = true;
 
-            if (instance.CurrentCursor == null) return;
+            if (instance == null || instance.CurrentCursor == null) return;
 
             Cursor.SetCursor(null, default, CursorMode.Auto);
             instance.CurrentCursor = null;

@@ -260,7 +260,7 @@ Scroller #unity-tracker {
 Scroller {
     border-left-width: 1px;
     background-color: rgb(41, 41, 41);
-    border-left-color: rgba(22, 22, 22, 255);
+    border-left-color: rgb(22, 22, 22);
 }
 
 .scrollview {
@@ -279,7 +279,7 @@ Scroller {
     border-bottom-right-radius: 0;
 }
 
-.progressbar > #unity-progress-bar > .unity-progress-bar__background {
+ProgressBar > #unity-progress-bar > .unity-progress-bar__background {
     background-color: rgb(48, 48, 48);
     border-left-width: 0.5px;
     border-right-width: 0.5px;
@@ -296,7 +296,7 @@ Scroller {
     height: auto;
 }
 
-.progressbar > #unity-progress-bar > .unity-progress-bar__background > .unity-progress-bar__progress {
+ProgressBar > #unity-progress-bar > .unity-progress-bar__background > .unity-progress-bar__progress {
     background-color: rgb(56, 93, 131);
     margin-left: 0;
     margin-right: 0;
@@ -304,15 +304,24 @@ Scroller {
     margin-bottom: 0;
 }
 
-.progressbar > #unity-progress-bar {
+ProgressBar.error > #unity-progress-bar > .unity-progress-bar__background > .unity-progress-bar__progress {
+    background-color: rgb(192, 21, 66);
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+ProgressBar > #unity-progress-bar {
     max-height: 15px;
     min-height: 15px;
 }
 
-.progressbar Label {
+ProgressBar Label {
     padding-left: 0;
     padding-right: 0;
     padding-top: 0;
     padding-bottom: 0;
     font-size: 8px;
+    text-shadow: 1px 1px 0 rgb(0, 0, 0);
 }

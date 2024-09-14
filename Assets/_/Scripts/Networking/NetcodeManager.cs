@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace Networking.Managers
 {
@@ -62,6 +64,8 @@ namespace Networking.Managers
         internal IReadOnlyDictionary<ulong, SceneUnloadInfo> SceneUnloadings => sceneUnloadings;
 
         ImguiWindow Window;
+        [SerializeField, ReadOnly] UIDocument BackroundNetworkUI;
+        [SerializeField] VisualTreeAsset BackroundNetworkItem;
 
         void Start()
         {
@@ -69,9 +73,14 @@ namespace Networking.Managers
 
             Window = IMGUIManager.Instance.CreateWindow(new Rect(5f, 5f, 250f, 150f));
             Window.Title = "Netcode Scenes";
-            Window.Visible = true;
+            Window.Visible = false;
             Window.Skin = IMGUIManager.Instance.Skin;
             Window.DrawContent = OnWindowGUI;
+
+            {
+                GameObject o = GameObject.Find("Background Network");
+                if (o) BackroundNetworkUI = o.GetComponent<UIDocument>();
+            }
         }
 
         void OnWindowGUI()
@@ -170,7 +179,7 @@ namespace Networking.Managers
 
         void Update()
         {
-            Window.Visible = sceneLoadings.Count != 0 || sceneUnloadings.Count != 0 || sceneSynchronizations.Count != 0;
+            // Window.Visible = sceneLoadings.Count != 0 || sceneUnloadings.Count != 0 || sceneSynchronizations.Count != 0;
 
             if (!BaseEventsRegistered && NetworkManager.Singleton != null)
             {
@@ -200,6 +209,35 @@ namespace Networking.Managers
                 NetworkManager.Singleton.SceneManager.OnUnloadEventCompleted += OnSceneUnloadEventCompleted;
 
                 // Debug.Log($"[{nameof(NetcodeManager)}]: Scene events registered", this);
+            }
+        }
+
+        void FixedUpdate()
+        {
+            foreach ((ulong clientId, SceneLoadInfo item) in sceneLoadings)
+            {
+                VisualElement element = UI_EnsureElement($"client-{clientId}-load");
+                ProgressBar progressBar = element.Q<ProgressBar>();
+                progressBar.value = item.IsDone ? 1f : item.AsyncOperation?.progress ?? 1f;
+                progressBar.title = "Loading scene";
+                progressBar.EnableInClassList("error", item.IsTimedOut);
+            }
+
+            foreach ((ulong clientId, SceneUnloadInfo item) in sceneUnloadings)
+            {
+                VisualElement element = UI_EnsureElement($"client-{clientId}-unload");
+                ProgressBar progressBar = element.Q<ProgressBar>();
+                progressBar.value = item.IsDone ? 1f : item.AsyncOperation?.progress ?? 1f;
+                progressBar.title = "Unloading scene";
+                progressBar.EnableInClassList("error", item.IsTimedOut);
+            }
+
+            foreach (ulong clientId in sceneSynchronizations)
+            {
+                VisualElement element = UI_EnsureElement($"client-{clientId}-sync");
+                ProgressBar progressBar = element.Q<ProgressBar>();
+                progressBar.value = 1f;
+                progressBar.title = "Sync schene";
             }
         }
 
@@ -254,6 +292,7 @@ namespace Networking.Managers
                 if (sceneSynchronizations[i] == clientId)
                 { sceneSynchronizations.RemoveAt(i); }
             }
+            UI_RemoveElement($"client-{clientId}-sync");
         }
 
         void OnSceneSynchronize(ulong clientId)
@@ -308,6 +347,25 @@ namespace Networking.Managers
             {
 
             };
+        }
+
+        VisualElement UI_EnsureElement(string itemId)
+        {
+            VisualElement container = BackroundNetworkUI.rootVisualElement.Q("container");
+            VisualElement exists = container.Children().FirstOrDefault(v => v.name == itemId);
+            if (exists != null) return exists;
+            exists = BackroundNetworkItem.Instantiate();
+            exists.name = itemId;
+            container.Add(exists);
+            return exists;
+        }
+
+        void UI_RemoveElement(string itemId)
+        {
+            VisualElement container = BackroundNetworkUI.rootVisualElement.Q("container");
+            VisualElement exists = container.Children().FirstOrDefault(v => v.name == itemId);
+            if (exists == null) return;
+            container.Remove(exists);
         }
 
         void Singleton_OnServerStopped(bool isHost)

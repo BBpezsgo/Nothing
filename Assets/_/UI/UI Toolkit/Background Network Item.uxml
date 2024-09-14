@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_/UI/UI%20Toolkit/Style.uss?fileID=7433441132597879392&amp;guid=aef2f4b73eba1c34e9cac829dd075ce5&amp;type=3#Style" />
+    <ui:VisualElement name="VisualElement" style="flex-direction: row; align-items: center; height: 24px;">
+        <ui:Label text="Client 1" name="label-client" style="-unity-text-align: middle-left;" />
+        <ui:ProgressBar value="0" title="Connecting ..." name="progress-bar" high-value="1" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

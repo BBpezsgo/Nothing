@@ -5331,7 +5331,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &262163408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6264,7 +6264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &799445615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11385,7 +11385,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &924264485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16778,10 +16778,10 @@ Terrain:
   m_SplatMapDistance: 250
   m_HeightmapMinimumLODSimplification: 0
   m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 1
+  m_ShadowCastingMode: 0
   m_DrawHeightmap: 1
   m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
+  m_DrawTreesAndFoliage: 0
   m_StaticShadowCaster: 0
   m_IgnoreQualitySettings: 0
   m_ReflectionProbeUsage: 0
@@ -16839,7 +16839,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1235052310
 Transform:
   m_ObjectHideFlags: 0
@@ -16966,7 +16966,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1261579860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23736,6 +23736,14 @@ PrefabInstance:
       propertyPath: Team
       value: a
       objectReference: {fileID: 0}
+    - target: {fileID: 3888618676222013691, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
+      propertyPath: SyncRotAngleX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3888618676222013691, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
+      propertyPath: SyncRotAngleZ
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7066328581009008152, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
       propertyPath: m_Mass
       value: 5
@@ -23790,15 +23798,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7066328581009008159, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7066328581009008159, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7066328581009008159, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7066328581009008159, guid: 9dd87a3c49dc9d348b6d611d70d5c236, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

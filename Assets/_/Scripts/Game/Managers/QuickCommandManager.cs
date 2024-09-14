@@ -14,8 +14,10 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
     Texture2D SphereFilled;
     Texture2D Sphere;
+    Texture2D Cross;
     [SerializeField] int Size = 120;
     [SerializeField] float CircleThicknessValue = .25f;
+    [SerializeField] float CrossThicknessValue = .25f;
     [SerializeField, Min(.0000001f)] float ActionScale = 1f;
     [SerializeField] float ShowSpeed = 10f;
 
@@ -51,6 +53,10 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
         if (Sphere != null)
         { Texture2D.Destroy(Sphere); }
         Sphere = GUIUtils.GenerateCircle(Vector2Int.one * 128, CircleThicknessValue);
+
+        if (Cross != null)
+        { Texture2D.Destroy(Cross); }
+        Cross = GUIUtils.GenerateCross(Vector2Int.one * 128, CrossThicknessValue);
     }
 
     void Update()
@@ -237,7 +243,20 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
                 if (GLUtils.SolidMaterial.SetPass(0))
                 {
-                    GLUtils.DrawLine(projectedWorldPosition, startP, 2f, new Color(0f, 0f, 0f, .5f));
+                    GLUtils.DrawLine(projectedWorldPosition, startP, 2f, CircleBackground);
+                }
+
+                GL.PopMatrix();
+            }
+            else if (diffD < MathF.Pow(InnerRadius, 2))
+            {
+                Vector2 startP = center + (diff.normalized * InnerRadius);
+
+                GL.PushMatrix();
+
+                if (GLUtils.SolidMaterial.SetPass(0))
+                {
+                    GLUtils.DrawLine(projectedWorldPosition, startP, 2f, CircleBackground);
                 }
 
                 GL.PopMatrix();
@@ -245,7 +264,7 @@ public class QuickCommandManager : SingleInstance<QuickCommandManager>
 
             if (outOfScreen)
             {
-                GUI.DrawTexture(RectUtils.FromCenter(projectedWorldPosition, Vector2.one * 32), SphereFilled, ScaleMode.StretchToFill, true, 0f, Color.red, 0f, 0f);
+                GUI.DrawTexture(RectUtils.FromCenter(projectedWorldPosition, Vector2.one * 16), Cross, ScaleMode.StretchToFill, true, 0f, Color.red, 0f, 0f);
             }
         }
     }

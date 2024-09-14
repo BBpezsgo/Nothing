@@ -462,7 +462,7 @@ namespace Game.Components
                         force += availableTorque * TorqueInput * _forward;
                     }
 
-                    if (wheel.Particles != null)
+                    if (wheel.Particles != null && QualityHandler.EnableParticles)
                     {
                         wheel.Particles.transform.rotation = Quaternion.LookRotation(force.normalized);
 
