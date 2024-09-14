@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+
+    <style>
+        body a,
+        .fakelink {
+            color: #005ae2;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        body a:hover,
+        body a:active,
+        body a:focus,
+        .fakelink:hover,
+        .fakelink:active,
+        .fakelink:focus {
+            text-decoration: underline;
+        }
+
+        body {
+            color: #e8eaed;
+            background: #222;
+        }
+
+        body a,
+        .fakelink {
+            color: #8ab4f8;
+        }
+
+        .btn {
+            border-radius: 3px;
+            border: none;
+            background-color: #585858;
+            color: #dadada;
+            cursor: default;
+            padding: 2px 4px;
+            border: 1px solid #303030;
+            border-bottom-color: #242424;
+            text-decoration: none !important;
+            font-size: 12px;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background-color: #676767;
+            color: #dadada;
+        }
+
+        .btn:active {
+            background-color: #46607c;
+            color: #dadada;
+            border-color: #242424;
+            border-top-color: #0d0d0d;
+        }
+
+        .panel {
+            background-color: #383838;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 3px;
+            width: fit-content;
+            border: 1px solid #292929;
+            border-top-color: #3f3f3f;
+            border-bottom-color: #161616;
+            box-shadow: #0003 0px 0px 5px;
+            display: inline-block;
+        }
+
+        ul.no-list,
+        ol.no-list {
+            list-style: none;
+            padding-inline-start: 0px;
+        }
+
+        hr {
+            display: block;
+            unicode-bidi: isolate;
+            margin-block-start: 0.5em;
+            margin-block-end: 0.5em;
+            margin-inline-start: auto;
+            margin-inline-end: auto;
+            overflow: hidden;
+            border: none;
+            border-top: solid 1px #494949;
+        }
+
+        .panel>.panel-title {
+            display: block;
+            width: calc(100% + 40px);
+            position: relative;
+            top: -20px;
+            left: -20px;
+            border-top: 2px solid transparent;
+            background-color: #2d2d2d;
+        }
+
+        .panel>.panel-title>span {
+            background-color: #383838;
+            border-top: 2px solid #2c5d87;
+            border-radius: 3px 3px 0px 0px;
+            padding: 1px 6px;
+            user-select: none;
+        }
+
+        a:not(.btn):hover img {
+            border-bottom-color: unset !important;
+        }
+
+        img {
+            position: relative;
+            top: 2px;
+            left: 2px;
+        }
+
+        h1 {
+            border: #000;
+            background-color: #444;
+            margin: 64px 64px 32px 64px;
+            padding: 16px;
+        }
+
+        ul {
+            margin: 0px 64px;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        <img src="/d_console.erroricon.png">
+        <span style="color:#bbb; padding-right: 16px; margin-right: 16px; border-right: 2px solid #fff4">HTTP {{code}}</span>{{message}}
+    </h1>
+    {{#if details}}
+    <ul class="no-list">
+        {{#each details}}
+        <li><b>{{key}}:</b> {{value}}</li>
+        {{/each}}
+    </ul>
+    {{/if}}
+</body>
+</html>

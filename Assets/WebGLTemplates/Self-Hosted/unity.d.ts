@@ -116,10 +116,10 @@ export function UnityPreprocessorVariables(): PreprocessorVariables
 declare global {
     /**
      * @param canvas Unity runtime uses the `canvas` object to render the game.
-    * @param config The config object contains the build configuration, such as the code and data URLs, product and company name, and version.
-    * @param onProgress The WebGL loader calls the onProgress callback object every time the download progress updates.The progress argument that comes with the onProgress callback determines the loading progress as a value between 0.0 and 1.0.
+     * @param config The config object contains the build configuration, such as the code and data URLs, product and company name, and version.
+     * @param onProgress The WebGL loader calls the onProgress callback object every time the download progress updates.The progress argument that comes with the onProgress callback determines the loading progress as a value between 0.0 and 1.0.
      */
-    function createUnityInstance(canvas: HTMLCanvasElement, config: any, onProgress: (progress: number) => void): Promise<UnityInstance>
+    function createUnityInstance(canvas: HTMLCanvasElement, config: UnityBuildConfig, onProgress: (progress: number) => void): Promise<UnityInstance>
 }
 
 export type UnityBuildConfig = {
@@ -138,13 +138,12 @@ export type UnityBuildConfig = {
 export interface UnityInstance {
     SetFullscreen(enabled: 1 | 0): void
     Quit(): Promise<any>
-    SendMessage(...args: any[]): undefined
-    Module: UnityModule
+    SendMessage(...args: Array<any>): undefined
+    readonly Module: UnityModule
 }
 
 export interface UnityModule {
     // #region Internal
-    /*
     
     AL(): unknown
     AsciiToString(): unknown
@@ -304,11 +303,11 @@ export interface UnityModule {
     currentFullscreenStrategy(): unknown
     cwrap(ident, returnType, argTypes, opts): unknown
     dataUrl: string
-    deinitializers: ((() => void) | unknown)[]
+    deinitializers: Array<((() => void) | unknown)>
     demangle(): unknown
     demangleAll(): unknown
     disableAccessToMediaDevices(): unknown
-    disabledCanvasEvents: string[]
+    disabledCanvasEvents: Array<string>
     doRequestFullscreen(): unknown
     downloadProgress: {} | { dataUrl: object }
     emscriptenWebGLGet(): unknown
@@ -404,8 +403,8 @@ export interface UnityModule {
     mmapAlloc(): unknown
     pauseMainLoop(): unknown
     polyfillSetImmediate(): unknown
-    postRun: unknown[]
-    preRun: unknown[]
+    postRun: Array<unknown>
+    preRun: Array<unknown>
     preloadedAudios: object
     preloadedImages: object
     preprocess_c_code(): unknown
@@ -555,7 +554,6 @@ export interface UnityModule {
 
     readonly shouldQuit: boolean
 
-    */
     // #endregion
 
     // #region User
@@ -624,7 +622,7 @@ declare class UnityCache {
      * @param parameters Parameters for the operation
      * @returns A promise to the cache entry
      */
-    execute(store: string, operation: string, parameters: any[]): Promise<any>
+    execute(store: string, operation: string, parameters: Array<any>): Promise<any>
 
     /**
      * Load a request from the cache.
@@ -646,4 +644,4 @@ declare class UnityCache {
     close(): Promise<any>
 }
 
-declare function unityFramework(module: UnityModule, ...args: any[]): void
+declare function unityFramework(module: UnityModule, ...args: Array<any>): void

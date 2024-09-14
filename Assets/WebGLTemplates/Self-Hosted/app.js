@@ -1,18 +1,18 @@
-const elements = Elements()
-const Preferences = UnityPreprocessorVariables()
+const elements = getElements()
+const Preferences = unityPreprocessorVariables()
 
 const buildUrl = "Build"
 const loaderUrl = buildUrl + "/" + Preferences.LOADER_FILENAME
 
 /** @type {import('./unity').UnityBuildConfig} */
-let config = {
+const config = {
     dataUrl: buildUrl + "/" + Preferences.DATA_FILENAME,
     frameworkUrl: buildUrl + "/" + Preferences.FRAMEWORK_FILENAME,
     streamingAssetsUrl: "StreamingAssets",
     companyName: Preferences.COMPANY_NAME,
     productName: Preferences.PRODUCT_NAME,
     productVersion: Preferences.PRODUCT_VERSION,
-    showBanner: ShowPopup,
+    showBanner: showPopup,
 }
 
 if (Preferences.USE_WASM) {
@@ -46,7 +46,7 @@ if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     // performance, uncomment the following line:
     // config.devicePixelRatio = 1;
 
-    ShowPopup('WebGL builds are not supported on mobile devices.', 'error')
+    showPopup('WebGL builds are not supported on mobile devices.', 'error')
 } else {
     // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
@@ -59,27 +59,27 @@ if (Preferences.BACKGROUND_FILENAME) {
 }
 elements.loadingBar.style.display = "block"
 
-function OnQuit() {
-    ShowPopup('The game has quitted!', 'info')
+function onQuit() {
+    showPopup('The game has quitted!', 'info')
 }
 
-function OnScriptLoaded() {
+function onScriptLoaded() {
     createUnityInstance(
         elements.canvas,
         config,
         progress => { elements.progressBarFull.style.width = 100 * progress + "%" }
-        )
-    .then(unityInstance => {
-        elements.loadingBar.style.display = 'none'
-        elements.fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1)
-        }
-        unityInstance.Module.onQuit = OnQuit
-    })
-    .catch(alert)
+    )
+        .then(unityInstance => {
+            elements.loadingBar.style.display = 'none'
+            elements.fullscreenButton.onclick = () => {
+                unityInstance.SetFullscreen(1)
+            }
+            unityInstance.Module.onQuit = onQuit
+        })
+        .catch(alert)
 }
 
 const script = document.createElement("script")
 script.src = loaderUrl
-script.onload = OnScriptLoaded
+script.onload = onScriptLoaded
 document.body.appendChild(script)

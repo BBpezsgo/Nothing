@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "handlebars": "^4.7.7",
+        "mime": "^3.0.0"
+    }
+}

@@ -85,3 +85,7 @@ crashlytics-build.properties
 /Assets/DinoFracture
 /Assets/_/Scripts/Utils/UnityEditor/GitHubCredentials.cs
 /.vscode
+node_modules
+package-lock.json
+/Build Tools/Game Hosting Server/config.json
+/Build Tools/Game Hosting Server/storage
